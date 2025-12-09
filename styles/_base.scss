@@ -1,0 +1,59 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#__next,
+#safeHydrate {
+  height: 100%;
+}
+
+/* prevent scrolling when there is an open dialog */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
+html,
+body {
+  color: var(--gcds-text-primary);
+}
+
+footer,
+header {
+  background-color: #fff;
+}
+
+#page-container {
+  @apply grow shrink-0 basis-auto px-6 laptop:px-0;
+  max-width: 71.25rem;
+  margin: 0 auto;
+}
+
+.gc-richText {
+  @apply w-auto tablet:w-9/12;
+}
+
+/* Adjustments for tailwind defaults that conflict with the node-starter-app defaults */
+
+ol {
+  @apply list-decimal pl-10;
+}
+
+ul {
+  @apply list-disc pl-10;
+}
+
+li ul {
+  @apply list-circle;
+}
+
+a {
+  @apply underline text-blue-dark hover:text-blue-hover;
+}
+
+@import "../node_modules/@cdssnc/gcds-tokens/build/web/css/global.css";
+
+.container-xl {
+  max-width: var(--gcds-container-xl);
+  width: 100%;
+}

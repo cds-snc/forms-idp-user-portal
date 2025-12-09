@@ -1,0 +1,65 @@
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getActiveIdentityProviders, getDefaultOrg, getLoginSettings } from "@lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { Metadata } from "next";
+import { I18n } from "@i18n";
+import { serverTranslation } from "@i18n/server";
+import { headers } from "next/headers";
+import { UserNameForm } from "./components/UserNameForm";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await serverTranslation("start");
+  return { title: t("title") };
+}
+
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+}) {
+  const searchParams = await props.searchParams;
+
+  const loginName = searchParams?.loginName;
+  const requestId = searchParams?.requestId;
+  const organization = searchParams?.organization;
+  const suffix = searchParams?.suffix;
+  const submit: boolean = searchParams?.submit === "true";
+
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+    });
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: organization ?? defaultOrganization,
+  });
+
+  const identityProviders = await getActiveIdentityProviders({
+    serviceUrl,
+    orgId: organization ?? defaultOrganization,
+  }).then((resp) => {
+    return resp.identityProviders;
+  });
+
+  return (
+    <div className="items-center flex flex-col">
+      <div className="mb-6">
+        <I18n i18nKey="welcome" namespace="start" />
+      </div>
+      <UserNameForm
+        loginName={loginName}
+        requestId={requestId}
+        organization={organization}
+        suffix={suffix}
+        submit={submit}
+        allowRegister={!!loginSettings?.allowRegister}
+      />
+    </div>
+  );
+}

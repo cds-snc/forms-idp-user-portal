@@ -1,0 +1,136 @@
+{
+  "common": {
+    "button": {
+      "back": "Back",
+      "continue": "Continue",
+      "submit": "Submit"
+    },
+    "title": "GCForms Awesome SSO"
+  },
+  "header": {
+    "lang-toggle": "Language selection"
+  },
+  "fip": {
+    "link": "http://canada.ca/en.html",
+    "text": "Symbol of the Government of Canada",
+    "label": "Government of Canada homepage"
+  },
+  "layout": {
+    "skip-link": "Skip to main content"
+  },
+  "footer": {
+    "about": {
+      "link": "https://articles.alpha.canada.ca/forms-formulaires/?utm_source=EN_FormsFooter&utm_medium=Product&utm_campaign=forms_product",
+      "desc": "About GC Forms"
+    },
+    "terms-and-conditions": {
+      "link": "/en/terms-and-conditions",
+      "desc": "Terms and conditions"
+    },
+    "terms-of-use": {
+      "link": "/en/terms-of-use",
+      "desc": "Terms of use"
+    },
+    "sla": {
+      "link": "/en/sla",
+      "desc": "Service-level agreement"
+    },
+    "support": {
+      "link": "/en/support",
+      "desc": "Support"
+    },
+    "ariaLabel": "Footer"
+  },
+  "home": {
+    "description": "Welcome to GCForms super duper one stop shop for login",
+    "next": "Let's get started"
+  },
+  "start": {
+    "title": "Start Login",
+    "welcome": "Welcome to GCForm's amazing new login solution",
+    "userName": "User Name",
+    "register": "Register now",
+    "form": {
+      "label": "User Name",
+      "description": "Must be a federal government email address."
+    }
+  },
+  "password": {
+    "title": "Password",
+    "description": "Please enter your password or select a different account below",
+    "form": {
+      "resetPassword": "Reset Password",
+      "label": "Password"
+    }
+  },
+  "otp": {
+    "title": "One Time Code",
+    "otpDescription": "Please enter the code from your authenticator device",
+    "smsDescription": "Please enter the code received by text message",
+    "emailDescription": "Please enter the code received by email",
+    "form": {
+      "label": "Code"
+    }
+  },
+  "signedin": {
+    "title": "Welcome {{user}}!",
+    "description": "You are signed in.",
+    "continue": "Continue",
+    "error": {
+      "title": "Error",
+      "description": "An error occurred while trying to sign in."
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    },
+    "title": "Register",
+    "description": "Create your GCForms account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
+    "selectMethod": "Select the method you would like to authenticate",
+    "agreeTo": "To register you must agree to the terms and conditions",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "submit": "Continue",
+    "password": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "submit": "Continue",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "password": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      }
+    },
+    "labels": {
+      "firstname": "First name",
+      "lastname": "Last name",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "This field is required",
+      "lastname": "This field is required",
+      "email": "This field is required"
+    },
+    "errors": {
+      "couldNotCreateUser": "Could not create user",
+      "couldNotCreateSession": "Could not create session",
+      "userNotFound": "User not found in the system",
+      "couldNotLinkIDP": "Could not link IDP to user",
+      "couldNotRegisterUser": "Could not register user"
+    }
+  }
+}
