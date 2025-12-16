@@ -1,18 +1,18 @@
-import { DynamicTheme } from "@/components/dynamic-theme";
-import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
-import { Translated } from "@/components/translated";
-import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { SetRegisterPasswordForm } from "./components/set-register-password-form";
+import { I18n } from "@i18n";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 import {
-  getBrandingSettings,
   getDefaultOrg,
   getLegalAndSupportSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
-} from "@/lib/zitadel";
+} from "@lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+}) {
   const searchParams = await props.searchParams;
 
   let { firstname, lastname, email, organization, requestId } = searchParams;
@@ -40,36 +40,31 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization,
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
-
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization,
   });
 
   return missingData ? (
-    <DynamicTheme branding={branding}>
+    <>
       <div className="flex flex-col items-center space-y-4">
         <h1>
-          <Translated i18nKey="missingdata.title" namespace="register" />
+          <I18n i18nKey="missingdata.title" namespace="register" />
         </h1>
         <p className="ztdl-p">
-          <Translated i18nKey="missingdata.description" namespace="register" />
+          <I18n i18nKey="missingdata.description" namespace="register" />
         </p>
       </div>
       <div className="w-full"></div>
-    </DynamicTheme>
+    </>
   ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
-    <DynamicTheme branding={branding}>
+    <>
       <div className="flex flex-col space-y-4">
         <h1>
-          <Translated i18nKey="password.title" namespace="register" />
+          <I18n i18nKey="password.title" namespace="register" />
         </h1>
         <p className="ztdl-p">
-          <Translated i18nKey="description" namespace="register" />
+          <I18n i18nKey="description" namespace="register" />
         </p>
       </div>
 
@@ -85,18 +80,18 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           ></SetRegisterPasswordForm>
         )}
       </div>
-    </DynamicTheme>
+    </>
   ) : (
-    <DynamicTheme branding={branding}>
+    <>
       <div className="flex flex-col space-y-4">
         <h1>
-          <Translated i18nKey="disabled.title" namespace="register" />
+          <I18n i18nKey="disabled.title" namespace="register" />
         </h1>
         <p className="ztdl-p">
-          <Translated i18nKey="disabled.description" namespace="register" />
+          <I18n i18nKey="disabled.description" namespace="register" />
         </p>
       </div>
       <div className="w-full"></div>
-    </DynamicTheme>
+    </>
   );
 }

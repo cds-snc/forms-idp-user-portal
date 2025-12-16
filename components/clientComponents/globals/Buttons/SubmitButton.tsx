@@ -41,6 +41,7 @@ interface ButtonProps {
   dataTestId?: string;
   describeLoading?: string;
   type?: "submit" | "button";
+  disabled?: boolean;
 }
 
 interface SubmitButtonProps extends ButtonProps {
@@ -58,6 +59,7 @@ export const SubmitButton = ({
   loading,
   describeLoading,
   type = "submit",
+  disabled = false,
   ...rest
 }: SubmitButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const { t } = useTranslation("common");
@@ -82,7 +84,7 @@ export const SubmitButton = ({
         }
       }}
       className={
-        loading
+        loading || disabled
           ? cn(themes["base"], themes.disabled, disabledClass, className)
           : cn(themes["base"], themes[theme], className)
       }
