@@ -1,7 +1,7 @@
 import { dir } from "i18next";
 import "@root/styles/app.scss";
 import { Viewport } from "next";
-
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { Noto_Sans, Lato } from "next/font/google";
 import { Footer } from "@serverComponents/globals/Footer";
 import Link from "next/link";
@@ -72,7 +72,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
                       <I18n i18nKey="title" namespace="common" />
                     </span>
                   </Link>
-                  {children}
+                  <Tooltip.Provider>{children}</Tooltip.Provider>
                   <ToastContainer autoClose={false} containerId="default" />
                 </main>
               </div>

@@ -45,6 +45,14 @@
     "description": "Welcome to GCForms super duper one stop shop for login",
     "next": "Let's get started"
   },
+  "accounts": {
+    "title": "Accounts",
+    "description": "Select the account you want to use.",
+    "addAnother": "Add another account",
+    "noResults": "No accounts found",
+    "verified": "verified",
+    "expired": "expired"
+  },
   "start": {
     "title": "Start Login",
     "welcome": "Welcome to GCForm's amazing new login solution",
@@ -73,6 +81,13 @@
       "doesNotMatch": "Doesn't match"
     }
   },
+  "mfa": {
+    "verify": {
+      "title": "Verify your identity",
+      "description": "Choose one of the following factors.",
+      "noResults": "No second factors available to setup."
+    }
+  },
   "otp": {
     "title": "One Time Code",
     "otpDescription": "Please enter the code from your authenticator device",
@@ -89,6 +104,17 @@
     "error": {
       "title": "Error",
       "description": "An error occurred while trying to sign in."
+    }
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
     }
   },
   "register": {
