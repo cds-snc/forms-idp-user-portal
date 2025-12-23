@@ -40,13 +40,6 @@ export default async function Page(props: {
     organization: organization ?? defaultOrganization,
   });
 
-  const identityProviders = await getActiveIdentityProviders({
-    serviceUrl,
-    orgId: organization ?? defaultOrganization,
-  }).then((resp) => {
-    return resp.identityProviders;
-  });
-
   return (
     <div className="items-center flex flex-col">
       <div className="mb-6">
