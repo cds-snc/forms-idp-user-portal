@@ -9,7 +9,7 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 
 import { serverTranslation } from "@i18n/server";
-// import { getLocale } from "next-intl/server";
+
 import { headers } from "next/headers";
 import Link from "next/link";
 

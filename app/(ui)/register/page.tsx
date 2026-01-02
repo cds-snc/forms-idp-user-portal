@@ -5,7 +5,6 @@ import { I18n } from "@i18n";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import {
   getActiveIdentityProviders,
-  getBrandingSettings,
   getDefaultOrg,
   getLegalAndSupportSettings,
   getLoginSettings,
@@ -17,6 +16,7 @@ import { Metadata } from "next";
 
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("register");
@@ -54,7 +54,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,

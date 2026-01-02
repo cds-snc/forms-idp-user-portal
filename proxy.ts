@@ -15,6 +15,10 @@ export const config = {
   ],
 };
 
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 async function loadSecuritySettings(request: NextRequest): Promise<SecuritySettings | null> {
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 

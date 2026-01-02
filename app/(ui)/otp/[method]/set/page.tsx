@@ -11,6 +11,7 @@ import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_servic
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getSerializableObject } from "@lib/utils";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -28,7 +29,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   const session = await loadMostRecentSession({
     serviceUrl,

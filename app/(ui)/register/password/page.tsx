@@ -1,6 +1,7 @@
 import { SetRegisterPasswordForm } from "./components/set-register-password-form";
 import { I18n } from "@i18n";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getSerializableObject } from "@lib/utils";
 import {
   getDefaultOrg,
   getLegalAndSupportSettings,
@@ -43,7 +44,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   return missingData ? (
     <>

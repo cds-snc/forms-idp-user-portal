@@ -16,6 +16,7 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
@@ -57,7 +58,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   let user: User | undefined;
   let displayName: string | undefined;

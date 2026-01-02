@@ -10,6 +10,7 @@ import { getBrandingSettings, getLoginSettings, getSession } from "@lib/zitadel"
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
+import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -66,7 +67,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   return (
     <div className="flex flex-col items-center">

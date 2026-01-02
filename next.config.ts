@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
 const securityHeaders = [
   {
     key: "Strict-Transport-Security",
@@ -20,6 +26,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   poweredByHeader: false,
   sassOptions: {
     includePaths: ["styles"],

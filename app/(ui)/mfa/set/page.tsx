@@ -19,6 +19,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -112,7 +113,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: sessionWithData.factors?.user?.organizationId,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   const { valid } = isSessionValid(sessionWithData);
 

@@ -10,6 +10,7 @@ import { SkipLink } from "@serverComponents/globals/SkipLink";
 import { SiteLogo } from "@serverComponents/icons";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
+import { Logout } from "@serverComponents/globals/Logout";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
             <div className="flex justify-between">
               <Fip />
               <div className="inline-flex gap-4">
+                <Logout />
                 <LanguageToggle />
               </div>
             </div>

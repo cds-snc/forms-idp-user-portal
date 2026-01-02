@@ -41,3 +41,28 @@ export function safeJSONParse<T>(...args: Parameters<typeof JSON.parse>): T | un
     return undefined;
   }
 }
+
+/**
+ * Recursively filters out non-serializable properties and returns a new, clean object.
+ * @param {object} obj - The original object.
+ * @returns {object} A new serializable object.
+ */
+export function getSerializableObject<T>(obj: T): T {
+  // Use JSON.stringify with a replacer function to filter properties
+  const jsonString = JSON.stringify(obj, (_, value) => {
+    // Exclude functions and symbols by returning undefined
+
+    if (typeof value === "function" || typeof value === "symbol") {
+      return undefined;
+    }
+    // Handle other specific non-serializable types if necessary (e.g., DOM nodes)
+    // if (value instanceof jQuery) { return undefined; }
+
+    // For all other serializable values, return them as is
+    return value;
+  });
+
+  // Parse the resulting JSON string back into a new JavaScript object
+  // This new object is guaranteed to be serializable
+  return JSON.parse(jsonString);
+}

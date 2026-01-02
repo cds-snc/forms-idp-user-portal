@@ -2,7 +2,7 @@ import { SessionsClearList } from "./components/sessions-clear-list";
 import { I18n } from "@i18n";
 import { getAllSessionCookieIds } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions } from "@lib/zitadel";
+import { getDefaultOrg, listSessions } from "@lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
@@ -54,11 +54,6 @@ export default async function Page(props: {
   }
 
   let sessions = await loadSessions({ serviceUrl });
-
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
-  });
 
   const params = new URLSearchParams();
 

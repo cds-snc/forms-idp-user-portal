@@ -1,5 +1,5 @@
 import { Alert, ErrorStatus } from "@clientComponents/forms/Alert";
-
+import { getSerializableObject } from "@lib/utils";
 import { PasswordForm } from "./components/PasswordForm";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
@@ -54,7 +54,7 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: organization ?? defaultOrganization,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   return (
     <>

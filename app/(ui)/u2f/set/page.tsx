@@ -5,7 +5,8 @@ import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-
+import { getLoginSettings } from "@lib/zitadel";
+import { getSerializableObject } from "@lib/utils";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
@@ -24,6 +25,11 @@ export default async function Page(props: {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization,
+  }).then((obj) => getSerializableObject(obj));
 
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,
@@ -70,6 +76,7 @@ export default async function Page(props: {
             organization={organization}
             requestId={requestId}
             checkAfter={checkAfter === "true"}
+            loginSettings={loginSettings}
           />
         )}
       </div>

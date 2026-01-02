@@ -10,7 +10,6 @@ import { loadMostRecentSession } from "@lib/session";
 import { checkUserVerification } from "@lib/verify-helper";
 import {
   getActiveIdentityProviders,
-  getBrandingSettings,
   getLoginSettings,
   getSession,
   getUserByID,
@@ -23,6 +22,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("authenticator");
@@ -103,15 +103,10 @@ export default async function Page(props: {
     );
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: sessionWithData.factors.user?.organizationId,
-  });
-
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: sessionWithData.factors.user?.organizationId,
-  });
+  }).then((obj) => getSerializableObject(obj));
 
   // check if user was verified recently
   const isUserVerified = await checkUserVerification(sessionWithData.factors.user?.id);
