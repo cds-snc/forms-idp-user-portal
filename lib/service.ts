@@ -6,7 +6,6 @@ import { SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { systemAPIToken } from "./api";
 import { createServerTransport } from "../lib/zitadel";
 
 type ServiceClass =
@@ -22,11 +21,8 @@ export async function createServiceForHost<T extends ServiceClass>(service: T, s
   let token;
 
   // if we are running in a multitenancy context, use the system user token
-  if (process.env.AUDIENCE && process.env.SYSTEM_USER_ID && process.env.SYSTEM_USER_PRIVATE_KEY) {
-    token = await systemAPIToken();
-  } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
-    token = process.env.ZITADEL_SERVICE_USER_TOKEN;
-  }
+
+  token = process.env.ZITADEL_SERVICE_USER_TOKEN;
 
   if (!serviceUrl) {
     throw new Error("No instance url found");
