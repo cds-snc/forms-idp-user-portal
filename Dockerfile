@@ -2,7 +2,7 @@ FROM node:22-alpine AS base
 
 ENV NODE_ENV=production
 ENV NEXT_OUTPUT_STANDALONE=true
-
+ENV NEXT_PUBLIC_BASE_PATH=/ui/v2
 COPY . /src
 WORKDIR /src
 
