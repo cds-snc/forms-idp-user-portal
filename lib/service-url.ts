@@ -15,6 +15,10 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 } {
   let instanceUrl;
 
+  headers.forEach((val, key) => {
+    console.info(`Header: ${key}, Value: ${val} `);
+  });
+
   const forwardedHost = headers.get("x-zitadel-forward-host");
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   // if (forwardedHost) {
@@ -23,17 +27,17 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   //     ? instanceUrl
   //     : `https://${instanceUrl}`;
   // } else
-  if (process.env.ZITADEL_API_URL) {
-    instanceUrl = process.env.ZITADEL_API_URL;
-  } else {
-    const host = headers.get("host");
+  // if (process.env.ZITADEL_API_URL) {
+  //   instanceUrl = process.env.ZITADEL_API_URL;
+  // } else {
+  const host = headers.get("host");
 
-    if (host) {
-      const [hostname] = host.split(":");
-      if (hostname !== "localhost") {
-        instanceUrl = host.startsWith("http") ? host : `https://${host}`;
-      }
+  if (host) {
+    const [hostname] = host.split(":");
+    if (hostname !== "localhost") {
+      instanceUrl = host.startsWith("http") ? host : `https://${host}`;
     }
+    // }
   }
 
   if (!instanceUrl) {
