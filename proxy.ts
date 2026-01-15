@@ -68,7 +68,7 @@ export async function proxy(request: NextRequest) {
   // Add additional headers as before
   requestHeaders.set("x-zitadel-public-host", `https://${_headers.get("host")}`);
   requestHeaders.set("x-zitadel-instance-host", instanceHost);
-  requestHeaders.set("x-zitadel-forward-host", `${_headers.get("x-forwarded-host")}`);
+  requestHeaders.set("x-zitadel-forward-host", `https://${_headers.get("host")}`);
 
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
