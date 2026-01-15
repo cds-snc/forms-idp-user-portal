@@ -56,7 +56,11 @@ export const Footer = async ({ displayFormBuilderFooter = false, className = "" 
         </div>
 
         <div className="min-w-[168px]">
-          <Image className="h-10 lg:h-8" alt="" src="/img/wmms-blk.svg" />
+          <Image
+            className="h-10 lg:h-8"
+            alt=""
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/wmms-blk.svg`}
+          />
         </div>
       </div>
     </footer>

@@ -44,7 +44,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <meta charSet="utf-8" />
         <link
           rel="shortcut icon"
-          href="${process.env.NEXT_PUBLIC_BASE_PATH}/favicon.ico"
+          href={`${process.env.NEXT_PUBLIC_BASE_PATH}/favicon.ico`}
           type="image/x-icon"
           sizes="32x32"
         />

@@ -11,7 +11,11 @@ export const Fip = () => {
   return (
     <div className="canada-flag">
       <Link href={t("link")} aria-label={t("text")}>
-        <Image src={`/img/sig-blk-${language}.svg`} alt={t("text")} className={"max-h-[40px]"} />
+        <Image
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/sig-blk-${language}.svg`}
+          alt={t("text")}
+          className={"max-h-[40px]"}
+        />
       </Link>
     </div>
   );
