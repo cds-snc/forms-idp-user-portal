@@ -1,6 +1,6 @@
 import { I18n } from "@i18n";
 import { cn } from "@lib/utils";
-
+import Image from "next/image";
 import { Version } from "@serverComponents/globals/Version";
 
 interface FooterProps {
@@ -56,9 +56,7 @@ export const Footer = async ({ displayFormBuilderFooter = false, className = "" 
         </div>
 
         <div className="min-w-[168px]">
-          <picture>
-            <img className="h-10 lg:h-8" src="/img/wmms-blk.svg" />
-          </picture>
+          <Image className="h-10 lg:h-8" alt="" src="/img/wmms-blk.svg" />
         </div>
       </div>
     </footer>

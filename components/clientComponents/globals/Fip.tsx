@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useTranslation } from "@i18n";
+import Image from "next/image";
 
 export const Fip = () => {
   const {
@@ -10,9 +11,7 @@ export const Fip = () => {
   return (
     <div className="canada-flag">
       <Link href={t("link")} aria-label={t("text")}>
-        <picture>
-          <img src={`/img/sig-blk-${language}.svg`} alt={t("text")} className={"max-h-[40px]"} />
-        </picture>
+        <Image src={`/img/sig-blk-${language}.svg`} alt={t("text")} className={"max-h-[40px]"} />
       </Link>
     </div>
   );

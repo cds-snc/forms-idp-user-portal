@@ -42,7 +42,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta charSet="utf-8" />
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" sizes="32x32" />
+        <link
+          rel="shortcut icon"
+          href="${process.env.NEXT_PUBLIC_BASE_PATH}/favicon.ico"
+          type="image/x-icon"
+          sizes="32x32"
+        />
       </head>
 
       <body>

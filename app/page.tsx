@@ -1,8 +1,6 @@
 import { Metadata } from "next";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
-import { Button } from "@clientComponents/globals";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 
 export async function generateMetadata(): Promise<Metadata> {
