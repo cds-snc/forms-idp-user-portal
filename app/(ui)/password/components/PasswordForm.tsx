@@ -62,8 +62,6 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
         setLoading(false);
       });
 
-    console.info(response);
-
     if (response && "error" in response && response.error) {
       return response;
     }

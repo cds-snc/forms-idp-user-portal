@@ -63,8 +63,6 @@ export const UserNameForm = ({
       })
       .finally(() => setLoading(false));
 
-    console.info(result);
-
     if (result?.error) {
       return {
         ...previousState,
