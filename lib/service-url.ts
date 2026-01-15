@@ -27,17 +27,17 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   //     ? instanceUrl
   //     : `https://${instanceUrl}`;
   // } else
-  // if (process.env.ZITADEL_API_URL) {
-  //   instanceUrl = process.env.ZITADEL_API_URL;
-  // } else {
-  const host = headers.get("host");
+  if (process.env.ZITADEL_API_URL) {
+    instanceUrl = process.env.ZITADEL_API_URL;
+  } else {
+    const host = headers.get("host");
 
-  if (host) {
-    const [hostname] = host.split(":");
-    if (hostname !== "localhost") {
-      instanceUrl = host.startsWith("http") ? host : `https://${host}`;
+    if (host) {
+      const [hostname] = host.split(":");
+      if (hostname !== "localhost") {
+        instanceUrl = host.startsWith("http") ? host : `https://${host}`;
+      }
     }
-    // }
   }
 
   if (!instanceUrl) {
