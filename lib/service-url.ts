@@ -17,12 +17,13 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 
   const forwardedHost = headers.get("x-zitadel-forward-host");
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
-  if (forwardedHost) {
-    instanceUrl = forwardedHost;
-    instanceUrl = instanceUrl.startsWith("http://")
-      ? instanceUrl
-      : `https://${instanceUrl}`;
-  } else if (process.env.ZITADEL_API_URL) {
+  // if (forwardedHost) {
+  //   instanceUrl = forwardedHost;
+  //   instanceUrl = instanceUrl.startsWith("http://")
+  //     ? instanceUrl
+  //     : `https://${instanceUrl}`;
+  // } else
+  if (process.env.ZITADEL_API_URL) {
     instanceUrl = process.env.ZITADEL_API_URL;
   } else {
     const host = headers.get("host");
