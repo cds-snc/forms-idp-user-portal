@@ -15,7 +15,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 } {
   let instanceUrl;
 
-  const forwardedHost = headers.get("x-forward-host");
+  const forwardedHost = headers.get("x-forwarded-host");
   //use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (forwardedHost) {
     instanceUrl = forwardedHost;
