@@ -66,7 +66,7 @@ export async function proxy(request: NextRequest) {
   const instanceHost = `${serviceUrl}`.replace("https://", "").replace("http://", "");
 
   // Add additional headers as before
-  requestHeaders.set("x-zitadel-public-host", `${request.nextUrl.host}`);
+  requestHeaders.set("x-zitadel-public-host", `https://${_headers.get("host")}`);
   requestHeaders.set("x-zitadel-instance-host", instanceHost);
 
   const responseHeaders = new Headers();
