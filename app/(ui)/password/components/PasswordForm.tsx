@@ -97,7 +97,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       return;
     }
 
-    setInfo(t("info.passwordResetSent"));
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
@@ -118,7 +118,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
     <form className="w-2/3 pt-2" action={formAction}>
       <div className={`${error && "transform-gpu animate-shake"} gc`}>
         <Label id={"label-password"} htmlFor={"password"} className="required" required>
-          {t("form.label")}
+          {t("verify.form.label")}
         </Label>
         <TextInput
           className="h-10 w-full min-w-full rounded-xl"
@@ -136,7 +136,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
             disabled={loading}
             data-testid="reset-button"
           >
-            {t("form.resetPassword")}
+            {t("verify.form.resetPassword")}
           </button>
         )}
 

@@ -19,8 +19,8 @@ import { headers } from "next/headers";
 import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await serverTranslation("password");
-  return { title: t("set.title") };
+  const { t } = await serverTranslation("password.set");
+  return { title: t("title") };
 }
 
 export default async function Page(props: {

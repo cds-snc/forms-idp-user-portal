@@ -65,12 +65,66 @@
       "description": "Must be a federal government email address."
     }
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
   "password": {
-    "title": "Password",
-    "description": "Please enter your password or select a different account below",
-    "form": {
-      "resetPassword": "Reset Password",
-      "label": "Password"
+    "verify": {
+      "title": "Password",
+      "description": "Please enter your password or select a different account below",
+      "form": {
+        "resetPassword": "Reset Password",
+        "label": "Password"
+      }
+    },
+    "set": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "codeSent": "A code has been sent to your email address.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resend": "Resend code",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "code": "This field is required",
+        "newPassword": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      },
+      "errors": {
+        "couldNotSetPassword": "Could not set password",
+        "couldNotResetPassword": "Could not reset password",
+        "couldNotVerifyPassword": "Could not verify password"
+      }
+    },
+    "change": {
+      "title": "Change Password",
+      "description": "Set the password for your account",
+      "submit": "Continue",
+      "labels": {
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "required": {
+        "newPassword": "You have to provide a new password!",
+        "confirmPassword": "This field is required"
+      },
+      "errors": {
+        "couldNotChangePassword": "Could not change password",
+        "couldNotVerifyPassword": "Could not verify password",
+        "unknownError": "Unknown error"
+      }
     },
     "complexity": {
       "length": "Must be at least {minLength} characters long.",
@@ -81,6 +135,24 @@
       "equals": "Password confirmation matched.",
       "matches": "Matches",
       "doesNotMatch": "Doesn't match"
+    },
+    "errors": {
+      "noHostFound": "No host found",
+      "couldNotSendResetLink": "Could not send Password Reset Link",
+      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotVerifyPassword": "Could not verify password",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Failed to authenticate.",
+      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "userNotFound": "User not found in the system",
+      "initialUserNotSupported": "Initial User not supported",
+      "userInitialStateNotSupported": "User Initial State is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+      "verificationRequired": "User Verification Check has to be done",
+      "couldNotLoadSession": "Could not load session",
+      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "failedPrecondition": "Failed precondition",
+      "sessionNotValid": "Session is not valid"
     }
   },
   "mfa": {
@@ -88,15 +160,38 @@
       "title": "Verify your identity",
       "description": "Choose one of the following factors.",
       "noResults": "No second factors available to setup."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Choose one of the following second factors.",
+      "skip": "Skip"
     }
   },
   "otp": {
-    "title": "One Time Code",
-    "otpDescription": "Please enter the code from your authenticator device",
-    "smsDescription": "Please enter the code received by text message",
-    "emailDescription": "Please enter the code received by email",
-    "form": {
-      "label": "Code"
+    "verify": {
+      "title": "One Time Code",
+      "otpDescription": "Please enter the code from your authenticator device",
+      "smsDescription": "Please enter the code received by text message",
+      "emailDescription": "Please enter the code received by email",
+      "form": {
+        "label": "Code",
+        "noCodeReceived": "Didn't receive a code?",
+        "resendCode": "Resend code"
+      }
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "totpDescription": "Scan the QR code with your authenticator app.",
+      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "emailDescription": "Enter your email address to receive a code via email.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
     }
   },
   "signedin": {
@@ -106,17 +201,6 @@
     "error": {
       "title": "Error",
       "description": "An error occurred while trying to sign in."
-    }
-  },
-  "logout": {
-    "title": "Logout",
-    "description": "Click an account to end the session",
-    "noResults": "No accounts found",
-    "clear": "End Session",
-    "verifiedAt": "Last active: {time}",
-    "success": {
-      "title": "Logout successful",
-      "description": "You have successfully logged out."
     }
   },
   "register": {

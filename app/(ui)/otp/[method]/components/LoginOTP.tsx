@@ -225,7 +225,7 @@ export function LoginOTP({
       {["email", "sms"].includes(method) && (
         <Alert type={ErrorStatus.INFO}>
           <div className="flex flex-row">
-            <span className="mr-auto flex-1 text-left">{t("form.noCodeReceived")}</span>
+            <span className="mr-auto flex-1 text-left">{t("verify.form.noCodeReceived")}</span>
             <button
               aria-label="Resend OTP Code"
               disabled={loading}
@@ -244,14 +244,14 @@ export function LoginOTP({
               }}
               data-testid="resend-button"
             >
-              {t("form.resendCode")}
+              {t("verify.form.resendCode")}
             </button>
           </div>
         </Alert>
       )}
       <div className="mt-4">
         <Label id={"label-otp"} htmlFor={"code"} className="required" required>
-          {t("form.label")}
+          {t("verify.form.label")}
         </Label>
         <TextInput
           className="h-10 w-full min-w-full rounded-xl"

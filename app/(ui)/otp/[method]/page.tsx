@@ -14,7 +14,7 @@ import { getSerializableObject } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
-  return { title: t("title") };
+  return { title: t("verify.title") };
 }
 
 export default async function Page(props: {
@@ -73,21 +73,21 @@ export default async function Page(props: {
     <div className="flex flex-col items-center">
       <div className="flex flex-col space-y-4">
         <h1>
-          <I18n i18nKey="title" namespace="otp" />
+          <I18n i18nKey="verify.title" namespace="otp" />
         </h1>
         {method === "time-based" && (
           <p className="ztdl-p">
-            <I18n i18nKey="otpDescription" namespace="otp" />
+            <I18n i18nKey="verify.otpDescription" namespace="otp" />
           </p>
         )}
         {method === "sms" && (
           <p className="ztdl-p">
-            <I18n i18nKey="smsDescription" namespace="otp" />
+            <I18n i18nKey="verify.smsDescription" namespace="otp" />
           </p>
         )}
         {method === "email" && (
           <p className="ztdl-p">
-            <I18n i18nKey="emailDescription" namespace="otp" />
+            <I18n i18nKey="verify.emailDescription" namespace="otp" />
           </p>
         )}
 

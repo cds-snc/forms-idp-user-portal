@@ -60,7 +60,7 @@ export default async function Page(props: {
     <>
       <div className="flex flex-col items-center space-y-4">
         <p>
-          <I18n i18nKey="description" namespace="password" />
+          <I18n i18nKey="verify.description" namespace="password" />
         </p>
 
         {sessionFactors && (
