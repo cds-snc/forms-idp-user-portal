@@ -8,7 +8,8 @@
     "title": "GCForms Awesome SSO"
   },
   "header": {
-    "lang-toggle": "Language selection"
+    "lang-toggle": "Language selection",
+    "logout": "Logout"
   },
   "fip": {
     "link": "http://canada.ca/en.html",
@@ -19,6 +20,7 @@
     "skip-link": "Skip to main content"
   },
   "footer": {
+    "version": "Version",
     "about": {
       "link": "https://articles.alpha.canada.ca/forms-formulaires/?utm_source=EN_FormsFooter&utm_medium=Product&utm_campaign=forms_product",
       "desc": "About GC Forms"

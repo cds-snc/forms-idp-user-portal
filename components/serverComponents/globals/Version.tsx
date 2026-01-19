@@ -1,15 +1,16 @@
+import { serverTranslation } from "@i18n/server";
 import packageJson from "../../../package.json";
-import { I18n } from "@i18n";
 
 const deploymentId = process.env.NEXT_DEPLOYMENT_ID || "local";
 
-export const Version = () => {
+export const Version = async () => {
   const { version } = packageJson;
+
+  const { t } = await serverTranslation(["footer"]);
 
   return (
     <div className="mt-2 text-sm text-slate-800">
-      <I18n i18nKey="version" namespace="layout />" />
-      {version} <span className="hidden"> - {deploymentId}</span>
+      {t("version")} {version} <span className="hidden"> - {deploymentId}</span>
     </div>
   );
 };

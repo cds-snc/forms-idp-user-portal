@@ -40,7 +40,6 @@ export const Footer = async () => {
               <DefaultLinks />
             </nav>
           </>
-
           <Version />
         </div>
 

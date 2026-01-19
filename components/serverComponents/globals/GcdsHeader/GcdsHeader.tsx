@@ -23,7 +23,7 @@ export const GcdsHeader = ({
         <BrandContainer>
           <Fip language={language} />
           {showLanguageToggle && <LanguageToggle pathname={pathname} language={language} />}
-          {children}
+          <div className="gc-logout">{children}</div>
         </BrandContainer>
       </header>
     </div>

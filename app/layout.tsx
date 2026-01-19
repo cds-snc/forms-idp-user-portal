@@ -33,7 +33,6 @@ export const viewport: Viewport = {
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const {
-    t,
     i18n: { language },
   } = await serverTranslation(["fip"]);
 
@@ -53,7 +52,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <body>
         <div className="flex min-h-full flex-col bg-gray-soft">
           <GcdsHeader pathname="" language={language}>
-            <Logout />
+            <div className="flex items-center justify-end">
+              <Logout />
+            </div>
           </GcdsHeader>
 
           <div id="page-container" className="gc-authpages">

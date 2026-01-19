@@ -1,6 +1,5 @@
 import { headers } from "next/headers";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
 import Link from "next/link";
 import { serverTranslation } from "@i18n/server";
 import { getAllSessionCookieIds } from "@lib/cookies";
@@ -16,7 +15,6 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
     });
     return response?.sessions ?? [];
   } else {
-    console.info("No session cookie found.");
     return [];
   }
 }
@@ -24,7 +22,7 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
 export const Logout = async () => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const { t } = await serverTranslation("common");
+  const { t } = await serverTranslation("header");
   const sessions = await loadSessions({ serviceUrl }).then((list) =>
     list.filter((session) => session?.factors?.user?.loginName)
   );
@@ -33,7 +31,7 @@ export const Logout = async () => {
   }
 
   return (
-    <Link href="/logout" className="text-right text-base" aria-label={t("logout")} prefetch={false}>
+    <Link href="/logout" aria-label={t("logout")} prefetch={false}>
       {t("logout")}
     </Link>
   );

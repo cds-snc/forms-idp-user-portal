@@ -1,12 +1,14 @@
 {
   "header": {
     "title": "CDS Awesome SSO - FR",
-    "lang-toggle": "Sélection de la langue"
+    "lang-toggle": "Sélection de la langue",
+    "logout": "Logout [FR]"
   },
   "layout": {
     "skip-link": "Passer au contenu principal"
   },
   "footer": {
+    "version": "Version [FR]",
     "about": {
       "link": "https://articles.alpha.canada.ca/forms-formulaires/fr/?utm_source=FR_FormsFooter&utm_medium=Product&utm_campaign=forms_product",
       "desc": "À propos de Formulaires GC"
