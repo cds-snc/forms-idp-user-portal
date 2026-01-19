@@ -1,14 +1,6 @@
 import { I18n } from "@i18n";
 import { cn } from "@lib/utils";
-import Image from "next/image";
 import { Version } from "@serverComponents/globals/Version";
-
-interface FooterProps {
-  isSplashPage?: boolean;
-  disableGcBranding?: boolean;
-  displayFormBuilderFooter?: boolean;
-  className?: string;
-}
 
 const BulletPoint = () => {
   return <span className="px-3">&#x2022;</span>;
@@ -32,14 +24,11 @@ const DefaultLinks = async () => {
   );
 };
 
-export const Footer = async ({ displayFormBuilderFooter = false, className = "" }: FooterProps) => {
-  const isFormBuilder = displayFormBuilderFooter ? true : false;
-
+export const Footer = async () => {
   return (
     <footer
       className={cn(
-        "mt-16 flex-none border-0 bg-gray-100 px-[1rem] tablet:px-[4rem] py-0 lg:mt-10 laptop:px-32",
-        className
+        "mt-16 flex-none border-0 bg-gray-100 px-[1rem] tablet:px-[4rem] py-0 lg:mt-10 laptop:px-32"
       )}
       data-server="true"
       data-testid="footer"
@@ -56,11 +45,9 @@ export const Footer = async ({ displayFormBuilderFooter = false, className = "" 
         </div>
 
         <div className="min-w-[168px]">
-          <Image
-            className="h-10 lg:h-8"
-            alt=""
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/wmms-blk.svg`}
-          />
+          <picture>
+            <img className="h-10 lg:h-8" alt="fip.text" src="/img/wmms-blk.svg" />
+          </picture>
         </div>
       </div>
     </footer>

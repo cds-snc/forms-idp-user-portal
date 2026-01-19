@@ -69,6 +69,9 @@ importers:
       '@cdssnc/gcds-tokens':
         specifier: ^2.13.1
         version: 2.13.1
+      '@gcforms/types':
+        specifier: 1.0.26
+        version: 1.0.26
       '@tailwindcss/postcss':
         specifier: ^4.1.18
         version: 4.1.18
@@ -705,6 +708,9 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@gcforms/types@1.0.26':
+    resolution: {integrity: sha512-2KMewzmSsvRjvzQaxQDHjVNc1YVc1a2qTgapsRGeH6L4LoXchtF16IXFdK1rWRHmZH75kEYFQGQ5pehJrW3zNg==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -4575,6 +4581,8 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@gcforms/types@1.0.26': {}
 
   '@humanfs/core@0.19.1': {}
 

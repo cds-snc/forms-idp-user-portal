@@ -5,12 +5,12 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { Noto_Sans, Lato } from "next/font/google";
 import { Footer } from "@serverComponents/globals/Footer";
 import Link from "next/link";
-import { LanguageToggle, ToastContainer, Fip } from "@clientComponents/globals";
-import { SkipLink } from "@serverComponents/globals/SkipLink";
+import { ToastContainer } from "@clientComponents/globals";
 import { SiteLogo } from "@serverComponents/icons";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { Logout } from "@serverComponents/globals/Logout";
+import { GcdsHeader } from "@serverComponents/globals/GcdsHeader/GcdsHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -52,16 +52,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
       <body>
         <div className="flex min-h-full flex-col bg-gray-soft">
-          <SkipLink />
-          <header className="mb-4 bg-white px-16 py-6 laptop:px-32">
-            <div className="flex justify-between">
-              <Fip />
-              <div className="inline-flex gap-4">
-                <Logout />
-                <LanguageToggle />
-              </div>
-            </div>
-          </header>
+          <GcdsHeader pathname="" language={language}>
+            <Logout />
+          </GcdsHeader>
+
           <div id="page-container" className="gc-authpages">
             <div className="account-wrapper mt-10 flex items-center justify-center">
               <div
@@ -85,7 +79,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
               </div>
             </div>
           </div>
-          <Footer displayFormBuilderFooter />
+          <Footer />
         </div>
       </body>
     </html>

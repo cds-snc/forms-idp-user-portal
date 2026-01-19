@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@cdssnc/gcds-tokens": "^2.13.1",
+    "@gcforms/types": "1.0.26",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^20.19.27",
     "@types/react": "^19.2.7",
