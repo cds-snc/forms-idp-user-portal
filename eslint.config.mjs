@@ -3,10 +3,22 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
+import tailwind from "eslint-plugin-tailwindcss";
+import reactHooks from "eslint-plugin-react-hooks";
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  ...eslintPluginPrettierRecommended,
+  eslintPluginPrettierRecommended,
+  {
+    plugins: {
+      "react-hooks": reactHooks,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+    },
+  },
+  ...tailwind.configs["flat/recommended"],
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
