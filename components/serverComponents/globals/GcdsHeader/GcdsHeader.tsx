@@ -1,16 +1,14 @@
-import { LanguageToggle } from "./LanguageToggle";
+import LanguageToggle from "@clientComponents/globals/LanguageToggle";
 import { BrandContainer } from "./BrandContainer";
 import { Fip } from "./Fip";
 import { SkipLink } from "@root/components/clientComponents/globals";
 
 export const GcdsHeader = ({
-  pathname,
   language,
   showLanguageToggle = true,
   skipLink = true,
   children,
 }: {
-  pathname: string;
   language: string;
   showLanguageToggle?: boolean;
   skipLink?: boolean;
@@ -22,8 +20,10 @@ export const GcdsHeader = ({
         {skipLink && <SkipLink />}
         <BrandContainer>
           <Fip language={language} />
-          {showLanguageToggle && <LanguageToggle pathname={pathname} language={language} />}
-          <div className="gc-logout">{children}</div>
+          <div className="brand__toggle">
+            {children}
+            {showLanguageToggle && <LanguageToggle />}
+          </div>
         </BrandContainer>
       </header>
     </div>
