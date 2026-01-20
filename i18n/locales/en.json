@@ -5,7 +5,7 @@
       "continue": "Continue",
       "submit": "Submit"
     },
-    "title": "GCForms Awesome SSO"
+    "title": "GCForms"
   },
   "header": {
     "lang-toggle": "Language selection",
@@ -216,7 +216,7 @@
       "title": "Missing data",
       "description": "Provide email, first and last name to register."
     },
-    "title": "Register",
+    "title": "Account Setup",
     "description": "Create your GCForms account.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",

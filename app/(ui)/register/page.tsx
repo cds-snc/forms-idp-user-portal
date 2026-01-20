@@ -83,13 +83,10 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col gap-4 mb-6">
-        <h1>
+      <div>
+        <h1 className="mt-6 border-b-0">
           <I18n i18nKey="title" namespace="register" />
         </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="description" namespace="register" />
-        </p>
       </div>
 
       <div className="w-full">
@@ -100,15 +97,17 @@ export default async function Page(props: {
         )}
 
         {legal && passwordComplexitySettings && organization && (
-          <RegisterForm
-            idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
-            organization={organization}
-            firstname={firstname}
-            lastname={lastname}
-            email={email}
-            requestId={requestId}
-            loginSettings={loginSettings}
-          ></RegisterForm>
+          <div id="auth-panel">
+            <RegisterForm
+              idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
+              organization={organization}
+              firstname={firstname}
+              lastname={lastname}
+              email={email}
+              requestId={requestId}
+              loginSettings={loginSettings}
+            ></RegisterForm>
+          </div>
         )}
       </div>
     </>

@@ -67,10 +67,12 @@ export function RegisterForm({ email, firstname, lastname, organization, request
   const [state, formAction] = useActionState(localFormAction, {});
 
   return (
-    <form className="w-2/3" action={formAction}>
+    <form action={formAction}>
       <div className="mb-4 flex flex-col gap-4">
-        <div>
-          <Label htmlFor="firstname">{t("labels.firstname")}</Label>
+        <div className="gcds-input-wrapper">
+          <Label className="required" htmlFor="firstname">
+            {t("labels.firstname")}
+          </Label>
           <TextInput
             className="w-full"
             type="text"
@@ -80,7 +82,8 @@ export function RegisterForm({ email, firstname, lastname, organization, request
             defaultValue={firstname}
           />
         </div>
-        <div className="">
+
+        <div className="gcds-input-wrapper">
           <Label htmlFor="lastname">{t("labels.lastname")}</Label>
           <TextInput
             className="w-full"
@@ -91,7 +94,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
             defaultValue={lastname}
           />
         </div>
-        <div className="col-span-2">
+        <div className="gcds-input-wrapper col-span-2">
           <Label htmlFor="email">{t("labels.email")}</Label>
           <TextInput
             className="w-full"
