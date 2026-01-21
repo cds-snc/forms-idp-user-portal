@@ -35,7 +35,8 @@
     "react-dom": "^19.2.3",
     "react-i18next": "^16.5.0",
     "react-toastify": "^11.0.5",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@cdssnc/gcds-tokens": "^2.13.1",

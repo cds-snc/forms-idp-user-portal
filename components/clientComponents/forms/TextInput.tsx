@@ -1,39 +1,44 @@
-import React, { type JSX } from "react";
+import React from "react";
 import { cn } from "@lib/utils";
 
-export interface TextInputProps {
+export const TextInput = ({
+  id,
+  type,
+  className,
+  required,
+  placeholder,
+  autoComplete,
+  ariaDescribedbyIds,
+  onChange,
+  defaultValue = "",
+}: {
+  id: string;
+  type: string;
+  className?: string;
+  required?: boolean;
   placeholder?: string;
-  validationError?: string;
-  value?: string;
-}
-
-export const TextInput = (
-  props: TextInputProps & JSX.IntrinsicElements["input"]
-): React.ReactElement => {
-  const {
-    id,
-    type,
-    className,
-    required,
-    placeholder,
-    autoComplete,
-    onChange,
-    defaultValue = "",
-  } = props;
+  autoComplete?: string;
+  ariaDescribedbyIds?: string[];
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  defaultValue?: string;
+}): React.ReactElement => {
   const classes = cn("gc-input-text", className);
 
   return (
-    <input
-      data-testid="textInput"
-      className={classes}
-      id={id}
-      name={id}
-      type={type}
-      required={required}
-      autoComplete={autoComplete ? autoComplete : "off"}
-      placeholder={placeholder}
-      defaultValue={defaultValue}
-      onChange={onChange}
-    />
+    <>
+      <input
+        data-testid="textInput"
+        className={classes}
+        id={id}
+        name={id}
+        type={type}
+        required={required}
+        autoComplete={autoComplete ? autoComplete : "off"}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        {...(ariaDescribedbyIds && { "aria-describedby": ariaDescribedbyIds.join(" ") })}
+      />
+    </>
   );
 };
