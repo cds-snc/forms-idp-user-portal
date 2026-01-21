@@ -252,7 +252,14 @@
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotRegisterUser": "Could not register user",
+      "validation": {
+        "required": "Complete the required field to continue.",
+        "requiredFirstname": "First name is required.",
+        "requiredLastname": "Last name is required.",
+        "requiredEmail": "Email is required.",
+        "validGovEmail": "Enter a valid email address."
+      }
     }
   }
 }
