@@ -51,9 +51,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
       <body>
         <div className="flex min-h-full flex-col bg-gray-soft">
-          <GcdsHeader pathname="" language={language}>
-            <div className="flex items-center justify-end">
-              <Logout />
+          <GcdsHeader language={language}>
+            <div className="inline-block">
+              <Logout className="mr-2 text-sm" />
             </div>
           </GcdsHeader>
 

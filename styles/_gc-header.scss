@@ -137,34 +137,10 @@
   }
 }
 
+
 /* Override for Preview header  */
 .gc-form-preview-header {
   .brand__container {
     width: 100%;
-  }
-}
-
-/* Note: viewport specific style decision */
-@media screen and (width >= 48em) {
-  .gc-logout {
-    a {
-      font: var(--gcds-lang-toggle-font-desktop);
-      padding-inline: 0 !important;
-    }
-
-    span {
-      display: initial;
-    }
-
-    abbr {
-      display: none;
-    }
-  }
-}
-
-@media screen and (width < 48em) {
-  .gc-logout a {
-    font: var(--gcds-lang-toggle-font-mobile);
-    font-weight: 700;
   }
 }

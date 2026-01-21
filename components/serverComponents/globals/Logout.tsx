@@ -19,7 +19,7 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   }
 }
 
-export const Logout = async () => {
+export const Logout = async ({ className }: { className?: string }) => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("header");
@@ -31,7 +31,7 @@ export const Logout = async () => {
   }
 
   return (
-    <Link href="/logout" aria-label={t("logout")} prefetch={false}>
+    <Link href="/logout" className={className} aria-label={t("logout")} prefetch={false}>
       {t("logout")}
     </Link>
   );
