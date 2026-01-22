@@ -8,7 +8,7 @@ import { useTranslation } from "@i18n";
 import * as v from "valibot";
 
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorListItem, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
+import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { emailSchema, firstnameSchema, lastnameSchema } from "@lib/validationSchemas";
 // import { ErrorCharacterCount } from "@clientComponents/forms/ErrorCharacterCount";
