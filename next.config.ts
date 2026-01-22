@@ -32,18 +32,8 @@ const nextConfig: NextConfig = {
   sassOptions: {
     includePaths: ["styles"],
   },
+  reactCompiler: true,
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
-
-  webpack: (config) => {
-    // Support reading markdown
-    config.module.rules.push({
-      test: /\.md$/,
-      type: "asset/source",
-    });
-
-    return config;
-  },
-
   async headers() {
     return [
       {
@@ -53,7 +43,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-
   turbopack: {
     rules: {
       "*.md": {

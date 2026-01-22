@@ -6,7 +6,9 @@ import { useTranslation } from "@i18n/client";
 import { sendLoginname } from "@lib/server/username";
 import { useRouter } from "next/navigation";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { Button } from "@clientComponents/globals";
+import { I18n } from "@i18n";
+
+import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 
 type Props = {
   loginName: string | undefined;
@@ -15,7 +17,6 @@ type Props = {
   organization?: string;
   suffix?: string;
   submit: boolean;
-  allowRegister: boolean;
 };
 
 type FormState = {
@@ -25,22 +26,20 @@ type FormState = {
   error?: string;
 };
 
-export const UserNameForm = ({
-  loginName,
-  requestId,
-  organization,
-  suffix,
-  submit,
-  allowRegister,
-}: Props) => {
+const ValidationError = (message: string) => {
+  if (!message) {
+    return null;
+  }
+  return (
+    <ErrorMessage id="username-validation-error">
+      <I18n i18nKey={message} namespace="start" />
+    </ErrorMessage>
+  );
+};
+
+export const UserNameForm = ({ loginName, requestId, organization, suffix, submit }: Props) => {
   const { t } = useTranslation(["start", "common"]);
 
-  useEffect(() => {
-    if (submit && loginName) {
-      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      localFormAction({ formData: { username: loginName } });
-    }
-  }, []);
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -78,14 +77,23 @@ export const UserNameForm = ({
     return previousState;
   };
 
+  useEffect(() => {
+    if (submit && loginName) {
+      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
+      localFormAction({ formData: { username: loginName } });
+    }
+  }, []);
+
   const [state, formAction] = useActionState(localFormAction, {
     formData: {
       username: loginName ? loginName : "",
     },
   });
 
+  const validationError = state.error ? ValidationError(state.error) : null;
+
   return (
-    <div className="w-2/3">
+    <div>
       {state.error && (
         <Alert type={ErrorStatus.ERROR} heading={state.error} focussable={true} id="cognitoErrors">
           {state.error}
@@ -94,43 +102,24 @@ export const UserNameForm = ({
 
       <form id="login" action={formAction} noValidate>
         <div className="mb-4">
-          <Label id={"label-username"} htmlFor={"username"} className="required" required>
-            {t("form.label")}
-          </Label>
-          <div className="mb-4 text-sm text-black" id="login-description">
-            {t("form.description")}
+          <div className="gcds-input-wrapper">
+            <Label id={"label-username"} htmlFor={"username"} className="required" required>
+              {t("form.label")}
+            </Label>
+            <div className="mb-4 text-sm text-black" id="login-description">
+              {t("form.description")}
+            </div>
+            <TextInput
+              validationError={validationError}
+              type={"email"}
+              id={"username"}
+              required
+              defaultValue={state.formData?.username || ""}
+            />
           </div>
-          <TextInput
-            className="h-10 w-full max-w-lg rounded-xl"
-            type={"email"}
-            id={"username"}
-            name={"username"}
-            required
-            defaultValue={state.formData?.username || ""}
-          />
         </div>
 
-        {allowRegister && (
-          <Button
-            onClick={() => {
-              const registerParams = new URLSearchParams();
-              if (organization) {
-                registerParams.append("organization", organization);
-              }
-              if (requestId) {
-                registerParams.append("requestId", requestId);
-              }
-
-              router.push("/register?" + registerParams);
-            }}
-            type="button"
-            disabled={loading}
-            data-testid="register-button"
-          >
-            {t("register")}
-          </Button>
-        )}
-        <SubmitButtonAction className="float-right">{t("button.continue")}</SubmitButtonAction>
+        <SubmitButtonAction>{t("button.continue")}</SubmitButtonAction>
       </form>
     </div>
   );

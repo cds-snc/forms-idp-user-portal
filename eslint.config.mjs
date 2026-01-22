@@ -51,6 +51,7 @@ const eslintConfig = defineConfig([
         whitelist: [
           "(gc\\-).*",
           "(gcds\\-).*",
+          "label--required",
           "form-builder",
           "form-builder-editor",
           "page-container",

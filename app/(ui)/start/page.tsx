@@ -1,11 +1,13 @@
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getActiveIdentityProviders, getDefaultOrg, getLoginSettings } from "@lib/zitadel";
+import { getDefaultOrg, getLoginSettings } from "@lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { UserNameForm } from "./components/UserNameForm";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import Link from "next/dist/client/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
@@ -40,18 +42,36 @@ export default async function Page(props: {
     organization: organization ?? defaultOrganization,
   });
 
+  const registerParams = new URLSearchParams();
+  if (organization) {
+    registerParams.append("organization", organization);
+  }
+  if (requestId) {
+    registerParams.append("requestId", requestId);
+  }
+
+  const registerLink = `/register?${registerParams.toString()}`;
+
   return (
-    <div className="items-center flex flex-col">
-      <div className="mb-6">
-        <I18n i18nKey="welcome" namespace="start" />
-      </div>
+    <div id="auth-panel">
+      <AuthPanelTitle i18nKey="title" namespace="start" />
+
+      {!!loginSettings?.allowRegister && (
+        <div className="mb-6">
+          <I18n i18nKey="signUpText" namespace="start" />
+          &nbsp;
+          <Link href={registerLink}>
+            <I18n i18nKey="signUpLink" namespace="start" />
+          </Link>
+        </div>
+      )}
+
       <UserNameForm
         loginName={loginName}
         requestId={requestId}
         organization={organization}
         suffix={suffix}
         submit={submit}
-        allowRegister={!!loginSettings?.allowRegister}
       />
     </div>
   );

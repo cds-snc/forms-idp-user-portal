@@ -5,7 +5,8 @@
       "continue": "Continue",
       "submit": "Submit"
     },
-    "title": "GCForms"
+    "title": "GC Forms",
+    "required": "required"
   },
   "header": {
     "lang-toggle": "Language selection",
@@ -56,13 +57,14 @@
     "expired": "expired"
   },
   "start": {
-    "title": "Start Login",
-    "welcome": "Welcome to GCForm's amazing new login solution",
-    "userName": "User Name",
+    "title": "Sign in",
+    "signUpText": "If you do not have an account, you can",
+    "signUpLink": "create one now.",
+    "userName": "Name",
     "register": "Register now",
     "form": {
-      "label": "User Name",
-      "description": "Must be a federal government email address."
+      "label": "Email address",
+      "description": "Enter your own individual government email address."
     }
   },
   "logout": {
@@ -131,7 +133,7 @@
       "hasSymbol": "Must include a symbol.",
       "hasNumber": "Must include a number.",
       "hasUppercase": "Must include an uppercase letter.",
-      "hasLowercase": "Must include a lowercase letter.",
+      "hasLowercase": "MusUser t include a lowercase letter.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
       "doesNotMatch": "Doesn't match"

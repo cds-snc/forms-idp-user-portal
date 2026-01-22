@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@lib/utils";
-import { useTranslation } from "@i18n/client";
+import { I18n } from "@i18n";
 
 interface LabelProps {
   children: React.ReactNode;
@@ -12,26 +12,32 @@ interface LabelProps {
   srOnly?: boolean;
   required?: boolean;
   group?: boolean;
-  lang?: string;
 }
 
 export const Label = (props: LabelProps): React.ReactElement => {
-  const { children, htmlFor, className, error, hint, srOnly, required, id, group, lang } = props;
+  const { children, htmlFor, className, error, hint, srOnly, required, id, group } = props;
 
   const classes = cn(
     {
-      "gc-label": !srOnly,
+      "gcds-label": !srOnly,
       "gc-sr-only": srOnly,
-      "gc-label--error": error,
+      "gcds-label--error": error,
     },
     className
   );
 
-  const { t } = useTranslation("common", { lng: lang });
-
   const childrenElements = (
     <>
       {children}
+      {required && (
+        <I18n
+          data-testid="required"
+          className="label--required"
+          aria-hidden
+          i18nKey="required"
+          namespace="common"
+        />
+      )}
 
       {hint && <span className="gc-hint">{hint}</span>}
     </>
