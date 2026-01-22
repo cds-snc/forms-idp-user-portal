@@ -5,13 +5,16 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@i18n";
+import * as v from "valibot";
 
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorListItem, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { validateAccount } from "../validation";
+import { emailSchema, firstnameSchema, lastnameSchema } from "@lib/validationSchemas";
 // import { ErrorCharacterCount } from "@clientComponents/forms/ErrorCharacterCount";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
+import Link from "next/link";
+import { Hint } from "@clientComponents/forms/Hint";
 
 type RegisterData = {
   firstname?: string;
@@ -41,37 +44,25 @@ type Props = {
   idpCount: number;
 };
 
-// TODO WIP Figure out a better way
-const getTranslationStrings = (t: (key: string) => string) => {
-  return {
-    "errors.validation.requiredFirstname": t("errors.validation.requiredFirstname"),
-    "errors.validation.requiredLastname": t("errors.validation.requiredLastname"),
-    "errors.validation.requiredEmail": t("errors.validation.requiredEmail"),
-    "errors.validation.validGovEmail": t("errors.validation.validGovEmail"),
-    //TODO move to password validation
-    // "signUpRegistration.fields.name.error.maxLength": t(
-    //   "signUpRegistration.fields.name.error.maxLength"
-    // ),
-    // "account.fields.password.error.minLength": t("account.fields.password.error.minLength"),
-    // "account.fields.password.error.maxLength": t("account.fields.password.error.maxLength"),
-    // "account.fields.password.error.oneLowerCase": t("account.fields.password.error.oneLowerCase"),
-    // "account.fields.password.error.oneUpperCase": t("account.fields.password.error.oneUpperCase"),
-    // "account.fields.password.error.oneNumber": t("account.fields.password.error.oneNumber"),
-    // "account.fields.password.error.oneSymbol": t("account.fields.password.error.oneSymbol"),
-    // "account.fields.passwordConfirmation.error.mustMatch": t(
-    //   "account.fields.passwordConfirmation.error.mustMatch"
-    // ),
-  };
+const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...firstnameSchema(),
+      ...lastnameSchema(),
+      ...emailSchema(),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
+// TODO Language detection
+
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
-  const { t } = useTranslation("register");
+  const { t, i18n } = useTranslation(["register", "validation", "errorSummary"]);
 
   const router = useRouter();
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
-    const errorMessages = getTranslationStrings(t);
-
     const originalFormData = {
       firstname: formData.get("firstname") as string,
       lastname: formData.get("lastname") as string,
@@ -80,13 +71,13 @@ export function RegisterForm({ email, firstname, lastname, organization, request
 
     const rawFormData = Object.fromEntries(formData.entries());
 
-    const validationResult = await validateAccount(rawFormData, errorMessages);
+    const validationResult = await validateAccount(rawFormData);
 
     if (!validationResult.success) {
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: issue.message,
+          fieldValue: t(issue.message || "required", { ns: "validation" }),
         })),
         formData: originalFormData,
       };
@@ -125,6 +116,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
   return (
     <>
       {state.validationErrors && Object.keys(state.validationErrors).length > 0 && (
+        // TODO move to ErrroSummary commponent pass in something like an array
         <Alert
           className="w-full"
           type={ErrorStatus.ERROR}
@@ -132,7 +124,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
           tabIndex={0}
           focussable={true}
           id="registrationValidationErrors"
-          heading={t("input-validation.heading", { ns: "common" })}
+          heading={t("title", { ns: "errorSummary" })}
         >
           <ol className="gc-ordered-list p-0">
             {state.validationErrors.map(({ fieldKey, fieldValue }, index) => {
@@ -150,7 +142,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
       <form action={formAction} noValidate>
         <div className="mb-4 flex flex-col gap-4">
           <div className="gcds-input-wrapper">
-            <Label className="required" htmlFor="firstname">
+            <Label className="required" htmlFor="firstname" required>
               {t("labels.firstname")}
             </Label>
             {getError("firstname") && (
@@ -168,7 +160,9 @@ export function RegisterForm({ email, firstname, lastname, organization, request
             {/* TODO? <ErrorCharacterCount id="characterCountMessageFirstname" maxLength={50} /> */}
           </div>
           <div className="gcds-input-wrapper">
-            <Label htmlFor="lastname">{t("labels.lastname")}</Label>
+            <Label htmlFor="lastname" required>
+              {t("labels.lastname")}
+            </Label>
             {getError("lastname") && (
               <ErrorMessage id={"errorMessageLastname"}>{getError("lastname")}</ErrorMessage>
             )}
@@ -183,7 +177,10 @@ export function RegisterForm({ email, firstname, lastname, organization, request
             />
           </div>
           <div className="gcds-input-wrapper col-span-2">
-            <Label htmlFor="email">{t("labels.email")}</Label>
+            <Label htmlFor="email" required>
+              {t("labels.email")}
+            </Label>
+            <Hint>{t("emailInputHint")}</Hint>
             {getError("email") && (
               <ErrorMessage id={"errorMessageEmail"}>{getError("email")}</ErrorMessage>
             )}
@@ -198,6 +195,13 @@ export function RegisterForm({ email, firstname, lastname, organization, request
             />
           </div>
         </div>
+
+        {/* TODO terms page or link to app? */}
+        <p className="-mt-2 mb-10">
+          {t("terms.agreement")}
+          <Link href={`/${i18n.language}/terms-of-use`}>{t("terms.linkText")}</Link>
+        </p>
+
         <div className="mt-8 flex flex-row items-center justify-between">
           <BackButton data-testid="back-button" />
           <SubmitButtonAction>{t("submit")}</SubmitButtonAction>

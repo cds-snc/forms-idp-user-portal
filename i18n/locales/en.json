@@ -218,7 +218,9 @@
       "title": "Missing data",
       "description": "Provide email, first and last name to register."
     },
-    "title": "Account Setup",
+    "title": "Setup your account",
+    "emailInputHint": "Use a government address only you can access, not a shared inbox.",
+
     "description": "Create your GCForms account.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
@@ -249,19 +251,26 @@
       "lastname": "This field is required",
       "email": "This field is required"
     },
+    "terms": {
+      "agreement": "By creating an account you agree to the ",
+      "linkText": "Terms of use."
+    },
     "errors": {
       "couldNotCreateUser": "Could not create user",
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user",
-      "validation": {
-        "required": "Complete the required field to continue.",
-        "requiredFirstname": "First name is required.",
-        "requiredLastname": "Last name is required.",
-        "requiredEmail": "Email is required.",
-        "validGovEmail": "Enter a valid email address."
-      }
+      "couldNotRegisterUser": "Could not register user"
     }
+  },
+  "errorSummary": {
+    "title":"Please correct the errors on the page."
+  },
+  "validation": {
+    "required": "Complete the required field to continue.",
+    "requiredFirstname": "First name is required.",
+    "requiredLastname": "Last name is required.",
+    "requiredEmail": "Email is required.",
+    "validGovEmail": "Enter a valid email address."
   }
 }

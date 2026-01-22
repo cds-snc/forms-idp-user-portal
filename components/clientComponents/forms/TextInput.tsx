@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "@lib/utils";
-import { type JSX } from "react";
 
 export const TextInput = ({
   id,
@@ -12,7 +11,6 @@ export const TextInput = ({
   ariaDescribedbyIds,
   onChange,
   defaultValue = "",
-  validationError,
 }: {
   id: string;
   type: string;
@@ -23,13 +21,11 @@ export const TextInput = ({
   ariaDescribedbyIds?: string[];
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   defaultValue?: string;
-  validationError: JSX.Element | string | null;
 }): React.ReactElement => {
   const classes = cn("gc-input-text", className);
 
   return (
     <>
-      {validationError && validationError}
       <input
         data-testid="textInput"
         className={classes}
