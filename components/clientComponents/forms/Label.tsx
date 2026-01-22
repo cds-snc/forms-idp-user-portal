@@ -30,16 +30,14 @@ export const Label = (props: LabelProps): React.ReactElement => {
     <>
       {children}
       {required && (
-        <I18n
-          data-testid="required"
-          className="label--required"
-          aria-hidden
-          i18nKey="required"
-          namespace="common"
-        />
+        <span className="label--required">
+          {"("}
+          <I18n data-testid="required" aria-hidden i18nKey="required" namespace="common" />
+          {")"}
+        </span>
       )}
 
-      {hint && <span className="gc-hint">{hint}</span>}
+      {hint && <span className="gcds-hint">{hint}</span>}
     </>
   );
 
