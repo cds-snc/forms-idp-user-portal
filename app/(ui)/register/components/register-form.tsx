@@ -15,6 +15,7 @@ import { emailSchema, firstnameSchema, lastnameSchema } from "@lib/validationSch
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
 import { Hint } from "@clientComponents/forms/Hint";
+import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
 type RegisterData = {
   firstname?: string;
@@ -111,34 +112,9 @@ export function RegisterForm({ email, firstname, lastname, organization, request
     return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
   };
 
-  // TODO WIP add validation on typing/blur or similar?
-
   return (
     <>
-      {state.validationErrors && Object.keys(state.validationErrors).length > 0 && (
-        // TODO move to ErrroSummary commponent pass in something like an array
-        <Alert
-          className="w-full"
-          type={ErrorStatus.ERROR}
-          validation={true}
-          tabIndex={0}
-          focussable={true}
-          id="registrationValidationErrors"
-          heading={t("title", { ns: "errorSummary" })}
-        >
-          <ol className="gc-ordered-list p-0">
-            {state.validationErrors.map(({ fieldKey, fieldValue }, index) => {
-              return (
-                <ErrorListItem
-                  key={`error-${fieldKey}-${index}`}
-                  errorKey={fieldKey}
-                  value={fieldValue}
-                />
-              );
-            })}
-          </ol>
-        </Alert>
-      )}
+      <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
       <form action={formAction} noValidate>
         <div className="mb-4 flex flex-col gap-4">
           <div className="gcds-input-wrapper">
