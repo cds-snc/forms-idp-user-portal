@@ -58,7 +58,7 @@ export default async function Page(props: {
 
       {!!loginSettings?.allowRegister && (
         <div className="mb-6">
-          <I18n i18nKey="signUpText" namespace="start" />
+          <I18n i18nKey="x" namespace="start" />
           &nbsp;
           <Link href={registerLink}>
             <I18n i18nKey="signUpLink" namespace="start" />
