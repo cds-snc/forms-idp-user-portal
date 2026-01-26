@@ -6,7 +6,7 @@ export const Hint = ({
   className,
   id,
 }: {
-  children: string | undefined;
+  children: string | React.ReactNode | undefined;
   id?: string;
   className?: string;
 }): React.ReactElement => {

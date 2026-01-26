@@ -17,7 +17,7 @@ export const ErrorSummary = ({
 
   return (
     <>
-      {validationErrors && validationErrors.length > 0 && (
+      {Array.isArray(validationErrors) && validationErrors.length > 0 && (
         <Alert
           className={classes}
           type={ErrorStatus.ERROR}

@@ -228,19 +228,6 @@
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "submit": "Continue",
-    "password": {
-      "title": "Set Password",
-      "description": "Set the password for your account",
-      "submit": "Continue",
-      "labels": {
-        "password": "Password",
-        "confirmPassword": "Confirm Password"
-      },
-      "required": {
-        "password": "You have to provide a password!",
-        "confirmPassword": "This field is required"
-      }
-    },
     "labels": {
       "firstname": "First name",
       "lastname": "Last name",
@@ -263,6 +250,23 @@
       "couldNotRegisterUser": "Could not register user"
     }
   },
+  "registerPassword": {
+    "title": "Set Password",
+    "submit": "Continue",
+    "labels": {
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "passwordHint": "Your password should be hard to guess with:",
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    }
+  },
   "errorSummary": {
     "title":"Please correct the errors on the page."
   },
@@ -271,6 +275,6 @@
     "requiredFirstname": "First name is required.",
     "requiredLastname": "Last name is required.",
     "requiredEmail": "Email is required.",
-    "validGovEmail": "Enter a valid email address."
+    "validGovEmail": "Enter a valid government email address."
   }
 }

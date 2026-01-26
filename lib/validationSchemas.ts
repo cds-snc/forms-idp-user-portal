@@ -1,9 +1,9 @@
 import * as v from "valibot";
 import {
-  // containsLowerCaseCharacter,
-  // containsNumber,
-  // containsSymbol,
-  // containsUpperCaseCharacter,
+  containsLowerCaseCharacter,
+  containsNumber,
+  containsSymbol,
+  containsUpperCaseCharacter,
   isValidGovEmail,
 } from "@lib/validators";
 
@@ -32,40 +32,43 @@ export const emailSchema = () => ({
   ),
 });
 
-//TODO
-/*
-const passwordSchema = () => ({
+// Password restrictions from Zitadel password settings
+export const passwordSchema = ({
+  minLength,
+  requiresLowercase,
+  requiresNumber,
+  requiresSymbol,
+  requiresUppercase,
+}: {
+  minLength?: number;
+  requiresLowercase?: boolean;
+  requiresNumber?: boolean;
+  requiresSymbol?: boolean;
+  requiresUppercase?: boolean;
+}) => ({
   ...{
     password: v.pipe(
       v.string(),
       v.trim(),
-      v.minLength(1, errorMessages["input-validation.required"]),
-      v.minLength(8, errorMessages["account.fields.password.error.minLength"]),
-      v.maxLength(50, errorMessages["account.fields.password.error.maxLength"]),
+      v.minLength(1, "requiredPassword"),
+      v.check((password) => !minLength || password.length >= minLength, "minLength"),
+      v.maxLength(50, "maxLength"),
       v.check(
-        (password) => containsLowerCaseCharacter(password),
-        errorMessages["account.fields.password.error.oneLowerCase"]
+        (password) => !requiresLowercase || containsLowerCaseCharacter(password),
+        "oneLowerCase"
       ),
       v.check(
-        (password) => containsUpperCaseCharacter(password),
-        errorMessages["account.fields.password.error.oneUpperCase"]
+        (password) => !requiresUppercase || containsUpperCaseCharacter(password),
+        "oneUpperCase"
       ),
-      v.check(
-        (password) => containsNumber(password),
-        errorMessages["account.fields.password.error.oneNumber"]
-      ),
-      v.check(
-        (password) => containsSymbol(password),
-        errorMessages["account.fields.password.error.oneSymbol"]
-      )
-    ),
-  },
-  ...{
-    passwordConfirmation: v.pipe(
-      v.string(),
-      v.trim(),
-      v.minLength(1, errorMessages["input-validation.required"])
+      v.check((password) => !requiresNumber || containsNumber(password), "oneNumber"),
+      v.check((password) => !requiresSymbol || containsSymbol(password), "oneSymbol")
     ),
   },
 });
-*/
+
+export const confirmPasswordSchema = () => ({
+  ...{
+    confirmPassword: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredConfirmPassword")),
+  },
+});

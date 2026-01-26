@@ -56,8 +56,6 @@ const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue })
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
-// TODO Language detection
-
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary"]);
 

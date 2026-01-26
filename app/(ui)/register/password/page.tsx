@@ -8,6 +8,7 @@ import {
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@lib/zitadel";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
@@ -46,53 +47,46 @@ export default async function Page(props: {
     organization,
   }).then((obj) => getSerializableObject(obj));
 
-  return missingData ? (
-    <>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>
-          <I18n i18nKey="missingdata.title" namespace="register" />
-        </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="missingdata.description" namespace="register" />
-        </p>
-      </div>
-      <div className="w-full"></div>
-    </>
-  ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
-    <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="password.title" namespace="register" />
-        </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="description" namespace="register" />
-        </p>
-      </div>
+  if (missingData) {
+    return (
+      <>
+        <div className="flex flex-col space-y-4">
+          <AuthPanelTitle i18nKey="missingdata.title" namespace="registerPassword" />
+          <p className="ztdl-p">
+            <I18n i18nKey="missingdata.description" namespace="registerPassword" />
+          </p>
+        </div>
+      </>
+    );
+  }
 
-      <div className="w-full">
-        {legal && passwordComplexitySettings && (
-          <SetRegisterPasswordForm
-            passwordComplexitySettings={passwordComplexitySettings}
-            email={email}
-            firstname={firstname}
-            lastname={lastname}
-            organization={organization as string} // organization is guaranteed to be a string here otherwise we would have returned earlier
-            requestId={requestId}
-          ></SetRegisterPasswordForm>
-        )}
-      </div>
-    </>
-  ) : (
-    <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="disabled.title" namespace="register" />
-        </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="disabled.description" namespace="register" />
-        </p>
-      </div>
-      <div className="w-full"></div>
-    </>
+  // TODO Should this be done on the register page also/instead?
+  if (!loginSettings?.allowRegister || !loginSettings.allowUsernamePassword) {
+    return (
+      <>
+        <div className="flex flex-col space-y-4">
+          <AuthPanelTitle i18nKey="disabled.title" namespace="registerPassword" />
+          <p className="ztdl-p">
+            <I18n i18nKey="disabled.description" namespace="registerPassword" />
+          </p>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <div id="auth-panel">
+      <AuthPanelTitle i18nKey="title" namespace="registerPassword" />
+      {legal && passwordComplexitySettings && (
+        <SetRegisterPasswordForm
+          passwordComplexitySettings={passwordComplexitySettings}
+          email={email}
+          firstname={firstname}
+          lastname={lastname}
+          organization={organization as string} // organization is guaranteed to be a string here otherwise we would have returned earlier
+          requestId={requestId}
+        ></SetRegisterPasswordForm>
+      )}
+    </div>
   );
 }
