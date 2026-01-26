@@ -62,23 +62,22 @@ export function RegisterForm({ email, firstname, lastname, organization, request
   const router = useRouter();
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
-    const originalFormData = {
-      firstname: formData.get("firstname") as string,
-      lastname: formData.get("lastname") as string,
-      email: formData.get("email") as string,
+    const formEntries = {
+      firstname: (formData.get("firstname") as string) || "",
+      lastname: (formData.get("lastname") as string) || "",
+      email: (formData.get("email") as string) || "",
     };
 
-    const rawFormData = Object.fromEntries(formData.entries());
-
-    const validationResult = await validateAccount(rawFormData);
-
+    // Validate form entries and map any errors to form state with translated messages
+    const formEntriesData = Object.fromEntries(formData.entries());
+    const validationResult = await validateAccount(formEntriesData);
     if (!validationResult.success) {
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: t(`validation.${issue.message}` || "required"),
+          fieldValue: t(`validation.${issue.message}`),
         })),
-        formData: originalFormData,
+        formData: formEntries,
       };
     }
 
@@ -89,11 +88,10 @@ export function RegisterForm({ email, firstname, lastname, organization, request
     };
     router.push(`/register/password?` + new URLSearchParams(registerParams));
 
-    // Case of router throwing an error or something, fallback to original state
-    // This is unnecessary since Next would route to a HTTP status error page?
+    // Case of router throwing an error or similar, fallback to original state
     return {
       validationErrors: undefined,
-      formData: originalFormData,
+      formData: formEntries,
     };
   };
 

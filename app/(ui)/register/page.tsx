@@ -10,8 +10,8 @@ import {
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+// import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+// import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 
 import { serverTranslation } from "@i18n/server";
@@ -23,24 +23,24 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
+const getOrg = async (serviceUrl: string) => {
+  const org = await getDefaultOrg({
+    serviceUrl,
+  });
+  if (org) {
+    return org.id;
+  }
+};
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const searchParams = await props.searchParams;
-
-  let { firstname, lastname, email, organization, requestId } = searchParams;
-
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      organization = org.id;
-    }
-  }
+  const searchParams = await props.searchParams;
+  const { firstname, lastname, email, requestId } = searchParams;
+  const organization = searchParams.organization ?? (await getOrg(serviceUrl));
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
@@ -72,7 +72,7 @@ export default async function Page(props: {
           <h1>
             <I18n i18nKey="disabled.title" namespace="register" />
           </h1>
-          <p className="ztdl-p">
+          <p>
             <I18n i18nKey="disabled.description" namespace="register" />
           </p>
         </div>

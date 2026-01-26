@@ -34,17 +34,7 @@ type Props = {
   requestId?: string;
 };
 
-// type PasswordParams = {
-//   password?: string;
-//   confirmPassword?: string;
-//   email: string;
-//   firstName: string;
-//   lastName: string;
-//   organization: string;
-//   requestId?: string;
-// };
-
-const validatePassword = async (
+const validateCreatePassword = async (
   formEntries: { [k: string]: FormDataEntryValue },
   passwordComplexitySettings = {}
 ) => {
@@ -78,49 +68,27 @@ export function SetRegisterPasswordForm({
 
   const localFormAction = async (formState: FormState, formData: FormData) => {
     const formEntries = {
-      password: formData.get("password"),
-      confirmPassword: formData.get("confirmPassword"),
+      password: (formData.get("password") as string) || "",
+      confirmPassword: (formData.get("confirmPassword") as string) || "",
     };
 
+    // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = Object.fromEntries(formData.entries());
-
-    const validationResult = await validatePassword(formEntriesData, passwordComplexitySettings);
+    const validationResult = await validateCreatePassword(
+      formEntriesData,
+      passwordComplexitySettings
+    );
     if (!validationResult.success) {
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          // TODO put back once translations are done
-          // fieldValue: t(issue.message || "required", { ns: "validation" }),
           fieldValue: t(`complexity.${issue.message}`),
         })),
-        formData: {
-          password: typeof formEntries.password === "string" ? formEntries.password : "",
-          confirmPassword:
-            typeof formEntries.confirmPassword === "string" ? formEntries.confirmPassword : "",
-        },
+        formData: formEntries,
       };
     }
 
-    // const fields: (keyof PasswordParams)[] = ["password"];
-    // const passwordParams: PasswordParams = {
-    //   email: email,
-    //   firstName: firstname,
-    //   lastName: lastname,
-    //   organization: organization,
-    //   requestId: requestId,
-    // };
-
-    // fields.forEach((field) => {
-    //   const value = formData?.get(field);
-    //   if (typeof value !== "string") {
-    //     return {
-    //       error: "Invalid Field",
-    //     };
-    //   }
-    //   passwordParams[field] = value;
-    // });
-
-    // TODO - want to re-validate the account data first
+    // TODO want to re-validate the account data first since can access this page directly
     const response = await registerUser({
       email: email,
       firstName: firstname,
@@ -146,8 +114,6 @@ export function SetRegisterPasswordForm({
 
     return formState;
   };
-
-  // const [state, formAction] = useActionState(localFormAction, {});
 
   const [state, formAction] = useActionState(localFormAction, {
     error: undefined,
