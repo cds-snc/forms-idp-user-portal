@@ -1,16 +1,13 @@
 "use client";
 import { useActionState } from "react";
-
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-
 import { useTranslation } from "@i18n";
-import * as v from "valibot";
 
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { emailSchema, firstnameSchema, lastnameSchema } from "@lib/validationSchemas";
+import { validateAccount } from "@lib/validationSchemas";
 // import { ErrorCharacterCount } from "@clientComponents/forms/ErrorCharacterCount";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
@@ -45,17 +42,6 @@ type Props = {
   idpCount: number;
 };
 
-const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue }) => {
-  const formValidationSchema = v.pipe(
-    v.object({
-      ...firstnameSchema(),
-      ...lastnameSchema(),
-      ...emailSchema(),
-    })
-  );
-  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
-};
-
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary"]);
 
@@ -88,11 +74,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
     };
     router.push(`/register/password?` + new URLSearchParams(registerParams));
 
-    // Case of router throwing an error or similar, fallback to original state
-    return {
-      validationErrors: undefined,
-      formData: formEntries,
-    };
+    return previousState;
   };
 
   const [state, formAction] = useActionState(localFormAction, {

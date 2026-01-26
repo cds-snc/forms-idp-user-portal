@@ -12,7 +12,7 @@ import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { Hint } from "@clientComponents/forms/Hint";
-import { confirmPasswordSchema, passwordSchema } from "@lib/validationSchemas";
+import { confirmPasswordSchema, passwordSchema, validateAccount } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 
@@ -66,7 +66,7 @@ export function SetRegisterPasswordForm({
   const [watchPassword, setWatchPassword] = useState("");
   const [watchConfirmPassword, setWatchConfirmPassword] = useState("");
 
-  const localFormAction = async (formState: FormState, formData: FormData) => {
+  const localFormAction = async (previousState: FormState, formData: FormData) => {
     const formEntries = {
       password: (formData.get("password") as string) || "",
       confirmPassword: (formData.get("confirmPassword") as string) || "",
@@ -88,7 +88,16 @@ export function SetRegisterPasswordForm({
       };
     }
 
-    // TODO want to re-validate the account data first since can access this page directly
+    // Validate account data again to be safe
+    const validateAccountData = await validateAccount({ firstname, lastname, email } as {
+      [k: string]: FormDataEntryValue;
+    });
+    if (!validateAccountData.success) {
+      return {
+        error: t("create.missingOrInvalidData.title"),
+      };
+    }
+
     const response = await registerUser({
       email: email,
       firstName: firstname,
@@ -112,7 +121,7 @@ export function SetRegisterPasswordForm({
       router.push(response.redirect);
     }
 
-    return formState;
+    return previousState;
   };
 
   const [state, formAction] = useActionState(localFormAction, {

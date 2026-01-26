@@ -3,6 +3,7 @@ import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSerializableObject } from "@lib/utils";
+import { validateAccount } from "@lib/validationSchemas";
 import {
   getDefaultOrg,
   getLegalAndSupportSettings,
@@ -39,6 +40,9 @@ export default async function Page(props: {
   const organization = searchParams.organization ?? (await getOrg(serviceUrl));
 
   const missingData = !firstname || !lastname || !email || !organization;
+  const validateData = await validateAccount({ firstname, lastname, email } as {
+    [k: string]: FormDataEntryValue;
+  });
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
@@ -54,27 +58,26 @@ export default async function Page(props: {
     organization,
   }).then((obj) => getSerializableObject(obj));
 
-  if (missingData) {
+  if (missingData || !validateData.success) {
     return (
       <>
         <div className="flex flex-col space-y-4">
-          <AuthPanelTitle i18nKey="missingdata.title" namespace="registerPassword" />
+          <AuthPanelTitle i18nKey="create.missingOrInvalidData.title" namespace="password" />
           <p>
-            <I18n i18nKey="missingdata.description" namespace="registerPassword" />
+            <I18n i18nKey="create.missingOrInvalidData.description" namespace="password" />
           </p>
         </div>
       </>
     );
   }
 
-  // TODO Should this be done on the register page also/instead?
   if (!loginSettings?.allowRegister || !loginSettings.allowUsernamePassword) {
     return (
       <>
         <div className="flex flex-col space-y-4">
-          <AuthPanelTitle i18nKey="disabled.title" namespace="registerPassword" />
+          <AuthPanelTitle i18nKey="disabled.title" namespace="password" />
           <p>
-            <I18n i18nKey="disabled.description" namespace="registerPassword" />
+            <I18n i18nKey="disabled.description" namespace="password" />
           </p>
         </div>
       </>
@@ -83,7 +86,7 @@ export default async function Page(props: {
 
   return (
     <div id="auth-panel">
-      <AuthPanelTitle i18nKey="title" namespace="registerPassword" />
+      <AuthPanelTitle i18nKey="title" namespace="password" />
       {legal && passwordComplexitySettings && (
         <SetRegisterPasswordForm
           passwordComplexitySettings={passwordComplexitySettings}

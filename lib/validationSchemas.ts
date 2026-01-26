@@ -72,3 +72,16 @@ export const confirmPasswordSchema = () => ({
     confirmPassword: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredConfirmPassword")),
   },
 });
+
+// Shared "composed" validation functions using the above schemas
+
+export const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...firstnameSchema(),
+      ...lastnameSchema(),
+      ...emailSchema(),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
+};

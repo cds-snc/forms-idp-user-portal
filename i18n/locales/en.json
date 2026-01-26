@@ -140,9 +140,9 @@
         "title": "Registration disabled",
         "description": "The registration is disabled. Please contact your administrator."
       },
-      "missingdata": {
-        "title": "Missing data",
-        "description": "Provide email, first and last name to register."
+      "missingOrInvalidData": {
+        "title": "Missing or Invalid data",
+        "description": "Provide a valid first name, last name, and email to register."
       }
     },
     "complexity": {
