@@ -73,7 +73,7 @@ export function PasswordComplexity({ passwordComplexitySettings, password, equal
           {renderIcon(hasMinLength, t)}
           <span className={desc}>
             <I18n
-              i18nKey="complexity.length"
+              i18nKey="complexity.minLength"
               namespace="password"
               data={{ minLength: passwordComplexitySettings.minLength.toString() }}
             />

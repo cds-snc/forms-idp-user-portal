@@ -128,15 +128,36 @@
         "unknownError": "Unknown error"
       }
     },
+    "create": {
+      "title": "Set Password",
+      "submit": "Continue",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "passwordHint": "Your password should be hard to guess with:",
+      "disabled": {
+        "title": "Registration disabled",
+        "description": "The registration is disabled. Please contact your administrator."
+      },
+      "missingdata": {
+        "title": "Missing data",
+        "description": "Provide email, first and last name to register."
+      }
+    },
     "complexity": {
-      "length": "Must be at least {minLength} characters long.",
-      "hasSymbol": "Must include a symbol.",
-      "hasNumber": "Must include a number.",
-      "hasUppercase": "Must include an uppercase letter.",
-      "hasLowercase": "MusUser t include a lowercase letter.",
+      "requiredPassword": "Password is required.",
+      "requiredConfirmPassword": "Confirm password is required.",
+      "minLength": "Password must be at least 8 characters.",
+      "maxLength": "Password must not exceed 50 characters.",
+      "hasSymbol": "Password must contain at least 1 symbol.",
+      "hasNumber": "Password must contain at least 1 number.",
+      "hasUppercase": "Password must contain at least 1 uppercase character.",
+      "hasLowercase": "Password must contain at least 1 lowercase character.",
+      "mustMatch": "The passwords must match.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
-      "doesNotMatch": "Doesn't match"
+      "doesNotMatch": "The entries for password must match."
     },
     "errors": {
       "noHostFound": "No host found",
@@ -242,6 +263,13 @@
       "agreement": "By creating an account you agree to the ",
       "linkText": "Terms of use."
     },
+    "validation": {
+      "required": "Complete the required field to continue.",
+      "requiredFirstname": "First name is required.",
+      "requiredLastname": "Last name is required.",
+      "requiredEmail": "Email is required.",
+      "validGovEmail": "Enter a valid government email address."
+    },
     "errors": {
       "couldNotCreateUser": "Could not create user",
       "couldNotCreateSession": "Could not create session",
@@ -250,31 +278,7 @@
       "couldNotRegisterUser": "Could not register user"
     }
   },
-  "registerPassword": {
-    "title": "Set Password",
-    "submit": "Continue",
-    "labels": {
-      "password": "Password",
-      "confirmPassword": "Confirm Password"
-    },
-    "passwordHint": "Your password should be hard to guess with:",
-    "disabled": {
-      "title": "Registration disabled",
-      "description": "The registration is disabled. Please contact your administrator."
-    },
-    "missingdata": {
-      "title": "Missing data",
-      "description": "Provide email, first and last name to register."
-    }
-  },
   "errorSummary": {
     "title":"Please correct the errors on the page."
-  },
-  "validation": {
-    "required": "Complete the required field to continue.",
-    "requiredFirstname": "First name is required.",
-    "requiredLastname": "Last name is required.",
-    "requiredEmail": "Email is required.",
-    "validGovEmail": "Enter a valid government email address."
   }
 }

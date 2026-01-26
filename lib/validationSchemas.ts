@@ -55,14 +55,14 @@ export const passwordSchema = ({
       v.maxLength(50, "maxLength"),
       v.check(
         (password) => !requiresLowercase || containsLowerCaseCharacter(password),
-        "oneLowerCase"
+        "hasLowercase"
       ),
       v.check(
         (password) => !requiresUppercase || containsUpperCaseCharacter(password),
-        "oneUpperCase"
+        "hasUppercase"
       ),
-      v.check((password) => !requiresNumber || containsNumber(password), "oneNumber"),
-      v.check((password) => !requiresSymbol || containsSymbol(password), "oneSymbol")
+      v.check((password) => !requiresNumber || containsNumber(password), "hasNumber"),
+      v.check((password) => !requiresSymbol || containsSymbol(password), "hasSymbol")
     ),
   },
 });

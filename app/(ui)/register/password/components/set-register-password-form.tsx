@@ -70,7 +70,7 @@ export function SetRegisterPasswordForm({
   organization,
   requestId,
 }: Props) {
-  const { t } = useTranslation(["registerPassword", "password"]);
+  const { t } = useTranslation(["password"]);
 
   const router = useRouter();
   const [watchPassword, setWatchPassword] = useState("");
@@ -91,7 +91,7 @@ export function SetRegisterPasswordForm({
           fieldKey: issue.path?.[0].key as string,
           // TODO put back once translations are done
           // fieldValue: t(issue.message || "required", { ns: "validation" }),
-          fieldValue: t(issue.message, { ns: "validation" }),
+          fieldValue: t(`complexity.${issue.message}`),
         })),
         formData: {
           password: typeof formEntries.password === "string" ? formEntries.password : "",
@@ -125,6 +125,7 @@ export function SetRegisterPasswordForm({
       email: email,
       firstName: firstname,
       lastName: lastname,
+      password: formEntries.password as string,
       organization: organization,
       requestId: requestId,
     }).catch(() => {
@@ -184,10 +185,10 @@ export function SetRegisterPasswordForm({
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
           <div className="">
             <Label htmlFor="password" required>
-              {t("labels.password")}
+              {t("create.labels.password")}
             </Label>
             {getError("password") && (
-              <ErrorMessage id={"errorMessagePassword"}>{getError("password")}</ErrorMessage>
+              <ErrorMessage id={"errorMessagePassword"}>{t(getError("password"))}</ErrorMessage>
             )}
             <TextInput
               id="password"
@@ -199,7 +200,7 @@ export function SetRegisterPasswordForm({
             />
             <Hint>
               <div className="my-4">
-                <I18n i18nKey="passwordHint" namespace="registerPassword" />
+                <I18n i18nKey="create.passwordHint" namespace="registerPassword" />
               </div>
               {passwordComplexitySettings && (
                 <PasswordComplexity
@@ -212,7 +213,7 @@ export function SetRegisterPasswordForm({
           </div>
           <div className="">
             <Label htmlFor="confirmPassword" required>
-              {t("labels.confirmPassword")}
+              {t("create.labels.confirmPassword")}
             </Label>
             {getError("confirmPassword") && (
               <ErrorMessage id={"errorMessageConfirmPassword"}>

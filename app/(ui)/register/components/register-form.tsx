@@ -76,7 +76,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: t(issue.message || "required", { ns: "validation" }),
+          fieldValue: t(`validation.${issue.message}` || "required"),
         })),
         formData: originalFormData,
       };
