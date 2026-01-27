@@ -157,7 +157,9 @@
       "mustMatch": "The passwords must match.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
-      "doesNotMatch": "The entries for password must match."
+      "doesNotMatch": "The entries for password must match.",
+      "succeeds": "Succeeds",
+      "fails": "Fails"
     },
     "errors": {
       "noHostFound": "No host found",

@@ -78,6 +78,12 @@ export function PasswordComplexity({ passwordComplexitySettings, password, equal
               data={{ minLength: passwordComplexitySettings.minLength.toString() }}
             />
           </span>
+          <span aria-live="polite" aria-atomic="true" className="sr-only">
+            {hasMinLength
+              ? t("complexity.succeeds", { ns: "password" })
+              : t("complexity.fails", { ns: "password" })}{" "}
+            {t("complexity.minLength", { ns: "password" })}
+          </span>
         </li>
       ) : (
         <span />
@@ -87,11 +93,23 @@ export function PasswordComplexity({ passwordComplexitySettings, password, equal
         <span className={desc}>
           <I18n i18nKey="complexity.hasSymbol" namespace="password" />
         </span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {hasSymbol
+            ? t("complexity.succeeds", { ns: "password" })
+            : t("complexity.fails", { ns: "password" })}{" "}
+          {t("complexity.hasSymbol", { ns: "password" })}
+        </span>
       </li>
       <li className="flex flex-row items-center" data-testid="number-check">
         {renderIcon(hasNumber, t)}
         <span className={desc}>
           <I18n i18nKey="complexity.hasNumber" namespace="password" />
+        </span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {hasNumber
+            ? t("complexity.succeeds", { ns: "password" })
+            : t("complexity.fails", { ns: "password" })}{" "}
+          {t("complexity.hasNumber", { ns: "password" })}
         </span>
       </li>
       <li className="flex flex-row items-center" data-testid="uppercase-check">
@@ -99,17 +117,35 @@ export function PasswordComplexity({ passwordComplexitySettings, password, equal
         <span className={desc}>
           <I18n i18nKey="complexity.hasUppercase" namespace="password" />
         </span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {hasUppercase
+            ? t("complexity.succeeds", { ns: "password" })
+            : t("complexity.fails", { ns: "password" })}{" "}
+          {t("complexity.hasUppercase", { ns: "password" })}
+        </span>
       </li>
       <li className="flex flex-row items-center" data-testid="lowercase-check">
         {renderIcon(hasLowercase, t)}
         <span className={desc}>
           <I18n i18nKey="complexity.hasLowercase" namespace="password" />
         </span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {hasLowercase
+            ? t("complexity.succeeds", { ns: "password" })
+            : t("complexity.fails", { ns: "password" })}{" "}
+          {t("complexity.hasLowercase", { ns: "password" })}
+        </span>
       </li>
       <li className="flex flex-row items-center" data-testid="equal-check">
         {renderIcon(equals, t)}
         <span className={desc}>
           <I18n i18nKey="complexity.equals" namespace="password" />
+        </span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {equals
+            ? t("complexity.succeeds", { ns: "password" })
+            : t("complexity.fails", { ns: "password" })}{" "}
+          {t("complexity.equals", { ns: "password" })}
         </span>
       </li>
     </ol>

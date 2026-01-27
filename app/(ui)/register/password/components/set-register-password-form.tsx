@@ -175,7 +175,7 @@ export function SetRegisterPasswordForm({
             />
             <Hint>
               <div className="my-4">
-                <I18n i18nKey="create.passwordHint" namespace="registerPassword" />
+                <I18n i18nKey="create.passwordHint" namespace="password" />
               </div>
               {passwordComplexitySettings && (
                 <PasswordComplexity
