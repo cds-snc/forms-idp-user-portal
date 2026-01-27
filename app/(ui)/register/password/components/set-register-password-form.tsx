@@ -207,6 +207,7 @@ export function SetRegisterPasswordForm({
         </div>
 
         <div className="mt-8 flex w-full flex-row items-center justify-between">
+          {/* TODO do we want to retain state and populate the register form when going back? */}
           <BackButton data-testid="back-button" />
           {/* <SubmitButtonAction disabled={!policyIsValid || watchPassword !== watchConfirmPassword}>
             {t("submit")}
