@@ -8,6 +8,7 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 
 import { I18n, useTranslation } from "@i18n";
 import { TFunction } from "i18next";
+import { useEffect, useReducer } from "react";
 
 function CheckIcon({ title }: { title: string }) {
   return (
@@ -54,6 +55,23 @@ function renderIcon(matched: boolean, t: TFunction) {
 }
 const desc = "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
+function useDelayedThatUpdate(allValid: boolean, delay: number) {
+  // Avoid any synchronous state issues with setting state in the useEffect by using a reducer
+  const [showDelayed, dispatch] = useReducer(
+    (_state: boolean, action: { type: "show" | "hide" }) => action.type === "show",
+    false
+  );
+  useEffect(() => {
+    if (!allValid) {
+      dispatch({ type: "hide" });
+      return;
+    }
+    const timer = setTimeout(() => dispatch({ type: "show" }), delay);
+    return () => clearTimeout(timer);
+  }, [allValid, delay]);
+  return showDelayed;
+}
+
 export function PasswordComplexity({
   passwordComplexitySettings,
   password,
@@ -73,6 +91,10 @@ export function PasswordComplexity({
   const hasNumber = numberValidator(password);
   const hasUppercase = upperCaseValidator(password);
   const hasLowercase = lowerCaseValidator(password);
+
+  // Make sure the "valid password" message is queued after the other success messsages
+  const allValid = ready && hasMinLength && hasNumber && hasUppercase && hasLowercase && hasSymbol;
+  const announceSuccess = useDelayedThatUpdate(allValid, 100);
 
   // TODO should the passwordComplexitySettings be the "source of truth" for all validation that is done or not done?
   return (
@@ -169,7 +191,7 @@ export function PasswordComplexity({
         </li> */}
       </ol>
       <span aria-live="polite" aria-atomic="true" className="sr-only">
-        {ready && hasMinLength && hasNumber && hasUppercase && hasLowercase && hasSymbol && (
+        {announceSuccess && (
           <I18n i18nKey="complexity.requiredPasswordSuccess" namespace="password" />
         )}
       </span>
