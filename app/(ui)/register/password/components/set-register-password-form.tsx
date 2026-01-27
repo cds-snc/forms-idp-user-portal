@@ -25,15 +25,6 @@ type FormState = {
   };
 };
 
-type Props = {
-  passwordComplexitySettings: PasswordComplexitySettings;
-  email: string;
-  firstname: string;
-  lastname: string;
-  organization: string;
-  requestId?: string;
-};
-
 const validateCreatePassword = async (
   formEntries: { [k: string]: FormDataEntryValue },
   passwordComplexitySettings = {}
@@ -59,7 +50,14 @@ export function SetRegisterPasswordForm({
   lastname,
   organization,
   requestId,
-}: Props) {
+}: {
+  passwordComplexitySettings: PasswordComplexitySettings;
+  email: string;
+  firstname: string;
+  lastname: string;
+  organization: string;
+  requestId?: string;
+}) {
   const { t } = useTranslation(["password"]);
 
   const router = useRouter();
@@ -152,11 +150,13 @@ export function SetRegisterPasswordForm({
   //   (passwordComplexitySettings.requiresSymbol ? hasSymbol : true) &&
   //   hasMinLength;
 
+  const [dirty, setDirty] = useState(false);
+
   return (
     <>
       {state.error && <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>}
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
-      <form className="w-full" action={formAction} noValidate>
+      <form className="w-full" action={formAction} noValidate onChange={() => setDirty(true)}>
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
           <div className="">
             <Label htmlFor="password" required>
@@ -165,16 +165,8 @@ export function SetRegisterPasswordForm({
             {getError("password") && (
               <ErrorMessage id={"errorMessagePassword"}>{t(getError("password"))}</ErrorMessage>
             )}
-            <TextInput
-              id="password"
-              className="w-full"
-              type="password"
-              required
-              defaultValue={state.formData?.password ?? ""}
-              onChange={(e) => setWatchPassword(e.target.value)}
-            />
             <Hint>
-              <div className="my-4">
+              <div className="mb-2">
                 <I18n i18nKey="create.passwordHint" namespace="password" />
               </div>
               {passwordComplexitySettings && (
@@ -182,9 +174,20 @@ export function SetRegisterPasswordForm({
                   passwordComplexitySettings={passwordComplexitySettings}
                   password={watchPassword}
                   equals={!!watchPassword && watchPassword === watchConfirmPassword}
+                  id="password-complexity-requirements"
+                  ready={dirty}
                 />
               )}
             </Hint>
+            <TextInput
+              id="password"
+              className="w-full"
+              type="password"
+              required
+              ariaDescribedbyIds={["password-complexity-requirements"]}
+              defaultValue={state.formData?.password ?? ""}
+              onChange={(e) => setWatchPassword(e.target.value)}
+            />
           </div>
           <div className="">
             <Label htmlFor="confirmPassword" required>

@@ -9,12 +9,6 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { I18n, useTranslation } from "@i18n";
 import { TFunction } from "i18next";
 
-type Props = {
-  passwordComplexitySettings: PasswordComplexitySettings;
-  password: string;
-  equals: boolean;
-};
-
 function CheckIcon({ title }: { title: string }) {
   return (
     <svg
@@ -23,10 +17,11 @@ function CheckIcon({ title }: { title: string }) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="las la-check mr-2 size-6 flex-none text-lg text-green-500 dark:text-green-500"
-      role="img"
+      className="mr-2 size-6 flex-none text-lg text-green-500 dark:text-green-500"
+      // role="img"
+      aria-hidden="true"
     >
-      <title>{title}</title>
+      {/* <title>{title}</title> */}
       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
     </svg>
   );
@@ -35,15 +30,16 @@ function CheckIcon({ title }: { title: string }) {
 function CrossIcon({ title }: { title: string }) {
   return (
     <svg
-      className="las la-times text-warn-light-500 dark:text-warn-dark-500 mr-2 size-6 flex-none text-lg"
+      className="mr-2 size-6 flex-none text-lg"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      role="img"
+      // role="img"
+      aria-hidden="true"
     >
-      <title>{title}</title>
+      {/* <title>{title}</title> */}
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
   );
@@ -58,7 +54,19 @@ function renderIcon(matched: boolean, t: TFunction) {
 }
 const desc = "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
-export function PasswordComplexity({ passwordComplexitySettings, password, equals }: Props) {
+export function PasswordComplexity({
+  passwordComplexitySettings,
+  password,
+  equals,
+  id,
+  ready,
+}: {
+  passwordComplexitySettings: PasswordComplexitySettings;
+  password: string;
+  equals: boolean;
+  id: string;
+  ready: boolean;
+}) {
   const { t } = useTranslation("password");
   const hasMinLength = password?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(password);
@@ -66,88 +74,105 @@ export function PasswordComplexity({ passwordComplexitySettings, password, equal
   const hasUppercase = upperCaseValidator(password);
   const hasLowercase = lowerCaseValidator(password);
 
+  // TODO should the passwordComplexitySettings be the "source of truth" for all validation that is done or not done?
   return (
-    <ol className="mb-4 grid grid-cols-2 gap-x-8 gap-y-2 pl-0">
-      {passwordComplexitySettings.minLength != undefined ? (
-        <li className="flex flex-row items-center" data-testid="length-check">
-          {renderIcon(hasMinLength, t)}
+    <>
+      <ol id={id} className="mb-4 pl-0">
+        {passwordComplexitySettings.minLength && (
+          <li className="mb-2 flex flex-row items-center" data-testid="length-check">
+            {renderIcon(hasMinLength, t)}
+            <span className={desc}>
+              <I18n
+                i18nKey="complexity.minLength"
+                namespace="password"
+                data={{ minLength: passwordComplexitySettings.minLength.toString() }}
+              />
+            </span>
+            <span aria-live="polite" aria-atomic="true" className="sr-only">
+              {ready && hasMinLength && (
+                <>
+                  <I18n i18nKey="complexity.success" namespace="password" />
+                  <I18n i18nKey="complexity.minLength" namespace="password" />
+                </>
+              )}
+            </span>
+          </li>
+        )}
+        <li className="mb-2 flex flex-row items-center" data-testid="number-check">
+          {renderIcon(hasNumber, t)}
           <span className={desc}>
-            <I18n
-              i18nKey="complexity.minLength"
-              namespace="password"
-              data={{ minLength: passwordComplexitySettings.minLength.toString() }}
-            />
+            <I18n i18nKey="complexity.hasNumber" namespace="password" />
           </span>
           <span aria-live="polite" aria-atomic="true" className="sr-only">
-            {hasMinLength
-              ? t("complexity.succeeds", { ns: "password" })
-              : t("complexity.fails", { ns: "password" })}{" "}
-            {t("complexity.minLength", { ns: "password" })}
+            {ready && hasNumber && (
+              <>
+                <I18n i18nKey="complexity.success" namespace="password" />
+                <I18n i18nKey="complexity.hasNumber" namespace="password" />
+              </>
+            )}
           </span>
         </li>
-      ) : (
-        <span />
-      )}
-      <li className="flex flex-row items-center" data-testid="symbol-check">
-        {renderIcon(hasSymbol, t)}
-        <span className={desc}>
-          <I18n i18nKey="complexity.hasSymbol" namespace="password" />
-        </span>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">
-          {hasSymbol
-            ? t("complexity.succeeds", { ns: "password" })
-            : t("complexity.fails", { ns: "password" })}{" "}
-          {t("complexity.hasSymbol", { ns: "password" })}
-        </span>
-      </li>
-      <li className="flex flex-row items-center" data-testid="number-check">
-        {renderIcon(hasNumber, t)}
-        <span className={desc}>
-          <I18n i18nKey="complexity.hasNumber" namespace="password" />
-        </span>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">
-          {hasNumber
-            ? t("complexity.succeeds", { ns: "password" })
-            : t("complexity.fails", { ns: "password" })}{" "}
-          {t("complexity.hasNumber", { ns: "password" })}
-        </span>
-      </li>
-      <li className="flex flex-row items-center" data-testid="uppercase-check">
-        {renderIcon(hasUppercase, t)}
-        <span className={desc}>
-          <I18n i18nKey="complexity.hasUppercase" namespace="password" />
-        </span>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">
-          {hasUppercase
-            ? t("complexity.succeeds", { ns: "password" })
-            : t("complexity.fails", { ns: "password" })}{" "}
-          {t("complexity.hasUppercase", { ns: "password" })}
-        </span>
-      </li>
-      <li className="flex flex-row items-center" data-testid="lowercase-check">
-        {renderIcon(hasLowercase, t)}
-        <span className={desc}>
-          <I18n i18nKey="complexity.hasLowercase" namespace="password" />
-        </span>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">
-          {hasLowercase
-            ? t("complexity.succeeds", { ns: "password" })
-            : t("complexity.fails", { ns: "password" })}{" "}
-          {t("complexity.hasLowercase", { ns: "password" })}
-        </span>
-      </li>
-      <li className="flex flex-row items-center" data-testid="equal-check">
-        {renderIcon(equals, t)}
-        <span className={desc}>
-          <I18n i18nKey="complexity.equals" namespace="password" />
-        </span>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">
-          {equals
-            ? t("complexity.succeeds", { ns: "password" })
-            : t("complexity.fails", { ns: "password" })}{" "}
-          {t("complexity.equals", { ns: "password" })}
-        </span>
-      </li>
-    </ol>
+        <li className="mb-2 flex flex-row items-center" data-testid="uppercase-check">
+          {renderIcon(hasUppercase, t)}
+          <span className={desc}>
+            <I18n i18nKey="complexity.hasUppercase" namespace="password" />
+          </span>
+          <span aria-live="polite" aria-atomic="true" className="sr-only">
+            {ready && hasUppercase && (
+              <>
+                <I18n i18nKey="complexity.success" namespace="password" />
+                <I18n i18nKey="complexity.hasUppercase" namespace="password" />
+              </>
+            )}
+          </span>
+        </li>
+        <li className="mb-2 flex flex-row items-center" data-testid="lowercase-check">
+          {renderIcon(hasLowercase, t)}
+          <span className={desc}>
+            <I18n i18nKey="complexity.hasLowercase" namespace="password" />
+          </span>
+          <span aria-live="polite" aria-atomic="true" className="sr-only">
+            {ready && hasLowercase && (
+              <>
+                <I18n i18nKey="complexity.success" namespace="password" />
+                <I18n i18nKey="complexity.hasLowercase" namespace="password" />
+              </>
+            )}
+          </span>
+        </li>
+        <li className="mb-2 flex flex-row items-center" data-testid="symbol-check">
+          {renderIcon(hasSymbol, t)}
+          <span className={desc}>
+            <I18n i18nKey="complexity.hasSymbol" namespace="password" />
+          </span>
+          <span aria-live="polite" aria-atomic="true" className="sr-only">
+            {ready && hasSymbol && (
+              <>
+                <I18n i18nKey="complexity.success" namespace="password" />
+                <I18n i18nKey="complexity.hasSymbol" namespace="password" />
+              </>
+            )}
+          </span>
+        </li>
+
+        {/* <li className="flex flex-row items-center" data-testid="equal-check">
+          {renderIcon(equals, t)}
+          <span className={desc}>
+            <I18n i18nKey="complexity.equals" namespace="password" />
+          </span>
+          <span aria-live="polite" aria-atomic="true" className="sr-only">
+            {equals
+              ? t("complexity.succeeds", { ns: "password" })
+              : t("complexity.fails", { ns: "password" })}{" "}
+            {t("complexity.equals", { ns: "password" })}
+          </span>
+        </li> */}
+      </ol>
+      <span aria-live="polite" aria-atomic="true" className="sr-only">
+        {ready && hasMinLength && hasNumber && hasUppercase && hasLowercase && hasSymbol && (
+          <I18n i18nKey="complexity.requiredPasswordSuccess" namespace="password" />
+        )}
+      </span>
+    </>
   );
 }

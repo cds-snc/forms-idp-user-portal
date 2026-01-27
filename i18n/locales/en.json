@@ -148,18 +148,18 @@
     "complexity": {
       "requiredPassword": "Password is required.",
       "requiredConfirmPassword": "Confirm password is required.",
-      "minLength": "Password must be at least 8 characters.",
-      "maxLength": "Password must not exceed 50 characters.",
-      "hasSymbol": "Password must contain at least 1 symbol.",
-      "hasNumber": "Password must contain at least 1 number.",
-      "hasUppercase": "Password must contain at least 1 uppercase character.",
-      "hasLowercase": "Password must contain at least 1 lowercase character.",
+      "minLength": "At least 8 characters",
+      "hasNumber": "A number",
+      "hasUppercase": "A capital letter",
+      "hasLowercase": "A lowercase letter",
+      "hasSymbol": "A symbol",
+      "maxLength": "Less than 50 characters",
       "mustMatch": "The passwords must match.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
       "doesNotMatch": "The entries for password must match.",
-      "succeeds": "Succeeds",
-      "fails": "Fails"
+      "success": "Succeeds",
+      "requiredPasswordSuccess": "Password provided is valid."
     },
     "errors": {
       "noHostFound": "No host found",
