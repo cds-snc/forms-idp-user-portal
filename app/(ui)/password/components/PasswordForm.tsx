@@ -8,7 +8,6 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "@i18n";
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 
@@ -52,8 +51,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
       }),
       requestId,
     })
-      .catch((e) => {
-        console.error(e);
+      .catch(() => {
         return {
           error: t("errors.couldNotVerifyPassword"),
         };
@@ -72,7 +70,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
     return previousState;
   };
 
-  const [state, formAction] = useActionState(localFormAction, {});
+  const [, formAction] = useActionState(localFormAction, {});
 
   async function resetPasswordAndContinue() {
     setError("");
@@ -115,34 +113,28 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
   }
 
   return (
-    <form className="w-2/3 pt-2" action={formAction}>
-      <div className={`${error && "transform-gpu animate-shake"} gc`}>
-        <Label id={"label-password"} htmlFor={"password"} className="required" required>
-          {t("verify.form.label")}
-        </Label>
-        <TextInput
-          className="h-10 w-full min-w-full rounded-xl"
-          type={"password"}
-          id={"password"}
-          name={"password"}
-          required
-          defaultValue={""}
-        />
-        {!loginSettings?.hidePasswordReset && (
-          <button
-            className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-            onClick={() => resetPasswordAndContinue()}
-            type="button"
-            disabled={loading}
-            data-testid="reset-button"
-          >
-            {t("verify.form.resetPassword")}
-          </button>
-        )}
+    <form action={formAction}>
+      <div>
+        <div className="gcds-input-wrapper">
+          <Label id={"label-password"} htmlFor={"password"} className="required" required>
+            {t("verify.form.label")}
+          </Label>
+          <TextInput type={"password"} id={"password"} required defaultValue={""} />
+          {!loginSettings?.hidePasswordReset && (
+            <button
+              onClick={() => resetPasswordAndContinue()}
+              type="button"
+              disabled={loading}
+              data-testid="reset-button"
+            >
+              {t("verify.form.resetPassword")}
+            </button>
+          )}
 
-        {loginName && (
-          <input type="hidden" name="loginName" autoComplete="username" value={loginName} />
-        )}
+          {loginName && (
+            <input type="hidden" name="loginName" autoComplete="username" value={loginName} />
+          )}
+        </div>
       </div>
 
       {info && (
@@ -157,11 +149,7 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
         </div>
       )}
 
-      <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton data-testid="back-button" />
-        <span className="flex-grow"></span>
-        <SubmitButtonAction>{t("button.submit")}</SubmitButtonAction>
-      </div>
+      <SubmitButtonAction>{t("button.continue")}</SubmitButtonAction>
     </form>
   );
 }
