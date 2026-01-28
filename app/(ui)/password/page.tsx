@@ -10,6 +10,7 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
@@ -20,7 +21,7 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  let { loginName, organization, requestId } = searchParams;
+  const { loginName, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -47,7 +48,7 @@ export default async function Page(props: {
       },
     });
   } catch (error) {
-    // ignore error to continue to show the password form
+    // eslint-disable-next-line no-console
     console.warn(error);
   }
 
@@ -58,39 +59,43 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col items-center space-y-4">
-        <p>
+      <div id="auth-panel">
+        <AuthPanelTitle i18nKey="title" namespace="start" />
+
+        <div className="mb-6">
           <I18n i18nKey="verify.description" namespace="password" />
-        </p>
+        </div>
 
         {sessionFactors && (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        )}
-      </div>
-
-      <div className="flex flex-col items-center w-full">
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
-          <div className="py-4">
-            <Alert type={ErrorStatus.ERROR}>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert>
+          <div className="mb-6">
+            <UserAvatar
+              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+              displayName={sessionFactors.factors?.user?.displayName}
+              showDropdown
+              searchParams={searchParams}
+            ></UserAvatar>
           </div>
         )}
 
-        {loginName && (
-          <PasswordForm
-            loginName={loginName}
-            requestId={requestId}
-            organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-            loginSettings={loginSettings}
-          />
-        )}
+        <div>
+          {/* show error only if usernames should be shown to be unknown */}
+          {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+            <div className="py-4">
+              <Alert type={ErrorStatus.ERROR}>
+                <I18n i18nKey="unknownContext" namespace="error" />
+              </Alert>
+            </div>
+          )}
+
+          {loginName && (
+            <PasswordForm
+              loginName={loginName}
+              requestId={requestId}
+              organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+              loginSettings={loginSettings}
+            />
+          )}
+        </div>
       </div>
     </>
   );
