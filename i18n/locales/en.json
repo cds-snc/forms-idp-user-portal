@@ -197,9 +197,9 @@
       "title": "One Time Code",
       "otpDescription": "Please enter the code from your authenticator device",
       "smsDescription": "Please enter the code received by text message",
-      "emailDescription": "Please enter the code received by email",
+      "emailDescription": "Check your email for a security code",
       "form": {
-        "label": "Code",
+        "label": "Security Code",
         "noCodeReceived": "Didn't receive a code?",
         "resendCode": "Resend code"
       }

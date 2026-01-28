@@ -24,10 +24,17 @@ type Props = {
   requestId?: string;
 };
 
-export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite }: Props) {
+export function VerifyEmailForm({
+  userId,
+  loginName,
+  organization,
+  requestId,
+  code,
+  isInvite,
+}: Props) {
   const router = useRouter();
 
-  const { t } = useTranslation("verify");
+  const { t } = useTranslation("otp");
 
   const [error, setError] = useState<string>("");
 
@@ -125,7 +132,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           </div>
         </Alert.Info>
         <div className="mt-4">
-          <Label htmlFor="code">{t("verify.labels.code")}</Label>
+          <Label htmlFor="code">{t("verify.form.label")}</Label>
           <TextInput type="text" id="code" defaultValue={code ?? ""} />
         </div>
 

@@ -2,7 +2,7 @@ import { Alert } from "@clientComponents/globals";
 
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { VerifyForm } from "./components/verify-form";
+import { VerifyEmailForm } from "./components/verify-email-form";
 import { sendEmailCode, sendInviteEmailCode } from "@lib/server/verify";
 import { getOriginalHostWithProtocol } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -14,7 +14,7 @@ import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await serverTranslation("verify");
+  const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };
 }
 
@@ -119,10 +119,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     <>
       <div className="flex flex-col space-y-4">
         <h1>
-          <I18n i18nKey="verify.title" namespace="verify" />
+          <I18n i18nKey="verify.title" namespace="otp" />
         </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="verify.description" namespace="verify" />
+        <p>
+          <I18n i18nKey="verify.description" namespace="otp" />
         </p>
 
         {sessionFactors ? (
@@ -168,7 +168,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </div>
         )}
 
-        <VerifyForm
+        <VerifyEmailForm
           loginName={loginName}
           organization={organization}
           userId={id}
