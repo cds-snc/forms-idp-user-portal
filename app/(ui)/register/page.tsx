@@ -17,6 +17,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSerializableObject } from "@lib/utils";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("register");
@@ -83,21 +84,17 @@ export default async function Page(props: {
 
   return (
     <>
-      <div>
-        <h1 className="mt-6 border-b-0">
-          <I18n i18nKey="title" namespace="register" />
-        </h1>
-      </div>
+      <div id="auth-panel">
+        <AuthPanelTitle i18nKey="title" namespace="register" />
 
-      <div className="w-full">
-        {!organization && (
-          <Alert.Danger>
-            <I18n i18nKey="unknownContext" namespace="error" />
-          </Alert.Danger>
-        )}
+        <div className="w-full">
+          {!organization && (
+            <Alert.Danger>
+              <I18n i18nKey="unknownContext" namespace="error" />
+            </Alert.Danger>
+          )}
 
-        {legal && passwordComplexitySettings && organization && (
-          <div id="auth-panel">
+          {legal && passwordComplexitySettings && organization && (
             <RegisterForm
               idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               organization={organization}
@@ -107,8 +104,8 @@ export default async function Page(props: {
               requestId={requestId}
               loginSettings={loginSettings}
             ></RegisterForm>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
