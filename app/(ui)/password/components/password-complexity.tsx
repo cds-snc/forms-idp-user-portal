@@ -55,7 +55,7 @@ function renderIcon(matched: boolean, t: TFunction) {
 }
 const desc = "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
-function useDelayedThatUpdate(allValid: boolean, delay: number) {
+function useDelayedUpdate(allValid: boolean, delay: number) {
   // Avoid any synchronous state issues with setting state in the useEffect by using a reducer
   const [showDelayed, dispatch] = useReducer(
     (_state: boolean, action: { type: "show" | "hide" }) => action.type === "show",
@@ -94,7 +94,7 @@ export function PasswordComplexity({
 
   // Make sure the "valid password" message is queued after the other success messsages
   const allValid = ready && hasMinLength && hasNumber && hasUppercase && hasLowercase && hasSymbol;
-  const announceSuccess = useDelayedThatUpdate(allValid, 100);
+  const announceSuccess = useDelayedUpdate(allValid, 100);
 
   // TODO should the passwordComplexitySettings be the "source of truth" for all validation that is done or not done?
   return (
