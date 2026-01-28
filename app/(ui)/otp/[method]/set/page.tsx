@@ -12,6 +12,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSerializableObject } from "@lib/utils";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -114,15 +115,16 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="set.title" namespace="otp" />
-        </h1>
+      <div id="auth-panel">
+        <AuthPanelTitle i18nKey="set.title" namespace="otp" />
 
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
-          <p className="ztdl-p">
-            <I18n i18nKey="set.totpRegisterDescription" namespace="otp" />
-          </p>
+          <I18n
+            i18nKey="set.totpRegisterDescription"
+            namespace="otp"
+            tagName="p"
+            className="mb-6"
+          />
         ) : (
           <p className="ztdl-p">
             {method === "email"

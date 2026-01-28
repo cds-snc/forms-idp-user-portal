@@ -20,6 +20,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSerializableObject } from "@lib/utils";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -119,14 +120,10 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="set.title" namespace="mfa" />
-        </h1>
+      <div id="auth-panel">
+        <AuthPanelTitle i18nKey="set.title" namespace="mfa" />
 
-        <p className="ztdl-p">
-          <I18n i18nKey="set.description" namespace="mfa" />
-        </p>
+        <I18n i18nKey="set.description" namespace="mfa" tagName="p" className="mb-6" />
 
         {sessionWithData && (
           <UserAvatar

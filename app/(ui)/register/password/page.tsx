@@ -63,9 +63,12 @@ export default async function Page(props: {
       <>
         <div className="flex flex-col space-y-4">
           <AuthPanelTitle i18nKey="create.missingOrInvalidData.title" namespace="password" />
-          <p>
-            <I18n i18nKey="create.missingOrInvalidData.description" namespace="password" />
-          </p>
+
+          <I18n
+            i18nKey="create.missingOrInvalidData.description"
+            namespace="password"
+            tagName="p"
+          />
         </div>
       </>
     );

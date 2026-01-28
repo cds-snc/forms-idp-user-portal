@@ -156,8 +156,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
           <Link href={`/${i18n.language}/terms-of-use`}>{t("terms.linkText")}</Link>
         </p>
 
-        <div className="mt-8 flex flex-row items-center justify-between">
-          <BackButton data-testid="back-button" />
+        <div>
           <SubmitButtonAction>{t("submit")}</SubmitButtonAction>
         </div>
       </form>
