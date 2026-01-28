@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   return (
-    <div className="items-center flex flex-col">
+    <div id="auth-panel">
       <div className="flex flex-col items-center gap-6">
         <I18n i18nKey="description" namespace="home" />
         <div>

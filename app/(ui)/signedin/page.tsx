@@ -10,6 +10,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("signedin");
@@ -29,7 +30,9 @@ async function loadSessionById(serviceUrl: string, sessionId: string, organizati
   });
 }
 
-export default async function Page(props: { searchParams: Promise<any> }) {
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+}) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
@@ -84,17 +87,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n
-            i18nKey="title"
-            namespace="signedin"
-            data={{ user: sessionFactors?.factors?.user?.displayName }}
-          />
-        </h1>
-        <p className="ztdl-p mb-6 block">
-          <I18n i18nKey="description" namespace="signedin" />
-        </p>
+      <div id="auth-panel">
+        <AuthPanelTitle
+          i18nKey="title"
+          namespace="signedin"
+          data={{ user: sessionFactors?.factors?.user?.displayName }}
+        />
+
+        <I18n i18nKey="description" namespace="signedin" tagName="p" className="mb-6" />
 
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
@@ -102,24 +102,24 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           showDropdown={!(requestId && requestId.startsWith("device_"))}
           searchParams={searchParams}
         />
-      </div>
 
-      <div className="w-full">
-        {requestId && requestId.startsWith("device_") && (
-          <Alert.Info>
-            You can now close this window and return to the device where you started the
-            authorization process to continue.
-          </Alert.Info>
-        )}
+        <div className="w-full">
+          {requestId && requestId.startsWith("device_") && (
+            <Alert.Info>
+              You can now close this window and return to the device where you started the
+              authorization process to continue.
+            </Alert.Info>
+          )}
 
-        {loginSettings?.defaultRedirectUri && (
-          <div className="mt-8 flex w-full flex-row items-center">
-            <span className="flex-grow"></span>
-            <LinkButton.Primary href={loginSettings?.defaultRedirectUri}>
-              <I18n i18nKey="continue" namespace="signedin" />
-            </LinkButton.Primary>
-          </div>
-        )}
+          {loginSettings?.defaultRedirectUri && (
+            <div className="mt-8 flex w-full flex-row items-center">
+              <span className="grow"></span>
+              <LinkButton.Primary href={loginSettings?.defaultRedirectUri}>
+                <I18n i18nKey="continue" namespace="signedin" />
+              </LinkButton.Primary>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

@@ -12,6 +12,7 @@ import { serverTranslation } from "@i18n/server";
 
 import { headers } from "next/headers";
 import Link from "next/link";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("accounts");
@@ -73,28 +74,24 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="title" namespace="accounts" />
-        </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="description" namespace="accounts" />
-        </p>
-      </div>
+      <div id="auth-panel">
+        <AuthPanelTitle i18nKey="title" namespace="accounts" />
+        <I18n i18nKey="description" namespace="accounts" tagName="p" className="mb-6" />
 
-      <div className="w-full">
-        <div className="flex w-full flex-col space-y-2">
-          <SessionsList sessions={sessions} requestId={requestId} />
-          <Link href={`/start?` + params}>
-            <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
-              <div className="mr-4 flex h-8 w-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
-                <AddIcon className="h-5 w-5" />
+        <div className="w-full">
+          <div className="flex w-full flex-col space-y-2">
+            <SessionsList sessions={sessions} requestId={requestId} />
+            <Link href={`/start?` + params}>
+              <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
+                <div className="mr-4 flex size-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
+                  <AddIcon className="size-5" />
+                </div>
+                <span className="text-sm">
+                  <I18n i18nKey="addAnother" namespace="accounts" />
+                </span>
               </div>
-              <span className="text-sm">
-                <I18n i18nKey="addAnother" namespace="accounts" />
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
     </>

@@ -1,10 +1,18 @@
 import { I18n } from "@i18n";
 
-export const AuthPanelTitle = ({ i18nKey, namespace }: { i18nKey: string; namespace: string }) => {
+export const AuthPanelTitle = ({
+  i18nKey,
+  namespace,
+  data,
+}: {
+  i18nKey: string;
+  namespace: string;
+  data?: Record<string, unknown>;
+}) => {
   return (
     <div className="mb-6 mt-4">
       <h1 className="!mb-0">
-        <I18n i18nKey={i18nKey} namespace={namespace} />
+        <I18n i18nKey={i18nKey} namespace={namespace} data={data} />
       </h1>
     </div>
   );
