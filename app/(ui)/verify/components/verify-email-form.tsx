@@ -1,10 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
-import { Alert } from "@clientComponents/globals";
 import { resendVerification, sendVerification } from "@lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as v from "valibot";
 
 import { I18n, useTranslation } from "@i18n";
@@ -14,10 +13,8 @@ import Link from "next/link";
 import { codeSchema } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { CodeEntry } from "@clientComponents/forms/CodeEntry";
-
-type Inputs = {
-  code: string;
-};
+import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 
 type FormState = {
   error?: string;
@@ -59,77 +56,67 @@ export function VerifyEmailForm({
 
   const [error, setError] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [codeLoading, setCodeLoading] = useState<boolean>(false);
+  const [codeSent, setCodeSent] = useState<boolean>(false);
 
   async function resendCode() {
     setError("");
-    setLoading(true);
+    setCodeLoading(true);
 
-    const response = await resendVerification({
-      userId,
-      isInvite: isInvite,
-    })
-      .catch(() => {
-        setError(t("errors.couldNotResendEmail"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await resendVerification({
+        userId,
+        isInvite: isInvite,
       });
 
-    if (response && "error" in response && response?.error) {
-      setError(response.error);
-      return;
+      if (response && "error" in response && response.error) {
+        setError(response.error);
+      } else {
+        setCodeSent(true);
+      }
+    } catch {
+      setError(t("errors.couldNotResendEmail"));
+    } finally {
+      setCodeLoading(false);
     }
-
-    return response;
   }
 
-  const fcn = useCallback(
-    async function submitCodeAndContinue(value: Inputs) {
-      return sendVerification({
-        code: value.code,
+  useEffect(() => {
+    if (code) {
+      sendVerification({
+        code: code,
         userId,
         isInvite: isInvite,
         loginName: loginName,
         organization: organization,
         requestId: requestId,
       });
-    },
-    [isInvite, userId]
-  );
-
-  useEffect(() => {
-    if (code) {
-      fcn({ code });
     }
-  }, [code, fcn]);
+  }, [code, userId, isInvite, loginName, organization, requestId]);
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const code = (formData.get("code") as string) || "";
 
+    // Validate form entries and map any errors to form state with translated messages
     const validationResult = await validateCode({ code });
     if (!validationResult.success) {
-      console.log("validationResult", validationResult);
-      const temp = {
+      return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
           fieldValue: t(`validation.${issue.message}`),
         })),
-        formData: {
-          code,
-        },
+        formData: { code },
       };
-
-      return temp;
     }
-    // if (typeof code !== "string") {
-    //   return {
-    //     error: "Invalid Field",
-    //   };
-    // }
 
-    const response = await fcn({ code });
+    const response = await sendVerification({
+      code: code,
+      userId,
+      isInvite: isInvite,
+      loginName: loginName,
+      organization: organization,
+      requestId: requestId,
+    });
 
     if (response && "error" in response && response?.error) {
       return {
@@ -144,8 +131,6 @@ export function VerifyEmailForm({
     return previousState;
   };
 
-  // const [state, formAction] = useActionState(localFormAction, {});
-
   const [state, formAction] = useActionState(localFormAction, {
     validationErrors: undefined,
     error: undefined,
@@ -154,58 +139,64 @@ export function VerifyEmailForm({
     },
   });
 
-  const getError = (fieldKey: string) => {
-    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
-  };
-
   return (
     <>
+      {state.error && (
+        <Alert
+          type={ErrorStatus.ERROR}
+          // heading={state.authError.title}
+          focussable={true}
+          id="zitadelError"
+        >
+          <I18n i18nKey={state.error} namespace="verify" />
+          {/* {state.authError.callToActionLink ? (
+            <Link href={state.authError.callToActionLink}>{state.authError.callToActionText}</Link>
+          ) : undefined} */}
+        </Alert>
+      )}
+      {/* {state.error && (
+        <div className="py-4" data-testid="error">
+          <Alert.Danger>
+            <p className="mt-3 font-bold">{state.error}</p>
+          </Alert.Danger>
+        </div>
+      )} */}
+
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
 
       {children}
 
       {error && (
-        <div className="py-4" data-testid="error">
-          <Alert.Warning>{error}</Alert.Warning>
+        <div className="py-4" data-testid="warning">
+          <AlertNotification.Warning>
+            <p className="mt-3 font-bold">{error}</p>
+          </AlertNotification.Warning>
         </div>
       )}
 
-      {state.error && (
-        <div className="py-4" data-testid="error">
-          <Alert.Danger>{state.error}</Alert.Danger>
-        </div>
+      {(codeLoading || codeSent) && (
+        <AlertNotification.Info>
+          <p className="mt-3 font-bold">
+            {codeLoading && <I18n i18nKey="sendingNewCode" namespace="verify" />}
+            {codeSent && <I18n i18nKey="sentNewCode" namespace="verify" />}
+          </p>
+        </AlertNotification.Info>
       )}
 
       <div className="w-full">
         <form action={formAction} noValidate>
-          {/* <Alert.Info>
-          <div className="flex flex-row">
-            <span className="mr-auto flex-1 text-left">
-              <I18n i18nKey="verify.noCodeReceived" namespace="verify" />
-            </span>
-            <button
-              aria-label="Resend Code"
-              disabled={loading}
-              type="button"
-              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
-              onClick={() => {
-                resendCode();
-              }}
-              data-testid="resend-button"
-            >
-              <I18n i18nKey="verify.resendCode" namespace="verify" />
-            </button>
-          </div>
-        </Alert.Info> */}
-
-
           <CodeEntry state={state} code={code ?? ""} className="mt-10" />
 
           <div className="mt-8 flex items-center gap-4">
-            {/* TODO replace with above button that calls resendCode() and add notification somewhere */}
-            <Link href="TODO">
+            <Button
+              theme="link"
+              type="button"
+              onClick={() => resendCode()}
+              disabled={codeLoading}
+              data-testid="resend-button"
+            >
               <I18n i18nKey="newCode" namespace="verify" />
-            </Link>
+            </Button>
             <Link href="/help">
               <I18n i18nKey="help" namespace="verify" />
             </Link>

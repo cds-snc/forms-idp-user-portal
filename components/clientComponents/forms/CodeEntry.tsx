@@ -10,6 +10,8 @@ type FormState = {
   formData?: Record<string, string>;
 };
 
+// Pulls the error keys out of form state. Note that the validationErrors must be
+// populated with the translated strings for this to work.
 const getError = (fieldKey: string, state: FormState) => {
   return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
 };

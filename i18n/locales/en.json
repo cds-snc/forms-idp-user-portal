@@ -286,10 +286,15 @@
     "hint": "Enter code within 15 minutes.",
     "submit": "Continue",
     "newCode": "Send a new code",
+    "sendingNewCode": "Sending new code...",
+    "sentNewCode": "New code sent",
     "help": "Need help?",
     "validation": {
       "required": "Cannot be empty",
       "length": "Must be 6 characters"
+    },
+    "errors": {
+      "couldNotVerifyEmail": "Could not verify email"
     }
   },
   "errorSummary": {
