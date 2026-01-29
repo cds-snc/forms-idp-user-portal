@@ -49,7 +49,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: t("errors.couldNotGetLoginSettings") };
   }
 
-  let searchUsersRequest: SearchUsersCommand = {
+  const searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
     searchValue: command.loginName,
     organizationId: command.organization,

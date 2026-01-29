@@ -126,7 +126,7 @@ export default async function Page(props: {
             className="mb-6"
           />
         ) : (
-          <p className="ztdl-p">
+          <p>
             {method === "email"
               ? "Code via email was successfully added."
               : method === "sms"
@@ -176,7 +176,7 @@ export default async function Page(props: {
         ) : (
           <div className="mt-8 flex w-full flex-row items-center">
             <BackButton />
-            <span className="flex-grow"></span>
+            <span className="grow"></span>
 
             <Link href={urlToContinue}>
               <Button>

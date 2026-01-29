@@ -8,7 +8,6 @@ import { getSessionCookieById } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import {
-  getBrandingSettings,
   getLoginSettings,
   getSession,
   getUserByID,
@@ -107,10 +106,6 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: sessionWithData.factors?.user?.organizationId,
