@@ -18,7 +18,7 @@ export const TextInput = ({
   required?: boolean;
   placeholder?: string;
   autoComplete?: string;
-  ariaDescribedbyIds?: string[];
+  ariaDescribedbyIds?: string[] | string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   defaultValue?: string;
 }): React.ReactElement => {
@@ -37,7 +37,11 @@ export const TextInput = ({
         placeholder={placeholder}
         defaultValue={defaultValue}
         onChange={onChange}
-        {...(ariaDescribedbyIds && { "aria-describedby": ariaDescribedbyIds.join(" ") })}
+        {...(ariaDescribedbyIds && {
+          "aria-describedby": Array.isArray(ariaDescribedbyIds)
+            ? ariaDescribedbyIds.join(" ")
+            : ariaDescribedbyIds,
+        })}
       />
     </>
   );

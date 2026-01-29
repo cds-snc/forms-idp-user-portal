@@ -12,6 +12,9 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import Link from "next/link";
+import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -117,57 +120,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="verify.title" namespace="otp" />
-        </h1>
-        <p>
-          <I18n i18nKey="verify.description" namespace="otp" />
-        </p>
-
-        {sessionFactors ? (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        ) : (
-          user && (
-            <UserAvatar
-              loginName={user.preferredLoginName}
-              displayName={human?.profile?.displayName}
-              showDropdown={false}
-            />
-          )
-        )}
-      </div>
-
-      <div className="w-full">
-        {error && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey={`errors.${error}`} namespace="verify" />
-            </Alert.Danger>
-          </div>
-        )}
-
-        {!id && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          </div>
-        )}
-
-        {id && send && (
-          <div className="w-full py-4">
-            <Alert.Info>
-              <I18n i18nKey="verify.codeSent" namespace="verify" />
-            </Alert.Info>
-          </div>
-        )}
-
+      <div id="auth-panel">
         <VerifyEmailForm
           loginName={loginName}
           organization={organization}
@@ -175,7 +128,52 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           code={code}
           isInvite={invite === "true"}
           requestId={requestId}
-        />
+        >
+          <AuthPanelTitle i18nKey="title" namespace="verify" />
+
+          <div className="my-8">
+            {sessionFactors ? (
+              <UserAvatar
+                loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+                displayName={sessionFactors.factors?.user?.displayName}
+                showDropdown
+                searchParams={searchParams}
+              ></UserAvatar>
+            ) : (
+              user && (
+                <UserAvatar
+                  loginName={user.preferredLoginName}
+                  displayName={human?.profile?.displayName}
+                  showDropdown={false}
+                />
+              )
+            )}
+          </div>
+
+          {error && (
+            <div className="py-4">
+              <Alert.Danger>
+                <I18n i18nKey={`errors.${error}`} namespace="verify" />
+              </Alert.Danger>
+            </div>
+          )}
+
+          {!id && (
+            <div className="py-4">
+              <Alert.Danger>
+                <I18n i18nKey="unknownContext" namespace="error" />
+              </Alert.Danger>
+            </div>
+          )}
+
+          {/* {id && send && (
+                  <div className="w-full py-4">
+                    <Alert.Info>
+                      <I18n i18nKey="verify.codeSent" namespace="verify" />
+                    </Alert.Info>
+                  </div>
+                )} */}
+        </VerifyEmailForm>
       </div>
     </>
   );

@@ -197,7 +197,7 @@
       "title": "One Time Code",
       "otpDescription": "Please enter the code from your authenticator device",
       "smsDescription": "Please enter the code received by text message",
-      "emailDescription": "Check your email for a security code",
+      "emailDescription": "Please enter the code received by email",
       "form": {
         "label": "Security Code",
         "noCodeReceived": "Didn't receive a code?",
@@ -278,6 +278,18 @@
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
       "couldNotRegisterUser": "Could not register user"
+    }
+  },
+  "verify": {
+    "title": "Check your email for a security code",
+    "label": "Security code",
+    "hint": "Enter code within 15 minutes.",
+    "submit": "Continue",
+    "newCode": "Send a new code",
+    "help": "Need help?",
+    "validation": {
+      "required": "Cannot be empty",
+      "length": "Must be 6 characters"
     }
   },
   "errorSummary": {

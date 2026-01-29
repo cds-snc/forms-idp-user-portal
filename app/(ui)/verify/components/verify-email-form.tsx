@@ -5,23 +5,37 @@ import { Alert } from "@clientComponents/globals";
 import { resendVerification, sendVerification } from "@lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import * as v from "valibot";
 
 import { I18n, useTranslation } from "@i18n";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import Link from "next/link";
+import { Hint } from "@clientComponents/forms/Hint";
+import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
+import { codeSchema } from "@lib/validationSchemas";
+import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
 type Inputs = {
   code: string;
 };
 
-type Props = {
-  userId: string;
-  loginName?: string;
-  organization?: string;
-  code?: string;
-  isInvite: boolean;
-  requestId?: string;
+type FormState = {
+  error?: string;
+  validationErrors?: { fieldKey: string; fieldValue: string }[];
+  formData?: {
+    code?: string;
+  };
+};
+
+const validateCode = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...codeSchema(),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
 export function VerifyEmailForm({
@@ -31,10 +45,19 @@ export function VerifyEmailForm({
   requestId,
   code,
   isInvite,
-}: Props) {
+  children,
+}: {
+  userId: string;
+  loginName?: string;
+  organization?: string;
+  code?: string;
+  isInvite: boolean;
+  requestId?: string;
+  children?: React.ReactNode;
+}) {
   const router = useRouter();
 
-  const { t } = useTranslation("otp");
+  const { t } = useTranslation("verify");
 
   const [error, setError] = useState<string>("");
 
@@ -84,14 +107,29 @@ export function VerifyEmailForm({
     }
   }, [code, fcn]);
 
-  const localFormAction = async (previousState: { error?: string }, formData: FormData) => {
-    const code = formData.get("code");
+  const localFormAction = async (previousState: FormState, formData: FormData) => {
+    const code = (formData.get("code") as string) || "";
 
-    if (typeof code !== "string") {
-      return {
-        error: "Invalid Field",
+    const validationResult = await validateCode({ code });
+    if (!validationResult.success) {
+      console.log("validationResult", validationResult);
+      const temp = {
+        validationErrors: validationResult.issues.map((issue) => ({
+          fieldKey: issue.path?.[0].key as string,
+          fieldValue: t(`validation.${issue.message}`),
+        })),
+        formData: {
+          code,
+        },
       };
+
+      return temp;
     }
+    // if (typeof code !== "string") {
+    //   return {
+    //     error: "Invalid Field",
+    //   };
+    // }
 
     const response = await fcn({ code });
 
@@ -104,15 +142,45 @@ export function VerifyEmailForm({
     if (response && "redirect" in response && response?.redirect) {
       router.push(response?.redirect);
     }
+
     return previousState;
   };
 
-  const [state, formAction] = useActionState(localFormAction, {});
+  // const [state, formAction] = useActionState(localFormAction, {});
+
+  const [state, formAction] = useActionState(localFormAction, {
+    validationErrors: undefined,
+    error: undefined,
+    formData: {
+      code: "",
+    },
+  });
+
+  const getError = (fieldKey: string) => {
+    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
+  };
 
   return (
     <>
-      <form className="w-full" action={formAction}>
-        <Alert.Info>
+      <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
+
+      {children}
+
+      {error && (
+        <div className="py-4" data-testid="error">
+          <Alert.Warning>{error}</Alert.Warning>
+        </div>
+      )}
+
+      {state.error && (
+        <div className="py-4" data-testid="error">
+          <Alert.Danger>{state.error}</Alert.Danger>
+        </div>
+      )}
+
+      <div className="w-full">
+        <form action={formAction} noValidate>
+          {/* <Alert.Info>
           <div className="flex flex-row">
             <span className="mr-auto flex-1 text-left">
               <I18n i18nKey="verify.noCodeReceived" namespace="verify" />
@@ -130,31 +198,46 @@ export function VerifyEmailForm({
               <I18n i18nKey="verify.resendCode" namespace="verify" />
             </button>
           </div>
-        </Alert.Info>
-        <div className="mt-4">
-          <Label htmlFor="code">{t("verify.form.label")}</Label>
-          <TextInput type="text" id="code" defaultValue={code ?? ""} />
-        </div>
+        </Alert.Info> */}
 
-        {error && (
-          <div className="py-4" data-testid="error">
-            <Alert.Warning>{error}</Alert.Warning>
+          <div className="mt-10">
+            <Label htmlFor="code" required>
+              <I18n i18nKey="label" namespace="verify" />
+            </Label>
+            <Hint id="codeHint">
+              <I18n i18nKey="hint" namespace="verify" />
+            </Hint>
+            {getError("code") && (
+              <ErrorMessage id={"errorMessageCode"}>{getError("code")}</ErrorMessage>
+            )}
+            <TextInput
+              type="text"
+              id="code"
+              defaultValue={state.formData?.code ?? code ?? ""}
+              ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
+              className="w-36"
+              required
+            />
           </div>
-        )}
-        {state.error && (
-          <div className="py-4" data-testid="error">
-            <Alert.Danger>{state.error}</Alert.Danger>
-          </div>
-        )}
 
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
-          <SubmitButtonAction>
-            <I18n i18nKey="verify.submit" namespace="verify" />
-          </SubmitButtonAction>
-        </div>
-      </form>
+          <div className="mt-8 flex items-center gap-4">
+            {/* TODO replace with above button that calls resendCode() and add notification somewhere */}
+            <Link href="TODO">
+              <I18n i18nKey="newCode" namespace="verify" />
+            </Link>
+            <Link href="/help">
+              <I18n i18nKey="help" namespace="verify" />
+            </Link>
+          </div>
+
+          <div className="mt-4 flex items-center gap-4">
+            <BackButton />
+            <SubmitButtonAction>
+              <I18n i18nKey="submit" namespace="verify" />
+            </SubmitButtonAction>
+          </div>
+        </form>
+      </div>
     </>
   );
 }
