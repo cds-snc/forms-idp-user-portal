@@ -6,7 +6,10 @@
       "submit": "Submit"
     },
     "title": "GC Forms",
-    "required": "required"
+    "required": "required",
+    "errorSummary": {
+      "title": "Please correct the errors on the page."
+    }
   },
   "header": {
     "lang-toggle": "Language selection",
@@ -65,6 +68,9 @@
     "form": {
       "label": "Email address",
       "description": "Enter your own individual government email address."
+    },
+    "validation": {
+      "requiredUsername": "Email address is required."
     }
   },
   "logout": {
@@ -296,8 +302,5 @@
     "errors": {
       "couldNotVerifyEmail": "Could not verify email"
     }
-  },
-  "errorSummary": {
-    "title":"Please correct the errors on the page."
   }
 }

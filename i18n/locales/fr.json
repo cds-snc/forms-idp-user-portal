@@ -7,6 +7,16 @@
   "layout": {
     "skip-link": "Passer au contenu principal"
   },
+  "common": {
+    "errorSummary": {
+      "title": "Veuillez corriger les erreurs sur la page."
+    }
+  },
+  "start": {
+    "validation": {
+      "requiredUsername": "L'adresse e-mail est requise."
+    }
+  },
   "footer": {
     "version": "Version [FR]",
     "about": {

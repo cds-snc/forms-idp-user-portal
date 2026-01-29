@@ -79,6 +79,10 @@ export const codeSchema = () => ({
   },
 });
 
+export const usernameSchema = () => ({
+  username: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredUsername")),
+});
+
 // Shared "composed" validation functions using the above schemas
 
 export const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue }) => {
@@ -87,6 +91,15 @@ export const validateAccount = async (formEntries: { [k: string]: FormDataEntryV
       ...firstnameSchema(),
       ...lastnameSchema(),
       ...emailSchema(),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
+};
+
+export const validateUsername = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...usernameSchema(),
     })
   );
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });

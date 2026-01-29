@@ -12,7 +12,7 @@ export const ErrorSummary = ({
   validationErrors?: { fieldKey: string; fieldValue: string }[];
   className?: string;
 }): React.ReactElement => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common"]);
   const classes = cn("w-full", className);
 
   return (
@@ -25,7 +25,7 @@ export const ErrorSummary = ({
           tabIndex={0}
           focussable={true}
           id={id ? id : "errorSummary"}
-          heading={t("title", { ns: "errorSummary" })}
+          heading={t("errorSummary.title")}
         >
           <ol className="gc-ordered-list p-0">
             {validationErrors.map(({ fieldKey, fieldValue }, index) => {
