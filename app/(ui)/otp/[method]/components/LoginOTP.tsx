@@ -46,27 +46,13 @@ export function LoginOTP({
 }: Props) {
   const { t } = useTranslation(["otp", "common"]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
   const initialized = useRef(false);
-
-  useEffect(() => {
-    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
-      initialized.current = true;
-      setLoading(true);
-      updateSessionForOTPChallenge()
-        .catch((error) => {
-          setError(error);
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, []);
 
   async function updateSessionForOTPChallenge() {
     let challenges;
@@ -120,10 +106,26 @@ export function LoginOTP({
     return response;
   }
 
+  useEffect(() => {
+    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
+      initialized.current = true;
+      setLoading(true);
+      updateSessionForOTPChallenge()
+        .catch((error) => {
+          setError(error);
+          return;
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
 
-    let body: any = {
+    const body: { code: string; method: string; organization?: string; requestId?: string } = {
       code: values.code,
       method,
     };
@@ -230,7 +232,6 @@ export function LoginOTP({
               aria-label="Resend OTP Code"
               disabled={loading}
               type="button"
-              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
               onClick={() => {
                 setLoading(true);
                 updateSessionForOTPChallenge()
@@ -257,7 +258,6 @@ export function LoginOTP({
           className="h-10 w-full min-w-full rounded-xl"
           type={"text"}
           id={"code"}
-          name={"code"}
           required
           defaultValue={""}
         />
@@ -271,7 +271,7 @@ export function LoginOTP({
 
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <SubmitButtonAction>{t("button.submit")}</SubmitButtonAction>
       </div>
     </form>
