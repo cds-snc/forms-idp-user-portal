@@ -1,24 +1,30 @@
 {
-  "header": {
-    "title": "CDS Awesome SSO - FR",
-    "lang-toggle": "Sélection de la langue",
-    "logout": "Logout [FR]"
-  },
-  "layout": {
-    "skip-link": "Passer au contenu principal"
-  },
   "common": {
+    "button": {
+      "back": "Retourner",
+      "continue": "Continuer",
+      "submit": "Soumettre"
+    },
+    "title": "Formulaires GC",
+    "required": "obligatoire",
     "errorSummary": {
       "title": "Veuillez corriger les erreurs sur la page."
     }
   },
-  "start": {
-    "validation": {
-      "requiredUsername": "L'adresse e-mail est requise."
-    }
+  "header": {
+    "lang-toggle": "Sélection de la langue",
+    "logout": "Se déconnecter"
+  },
+  "fip": {
+    "link": "http://canada.ca/en.html",
+    "text": "Symbole du gouvernement du Canada",
+    "label": "Page d'accueil du gouvernement du Canada"
+  },
+  "layout": {
+    "skip-link": "Passer au contenu principal"
   },
   "footer": {
-    "version": "Version [FR]",
+    "version": "Version",
     "about": {
       "link": "https://articles.alpha.canada.ca/forms-formulaires/fr/?utm_source=FR_FormsFooter&utm_medium=Product&utm_campaign=forms_product",
       "desc": "À propos de Formulaires GC"
@@ -39,6 +45,262 @@
       "link": "/fr/support",
       "desc": "Soutien"
     },
-    "ariaLabel": "Bas de page"
+    "ariaLabel": "Pied de page"
+  },
+  "home": {
+    "description": "Bienvenue dans Formulaires GC. Connectez-vous pour accéder à votre compte ou créez un nouveau compte pour essayer l'application.",
+    "next": "Commencer"
+  },
+  "accounts": {
+    "title": "Comptes",
+    "description": "Sélectionnez le compte que vous souhaitez utiliser.",
+    "addAnother": "Ajouter un autre compte",
+    "noResults": "Aucun compte trouvé",
+    "verified": "verifié",
+    "expired": "expiré"
+  },
+  "start": {
+    "title": "Se connecter",
+    "signUpText": "Si vous n'avez pas de compte, vous pouvez",
+    "signUpLink": "en créer un maintenant.",
+    "userName": "Nom",
+    "register": "Créer un compte maintenant",
+    "form": {
+      "label": "Adresse courriel",
+      "description": "Entrez votre propre adresse courriel individuelledu gouvernement."
+    },
+    "validation": {
+      "requiredUsername": "L'adresse courriel est obligatoire.",
+    }
+  },
+  "logout": {
+    "title": "Se déconnecter",
+    "description": "Cliquez sure un compte pour mettre fin à la session.",
+    "noResults": "Aucun compte trouvé",
+    "clear": "Mettre fin à la session",
+    "verifiedAt": "Dernière activité : {time}",
+    "success": {
+      "title": "Déconnexion réussie",
+      "description": "Vous vous êtes déconnecté."
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Mot de pass",
+      "description": "Veuillez entrer votre mot de passe pour continuer.",
+      "form": {
+        "resetPassword": "Réinitialiser le mot de passe",
+        "label": "Mot de passe"
+      }
+    },
+    "set": {
+      "title": "Définissez un mot de passe",
+      "description": "Définissez le mot de passe de votre compte",
+      "codeSent": "Un code a été envoyé à votre adresse courriel.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resend": "Envoyer un nouveau code",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code de sécurité",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmation du mot de passe"
+      },
+      "required": {
+        "code": "Ce champ est obligatoire.",
+        "newPassword": "Vous devez fournir un nouveau mot de passe.",
+        "confirmPassword": "Vous devez confirmer votre mot de passe."
+      },
+      "errors": {
+        "couldNotSetPassword": "Problème de définition du mot de passe",
+        "couldNotResetPassword": "Problème de réinitialisation du mot de passe.",
+        "couldNotVerifyPassword": "Problème de vérification du mot de passe."
+      }
+    },
+    "change": {
+      "title": "Modifier le mot de passe",
+      "description": "Définissez le mot de passe de votre compte",
+      "submit": "Continuer",
+      "labels": {
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
+      },
+      "required": {
+        "newPassword": "You have to provide a new password!",
+        "confirmPassword": "This field is required"
+      },
+      "errors": {
+        "couldNotChangePassword": "Could not change password",
+        "couldNotVerifyPassword": "Could not verify password",
+        "unknownError": "Unknown error"
+      }
+    },
+    "create": {
+      "title": "Set Password",
+      "submit": "Continue",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "passwordHint": "Your password should be hard to guess with:",
+      "disabled": {
+        "title": "Registration disabled",
+        "description": "The registration is disabled. Please contact your administrator."
+      },
+      "missingOrInvalidData": {
+        "title": "Missing or Invalid data",
+        "description": "Provide a valid first name, last name, and email to register."
+      }
+    },
+    "complexity": {
+      "requiredPassword": "Password is required.",
+      "requiredConfirmPassword": "Confirm password is required.",
+      "minLength": "At least 8 characters",
+      "hasNumber": "A number",
+      "hasUppercase": "A capital letter",
+      "hasLowercase": "A lowercase letter",
+      "hasSymbol": "A symbol",
+      "maxLength": "Less than 50 characters",
+      "mustMatch": "The passwords must match.",
+      "equals": "Password confirmation matched.",
+      "matches": "Matches",
+      "doesNotMatch": "The entries for password must match.",
+      "success": "Succeeds",
+      "requiredPasswordSuccess": "Password provided is valid."
+    },
+    "errors": {
+      "noHostFound": "No host found",
+      "couldNotSendResetLink": "Could not send Password Reset Link",
+      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotVerifyPassword": "Could not verify password",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Failed to authenticate.",
+      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "userNotFound": "User not found in the system",
+      "initialUserNotSupported": "Initial User not supported",
+      "userInitialStateNotSupported": "User Initial State is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+      "verificationRequired": "User Verification Check has to be done",
+      "couldNotLoadSession": "Could not load session",
+      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "failedPrecondition": "Failed precondition",
+      "sessionNotValid": "Session is not valid"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verify your identity",
+      "description": "Choose one of the following factors.",
+      "noResults": "No second factors available to setup."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Choose one of the following second factors.",
+      "skip": "Skip"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "One Time Code",
+      "otpDescription": "Please enter the code from your authenticator device",
+      "smsDescription": "Please enter the code received by text message",
+      "emailDescription": "Please enter the code received by email",
+      "form": {
+        "label": "Security Code",
+        "noCodeReceived": "Didn't receive a code?",
+        "resendCode": "Resend code"
+      }
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "totpDescription": "Scan the QR code with your authenticator app.",
+      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "emailDescription": "Enter your email address to receive a code via email.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
+      "required": {
+        "code": "This field is required"
+      }
+    }
+  },
+  "signedin": {
+    "title": "Welcome {{user}}!",
+    "description": "You are signed in.",
+    "continue": "Continue",
+    "error": {
+      "title": "Error",
+      "description": "An error occurred while trying to sign in."
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    },
+    "title": "Create your account",
+    "emailInputHint": "Use a government address only you can access, not a shared inbox.",
+
+    "description": "Create your GCForms account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
+    "selectMethod": "Select the method you would like to authenticate",
+    "agreeTo": "To register you must agree to the terms and conditions",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "submit": "Continue",
+    "labels": {
+      "firstname": "First name",
+      "lastname": "Last name",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "This field is required",
+      "lastname": "This field is required",
+      "email": "This field is required"
+    },
+    "terms": {
+      "agreement": "By creating an account you agree to the ",
+      "linkText": "Terms of use."
+    },
+    "validation": {
+      "required": "Complete the required field to continue.",
+      "requiredFirstname": "First name is required.",
+      "requiredLastname": "Last name is required.",
+      "requiredEmail": "Email is required.",
+      "validGovEmail": "Enter a valid government email address."
+    },
+    "errors": {
+      "couldNotCreateUser": "Could not create user",
+      "couldNotCreateSession": "Could not create session",
+      "userNotFound": "User not found in the system",
+      "couldNotLinkIDP": "Could not link IDP to user",
+      "couldNotRegisterUser": "Could not register user"
+    }
+  },
+  "verify": {
+    "title": "Check your email for a security code",
+    "label": "Security code",
+    "hint": "Enter code within 15 minutes.",
+    "submit": "Continue",
+    "newCode": "Send a new code",
+    "sendingNewCode": "Sending new code...",
+    "sentNewCode": "New code sent",
+    "help": "Need help?",
+    "validation": {
+      "required": "Cannot be empty",
+      "length": "Must be 6 characters"
+    },
+    "errors": {
+      "couldNotVerifyEmail": "Could not verify email"
+    }
   }
 }

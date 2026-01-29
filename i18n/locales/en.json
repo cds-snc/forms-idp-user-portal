@@ -13,7 +13,7 @@
   },
   "header": {
     "lang-toggle": "Language selection",
-    "logout": "Logout"
+    "logout": "Sign out"
   },
   "fip": {
     "link": "http://canada.ca/en.html",
@@ -48,8 +48,8 @@
     "ariaLabel": "Footer"
   },
   "home": {
-    "description": "Welcome to GCForms super duper one stop shop for login",
-    "next": "Let's get started"
+    "description": "Welcome to GC Forms. Sign in to continue to your account or create a new account to try out the application.",
+    "next": "Get started"
   },
   "accounts": {
     "title": "Accounts",
@@ -74,14 +74,14 @@
     }
   },
   "logout": {
-    "title": "Logout",
-    "description": "Click an account to end the session",
+    "title": "Sign out",
+    "description": "Click an account to end the session.",
     "noResults": "No accounts found",
-    "clear": "End Session",
+    "clear": "End session",
     "verifiedAt": "Last active: {time}",
     "success": {
-      "title": "Logout successful",
-      "description": "You have successfully logged out."
+      "title": "Sign-out was successful",
+      "description": "You've signed out."
     }
   },
   "password": {
@@ -89,40 +89,40 @@
       "title": "Password",
       "description": "Please enter your password or select a different account below",
       "form": {
-        "resetPassword": "Reset Password",
+        "resetPassword": "Reset password",
         "label": "Password"
       }
     },
     "set": {
-      "title": "Set Password",
+      "title": "Set a password",
       "description": "Set the password for your account",
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
-      "resend": "Resend code",
+      "resend": "Send a new code",
       "submit": "Continue",
       "labels": {
-        "code": "Code",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "code": "Security code",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
-        "code": "This field is required",
-        "newPassword": "You have to provide a password!",
-        "confirmPassword": "This field is required"
+        "code": "This field is required.",
+        "newPassword": "You have to provide a password.",
+        "confirmPassword": "You have to confirm your password."
       },
       "errors": {
         "couldNotSetPassword": "Could not set password",
-        "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotResetPassword": "Could not reset password.",
+        "couldNotVerifyPassword": "Could not verify password."
       }
     },
     "change": {
-      "title": "Change Password",
+      "title": "Change password",
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
         "newPassword": "You have to provide a new password!",
@@ -247,7 +247,7 @@
       "title": "Missing data",
       "description": "Provide email, first and last name to register."
     },
-    "title": "Setup your account",
+    "title": "Create your account",
     "emailInputHint": "Use a government address only you can access, not a shared inbox.",
 
     "description": "Create your GCForms account.",
