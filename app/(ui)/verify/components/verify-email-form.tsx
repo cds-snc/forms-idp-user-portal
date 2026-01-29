@@ -9,13 +9,11 @@ import * as v from "valibot";
 
 import { I18n, useTranslation } from "@i18n";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import Link from "next/link";
-import { Hint } from "@clientComponents/forms/Hint";
-import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import { codeSchema } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { CodeEntry } from "@clientComponents/forms/CodeEntry";
 
 type Inputs = {
   code: string;
@@ -200,25 +198,8 @@ export function VerifyEmailForm({
           </div>
         </Alert.Info> */}
 
-          <div className="mt-10">
-            <Label htmlFor="code" required>
-              <I18n i18nKey="label" namespace="verify" />
-            </Label>
-            <Hint id="codeHint">
-              <I18n i18nKey="hint" namespace="verify" />
-            </Hint>
-            {getError("code") && (
-              <ErrorMessage id={"errorMessageCode"}>{getError("code")}</ErrorMessage>
-            )}
-            <TextInput
-              type="text"
-              id="code"
-              defaultValue={state.formData?.code ?? code ?? ""}
-              ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
-              className="w-36"
-              required
-            />
-          </div>
+
+          <CodeEntry state={state} code={code ?? ""} className="mt-10" />
 
           <div className="mt-8 flex items-center gap-4">
             {/* TODO replace with above button that calls resendCode() and add notification somewhere */}
