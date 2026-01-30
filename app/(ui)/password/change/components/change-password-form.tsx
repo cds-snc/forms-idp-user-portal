@@ -39,7 +39,6 @@ export function ChangePasswordForm({
   const { t } = useTranslation("password");
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
 
   const localFormAction = async (previousState: { error?: string }, formData: FormData) => {
     const password = formData?.get("password");
@@ -146,9 +145,11 @@ export function ChangePasswordForm({
 
       {passwordComplexitySettings && (
         <PasswordComplexity
+          id="password-complexity-requirements"
           passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
           equals={!!watchPassword && watchPassword === watchConfirmPassword}
+          ready={watchPassword.length > 0}
         />
       )}
 
