@@ -12,6 +12,9 @@
       "title": "Veuillez corriger les erreurs sur la page."
     }
   },
+  "accounts": {
+    "verifyEmail": "Vérifiez votre adresse e-mail"
+  },
   "start": {
     "validation": {
       "requiredUsername": "L'adresse e-mail est requise."

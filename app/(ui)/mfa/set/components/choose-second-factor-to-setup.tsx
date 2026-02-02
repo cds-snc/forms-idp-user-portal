@@ -73,7 +73,7 @@ export function ChooseSecondFactorToSetup({
               return U2F(userMethods.includes(AuthenticationMethodType.U2F), "/u2f/set?" + params);
             case SecondFactorType.OTP_EMAIL:
               return (
-                (emailVerified || force) &&
+                emailVerified &&
                 EMAIL(
                   userMethods.includes(AuthenticationMethodType.OTP_EMAIL),
                   "/otp/email/set?" + params
