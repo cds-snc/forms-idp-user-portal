@@ -40,6 +40,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  // Email sending function
   async function sendEmail(userId: string) {
     const hostWithProtocol = await getOriginalHostWithProtocol();
 

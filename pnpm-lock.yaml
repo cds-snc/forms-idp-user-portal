@@ -72,10 +72,10 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(typescript@5.9.3)
     devDependencies:
-      '@cdssnc/gcds-tokens':
-        specifier: ^2.14.0
-        version: 2.14.0
       '@gcds-core/fonts':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@gcds-core/tokens':
         specifier: ^1.0.0
         version: 1.0.0
       '@gcforms/types':
@@ -219,9 +219,6 @@ packages:
   '@bufbuild/protobuf@2.10.2':
     resolution: {integrity: sha512-uFsRXwIGyu+r6AMdz+XijIIZJYpoWeYzILt5yZ2d3mCjQrWUTVpVD9WL/jZAbvp+Ed04rOhrsk7FiTcEDseB5A==}
 
-  '@cdssnc/gcds-tokens@2.14.0':
-    resolution: {integrity: sha512-xu7S+L686a2I+71EYRrYnRaKehRi1o15EApQZKjQMLN36ehCsvj6PjVsPP0TMEEYSQtvO6MIzjr9Few6DU/XPQ==}
-
   '@connectrpc/connect-node@2.1.1':
     resolution: {integrity: sha512-s3TfsI1XF+n+1z6MBS9rTnFsxxR4Rw5wmdEnkQINli81ESGxcsfaEet8duzq8LVuuCupmhUsgpRo0Nv9pZkufg==}
     engines: {node: '>=20'}
@@ -304,6 +301,9 @@ packages:
 
   '@gcds-core/fonts@1.0.0':
     resolution: {integrity: sha512-QJnTBeI2YUtchbNt96+3uYWpX94SaP/iJxmsI6olyYg+2dm9mpPhmtIFvaInWaAiNpE3fnAHPs7ZRqBbKmWTlQ==}
+
+  '@gcds-core/tokens@1.0.0':
+    resolution: {integrity: sha512-opAIpRzttKnlc0OUnKz96QsyxFM7BsB9tBdwvZb+Uc5wBbpD6quQRIeZIVeXayfmCxIgoVd37noZrSa+xO8T0Q==}
 
   '@gcforms/types@1.0.27':
     resolution: {integrity: sha512-YdDRMfoOuJ9T+t73zx89yuhQeq5C6G4V76S/+vwGEy7KzoFYFD8gmE6cWLMvwJDJ8N8Bso8irp/TQSsloctpXQ==}
@@ -3150,8 +3150,6 @@ snapshots:
 
   '@bufbuild/protobuf@2.10.2': {}
 
-  '@cdssnc/gcds-tokens@2.14.0': {}
-
   '@connectrpc/connect-node@2.1.1(@bufbuild/protobuf@2.10.2)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.10.2))':
     dependencies:
       '@bufbuild/protobuf': 2.10.2
@@ -3246,6 +3244,8 @@ snapshots:
   '@floating-ui/utils@0.2.10': {}
 
   '@gcds-core/fonts@1.0.0': {}
+
+  '@gcds-core/tokens@1.0.0': {}
 
   '@gcforms/types@1.0.27': {}
 

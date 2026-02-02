@@ -40,7 +40,7 @@
     "valibot": "^1.2.0"
   },
   "devDependencies": {
-    "@cdssnc/gcds-tokens": "^2.14.0",
+    "@gcds-core/tokens": "^1.0.0",
     "@gcds-core/fonts": "^1.0.0",
     "@gcforms/types": "1.0.27",
     "@tailwindcss/postcss": "^4.1.18",
