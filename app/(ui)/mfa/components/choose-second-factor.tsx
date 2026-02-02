@@ -41,7 +41,6 @@ export function ChooseSecondFactor({
             {method === AuthenticationMethodType.TOTP && TOTP(false, "/otp/time-based?" + params)}
             {method === AuthenticationMethodType.U2F && U2F(false, "/u2f?" + params)}
             {method === AuthenticationMethodType.OTP_EMAIL && EMAIL(false, "/otp/email?" + params)}
-            {method === AuthenticationMethodType.OTP_SMS && SMS(false, "/otp/sms?" + params)}
           </div>
         );
       })}
