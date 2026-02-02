@@ -10,6 +10,8 @@ import { getSession, listAuthenticationMethodTypes } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "i18n/server";
 import { headers } from "next/headers";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -80,12 +82,9 @@ export default async function Page(props: {
   return (
     <>
       <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="verify.title" namespace="mfa" />
-        </h1>
-        <p className="ztdl-p">
-          <I18n i18nKey="verify.description" namespace="mfa" />
-        </p>
+        <AuthPanelTitle i18nKey="set.title" namespace="mfa" />
+
+        <I18n i18nKey="verify.description" namespace="mfa" tagName="p" className="mb-6" />
 
         {sessionFactors && (
           <UserAvatar
@@ -103,7 +102,6 @@ export default async function Page(props: {
             <I18n i18nKey="unknownContext" namespace="error" />
           </Alert.Danger>
         )}
-
         {sessionFactors ? (
           <ChooseSecondFactor
             loginName={loginName}
@@ -116,6 +114,22 @@ export default async function Page(props: {
           <Alert.Warning>
             <I18n i18nKey="verify.noResults" namespace="mfa" />
           </Alert.Warning>
+        )}
+
+        {sessionFactors && (
+          <div className="mt-6">
+            <Link
+              href={`/mfa/set?${new URLSearchParams({
+                ...(loginName && { loginName }),
+                ...(sessionId && { sessionId }),
+                ...(requestId && { requestId }),
+                ...(organization && { organization }),
+              }).toString()}`}
+              className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
+            >
+              <I18n i18nKey="set.addAnother" namespace="mfa" />
+            </Link>
+          </div>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">

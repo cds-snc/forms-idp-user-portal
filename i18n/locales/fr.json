@@ -40,5 +40,10 @@
       "desc": "Soutien"
     },
     "ariaLabel": "Bas de page"
+  },
+  "mfa": {
+    "set": {
+      "addAnother": "Ajouter un autre facteur"
+    }
   }
 }

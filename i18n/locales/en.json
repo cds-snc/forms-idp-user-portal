@@ -195,7 +195,8 @@
     "set": {
       "title": "Set up 2-Factor",
       "description": "Choose one of the following second factors.",
-      "skip": "Skip"
+      "skip": "Skip",
+      "addAnother": "Add another factor"
     }
   },
   "otp": {

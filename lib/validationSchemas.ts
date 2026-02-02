@@ -75,7 +75,7 @@ export const confirmPasswordSchema = () => ({
 
 export const codeSchema = () => ({
   ...{
-    code: v.pipe(v.string(), v.trim(), v.minLength(1, "required"), v.length(6, "length")),
+    code: v.pipe(v.string(), v.trim(), v.minLength(1, "required"), v.maxLength(10, "length")),
   },
 });
 
