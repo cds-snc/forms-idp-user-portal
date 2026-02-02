@@ -42,7 +42,15 @@
     "ariaLabel": "Bas de page"
   },
   "mfa": {
+    "verify": {
+      "title": "Vérifiez votre identité",
+      "description": "Choisissez l'un des facteurs suivants.",
+      "noResults": "Aucun deuxième facteur disponible à configurer."
+    },
     "set": {
+      "title": "Configurer l'authentification à deux facteurs",
+      "description": "Choisissez l'un des deuxièmes facteurs suivants.",
+      "skip": "Ignorer",
       "addAnother": "Ajouter un autre facteur"
     }
   }

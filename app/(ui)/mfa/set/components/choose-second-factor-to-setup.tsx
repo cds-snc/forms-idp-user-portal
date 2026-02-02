@@ -7,7 +7,7 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
-import { EMAIL, SMS, TOTP, U2F } from "@serverComponents/AuthMethods/AuthMethods";
+import { EMAIL, TOTP, U2F } from "@serverComponents/AuthMethods/AuthMethods";
 import { I18n } from "@i18n";
 import { useState } from "react";
 import { Alert } from "@clientComponents/globals";
@@ -35,7 +35,6 @@ export function ChooseSecondFactorToSetup({
   loginSettings,
   userMethods,
   checkAfter,
-  phoneVerified,
   emailVerified,
   force,
 }: Props) {
@@ -74,18 +73,10 @@ export function ChooseSecondFactorToSetup({
               return U2F(userMethods.includes(AuthenticationMethodType.U2F), "/u2f/set?" + params);
             case SecondFactorType.OTP_EMAIL:
               return (
-                emailVerified &&
+                (emailVerified || force) &&
                 EMAIL(
                   userMethods.includes(AuthenticationMethodType.OTP_EMAIL),
                   "/otp/email/set?" + params
-                )
-              );
-            case SecondFactorType.OTP_SMS:
-              return (
-                phoneVerified &&
-                SMS(
-                  userMethods.includes(AuthenticationMethodType.OTP_SMS),
-                  "/otp/sms/set?" + params
                 )
               );
             default:
