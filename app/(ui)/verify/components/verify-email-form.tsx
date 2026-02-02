@@ -4,17 +4,16 @@ import { useActionState } from "react";
 import { resendVerification, sendVerification } from "@lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import * as v from "valibot";
 
 import { I18n, useTranslation } from "@i18n";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import Link from "next/link";
-import { codeSchema } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { CodeEntry } from "@clientComponents/forms/CodeEntry";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { Alert as AlertNotification, Button } from "@clientComponents/globals";
+import { validateCode } from "@lib/validationSchemas";
 
 type FormState = {
   error?: string;
@@ -22,15 +21,6 @@ type FormState = {
   formData?: {
     code?: string;
   };
-};
-
-const validateCode = async (formEntries: { [k: string]: FormDataEntryValue }) => {
-  const formValidationSchema = v.pipe(
-    v.object({
-      ...codeSchema(),
-    })
-  );
-  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
 export function VerifyEmailForm({
