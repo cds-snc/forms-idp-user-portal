@@ -2,7 +2,7 @@ import { SessionsList } from "./components/sessions-list";
 import { I18n } from "@i18n";
 import { getAllSessionCookieIds } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions } from "@lib/zitadel";
+import { getDefaultOrg, listSessions } from "@lib/zitadel";
 
 import { AddIcon } from "@serverComponents/icons";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -29,7 +29,6 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
     });
     return response?.sessions ?? [];
   } else {
-    console.info("No session cookie found.");
     return [];
   }
 }
@@ -55,12 +54,7 @@ export default async function Page(props: {
     }
   }
 
-  let sessions = await loadSessions({ serviceUrl });
-
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? defaultOrganization,
-  });
+  const sessions = await loadSessions({ serviceUrl });
 
   const params = new URLSearchParams();
 
@@ -70,6 +64,8 @@ export default async function Page(props: {
 
   if (organization) {
     params.append("organization", organization);
+  } else if (defaultOrganization) {
+    params.append("organization", defaultOrganization);
   }
 
   return (
@@ -82,13 +78,11 @@ export default async function Page(props: {
           <div className="flex w-full flex-col space-y-2">
             <SessionsList sessions={sessions} requestId={requestId} />
             <Link href={`/start?` + params}>
-              <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
-                <div className="mr-4 flex size-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
+              <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
+                <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
                   <AddIcon className="size-5" />
                 </div>
-                <span className="text-sm">
-                  <I18n i18nKey="addAnother" namespace="accounts" />
-                </span>
+                <I18n i18nKey="addAnother" namespace="accounts" className="text-sm" />
               </div>
             </Link>
           </div>
