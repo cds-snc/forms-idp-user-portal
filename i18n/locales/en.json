@@ -201,9 +201,8 @@
   "otp": {
     "verify": {
       "title": "One Time Code",
-      "otpDescription": "Please enter the code from your authenticator device",
-      "smsDescription": "Please enter the code received by text message",
-      "emailDescription": "Please enter the code received by email",
+      "otpDescription": "Please enter the code from your authenticator device.",
+      "emailDescription": "Please enter the code received by email.",
       "form": {
         "label": "Security Code",
         "noCodeReceived": "Didn't receive a code?",

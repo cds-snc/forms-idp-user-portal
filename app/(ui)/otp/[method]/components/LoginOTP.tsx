@@ -8,27 +8,27 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { I18n, useTranslation } from "@i18n";
 
-import { useTranslation } from "@i18n";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
+import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-
-// either loginName or sessionId must be provided
-type Props = {
-  host: string | null;
-  loginName?: string;
-  sessionId?: string;
-  requestId?: string;
-  organization?: string;
-  method: string;
-  code?: string;
-  loginSettings?: LoginSettings;
-};
+import { CodeEntry, mapValidationErrors } from "@clientComponents/forms/CodeEntry";
+import Link from "next/link";
+import { Alert as AlertNotification, Button } from "@clientComponents/globals";
+import { validateCode } from "@lib/validationSchemas";
+import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
 type FormState = {
   error?: string;
+  validationErrors?: { fieldKey: string; fieldValue: string }[];
+  formData?: {
+    code?: string;
+  };
 };
+// type FormState = {
+//   error?: string;
+// };
 
 type Inputs = {
   code: string;
@@ -43,12 +43,27 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
-}: Props) {
+  children,
+}: {
+  host: string | null;
+  loginName?: string; // either loginName or sessionId must be provided
+  sessionId?: string;
+  requestId?: string;
+  organization?: string;
+  method: string;
+  code?: string;
+  loginSettings?: LoginSettings;
+  children?: React.ReactNode;
+}) {
   const { t } = useTranslation(["otp", "common"]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string>("");
+
+  // TODO can probably remove most of the loading + codeLoading state
   const [loading, setLoading] = useState<boolean>(false);
+  const [codeLoading, setCodeLoading] = useState<boolean>(false);
+  const [codeSent, setCodeSent] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -76,11 +91,11 @@ export function LoginOTP({
       });
     }
 
-    if (method === "sms") {
-      challenges = create(RequestChallengesSchema, {
-        otpSms: {},
-      });
-    }
+    // if (method === "sms") {
+    //   challenges = create(RequestChallengesSchema, {
+    //     otpSms: {},
+    //   });
+    // }
 
     setLoading(true);
     const response = await updateSession({
@@ -107,7 +122,7 @@ export function LoginOTP({
   }
 
   useEffect(() => {
-    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
+    if (!initialized.current && ["email"].includes(method) && !code) {
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
@@ -140,11 +155,11 @@ export function LoginOTP({
 
     let checks;
 
-    if (method === "sms") {
-      checks = create(ChecksSchema, {
-        otpSms: { code: values.code },
-      });
-    }
+    // if (method === "sms") {
+    //   checks = create(ChecksSchema, {
+    //     otpSms: { code: values.code },
+    //   });
+    // }
     if (method === "email") {
       checks = create(ChecksSchema, {
         otpEmail: { code: values.code },
@@ -156,6 +171,7 @@ export function LoginOTP({
       });
     }
 
+    // TODO not returning anything when submitting an invalid code
     const response = await updateSession({
       loginName,
       sessionId,
@@ -180,9 +196,22 @@ export function LoginOTP({
   }
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
-    const value = (formData?.get("code") as string) ?? "";
+    const code = (formData?.get("code") as string) ?? "";
 
-    return submitCode({ code: value }, organization).then(async (response) => {
+    // Validate form entries and map any errors to form state with translated messages
+    const validationResult = await validateCode({ code });
+    if (!validationResult.success) {
+      return {
+        validationErrors: validationResult.issues.map((issue) => ({
+          fieldKey: issue.path?.[0].key as string,
+          fieldValue: t(`validation.${issue.message}`),
+        })),
+        formData: { code },
+      };
+    }
+
+    return submitCode({ code }, organization).then(async (response) => {
+      console.log("OTP response", response);
       if (response && "sessionId" in response) {
         setLoading(true);
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
@@ -207,6 +236,8 @@ export function LoginOTP({
 
           if ("error" in callbackResponse) {
             return {
+              ...previousState,
+              formData: { code },
               error: callbackResponse.error,
             };
           }
@@ -218,62 +249,132 @@ export function LoginOTP({
           setLoading(false);
         }
       }
-      return previousState;
+
+      return {
+        ...previousState,
+        formData: { code },
+      };
     });
   };
-  const [state, formAction] = useActionState(localFormAction, {});
-  return (
-    <form className="w-2/3" action={formAction}>
-      {["email", "sms"].includes(method) && (
-        <Alert type={ErrorStatus.INFO}>
-          <div className="flex flex-row">
-            <span className="mr-auto flex-1 text-left">{t("verify.form.noCodeReceived")}</span>
-            <button
-              aria-label="Resend OTP Code"
-              disabled={loading}
-              type="button"
-              onClick={() => {
-                setLoading(true);
-                updateSessionForOTPChallenge()
-                  .catch((error) => {
-                    setError(error);
-                    return;
-                  })
-                  .finally(() => {
-                    setLoading(false);
-                  });
-              }}
-              data-testid="resend-button"
-            >
-              {t("verify.form.resendCode")}
-            </button>
-          </div>
-        </Alert>
-      )}
-      <div className="mt-4">
-        <Label id={"label-otp"} htmlFor={"code"} className="required" required>
-          {t("verify.form.label")}
-        </Label>
-        <TextInput
-          className="h-10 w-full min-w-full rounded-xl"
-          type={"text"}
-          id={"code"}
-          required
-          defaultValue={""}
-        />
-      </div>
 
+  const resendCode = async () => {
+    setCodeLoading(true);
+    setCodeSent(false);
+    updateSessionForOTPChallenge()
+      .then(() => setCodeSent(true))
+      .catch((error) => {
+        setError(error);
+        return;
+      })
+      .finally(() => {
+        setCodeLoading(false);
+      });
+  };
+
+  const [state, formAction] = useActionState(localFormAction, {
+    validationErrors: undefined,
+    error: undefined,
+    formData: {
+      code: "",
+    },
+  });
+  // const [state, formAction] = useActionState(localFormAction, {});
+  return (
+    <>
       {state.error && (
         <div className="py-4" data-testid="error">
           <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>
         </div>
       )}
 
-      <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton data-testid="back-button" />
-        <span className="grow"></span>
-        <SubmitButtonAction>{t("button.submit")}</SubmitButtonAction>
+      <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
+
+      {children}
+
+      {(codeLoading || codeSent) && (
+        <AlertNotification.Info>
+          <p className="mt-3 font-bold">
+            {codeLoading && <I18n i18nKey="sendingNewCode" namespace="verify" />}
+            {codeSent && <I18n i18nKey="sentNewCode" namespace="verify" />}
+          </p>
+        </AlertNotification.Info>
+      )}
+
+      <div className="w-full">
+        <form action={formAction} noValidate>
+          <CodeEntry state={state} code={code ?? ""} className="mt-8" />
+
+          <div className="mt-6 flex items-center gap-4">
+            <BackButton />
+            <SubmitButtonAction>
+              <I18n i18nKey="submit" namespace="verify" />
+            </SubmitButtonAction>
+          </div>
+        </form>
+
+        <div className="mt-8 flex items-center gap-4">
+          {["email"].includes(method) && (
+            <Button
+              theme="link"
+              type="button"
+              onClick={() => resendCode()}
+              disabled={codeLoading}
+              data-testid="resend-button"
+            >
+              <I18n i18nKey="newCode" namespace="verify" />
+            </Button>
+          )}
+          <Link href="/help">
+            <I18n i18nKey="help" namespace="verify" />
+          </Link>
+        </div>
+
+        {/* <form action={formAction}>
+          {["email", "sms"].includes(method) && (
+          <Alert type={ErrorStatus.INFO}>
+            <div className="flex flex-row">
+              <span className="mr-auto flex-1 text-left">{t("verify.form.noCodeReceived")}</span>
+              <button
+                aria-label="Resend OTP Code"
+                disabled={loading}
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  updateSessionForOTPChallenge()
+                    .catch((error) => {
+                      setError(error);
+                      return;
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
+                }}
+                data-testid="resend-button"
+              >
+                {t("verify.form.resendCode")}
+              </button>
+            </div>
+          </Alert>
+        )}
+          <div className="mt-4">
+          <Label id={"label-otp"} htmlFor={"code"} className="required" required>
+            {t("verify.form.label")}
+          </Label>
+          <TextInput
+            className="h-10 w-full min-w-full rounded-xl"
+            type={"text"}
+            id={"code"}
+            required
+            defaultValue={""}
+          />
+        </div>
+          <div className="mt-8 flex w-full flex-row items-center">
+          <BackButton data-testid="back-button" />
+          <span className="grow"></span>
+          <SubmitButtonAction>{t("button.submit")}</SubmitButtonAction>
+        </div>
+        </form> */}
       </div>
-    </form>
+    </>
   );
 }
