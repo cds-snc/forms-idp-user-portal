@@ -13,7 +13,8 @@
     }
   },
   "accounts": {
-    "verifyEmail": "Vérifiez votre adresse e-mail"
+    "verifyEmail": "Vérifiez votre adresse e-mail",
+    "setUpMFA": "Modifier l'authentification à deux facteurs"
   },
   "start": {
     "validation": {

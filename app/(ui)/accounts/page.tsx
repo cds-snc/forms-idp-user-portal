@@ -98,6 +98,11 @@ export default async function Page(props: {
     verifyParams.append("loginName", currentLoginName);
   }
 
+  const mfaParams = new URLSearchParams(params);
+  if (currentLoginName) {
+    mfaParams.append("loginName", currentLoginName);
+  }
+
   return (
     <>
       <div id="auth-panel">
@@ -117,6 +122,14 @@ export default async function Page(props: {
                 </div>
               </Link>
             )}
+            <Link href={`/mfa/set?${mfaParams}`}>
+              <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
+                <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
+                  <AddIcon className="size-5" />
+                </div>
+                <I18n i18nKey="setUpMFA" namespace="accounts" className="text-sm" />
+              </div>
+            </Link>
             <Link href={`/start?` + params}>
               <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
                 <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
