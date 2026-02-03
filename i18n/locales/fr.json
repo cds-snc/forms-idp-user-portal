@@ -71,5 +71,12 @@
       "registerInstructions": "Cliquez sur Continuer et insérez votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
       "submit": "Continuer"
     }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Vérifier avec une clé d'accès",
+      "description": "Utilisez votre clé d'accès pour vérifier votre identité.",
+      "submit": "Vérifier"
+    }
   }
 }

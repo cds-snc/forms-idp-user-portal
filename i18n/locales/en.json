@@ -318,5 +318,12 @@
     "errors": {
       "couldNotVerifyEmail": "Could not verify email"
     }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Verify with passkey",
+      "description": "Use your passkey to verify your identity.",
+      "submit": "Verify"
+    }
   }
 }
