@@ -1,7 +1,7 @@
 "use client";
 
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils";
-import { sendPasskey } from "@lib/server/passkeys";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { verifyU2FLogin } from "@lib/server/u2f";
 import { updateSession } from "@lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import {
@@ -12,8 +12,10 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation, I18n } from "@i18n";
-import { Alert } from "@clientComponents/globals";
-import { BackButton, SubmitButton, Button } from "@clientComponents/globals/Buttons";
+
+import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
+import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { SubmitButton, Button } from "@clientComponents/globals/Buttons";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -25,7 +27,7 @@ type Props = {
   organization?: string;
 };
 
-export function LoginPasskey({
+export function LoginU2F({
   loginName,
   sessionId,
   requestId,
@@ -36,7 +38,7 @@ export function LoginPasskey({
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { t } = useTranslation("passkey");
+  const { t } = useTranslation("u2f");
   const router = useRouter();
 
   const initialized = useRef(false);
@@ -112,7 +114,7 @@ export function LoginPasskey({
 
   async function submitLogin(data: JsonObject) {
     setLoading(true);
-    const response = await sendPasskey({
+    const response = await verifyU2FLogin({
       loginName,
       sessionId,
       organization,
@@ -182,13 +184,12 @@ export function LoginPasskey({
         return submitLogin(data);
       })
       .catch((error) => {
-        // Handle passkey cancellation or errors
+        // Handle U2F verification cancellation or errors
         if (error?.name === "NotAllowedError") {
           setError(t("verify.errors.verificationCancelled"));
         } else {
           setError(t("verify.errors.verificationFailed"));
         }
-        console.error("Passkey verification error:", error);
       })
       .finally(() => {
         setLoading(false);
@@ -199,7 +200,7 @@ export function LoginPasskey({
     <div className="w-full">
       {error && (
         <div className="py-4">
-          <Alert.Warning>{error}</Alert.Warning>
+          <Alert type={ErrorStatus.ERROR}>{error}</Alert>
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center">
@@ -232,17 +233,15 @@ export function LoginPasskey({
             }}
             data-testid="password-button"
           >
-            <I18n i18nKey="verify.usePassword" namespace="passkey" />
+            <I18n i18nKey="verify.usePassword" namespace="u2f" />
           </Button>
         ) : (
           <BackButton />
         )}
 
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <SubmitButton
-          type="button"
-          theme="primary"
-          disabled={loading}
+          type="submit"
           loading={loading}
           onClick={async () => {
             const response = await updateSessionForChallenge().finally(() => {
@@ -269,7 +268,7 @@ export function LoginPasskey({
           }}
           data-testid="submit-button"
         >
-          <I18n i18nKey="verify.submit" namespace="passkey" />
+          <I18n i18nKey="verify.submit" namespace="u2f" />
         </SubmitButton>
       </div>
     </div>

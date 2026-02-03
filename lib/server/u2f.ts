@@ -3,11 +3,13 @@
 import { getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 import { create } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getSessionCookieById } from "../cookies";
+import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
+import { continueWithSession } from "./session";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -115,4 +117,47 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   });
 
   return verifyU2FRegistration({ serviceUrl, request });
+}
+
+type VerifyU2FLoginCommand = {
+  loginName?: string;
+  sessionId?: string;
+  organization?: string;
+  checks: Checks;
+  requestId?: string;
+};
+
+export async function verifyU2FLogin({
+  loginName,
+  sessionId,
+  organization,
+  checks,
+  requestId,
+}: VerifyU2FLoginCommand) {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  let sessionCookie;
+  if (sessionId) {
+    sessionCookie = await getSessionCookieById({ sessionId, organization });
+  } else if (loginName) {
+    sessionCookie = await getSessionCookieByLoginName({ loginName, organization });
+  }
+
+  if (!sessionCookie) {
+    return { error: "Could not get session" };
+  }
+
+  const session = await getSession({
+    serviceUrl,
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+    checks,
+  });
+
+  if (!session?.session) {
+    return { error: "Session verification failed" };
+  }
+
+  return continueWithSession({ ...session.session, requestId });
 }

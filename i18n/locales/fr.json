@@ -63,20 +63,24 @@
   "u2f": {
     "verify": {
       "title": "Vérifier l'authentification à deux facteurs",
-      "description": "Vérifiez votre compte avec votre appareil."
+      "description": "Vérifiez votre compte avec votre appareil.",
+      "usePassword": "Utiliser le mot de passe",
+      "submit": "Continuer",
+      "errors": {
+        "couldNotRequestChallenge": "Impossible de demander le défi de la clé de sécurité",
+        "couldNotVerifyPasskey": "Impossible de vérifier la clé de sécurité",
+        "noResponseReceived": "La vérification de la clé de sécurité a échoué - aucune réponse reçue",
+        "noRedirectProvided": "La vérification de la clé de sécurité est terminée mais aucune redirection n'a été fournie",
+        "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé de sécurité",
+        "verificationCancelled": "La vérification de la clé de sécurité a été annulée",
+        "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé de sécurité"
+      }
     },
     "set": {
       "title": "Configurer l'authentification à deux facteurs",
       "description": "Configurez un appareil comme deuxième facteur.",
       "registerInstructions": "Cliquez sur Continuer et insérez votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
       "submit": "Continuer"
-    }
-  },
-  "passkey": {
-    "verify": {
-      "title": "Vérifier avec une clé d'accès",
-      "description": "Utilisez votre clé d'accès pour vérifier votre identité.",
-      "submit": "Vérifier"
     }
   }
 }

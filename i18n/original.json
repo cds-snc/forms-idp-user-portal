@@ -48,7 +48,6 @@
       "couldNotCreateSession": "Could not create session for user",
       "initialUserNotSupported": "Initial User not supported",
       "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
-      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
       "couldNotFindIdentityProvider": "Could not find identity provider.",
       "userNotActive": "User is not active. Contact your administrator for more information."
     }
@@ -257,37 +256,6 @@
       }
     }
   },
-  "passkey": {
-    "verify": {
-      "title": "Authenticate with a passkey",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
-      "usePassword": "Use password",
-      "submit": "Continue",
-      "errors": {
-        "couldNotRequestChallenge": "Could not request passkey challenge",
-        "couldNotVerifyPasskey": "Could not verify passkey",
-        "noResponseReceived": "Passkey verification failed - no response received",
-        "noRedirectProvided": "Passkey verification completed but no redirect was provided",
-        "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
-        "verificationCancelled": "Passkey verification was cancelled",
-        "verificationFailed": "An error occurred during passkey verification",
-        "couldNotFindSession": "Could not find session",
-        "couldNotUpdateSession": "Could not update session",
-        "userNotFound": "User not found in the system",
-        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
-      }
-    },
-    "set": {
-      "title": "Setup a passkey",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
-      "info": {
-        "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-        "link": "Passwordless Authentication"
-      },
-      "skip": "Skip",
-      "submit": "Continue"
-    }
-  },
   "u2f": {
     "verify": {
       "title": "Verify 2-Factor",
@@ -301,7 +269,6 @@
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
       "password": "Password"
     },
     "disabled": {

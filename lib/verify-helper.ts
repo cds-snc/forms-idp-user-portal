@@ -106,14 +106,6 @@ export async function checkMFAFactors(
   organization?: string,
   requestId?: string
 ) {
-  console.log("checkMFAFactors called with session:", {
-    sessionId: session.id,
-    userId: session.factors?.user?.id,
-    loginName: session.factors?.user?.loginName,
-    hasIntentFactor: !!session.factors?.intent?.verifiedAt,
-    hasPasswordFactor: !!session.factors?.password?.verifiedAt,
-    hasWebAuthNFactor: !!session.factors?.webAuthN?.verifiedAt,
-  });
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
@@ -122,15 +114,7 @@ export async function checkMFAFactors(
       m === AuthenticationMethodType.U2F
   );
 
-  const hasAuthenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
-
-  // escape further checks if user has authenticated with passkey
-  if (hasAuthenticatedWithPasskey) {
-    return;
-  }
-
-  // if user has not authenticated with passkey and has only one additional mfa factor, redirect to that
+  // if user has only one additional mfa factor, redirect to that
   if (availableMultiFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -166,7 +150,13 @@ export async function checkMFAFactors(
         const preferredMethod = await getPreferredMFAMethodForUser(session.factors.user.id);
 
         // If user has a preferred method and it's available, use it
-        if (preferredMethod && availableMultiFactors.includes(preferredMethod)) {
+        if (
+          preferredMethod &&
+          (preferredMethod === AuthenticationMethodType.TOTP ||
+            preferredMethod === AuthenticationMethodType.OTP_SMS ||
+            preferredMethod === AuthenticationMethodType.OTP_EMAIL ||
+            preferredMethod === AuthenticationMethodType.U2F)
+        ) {
           const params = new URLSearchParams({
             loginName: session.factors?.user?.loginName as string,
           });
@@ -193,8 +183,7 @@ export async function checkMFAFactors(
             return { redirect: `/u2f?` + params };
           }
         }
-      } catch (error) {
-        console.warn("Failed to retrieve user preferred MFA method:", error);
+      } catch {
         // Fall through to showing MFA selection page
       }
     }
@@ -238,7 +227,6 @@ export async function checkMFAFactors(
       );
     }
 
-    // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
@@ -295,7 +283,6 @@ export async function checkMFAFactors(
       );
     }
 
-    // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   }
 }
@@ -314,16 +301,7 @@ export function shouldEnforceMFA(
     return false;
   }
 
-  // Check if user authenticated with passkey (passkeys are inherently multi-factor)
-  const authenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
-
-  // If user authenticated with passkey, MFA is not required regardless of settings
-  if (authenticatedWithPasskey) {
-    return false;
-  }
-
-  // If forceMfa is enabled, MFA is required for ALL authentication methods (except passkeys)
+  // If forceMfa is enabled, MFA is required for ALL authentication methods
   if (loginSettings.forceMfa) {
     return true;
   }
@@ -369,14 +347,10 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
-    console.warn("User verification check cookie not found. User verification check failed.");
     return false;
   }
 
   if (cookieValue !== verificationCheck) {
-    console.warn(
-      `User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`
-    );
     return false;
   }
 

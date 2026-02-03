@@ -240,7 +240,6 @@
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
       "password": "Password"
     },
     "disabled": {
@@ -293,7 +292,18 @@
   "u2f": {
     "verify": {
       "title": "Verify 2-Factor",
-      "description": "Verify your account with your device."
+      "description": "Verify your account with your device.",
+      "usePassword": "Use password",
+      "submit": "Continue",
+      "errors": {
+        "couldNotRequestChallenge": "Could not request security key challenge",
+        "couldNotVerifyPasskey": "Could not verify security key",
+        "noResponseReceived": "Security key verification failed - no response received",
+        "noRedirectProvided": "Security key verification completed but no redirect was provided",
+        "couldNotRetrievePasskey": "An error occurred while retrieving security key",
+        "verificationCancelled": "Security key verification was cancelled",
+        "verificationFailed": "An error occurred during security key verification"
+      }
     },
     "set": {
       "title": "Set up 2-Factor",
@@ -317,13 +327,6 @@
     },
     "errors": {
       "couldNotVerifyEmail": "Could not verify email"
-    }
-  },
-  "passkey": {
-    "verify": {
-      "title": "Verify with passkey",
-      "description": "Use your passkey to verify your identity.",
-      "submit": "Verify"
     }
   }
 }
