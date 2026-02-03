@@ -198,7 +198,9 @@
       "title": "Set up 2-Factor",
       "description": "Choose one of the following second factors.",
       "skip": "Skip",
-      "addAnother": "Add another factor"
+      "addAnother": "Add another factor",
+      "setAsDefault": "Set as my default authentication method",
+      "setAsDefaultShort": "Set as default"
     }
   },
   "otp": {

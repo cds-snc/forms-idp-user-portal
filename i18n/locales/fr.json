@@ -55,7 +55,9 @@
       "title": "Configurer l'authentification à deux facteurs",
       "description": "Choisissez l'un des deuxièmes facteurs suivants.",
       "skip": "Ignorer",
-      "addAnother": "Ajouter un autre facteur"
+      "addAnother": "Ajouter un autre facteur",
+      "setAsDefault": "Définir comme ma méthode d'authentification par défaut",
+      "setAsDefaultShort": "Définir par défaut"
     }
   },
   "u2f": {

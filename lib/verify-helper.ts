@@ -9,6 +9,7 @@ import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { getUserByID } from "../lib/zitadel";
+import { getPreferredMFAMethodForUser } from "./server/mfa-preferences";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -158,6 +159,47 @@ export async function checkMFAFactors(
       return { redirect: `/u2f?` + params };
     }
   } else if (availableMultiFactors?.length > 1) {
+    // Check if user has a preferred MFA method
+    if (session.factors?.user?.id) {
+      try {
+        // Try to get preferred method from cookie first
+        const preferredMethod = await getPreferredMFAMethodForUser(session.factors.user.id);
+
+        // If user has a preferred method and it's available, use it
+        if (preferredMethod && availableMultiFactors.includes(preferredMethod)) {
+          const params = new URLSearchParams({
+            loginName: session.factors?.user?.loginName as string,
+          });
+
+          if (requestId) {
+            params.append("requestId", requestId);
+          }
+
+          if (organization || session.factors?.user?.organizationId) {
+            params.append(
+              "organization",
+              organization ?? (session.factors?.user?.organizationId as string)
+            );
+          }
+
+          // Redirect to the preferred method
+          if (preferredMethod === AuthenticationMethodType.TOTP) {
+            return { redirect: `/otp/time-based?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.OTP_SMS) {
+            return { redirect: `/otp/sms?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.OTP_EMAIL) {
+            return { redirect: `/otp/email?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.U2F) {
+            return { redirect: `/u2f?` + params };
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to retrieve user preferred MFA method:", error);
+        // Fall through to showing MFA selection page
+      }
+    }
+
+    // Show MFA selection page if no preferred method or it's not available
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
