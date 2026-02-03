@@ -57,5 +57,17 @@
       "skip": "Ignorer",
       "addAnother": "Ajouter un autre facteur"
     }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Vérifier l'authentification à deux facteurs",
+      "description": "Vérifiez votre compte avec votre appareil."
+    },
+    "set": {
+      "title": "Configurer l'authentification à deux facteurs",
+      "description": "Configurez un appareil comme deuxième facteur.",
+      "registerInstructions": "Cliquez sur Continuer et insérez votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
+      "submit": "Continuer"
+    }
   }
 }

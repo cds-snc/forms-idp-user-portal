@@ -51,7 +51,26 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F({ serviceUrl, userId, domain: hostname });
+  const result = await registerU2F({ serviceUrl, userId, domain: hostname });
+
+  // The publicKeyCredentialCreationOptions is a structpb.Struct
+  // We need to use toJson() to get a plain object
+  const options = result.publicKeyCredentialCreationOptions;
+  let serializedOptions = null;
+
+  if (options && typeof (options as any).toJson === "function") {
+    // Use protobuf's toJson() method
+    serializedOptions = (options as any).toJson();
+  } else if (options) {
+    // Fallback to JSON serialization
+    serializedOptions = JSON.parse(JSON.stringify(options));
+  }
+
+  return {
+    u2fId: result.u2fId,
+    publicKeyCredentialCreationOptions: serializedOptions,
+    details: result.details,
+  };
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
@@ -67,9 +86,14 @@ export async function verifyU2F(command: VerifyU2FCommand) {
       device.vendor || device.model ? ", " : ""
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
+
   const sessionCookie = await getSessionCookieById({
     sessionId: command.sessionId,
   });
+
+  if (!sessionCookie) {
+    return { error: "Could not get session cookie" };
+  }
 
   const session = await getSession({
     serviceUrl,

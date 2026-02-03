@@ -288,6 +288,18 @@
       "couldNotRegisterUser": "Could not register user"
     }
   },
+  "u2f": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "description": "Verify your account with your device."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Set up a device as a second factor.",
+      "registerInstructions": "Click Continue and insert your security key or use biometric authentication when prompted.",
+      "submit": "Continue"
+    }
+  },
   "verify": {
     "title": "Check your email for a security code",
     "label": "Security code",
