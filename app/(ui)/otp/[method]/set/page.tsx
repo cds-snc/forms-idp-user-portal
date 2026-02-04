@@ -12,7 +12,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSerializableObject } from "@lib/utils";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -115,9 +115,7 @@ export default async function Page(props: {
 
   return (
     <>
-      <div id="auth-panel">
-        <AuthPanelTitle i18nKey="set.title" namespace="otp" />
-
+      <AuthPanel titleI18nKey="set.title" descriptionI18nKey="none" namespace="otp">
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
           <I18n
             i18nKey="set.totpRegisterDescription"
@@ -157,7 +155,7 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
-      </div>
+      </AuthPanel>
 
       <div className="w-full">
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (

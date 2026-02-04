@@ -6,11 +6,11 @@ import { getOriginalHost } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getSerializableObject, SearchParams } from "@lib/utils";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -73,23 +73,28 @@ export default async function Page(props: {
             </div>
           )}
 
-          <AuthPanelTitle i18nKey="verify.title" namespace="otp" />
+          <AuthPanel titleI18nKey="verify.title" descriptionI18nKey="none" namespace="otp">
+            {method === "email" && (
+              <I18n
+                i18nKey="verify.emailDescription"
+                namespace="otp"
+                tagName="p"
+                className="mb-3"
+              />
+            )}
+            {method === "time-based" && (
+              <I18n i18nKey="verify.otpDescription" namespace="otp" tagName="p" className="mb-3" />
+            )}
 
-          {method === "email" && (
-            <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
-          )}
-          {method === "time-based" && (
-            <I18n i18nKey="verify.otpDescription" namespace="otp" tagName="p" className="mb-3" />
-          )}
-
-          {sessionFactors && (
-            <UserAvatar
-              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-              displayName={sessionFactors.factors?.user?.displayName}
-              showDropdown
-              searchParams={searchParams}
-            />
-          )}
+            {sessionFactors && (
+              <UserAvatar
+                loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+                displayName={sessionFactors.factors?.user?.displayName}
+                showDropdown
+                searchParams={searchParams}
+              />
+            )}
+          </AuthPanel>
         </LoginOTP>
       )}
     </div>

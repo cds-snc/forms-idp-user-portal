@@ -1,13 +1,13 @@
 import { SessionsClearList } from "./components/sessions-clear-list";
 import { I18n } from "@i18n";
-import { getAllSessionCookieIds } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getDefaultOrg, listSessions } from "@lib/zitadel";
+import { getDefaultOrg } from "@lib/zitadel";
+import { loadSessionsFromCookies } from "@lib/server/session";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("logout");
@@ -15,18 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const cookieIds = await getAllSessionCookieIds();
-
-  if (cookieIds && cookieIds.length) {
-    const response = await listSessions({
-      serviceUrl,
-      ids: cookieIds.filter((id) => !!id) as string[],
-    });
-    return response?.sessions ?? [];
-  } else {
-    console.info("No session cookie found.");
-    return [];
-  }
+  return loadSessionsFromCookies({ serviceUrl });
 }
 
 export default async function Page(props: {
@@ -63,23 +52,17 @@ export default async function Page(props: {
   }
 
   return (
-    <>
-      <div id="auth-panel">
-        <AuthPanelTitle i18nKey="title" namespace="logout" />
-
-        <I18n i18nKey="description" namespace="logout" tagName="p" className="mb-6" />
-
-        <div className="w-full">
-          <div className="flex w-full flex-col space-y-2">
-            <SessionsClearList
-              sessions={sessions}
-              logoutHint={logoutHint}
-              postLogoutRedirectUri={postLogoutRedirectUri}
-              organization={organization ?? defaultOrganization}
-            />
-          </div>
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="logout">
+      <div className="w-full">
+        <div className="flex w-full flex-col space-y-2">
+          <SessionsClearList
+            sessions={sessions}
+            logoutHint={logoutHint}
+            postLogoutRedirectUri={postLogoutRedirectUri}
+            organization={organization ?? defaultOrganization}
+          />
         </div>
       </div>
-    </>
+    </AuthPanel>
   );
 }

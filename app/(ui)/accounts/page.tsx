@@ -5,6 +5,7 @@ import { getDefaultOrg, getSession, getUserByID } from "@lib/zitadel";
 import { loadSessionsFromCookies } from "@lib/server/session";
 
 import { AddIcon } from "@serverComponents/icons";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 
@@ -12,7 +13,6 @@ import { serverTranslation } from "@i18n/server";
 
 import { headers } from "next/headers";
 import Link from "next/link";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 import { getMostRecentSessionCookie } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -90,43 +90,38 @@ export default async function Page(props: {
   }
 
   return (
-    <>
-      <div id="auth-panel">
-        <AuthPanelTitle i18nKey="title" namespace="accounts" />
-        <I18n i18nKey="description" namespace="accounts" tagName="p" className="mb-6" />
-
-        <div className="w-full">
-          <div className="flex w-full flex-col space-y-2">
-            <SessionsList sessions={sessions} requestId={requestId} />
-            {!emailVerified && (
-              <Link href={`/verify?${verifyParams}`}>
-                <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
-                  <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
-                    <AddIcon className="size-5" />
-                  </div>
-                  <I18n i18nKey="verifyEmail" namespace="accounts" className="text-sm" />
-                </div>
-              </Link>
-            )}
-            <Link href={`/mfa/set?${mfaParams}`}>
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="accounts">
+      <div className="w-full">
+        <div className="flex w-full flex-col space-y-2">
+          <SessionsList sessions={sessions} requestId={requestId} />
+          {!emailVerified && (
+            <Link href={`/verify?${verifyParams}`}>
               <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
                 <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
                   <AddIcon className="size-5" />
                 </div>
-                <I18n i18nKey="setUpMFA" namespace="accounts" className="text-sm" />
+                <I18n i18nKey="verifyEmail" namespace="accounts" className="text-sm" />
               </div>
             </Link>
-            <Link href={`/start?` + params}>
-              <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
-                <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
-                  <AddIcon className="size-5" />
-                </div>
-                <I18n i18nKey="addAnother" namespace="accounts" className="text-sm" />
+          )}
+          <Link href={`/mfa/set?${mfaParams}`}>
+            <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
+              <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
+                <AddIcon className="size-5" />
               </div>
-            </Link>
-          </div>
+              <I18n i18nKey="setUpMFA" namespace="accounts" className="text-sm" />
+            </div>
+          </Link>
+          <Link href={`/start?` + params}>
+            <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10">
+              <div className="mr-2 flex size-8 flex-row items-center justify-center rounded-full">
+                <AddIcon className="size-5" />
+              </div>
+              <I18n i18nKey="addAnother" namespace="accounts" className="text-sm" />
+            </div>
+          </Link>
         </div>
       </div>
-    </>
+    </AuthPanel>
   );
 }

@@ -17,7 +17,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSerializableObject } from "@lib/utils";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("register");
@@ -83,30 +83,24 @@ export default async function Page(props: {
   }
 
   return (
-    <>
-      <div id="auth-panel">
-        <AuthPanelTitle i18nKey="title" namespace="register" />
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="register">
+      {!organization && (
+        <Alert.Danger>
+          <I18n i18nKey="unknownContext" namespace="error" />
+        </Alert.Danger>
+      )}
 
-        <div className="w-full">
-          {!organization && (
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          )}
-
-          {legal && passwordComplexitySettings && organization && (
-            <RegisterForm
-              idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
-              organization={organization}
-              firstname={firstname}
-              lastname={lastname}
-              email={email}
-              requestId={requestId}
-              loginSettings={loginSettings}
-            ></RegisterForm>
-          )}
-        </div>
-      </div>
-    </>
+      {legal && passwordComplexitySettings && organization && (
+        <RegisterForm
+          idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
+          organization={organization}
+          firstname={firstname}
+          lastname={lastname}
+          email={email}
+          requestId={requestId}
+          loginSettings={loginSettings}
+        ></RegisterForm>
+      )}
+    </AuthPanel>
   );
 }

@@ -10,7 +10,7 @@ import {
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@lib/zitadel";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 // import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
@@ -60,36 +60,26 @@ export default async function Page(props: {
 
   if (missingData || !validateData.success) {
     return (
-      <>
-        <div className="flex flex-col space-y-4">
-          <AuthPanelTitle i18nKey="create.missingOrInvalidData.title" namespace="password" />
-
-          <I18n
-            i18nKey="create.missingOrInvalidData.description"
-            namespace="password"
-            tagName="p"
-          />
-        </div>
-      </>
+      <AuthPanel
+        titleI18nKey="create.missingOrInvalidData.title"
+        descriptionI18nKey="create.missingOrInvalidData.description"
+        namespace="password"
+      />
     );
   }
 
   if (!loginSettings?.allowRegister || !loginSettings.allowUsernamePassword) {
     return (
-      <>
-        <div className="flex flex-col space-y-4">
-          <AuthPanelTitle i18nKey="disabled.title" namespace="password" />
-          <p>
-            <I18n i18nKey="disabled.description" namespace="password" />
-          </p>
-        </div>
-      </>
+      <AuthPanel
+        titleI18nKey="disabled.title"
+        descriptionI18nKey="disabled.description"
+        namespace="password"
+      />
     );
   }
 
   return (
-    <div id="auth-panel">
-      <AuthPanelTitle i18nKey="title" namespace="password" />
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="password">
       {legal && passwordComplexitySettings && (
         <SetRegisterPasswordForm
           passwordComplexitySettings={passwordComplexitySettings}
@@ -100,6 +90,6 @@ export default async function Page(props: {
           requestId={requestId}
         ></SetRegisterPasswordForm>
       )}
-    </div>
+    </AuthPanel>
   );
 }

@@ -2,6 +2,7 @@ import { Alert } from "@clientComponents/globals";
 import { LoginU2F } from "./components/login-u2f";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { Metadata } from "next";
@@ -30,13 +31,11 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const sessionFactors = sessionData ? { factors: sessionData.factors } : undefined;
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="verify.title" namespace="u2f" />
-        </h1>
-
-        <I18n i18nKey="verify.description" namespace="u2f" tagName="p" className="mb-6" />
-
+      <AuthPanel
+        titleI18nKey="verify.title"
+        descriptionI18nKey="verify.description"
+        namespace="u2f"
+      >
         {sessionFactors && (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -51,7 +50,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             <I18n i18nKey="unknownContext" namespace="error" />
           </Alert.Warning>
         )}
-      </div>
+      </AuthPanel>
 
       <div className="w-full">
         {(loginName || sessionId) && (

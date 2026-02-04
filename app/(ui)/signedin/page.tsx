@@ -6,11 +6,11 @@ import { completeDeviceAuthorization } from "@lib/server/device";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -72,41 +72,36 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   }
 
   return (
-    <>
-      <div id="auth-panel">
-        <AuthPanelTitle
-          i18nKey="title"
-          namespace="signedin"
-          data={{ user: sessionFactors?.factors?.user?.displayName }}
-        />
+    <AuthPanel
+      titleI18nKey="title"
+      descriptionI18nKey="description"
+      namespace="signedin"
+      titleData={{ user: sessionFactors?.factors?.user?.displayName }}
+    >
+      <UserAvatar
+        loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
+        displayName={sessionFactors?.factors?.user?.displayName}
+        showDropdown={!(requestId && requestId.startsWith("device_"))}
+        searchParams={searchParams}
+      />
 
-        <I18n i18nKey="description" namespace="signedin" tagName="p" className="mb-6" />
+      <div className="w-full">
+        {requestId && requestId.startsWith("device_") && (
+          <Alert.Info>
+            You can now close this window and return to the device where you started the
+            authorization process to continue.
+          </Alert.Info>
+        )}
 
-        <UserAvatar
-          loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
-          displayName={sessionFactors?.factors?.user?.displayName}
-          showDropdown={!(requestId && requestId.startsWith("device_"))}
-          searchParams={searchParams}
-        />
-
-        <div className="w-full">
-          {requestId && requestId.startsWith("device_") && (
-            <Alert.Info>
-              You can now close this window and return to the device where you started the
-              authorization process to continue.
-            </Alert.Info>
-          )}
-
-          {loginSettings?.defaultRedirectUri && (
-            <div className="mt-8 flex w-full flex-row items-center">
-              <span className="grow"></span>
-              <LinkButton.Primary href={loginSettings?.defaultRedirectUri}>
-                <I18n i18nKey="continue" namespace="signedin" />
-              </LinkButton.Primary>
-            </div>
-          )}
-        </div>
+        {loginSettings?.defaultRedirectUri && (
+          <div className="mt-8 flex w-full flex-row items-center">
+            <span className="grow"></span>
+            <LinkButton.Primary href={loginSettings?.defaultRedirectUri}>
+              <I18n i18nKey="continue" namespace="signedin" />
+            </LinkButton.Primary>
+          </div>
+        )}
       </div>
-    </>
+    </AuthPanel>
   );
 }

@@ -6,7 +6,7 @@ import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { UserNameForm } from "./components/UserNameForm";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import Link from "next/dist/client/link";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,9 +53,7 @@ export default async function Page(props: {
   const registerLink = `/register?${registerParams.toString()}`;
 
   return (
-    <div id="auth-panel">
-      <AuthPanelTitle i18nKey="title" namespace="start" />
-
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
       {!!loginSettings?.allowRegister && (
         <div className="mb-6">
           <I18n i18nKey="signUpText" namespace="start" />
@@ -73,6 +71,6 @@ export default async function Page(props: {
         suffix={suffix}
         submit={submit}
       />
-    </div>
+    </AuthPanel>
   );
 }

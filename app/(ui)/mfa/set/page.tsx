@@ -7,13 +7,13 @@ import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSerializableObject, SearchParams } from "@lib/utils";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -58,11 +58,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   return (
     <>
-      <div id="auth-panel">
-        <AuthPanelTitle i18nKey="set.title" namespace="mfa" />
-
-        <I18n i18nKey="set.description" namespace="mfa" tagName="p" className="mb-6" />
-
+      <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="mfa">
         {sessionFactors && (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -71,7 +67,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             searchParams={searchParams}
           ></UserAvatar>
         )}
-      </div>
+      </AuthPanel>
 
       <div className="w-full">
         <div className="flex flex-col space-y-4">
