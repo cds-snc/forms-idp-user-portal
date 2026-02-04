@@ -1,5 +1,6 @@
 import { I18n } from "@i18n";
 import { cn } from "@lib/utils";
+import { getImageUrl } from "@lib/imageUrl";
 import { Version } from "@serverComponents/globals/Version";
 
 const BulletPoint = () => {
@@ -45,7 +46,7 @@ export const Footer = async () => {
 
         <div className="min-w-[168px]">
           <picture>
-            <img className="h-10 lg:h-8" alt="fip.text" src="/img/wmms-blk.svg" />
+            <img className="h-10 lg:h-8" alt="fip.text" src={getImageUrl("/img/wmms-blk.svg")} />
           </picture>
         </div>
       </div>
