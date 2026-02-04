@@ -7,6 +7,7 @@ import {
   getSecuritySettings,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
+  listSessions,
 } from "@lib/zitadel";
 import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -16,13 +17,88 @@ import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { completeFlowOrGetUrl } from "@lib/client";
 import {
+  Cookie,
+  getAllSessions,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
+  getAllSessionCookieIds,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
+
+/**
+ * Load sessions by their IDs
+ * @param serviceUrl - The Zitadel service URL
+ * @param ids - Array of session IDs to load
+ * @returns Array of Session objects
+ */
+export async function loadSessionsByIds({
+  serviceUrl,
+  ids,
+}: {
+  serviceUrl: string;
+  ids: string[];
+}): Promise<Session[]> {
+  const response = await listSessions({
+    serviceUrl,
+    ids: ids.filter((id: string | undefined) => !!id),
+  });
+
+  return response?.sessions ?? [];
+}
+
+/**
+ * Load sessions for all cookie IDs
+ * @param serviceUrl - The Zitadel service URL
+ * @param cleanup - Whether to filter out expired sessions (default: true)
+ * @returns Array of Session objects
+ */
+export async function loadSessionsFromCookies({
+  serviceUrl,
+  cleanup = true,
+}: {
+  serviceUrl: string;
+  cleanup?: boolean;
+}): Promise<Session[]> {
+  const cookieIds = await getAllSessionCookieIds(cleanup);
+
+  if (cookieIds && cookieIds.length) {
+    return loadSessionsByIds({
+      serviceUrl,
+      ids: cookieIds.filter((id) => !!id) as string[],
+    });
+  }
+
+  return [];
+}
+
+/**
+ * Load sessions with their corresponding cookies
+ * Useful when you need both Session objects and cookie tokens (e.g., for OIDC/SAML callbacks)
+ * @param serviceUrl - The Zitadel service URL
+ * @param cleanup - Whether to filter out expired sessions (default: true)
+ * @returns Object containing both sessions and sessionCookies arrays
+ */
+export async function loadSessionsWithCookies({
+  serviceUrl,
+  cleanup = true,
+}: {
+  serviceUrl: string;
+  cleanup?: boolean;
+}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
+  const sessionCookies = await getAllSessions(cleanup);
+
+  if (!sessionCookies.length) {
+    return { sessions: [], sessionCookies: [] };
+  }
+
+  const ids = sessionCookies.map((s) => s.id).filter((id) => !!id);
+  const sessions = await loadSessionsByIds({ serviceUrl, ids });
+
+  return { sessions, sessionCookies };
+}
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -116,7 +192,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
+  const { loginName, sessionId, organization, checks, requestId, challenges } = options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -155,7 +231,6 @@ export async function updateSession(options: UpdateSessionCommand) {
       : undefined;
 
   if (!lifetime || !lifetime.seconds) {
-    console.warn("No lifetime provided for session, defaulting to 24 hours");
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
       nanos: 0,
