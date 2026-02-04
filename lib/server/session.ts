@@ -27,6 +27,7 @@ import {
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
+import { logMessage } from "@lib/logger";
 
 /**
  * Load sessions by their IDs
@@ -295,4 +296,54 @@ export async function clearSession(options: ClearSessionOptions) {
   }
 
   return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+}
+
+type LogoutCurrentSessionOptions = {
+  organization?: string;
+  postLogoutRedirectUri?: string;
+};
+
+export async function logoutCurrentSession(
+  options: LogoutCurrentSessionOptions = {}
+): Promise<{ redirect: string } | { error: string }> {
+  const { organization, postLogoutRedirectUri } = options;
+
+  try {
+    const mostRecentSession = await getMostRecentSessionCookie();
+
+    if (!mostRecentSession?.id) {
+      return { error: "No active session found" };
+    }
+
+    await clearSession({ sessionId: mostRecentSession.id });
+
+    // Determine redirect URL
+    if (postLogoutRedirectUri) {
+      return { redirect: postLogoutRedirectUri };
+    }
+
+    const params = new URLSearchParams();
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    const redirectUrl = `/logout/done${params.toString() ? `?${params.toString()}` : ""}`;
+    return { redirect: redirectUrl };
+  } catch (error) {
+    logMessage.error({ error }, "Error during logout");
+    return { error: "Failed to logout" };
+  }
+}
+
+/**
+ * Get the count of active sessions
+ * @returns The number of sessions in cookies
+ */
+export async function getSessionCount(): Promise<number> {
+  try {
+    const sessions = await getAllSessions();
+    return sessions.length;
+  } catch {
+    return 0;
+  }
 }
