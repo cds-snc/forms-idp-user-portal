@@ -1,4 +1,3 @@
-import { getAllSessions } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { validateAuthRequest, isRSCRequest } from "@lib/auth-utils";
 import {
@@ -6,8 +5,7 @@ import {
   handleSAMLFlowInitiation,
   FlowInitiationParams,
 } from "@lib/server/flow-initiation";
-import { loadSessionsByIds } from "@lib/server/session";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { loadSessionsWithCookies } from "@lib/server/session";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -34,12 +32,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No valid authentication request found" }, { status: 400 });
   }
 
-  const sessionCookies = await getAllSessions();
-  const ids = sessionCookies.map((s) => s.id);
-  let sessions: Session[] = [];
-  if (ids && ids.length) {
-    sessions = await loadSessionsByIds({ serviceUrl, ids });
-  }
+  const { sessions, sessionCookies } = await loadSessionsWithCookies({
+    serviceUrl,
+  });
 
   // Flow initiation - delegate to appropriate handler
   const flowParams: FlowInitiationParams = {
