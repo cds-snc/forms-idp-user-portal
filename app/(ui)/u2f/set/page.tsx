@@ -3,6 +3,7 @@ import { Alert } from "@clientComponents/globals";
 import { RegisterU2f } from "./components/register-u2f";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -40,25 +41,17 @@ export default async function Page(props: {
   });
 
   return (
-    <>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>
-          <I18n i18nKey="set.title" namespace="u2f" />
-        </h1>
-
-        <p className="ztdl-p mb-6 block">
-          <I18n i18nKey="set.description" namespace="u2f" />
-        </p>
-
-        {sessionFactors && (
+    <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="u2f">
+      {sessionFactors && (
+        <div className="mb-6">
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="w-full">
         {!sessionFactors && (
@@ -80,6 +73,6 @@ export default async function Page(props: {
           />
         )}
       </div>
-    </>
+    </AuthPanel>
   );
 }
