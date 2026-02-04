@@ -46,8 +46,6 @@ type SessionWithAuthData = {
   expirationDate?: Session["expirationDate"];
 };
 
-export type { SessionWithAuthData };
-
 async function getAuthMethodsAndUser(
   serviceUrl: string,
   session?: Session
@@ -66,8 +64,8 @@ async function getAuthMethodsAndUser(
   const user = await getUserByID({ serviceUrl, userId });
   const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
-  reid: session?.id,
-    turn {
+  return {
+    id: session?.id,
     factors: session?.factors,
     authMethods: methods.authMethodTypes ?? [],
     phoneVerified: humanUser?.phone?.isVerified ?? false,
