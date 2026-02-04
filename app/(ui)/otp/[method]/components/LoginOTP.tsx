@@ -19,7 +19,7 @@ import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
-const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
+const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_URL || "";
 
 type FormState = {
   error?: string;
