@@ -17,6 +17,8 @@ import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { completeFlowOrGetUrl } from "@lib/client";
 import {
+  Cookie,
+  getAllSessions,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
@@ -50,14 +52,17 @@ export async function loadSessionsByIds({
 /**
  * Load sessions for all cookie IDs
  * @param serviceUrl - The Zitadel service URL
+ * @param cleanup - Whether to filter out expired sessions (default: true)
  * @returns Array of Session objects
  */
 export async function loadSessionsFromCookies({
   serviceUrl,
+  cleanup = true,
 }: {
   serviceUrl: string;
+  cleanup?: boolean;
 }): Promise<Session[]> {
-  const cookieIds = await getAllSessionCookieIds();
+  const cookieIds = await getAllSessionCookieIds(cleanup);
 
   if (cookieIds && cookieIds.length) {
     return loadSessionsByIds({
@@ -67,6 +72,32 @@ export async function loadSessionsFromCookies({
   }
 
   return [];
+}
+
+/**
+ * Load sessions with their corresponding cookies
+ * Useful when you need both Session objects and cookie tokens (e.g., for OIDC/SAML callbacks)
+ * @param serviceUrl - The Zitadel service URL
+ * @param cleanup - Whether to filter out expired sessions (default: true)
+ * @returns Object containing both sessions and sessionCookies arrays
+ */
+export async function loadSessionsWithCookies({
+  serviceUrl,
+  cleanup = true,
+}: {
+  serviceUrl: string;
+  cleanup?: boolean;
+}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
+  const sessionCookies = await getAllSessions(cleanup);
+
+  if (!sessionCookies.length) {
+    return { sessions: [], sessionCookies: [] };
+  }
+
+  const ids = sessionCookies.map((s) => s.id).filter((id) => !!id);
+  const sessions = await loadSessionsByIds({ serviceUrl, ids });
+
+  return { sessions, sessionCookies };
 }
 
 export async function skipMFAAndContinueWithNextUrl({
