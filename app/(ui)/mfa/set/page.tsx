@@ -45,16 +45,16 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionWithData = sessionId
+  const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    organization: sessionFactors.factors?.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 
-  const { valid } = isSessionValid(sessionWithData);
+  const { valid } = isSessionValid(sessionFactors);
 
   return (
     <>
@@ -63,10 +63,10 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
         <I18n i18nKey="set.description" namespace="mfa" tagName="p" className="mb-6" />
 
-        {sessionWithData && (
+        {sessionFactors && (
           <UserAvatar
-            loginName={loginName ?? sessionWithData.factors?.user?.loginName}
-            displayName={sessionWithData.factors?.user?.displayName}
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -87,17 +87,17 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             </Alert.Warning>
           )}
 
-          {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
+          {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
             <ChooseSecondFactorToSetup
-              userId={sessionWithData.factors?.user?.id}
+              userId={sessionFactors.factors?.user?.id}
               loginName={loginName}
-              sessionId={sessionWithData.id}
+              sessionId={sessionFactors.id}
               requestId={requestId}
               organization={organization}
               loginSettings={loginSettings}
-              userMethods={sessionWithData.authMethods ?? []}
-              phoneVerified={sessionWithData.phoneVerified ?? false}
-              emailVerified={sessionWithData.emailVerified ?? false}
+              userMethods={sessionFactors.authMethods ?? []}
+              phoneVerified={sessionFactors.phoneVerified ?? false}
+              emailVerified={sessionFactors.emailVerified ?? false}
               checkAfter={checkAfter === "true"}
               force={force === "true"}
             ></ChooseSecondFactorToSetup>

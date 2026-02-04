@@ -104,6 +104,27 @@ export async function loadSessionByLoginname(
 }
 
 /**
+ * Load session factors (authentication state) by session ID without fetching auth methods or user verification data.
+ * Use this when you only need the session's authentication factors, not the complete enriched session data.
+ */
+export async function loadSessionFactorsById(
+  serviceUrl: string,
+  sessionId: string,
+  organization?: string
+): Promise<Session | undefined> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+  return getSession({
+    serviceUrl,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  }).then((response) => {
+    if (response?.session) {
+      return response.session;
+    }
+  });
+}
+
+/**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/

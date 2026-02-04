@@ -1,11 +1,11 @@
 import { Alert } from "@clientComponents/globals";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@lib/cookies";
+import { getMostRecentCookieWithLoginname } from "@lib/cookies";
 import { completeDeviceAuthorization } from "@lib/server/device";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { getLoginSettings, getSession } from "@lib/zitadel";
+import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
+import { getLoginSettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
@@ -70,7 +70,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   }
 
   const sessionFactors = sessionId
-    ? await getSessionOnly(serviceUrl, sessionId, organization)
+    ? await loadSessionFactorsById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },

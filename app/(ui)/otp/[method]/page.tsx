@@ -43,7 +43,7 @@ export default async function Page(props: {
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   // Extract just the session factors from the session data
-  const session = sessionData
+  const sessionFactors = sessionData
     ? { factors: sessionData.factors, expirationDate: sessionData.expirationDate }
     : undefined;
 
@@ -55,23 +55,23 @@ export default async function Page(props: {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: organization ?? session?.factors?.user?.organizationId,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 
   return (
     <div id="auth-panel">
-      {method && session && (
+      {method && sessionFactors && (
         <LoginOTP
-          loginName={loginName ?? session.factors?.user?.loginName}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
           requestId={requestId}
-          organization={organization ?? session?.factors?.user?.organizationId}
+          organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}
           host={host}
           code={code}
         >
-          {!session && (
+          {!sessionFactors && (
             <div className="py-4">
               <Alert.Danger>
                 <I18n i18nKey="unknownContext" namespace="error" />
@@ -86,10 +86,10 @@ export default async function Page(props: {
             {method === "time-based" && <I18n i18nKey="verify.otpDescription" namespace="otp" />}
           </p>
 
-          {session && (
+          {sessionFactors && (
             <UserAvatar
-              loginName={loginName ?? session.factors?.user?.loginName}
-              displayName={session.factors?.user?.displayName}
+              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+              displayName={sessionFactors.factors?.user?.displayName}
               showDropdown
               searchParams={searchParams}
             />
