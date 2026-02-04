@@ -73,14 +73,14 @@ export const confirmPasswordSchema = () => ({
   },
 });
 
-export const codeSchema = () => ({
+export const codeSchema = (min = 1, max = 10) => ({
   ...{
-    code: v.pipe(v.string(), v.trim(), v.minLength(1, "required"), v.maxLength(10, "length")),
+    code: v.pipe(v.string(), v.trim(), v.minLength(min, "required"), v.maxLength(max, "length")),
   },
 });
 
-export const usernameSchema = () => ({
-  username: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredUsername")),
+export const usernameSchema = (min = 1) => ({
+  username: v.pipe(v.string(), v.trim(), v.minLength(min, "requiredUsername")),
 });
 
 // Shared "composed" validation functions using the above schemas
