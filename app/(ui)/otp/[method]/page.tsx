@@ -47,12 +47,6 @@ export default async function Page(props: {
     ? { factors: sessionData.factors, expirationDate: sessionData.expirationDate }
     : undefined;
 
-  // email links do not come with organization, thus we need to use the session's organization
-  // const branding = await getBrandingSettings({
-  //   serviceUrl,
-  //   organization: organization ?? session?.factors?.user?.organizationId,
-  // });
-
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: organization ?? sessionFactors?.factors?.user?.organizationId,

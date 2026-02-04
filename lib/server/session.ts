@@ -7,6 +7,7 @@ import {
   getSecuritySettings,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
+  listSessions,
 } from "@lib/zitadel";
 import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -20,9 +21,53 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
+  getAllSessionCookieIds,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
+
+/**
+ * Load sessions by their IDs
+ * @param serviceUrl - The Zitadel service URL
+ * @param ids - Array of session IDs to load
+ * @returns Array of Session objects
+ */
+export async function loadSessionsByIds({
+  serviceUrl,
+  ids,
+}: {
+  serviceUrl: string;
+  ids: string[];
+}): Promise<Session[]> {
+  const response = await listSessions({
+    serviceUrl,
+    ids: ids.filter((id: string | undefined) => !!id),
+  });
+
+  return response?.sessions ?? [];
+}
+
+/**
+ * Load sessions for all cookie IDs
+ * @param serviceUrl - The Zitadel service URL
+ * @returns Array of Session objects
+ */
+export async function loadSessionsFromCookies({
+  serviceUrl,
+}: {
+  serviceUrl: string;
+}): Promise<Session[]> {
+  const cookieIds = await getAllSessionCookieIds();
+
+  if (cookieIds && cookieIds.length) {
+    return loadSessionsByIds({
+      serviceUrl,
+      ids: cookieIds.filter((id) => !!id) as string[],
+    });
+  }
+
+  return [];
+}
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -116,7 +161,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
+  const { loginName, sessionId, organization, checks, requestId, challenges } = options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -155,7 +200,6 @@ export async function updateSession(options: UpdateSessionCommand) {
       : undefined;
 
   if (!lifetime || !lifetime.seconds) {
-    console.warn("No lifetime provided for session, defaulting to 24 hours");
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
       nanos: 0,

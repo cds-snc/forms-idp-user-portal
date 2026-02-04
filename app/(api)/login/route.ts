@@ -6,7 +6,7 @@ import {
   handleSAMLFlowInitiation,
   FlowInitiationParams,
 } from "@lib/server/flow-initiation";
-import { listSessions } from "@lib/zitadel";
+import { loadSessionsByIds } from "@lib/server/session";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -16,21 +16,6 @@ export const revalidate = false;
 export const fetchCache = "default-no-store";
 // Add this to prevent RSC requests
 export const runtime = "nodejs";
-
-async function loadSessions({
-  serviceUrl,
-  ids,
-}: {
-  serviceUrl: string;
-  ids: string[];
-}): Promise<Session[]> {
-  const response = await listSessions({
-    serviceUrl,
-    ids: ids.filter((id: string | undefined) => !!id),
-  });
-
-  return response?.sessions ?? [];
-}
 
 export async function GET(request: NextRequest) {
   const _headers = await headers();
@@ -53,7 +38,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, ids });
+    sessions = await loadSessionsByIds({ serviceUrl, ids });
   }
 
   // Flow initiation - delegate to appropriate handler

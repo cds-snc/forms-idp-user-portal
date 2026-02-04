@@ -1,8 +1,8 @@
 import { SessionsList } from "./components/sessions-list";
 import { I18n } from "@i18n";
-import { getAllSessionCookieIds } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getDefaultOrg, listSessions, getSession, getUserByID } from "@lib/zitadel";
+import { getDefaultOrg, getSession, getUserByID } from "@lib/zitadel";
+import { loadSessionsFromCookies } from "@lib/server/session";
 
 import { AddIcon } from "@serverComponents/icons";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -18,20 +18,6 @@ import { getMostRecentSessionCookie } from "@lib/cookies";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("accounts");
   return { title: t("title") };
-}
-
-async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const cookieIds = await getAllSessionCookieIds();
-
-  if (cookieIds && cookieIds.length) {
-    const response = await listSessions({
-      serviceUrl,
-      ids: cookieIds.filter((id) => !!id) as string[],
-    });
-    return response?.sessions ?? [];
-  } else {
-    return [];
-  }
 }
 
 export default async function Page(props: {
@@ -55,7 +41,7 @@ export default async function Page(props: {
     }
   }
 
-  const sessions = await loadSessions({ serviceUrl });
+  const sessions = await loadSessionsFromCookies({ serviceUrl });
 
   // Get current user's email verification status
   const recentCookie = await getMostRecentSessionCookie();

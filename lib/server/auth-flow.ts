@@ -4,7 +4,7 @@ import { getAllSessions } from "@lib/cookies";
 import { loginWithOIDCAndSession } from "@lib/oidc";
 import { loginWithSAMLAndSession } from "@lib/saml";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { listSessions } from "@lib/zitadel";
+import { loadSessionsByIds } from "@lib/server/session";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 
@@ -12,21 +12,6 @@ export interface AuthFlowParams {
   sessionId: string;
   requestId: string;
   organization?: string;
-}
-
-async function loadSessions({
-  serviceUrl,
-  ids,
-}: {
-  serviceUrl: string;
-  ids: string[];
-}): Promise<Session[]> {
-  const response = await listSessions({
-    serviceUrl,
-    ids: ids.filter((id: string | undefined) => !!id),
-  });
-
-  return response?.sessions ?? [];
 }
 
 /**
@@ -48,7 +33,7 @@ export async function completeAuthFlow(
   let sessions: Session[] = [];
 
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, ids });
+    sessions = await loadSessionsByIds({ serviceUrl, ids });
   }
 
   if (requestId.startsWith("oidc_")) {
@@ -67,7 +52,6 @@ export async function completeAuthFlow(
       typeof result !== "object" ||
       (!("redirect" in result) && !("error" in result))
     ) {
-      console.error("Auth flow: Invalid result from loginWithOIDCAndSession:", result);
       return { error: "Authentication completed but navigation failed" };
     }
 
@@ -88,7 +72,6 @@ export async function completeAuthFlow(
       typeof result !== "object" ||
       (!("redirect" in result) && !("error" in result))
     ) {
-      console.error("Auth flow: Invalid result from loginWithSAMLAndSession:", result);
       return { error: "Authentication completed but navigation failed" };
     }
 
