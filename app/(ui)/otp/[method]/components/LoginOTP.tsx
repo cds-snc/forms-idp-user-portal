@@ -13,7 +13,7 @@ import { I18n, useTranslation } from "@i18n";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { CodeEntry, mapValidationErrors } from "@clientComponents/forms/CodeEntry";
+import { CodeEntry } from "@clientComponents/forms/CodeEntry";
 import Link from "next/link";
 import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
@@ -61,7 +61,7 @@ export function LoginOTP({
   const [error, setError] = useState<string>("");
 
   // TODO can probably remove most of the loading + codeLoading state
-  const [loading, setLoading] = useState<boolean>(false);
+  const [, setLoading] = useState<boolean>(false);
   const [codeLoading, setCodeLoading] = useState<boolean>(false);
   const [codeSent, setCodeSent] = useState<boolean>(false);
 
@@ -211,7 +211,6 @@ export function LoginOTP({
     }
 
     return submitCode({ code }, organization).then(async (response) => {
-      console.log("OTP response", response);
       if (response && "sessionId" in response) {
         setLoading(true);
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint

@@ -2,15 +2,14 @@ import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { LoginOTP } from "./components/LoginOTP";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getSessionCookieById } from "@lib/cookies";
 import { getOriginalHost } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { getLoginSettings, getSession } from "@lib/zitadel";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getLoginSettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
-import { getSerializableObject } from "@lib/utils";
+import { getSerializableObject, SearchParams } from "@lib/utils";
 import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  searchParams: Promise<SearchParams>;
   params: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const params = await props.params;
@@ -39,25 +38,14 @@ export default async function Page(props: {
 
   const { method } = params;
 
-  const session = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
-      });
+  const sessionData = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
+  // Extract just the session factors from the session data
+  const sessionFactors = sessionData
+    ? { factors: sessionData.factors, expirationDate: sessionData.expirationDate }
+    : undefined;
 
   // email links do not come with organization, thus we need to use the session's organization
   // const branding = await getBrandingSettings({
@@ -67,23 +55,23 @@ export default async function Page(props: {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: organization ?? session?.factors?.user?.organizationId,
+    organization: organization ?? sessionFactors?.factors?.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 
   return (
     <div id="auth-panel">
-      {method && session && (
+      {method && sessionFactors && (
         <LoginOTP
-          loginName={loginName ?? session.factors?.user?.loginName}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
           requestId={requestId}
-          organization={organization ?? session?.factors?.user?.organizationId}
+          organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}
           host={host}
           code={code}
         >
-          {!session && (
+          {!sessionFactors && (
             <div className="py-4">
               <Alert.Danger>
                 <I18n i18nKey="unknownContext" namespace="error" />
@@ -98,10 +86,10 @@ export default async function Page(props: {
             {method === "time-based" && <I18n i18nKey="verify.otpDescription" namespace="otp" />}
           </p>
 
-          {session && (
+          {sessionFactors && (
             <UserAvatar
-              loginName={loginName ?? session.factors?.user?.loginName}
-              displayName={session.factors?.user?.displayName}
+              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+              displayName={sessionFactors.factors?.user?.displayName}
               showDropdown
               searchParams={searchParams}
             />

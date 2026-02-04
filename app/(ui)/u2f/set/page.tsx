@@ -73,7 +73,6 @@ export default async function Page(props: {
           <RegisterU2f
             loginName={loginName}
             sessionId={sessionFactors.id}
-            sessionToken={sessionFactors.sessionToken}
             organization={organization}
             requestId={requestId}
             checkAfter={checkAfter === "true"}

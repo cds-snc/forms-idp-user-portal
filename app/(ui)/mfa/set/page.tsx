@@ -4,21 +4,15 @@ import { ChooseSecondFactorToSetup } from "./components/choose-second-factor-to-
 
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getSessionCookieById } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import {
-  getLoginSettings,
-  getSession,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@lib/zitadel";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getLoginSettings } from "@lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { getSerializableObject } from "@lib/utils";
+import { getSerializableObject, SearchParams } from "@lib/utils";
 import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,9 +37,7 @@ function isSessionValid(session: Partial<Session>): {
   return { valid, verifiedAt };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, checkAfter, force, requestId, organization, sessionId } = searchParams;
@@ -53,65 +45,16 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
-
-  async function getAuthMethodsAndUser(session?: Session) {
-    const userId = session?.factors?.user?.id;
-
-    if (!userId) {
-      throw Error("Could not get user id from session");
-    }
-
-    return listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    }).then((methods) => {
-      return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
-
-        return {
-          id: session.id,
-          factors: session?.factors,
-          authMethods: methods.authMethodTypes ?? [],
-          phoneVerified: humanUser?.phone?.isVerified ?? false,
-          emailVerified: humanUser?.email?.isVerified ?? false,
-          expirationDate: session?.expirationDate,
-        };
-      });
-    });
-  }
-
-  async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    }).then((session) => {
-      return getAuthMethodsAndUser(session);
-    });
-  }
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
-    });
-  }
+  const sessionFactors = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: sessionWithData.factors?.user?.organizationId,
+    organization: sessionFactors.factors?.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 
-  const { valid } = isSessionValid(sessionWithData);
+  const { valid } = isSessionValid(sessionFactors);
 
   return (
     <>
@@ -120,10 +63,10 @@ export default async function Page(props: {
 
         <I18n i18nKey="set.description" namespace="mfa" tagName="p" className="mb-6" />
 
-        {sessionWithData && (
+        {sessionFactors && (
           <UserAvatar
-            loginName={loginName ?? sessionWithData.factors?.user?.loginName}
-            displayName={sessionWithData.factors?.user?.displayName}
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -144,17 +87,17 @@ export default async function Page(props: {
             </Alert.Warning>
           )}
 
-          {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
+          {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
             <ChooseSecondFactorToSetup
-              userId={sessionWithData.factors?.user?.id}
+              userId={sessionFactors.factors?.user?.id}
               loginName={loginName}
-              sessionId={sessionWithData.id}
+              sessionId={sessionFactors.id}
               requestId={requestId}
               organization={organization}
               loginSettings={loginSettings}
-              userMethods={sessionWithData.authMethods ?? []}
-              phoneVerified={sessionWithData.phoneVerified ?? false}
-              emailVerified={sessionWithData.emailVerified ?? false}
+              userMethods={sessionFactors.authMethods ?? []}
+              phoneVerified={sessionFactors.phoneVerified ?? false}
+              emailVerified={sessionFactors.emailVerified ?? false}
               checkAfter={checkAfter === "true"}
               force={force === "true"}
             ></ChooseSecondFactorToSetup>

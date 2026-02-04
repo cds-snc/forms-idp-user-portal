@@ -38,6 +38,7 @@ export async function loadMostRecentSession({
 }
 
 type SessionWithAuthData = {
+  id?: string;
   factors?: Session["factors"];
   authMethods: AuthenticationMethodType[];
   phoneVerified: boolean;
@@ -64,6 +65,7 @@ async function getAuthMethodsAndUser(
   const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
   return {
+    id: session?.id,
     factors: session?.factors,
     authMethods: methods.authMethodTypes ?? [],
     phoneVerified: humanUser?.phone?.isVerified ?? false,
@@ -99,6 +101,27 @@ export async function loadSessionByLoginname(
     },
   });
   return getAuthMethodsAndUser(serviceUrl, session);
+}
+
+/**
+ * Load session factors (authentication state) by session ID without fetching auth methods or user verification data.
+ * Use this when you only need the session's authentication factors, not the complete enriched session data.
+ */
+export async function loadSessionFactorsById(
+  serviceUrl: string,
+  sessionId: string,
+  organization?: string
+): Promise<Session | undefined> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+  return getSession({
+    serviceUrl,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  }).then((response) => {
+    if (response?.session) {
+      return response.session;
+    }
+  });
 }
 
 /**

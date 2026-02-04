@@ -4,35 +4,21 @@ import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@lib/cookies";
 import { completeDeviceAuthorization } from "@lib/server/device";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { getLoginSettings, getSession } from "@lib/zitadel";
+import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
+import { getLoginSettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
 import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("signedin");
   return { title: t("title", { user: "" }) };
 }
 
-async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
-  const recent = await getSessionCookieById({ sessionId, organization });
-  return getSession({
-    serviceUrl,
-    sessionId: recent.id,
-    sessionToken: recent.token,
-  }).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
-}
-
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
@@ -71,7 +57,7 @@ export default async function Page(props: {
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
+    ? await loadSessionFactorsById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },
