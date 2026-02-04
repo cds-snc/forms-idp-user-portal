@@ -17,12 +17,6 @@ import { SubmitButtonAction, BackButton } from "@clientComponents/globals/Button
 import { useState, useActionState } from "react";
 import { useTranslation, I18n } from "@i18n";
 
-type Inputs = {
-  code: string;
-  password: string;
-  confirmPassword: string;
-};
-
 type Props = {
   code?: string;
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -39,12 +33,11 @@ export function SetPasswordForm({
   requestId,
   loginName,
   userId,
-  code,
   codeRequired,
 }: Props) {
   const { t } = useTranslation("password");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
@@ -220,6 +213,8 @@ export function SetPasswordForm({
 
       {passwordComplexitySettings && (
         <PasswordComplexity
+          id="password-complexity-requirements"
+          ready
           passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
           equals={!!watchPassword && watchPassword === watchConfirmPassword}

@@ -1,5 +1,5 @@
 import { Alert } from "@clientComponents/globals";
-import { LoginPasskey } from "./components/login-passkey";
+import { LoginU2F } from "./components/login-u2f";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getSessionCookieById } from "@lib/cookies";
@@ -52,9 +52,7 @@ export default async function Page(props: {
           <I18n i18nKey="verify.title" namespace="u2f" />
         </h1>
 
-        <p className="ztdl-p mb-6 block">
-          <I18n i18nKey="verify.description" namespace="u2f" />
-        </p>
+        <I18n i18nKey="verify.description" namespace="u2f" tagName="p" className="mb-6" />
 
         {sessionFactors && (
           <UserAvatar
@@ -74,7 +72,7 @@ export default async function Page(props: {
 
       <div className="w-full">
         {(loginName || sessionId) && (
-          <LoginPasskey
+          <LoginU2F
             loginName={loginName}
             sessionId={sessionId}
             requestId={requestId}

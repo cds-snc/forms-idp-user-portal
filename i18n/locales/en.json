@@ -55,6 +55,8 @@
     "title": "Accounts",
     "description": "Select the account you want to use.",
     "addAnother": "Add another account",
+    "setUpMFA": "Edit 2-Factor Authentication",
+    "verifyEmail": "Verify your email",
     "noResults": "No accounts found",
     "verified": "verified",
     "expired": "expired"
@@ -196,6 +198,9 @@
       "title": "Set up two-factor authentication",
       "description": "Choose one of the following methods.",
       "skip": "Skip"
+      "addAnother": "Add another method",
+      "setAsDefault": "Set as my default authentication method",
+      "setAsDefaultShort": "Set as default"
     }
   },
   "otp": {
@@ -236,7 +241,6 @@
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
       "password": "Password"
     },
     "disabled": {
@@ -285,8 +289,32 @@
       "couldNotRegisterUser": "Could not register user account"
     }
   },
+  "u2f": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "description": "Verify your account with your device.",
+      "usePassword": "Use password",
+      "submit": "Continue",
+      "errors": {
+        "couldNotRequestChallenge": "Could not request security key challenge",
+        "couldNotVerifyPasskey": "Could not verify security key",
+        "noResponseReceived": "Security key verification failed - no response received",
+        "noRedirectProvided": "Security key verification completed but no redirect was provided",
+        "couldNotRetrievePasskey": "An error occurred while retrieving security key",
+        "verificationCancelled": "Security key verification was cancelled",
+        "verificationFailed": "An error occurred during security key verification"
+      }
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Set up a device as a second factor.",
+      "registerInstructions": "Click Continue and insert your security key or use biometric authentication when prompted.",
+      "submit": "Continue"
+    }
+  },
   "verify": {
-    "title": "Check your email for a security code",
+    "title": "Check your email for your account initialization code",
+    "description": "Please enter the code received by email. ",
     "label": "Security code",
     "hint": "Enter code within 15 minutes.",
     "submit": "Continue",

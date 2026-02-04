@@ -6,11 +6,12 @@ import { getSessionCookieById } from "@lib/cookies";
 import { getOriginalHost } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getBrandingSettings, getLoginSettings, getSession } from "@lib/zitadel";
+import { getLoginSettings, getSession } from "@lib/zitadel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getSerializableObject } from "@lib/utils";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -59,10 +60,10 @@ export default async function Page(props: {
   }
 
   // email links do not come with organization, thus we need to use the session's organization
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization: organization ?? session?.factors?.user?.organizationId,
-  });
+  // const branding = await getBrandingSettings({
+  //   serviceUrl,
+  //   organization: organization ?? session?.factors?.user?.organizationId,
+  // });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
@@ -70,45 +71,7 @@ export default async function Page(props: {
   }).then((obj) => getSerializableObject(obj));
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="verify.title" namespace="otp" />
-        </h1>
-        {method === "time-based" && (
-          <p className="ztdl-p">
-            <I18n i18nKey="verify.otpDescription" namespace="otp" />
-          </p>
-        )}
-        {method === "sms" && (
-          <p className="ztdl-p">
-            <I18n i18nKey="verify.smsDescription" namespace="otp" />
-          </p>
-        )}
-        {method === "email" && (
-          <p className="ztdl-p">
-            <I18n i18nKey="verify.emailDescription" namespace="otp" />
-          </p>
-        )}
-
-        {!session && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          </div>
-        )}
-
-        {session && (
-          <UserAvatar
-            loginName={loginName ?? session.factors?.user?.loginName}
-            displayName={session.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        )}
-      </div>
-
+    <div id="auth-panel">
       {method && session && (
         <LoginOTP
           loginName={loginName ?? session.factors?.user?.loginName}
@@ -119,7 +82,31 @@ export default async function Page(props: {
           loginSettings={loginSettings}
           host={host}
           code={code}
-        ></LoginOTP>
+        >
+          {!session && (
+            <div className="py-4">
+              <Alert.Danger>
+                <I18n i18nKey="unknownContext" namespace="error" />
+              </Alert.Danger>
+            </div>
+          )}
+
+          <AuthPanelTitle i18nKey="verify.title" namespace="otp" />
+
+          <p className="mb-3">
+            {method === "email" && <I18n i18nKey="verify.emailDescription" namespace="otp" />}
+            {method === "time-based" && <I18n i18nKey="verify.otpDescription" namespace="otp" />}
+          </p>
+
+          {session && (
+            <UserAvatar
+              loginName={loginName ?? session.factors?.user?.loginName}
+              displayName={session.factors?.user?.displayName}
+              showDropdown
+              searchParams={searchParams}
+            />
+          )}
+        </LoginOTP>
       )}
     </div>
   );

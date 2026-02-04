@@ -27,23 +27,25 @@ export const CodeEntry = ({
 }) => {
   return (
     <div className={className}>
-      <Label htmlFor="code" required>
-        <I18n i18nKey="label" namespace="verify" />
-      </Label>
-      <Hint id="codeHint">
-        <I18n i18nKey="hint" namespace="verify" />
-      </Hint>
-      {getError("code", state) && (
-        <ErrorMessage id={"errorMessageCode"}>{getError("code", state)}</ErrorMessage>
-      )}
-      <TextInput
-        type="text"
-        id="code"
-        defaultValue={state.formData?.code ?? code ?? ""}
-        ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
-        className="w-36"
-        required
-      />
+      <div className="gcds-input-wrapper">
+        <Label htmlFor="code" required>
+          <I18n i18nKey="label" namespace="verify" />
+        </Label>
+        <Hint id="codeHint">
+          <I18n i18nKey="hint" namespace="verify" />
+        </Hint>
+        {getError("code", state) && (
+          <ErrorMessage id={"errorMessageCode"}>{getError("code", state)}</ErrorMessage>
+        )}
+        <TextInput
+          type="text"
+          id="code"
+          defaultValue={state.formData?.code ?? code ?? ""}
+          ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
+          className="w-36"
+          required
+        />
+      </div>
     </div>
   );
 };

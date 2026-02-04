@@ -29,7 +29,6 @@ import {
   SetPasswordRequestSchema,
   UpdateHumanUserRequest,
   UserService,
-  VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 // import { unstable_cacheLife as cacheLife } from "next/cache";
@@ -1322,33 +1321,6 @@ export async function setPassword({
  *
  * @param host
  * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
-export async function createPasskeyRegistrationLink({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.createPasskeyRegistrationLink({
-    userId,
-    medium: {
-      case: "returnCode",
-      value: {},
-    },
-  });
-}
-
-/**
- *
- * @param host
- * @param userId the id of the user where the email should be set
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
@@ -1419,58 +1391,6 @@ export async function getActiveIdentityProviders({
   );
 
   return settingsService.getActiveIdentityProviders(props, {});
-}
-
-/**
- *
- * @param host
- * @param request the request object for verifying passkey registration
- * @returns the result of the verification
- */
-export async function verifyPasskeyRegistration({
-  serviceUrl,
-  request,
-}: {
-  serviceUrl: string;
-  request: VerifyPasskeyRegistrationRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.verifyPasskeyRegistration(request, {});
-}
-
-/**
- *
- * @param host
- * @param userId the id of the user where the email should be set
- * @param code the code for registering the passkey
- * @param domain the domain on which the factor is registered
- * @returns the newly set email
- */
-export async function registerPasskey({
-  serviceUrl,
-  userId,
-  code,
-  domain,
-}: {
-  serviceUrl: string;
-  userId: string;
-  code: { id: string; code: string };
-  domain: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.registerPasskey({
-    userId,
-    code,
-    domain,
-  });
 }
 
 /**

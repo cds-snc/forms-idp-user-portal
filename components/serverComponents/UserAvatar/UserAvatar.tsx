@@ -29,10 +29,10 @@ export function UserAvatar({ loginName, displayName, showDropdown, searchParams 
   }
 
   return (
-    <div className="flex h-full flex-row items-center rounded-md border-2 border-gcds-gray-300 p-2">
-      <div>
-        <Avatar size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
-      </div>
+    <div className="flex h-full flex-row items-center rounded-3xl border-2 border-gcds-gray-300 p-2">
+      {/* <div> */}
+      <Avatar size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
+      {/* </div> */}
       <span className="ml-4 overflow-hidden text-ellipsis pr-4">{loginName}</span>
       <span className="grow"></span>
       {showDropdown && (

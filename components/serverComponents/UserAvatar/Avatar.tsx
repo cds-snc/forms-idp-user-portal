@@ -40,7 +40,7 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
 
   return (
     <div
-      className={`pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center bg-gcds-blue-500 text-white transition-colors duration-200 rounded-lg ${
+      className={`pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center bg-gcds-blue-500 text-white transition-colors duration-200 rounded-full ${
         shadow ? "shadow" : ""
       } ${
         size === "large"

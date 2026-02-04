@@ -9,6 +9,7 @@ import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { getUserByID } from "../lib/zitadel";
+import { getPreferredMFAMethodForUser } from "./server/mfa-preferences";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -105,14 +106,6 @@ export async function checkMFAFactors(
   organization?: string,
   requestId?: string
 ) {
-  console.log("checkMFAFactors called with session:", {
-    sessionId: session.id,
-    userId: session.factors?.user?.id,
-    loginName: session.factors?.user?.loginName,
-    hasIntentFactor: !!session.factors?.intent?.verifiedAt,
-    hasPasswordFactor: !!session.factors?.password?.verifiedAt,
-    hasWebAuthNFactor: !!session.factors?.webAuthN?.verifiedAt,
-  });
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
@@ -121,15 +114,7 @@ export async function checkMFAFactors(
       m === AuthenticationMethodType.U2F
   );
 
-  const hasAuthenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
-
-  // escape further checks if user has authenticated with passkey
-  if (hasAuthenticatedWithPasskey) {
-    return;
-  }
-
-  // if user has not authenticated with passkey and has only one additional mfa factor, redirect to that
+  // if user has only one additional mfa factor, redirect to that
   if (availableMultiFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -158,6 +143,52 @@ export async function checkMFAFactors(
       return { redirect: `/u2f?` + params };
     }
   } else if (availableMultiFactors?.length > 1) {
+    // Check if user has a preferred MFA method
+    if (session.factors?.user?.id) {
+      try {
+        // Try to get preferred method from cookie first
+        const preferredMethod = await getPreferredMFAMethodForUser(session.factors.user.id);
+
+        // If user has a preferred method and it's available, use it
+        if (
+          preferredMethod &&
+          (preferredMethod === AuthenticationMethodType.TOTP ||
+            preferredMethod === AuthenticationMethodType.OTP_SMS ||
+            preferredMethod === AuthenticationMethodType.OTP_EMAIL ||
+            preferredMethod === AuthenticationMethodType.U2F)
+        ) {
+          const params = new URLSearchParams({
+            loginName: session.factors?.user?.loginName as string,
+          });
+
+          if (requestId) {
+            params.append("requestId", requestId);
+          }
+
+          if (organization || session.factors?.user?.organizationId) {
+            params.append(
+              "organization",
+              organization ?? (session.factors?.user?.organizationId as string)
+            );
+          }
+
+          // Redirect to the preferred method
+          if (preferredMethod === AuthenticationMethodType.TOTP) {
+            return { redirect: `/otp/time-based?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.OTP_SMS) {
+            return { redirect: `/otp/sms?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.OTP_EMAIL) {
+            return { redirect: `/otp/email?` + params };
+          } else if (preferredMethod === AuthenticationMethodType.U2F) {
+            return { redirect: `/u2f?` + params };
+          }
+        }
+      } catch {
+        // Fall through to showing MFA selection page
+      }
+    }
+
+    // Show MFA selection page if no preferred method or it's not available
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
@@ -196,7 +227,6 @@ export async function checkMFAFactors(
       );
     }
 
-    // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
@@ -253,7 +283,6 @@ export async function checkMFAFactors(
       );
     }
 
-    // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
   }
 }
@@ -272,16 +301,7 @@ export function shouldEnforceMFA(
     return false;
   }
 
-  // Check if user authenticated with passkey (passkeys are inherently multi-factor)
-  const authenticatedWithPasskey =
-    session.factors?.webAuthN?.verifiedAt && session.factors?.webAuthN?.userVerified;
-
-  // If user authenticated with passkey, MFA is not required regardless of settings
-  if (authenticatedWithPasskey) {
-    return false;
-  }
-
-  // If forceMfa is enabled, MFA is required for ALL authentication methods (except passkeys)
+  // If forceMfa is enabled, MFA is required for ALL authentication methods
   if (loginSettings.forceMfa) {
     return true;
   }
@@ -327,14 +347,10 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
-    console.warn("User verification check cookie not found. User verification check failed.");
     return false;
   }
 
   if (cookieValue !== verificationCheck) {
-    console.warn(
-      `User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`
-    );
     return false;
   }
 

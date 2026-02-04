@@ -13,15 +13,14 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
-import Link from "next/link";
-import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: { searchParams: Promise<any> }) {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
@@ -40,6 +39,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  // Email sending function
   async function sendEmail(userId: string) {
     const hostWithProtocol = await getOriginalHostWithProtocol();
 
@@ -102,9 +102,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   const params = new URLSearchParams({
-    userId: userId,
     initial: "true", // defines that a code is not required and is therefore not shown in the UI
   });
+
+  if (userId) {
+    params.set("userId", userId);
+  }
 
   if (loginName) {
     params.set("loginName", loginName);
@@ -130,6 +133,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           requestId={requestId}
         >
           <AuthPanelTitle i18nKey="title" namespace="verify" />
+
+          <I18n i18nKey="description" namespace="verify" tagName="p" className="mb-6" />
 
           <div className="my-8">
             {sessionFactors ? (
