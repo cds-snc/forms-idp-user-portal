@@ -111,9 +111,9 @@
         "confirmPassword": "Vous devez confirmer votre mot de passe."
       },
       "errors": {
-        "couldNotSetPassword": "Problème de définition du mot de passe",
-        "couldNotResetPassword": "Problème de réinitialisation du mot de passe.",
-        "couldNotVerifyPassword": "Problème de vérification du mot de passe."
+        "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
+        "couldNotResetPassword": "Le mot de passe n'a pas pu être réinitialisé.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié.",
       }
     },
     "change": {
@@ -125,182 +125,181 @@
         "confirmPassword": "Confirmer le mot de passe"
       },
       "required": {
-        "newPassword": "You have to provide a new password!",
-        "confirmPassword": "This field is required"
+        "newPassword": "Vous devez fournir un nouveau mot de passe.",
+        "confirmPassword": "Ce champ est obligatoire"
       },
       "errors": {
-        "couldNotChangePassword": "Could not change password",
-        "couldNotVerifyPassword": "Could not verify password",
-        "unknownError": "Unknown error"
+        "couldNotChangePassword": "Le mot de passe n'a pas pu être modifié.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié.",
+        "unknownError": "Une erreur inconnue s'est produite."
       }
     },
     "create": {
-      "title": "Set Password",
-      "submit": "Continue",
+      "title": "Définissez votre mot de passe",
+      "submit": "Continuer",
       "labels": {
-        "password": "Password",
-        "confirmPassword": "Confirm Password"
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
       },
-      "passwordHint": "Your password should be hard to guess with:",
+      "passwordHint": "Votre mot de passe devrait être difficile à deviner avec :",
       "disabled": {
-        "title": "Registration disabled",
-        "description": "The registration is disabled. Please contact your administrator."
+        "title": "L'inscription est désactivée",
+        "description": "L'inscription est désactivée. Veuillez contacter l'administrateur."
       },
       "missingOrInvalidData": {
-        "title": "Missing or Invalid data",
-        "description": "Provide a valid first name, last name, and email to register."
+        "title": "Données manquantes ou invalides",
+        "description": "Fournissez votre prénom, nom de famille et adresse courriel pour vous inscrire."
       }
     },
     "complexity": {
-      "requiredPassword": "Password is required.",
-      "requiredConfirmPassword": "Confirm password is required.",
-      "minLength": "At least 8 characters",
-      "hasNumber": "A number",
-      "hasUppercase": "A capital letter",
-      "hasLowercase": "A lowercase letter",
-      "hasSymbol": "A symbol",
-      "maxLength": "Less than 50 characters",
-      "mustMatch": "The passwords must match.",
-      "equals": "Password confirmation matched.",
-      "matches": "Matches",
-      "doesNotMatch": "The entries for password must match.",
-      "success": "Succeeds",
-      "requiredPasswordSuccess": "Password provided is valid."
+      "requiredPassword": "Le mot de passe est obligatoire.",
+      "requiredConfirmPassword": "La confirmation du mot de passe est obligatoire.",
+      "minLength": "Au moins 8 caractères",
+      "hasNumber": "Un chiffre",
+      "hasUppercase": "Une lettre majuscule",
+      "hasLowercase": "Une lettre minuscule",
+      "hasSymbol": "Un symbole",
+      "maxLength": "Moins de 50 caractères",
+      "mustMatch": "Les mots de passe doivent correspondre.",
+      "equals": "Confirmation du mot de passe correcte.",
+      "matches": "Correspondance",
+      "doesNotMatch": "Les entrées pour le mot de passe doivent correspondre.",
+      "success": "Succès",
+      "requiredPasswordSuccess": "Mot de passe valide."
     },
     "errors": {
-      "noHostFound": "No host found",
-      "couldNotSendResetLink": "Could not send Password Reset Link",
-      "couldNotCreateSessionForUser": "Could not create session for user",
-      "couldNotVerifyPassword": "Could not verify password",
-      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
-      "failedToAuthenticateNoLimit": "Failed to authenticate.",
-      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
-      "userNotFound": "User not found in the system",
-      "initialUserNotSupported": "Initial User not supported",
-      "userInitialStateNotSupported": "User Initial State is not supported",
-      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
-      "verificationRequired": "User Verification Check has to be done",
-      "couldNotLoadSession": "Could not load session",
-      "couldNotLoadAuthMethods": "Could not load auth methods",
-      "failedPrecondition": "Failed precondition",
-      "sessionNotValid": "Session is not valid"
+      "noHostFound": "Aucun hôte trouvé",
+      "couldNotSendResetLink": "Problème d'envoi du lien de réinitialisation du mot de passe",
+      "couldNotCreateSessionForUser": "Problème de création de session pour cet utilisateur",
+      "couldNotVerifyPassword": "Problème de vérification du mot de passe",
+      "failedToAuthenticate": "Échec de l'authentification. Vous avez essayé {failedAttempts} des {maxPasswordAttempts} tentatives de mot de passe. {lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Échec de l'authentification.",
+      "accountLockedContactAdmin": " Contactez votre administrateur pour déverrouiller votre compte",
+      "userNotFound": "Compte utilisateur introuvable dans le système",
+      "initialUserNotSupported": "Utilisateur initial non pris en charge",
+      "userInitialStateNotSupported": "L'état initial de l'utilisateur n'est pas pris en charge",
+      "codeOrVerificationRequired": "Vous devez fournir un code ou avoir une vérification d'utilisateur valide",
+      "verificationRequired": "La vérification de l'utilisateur doit être effectuée",
+      "couldNotLoadSession": "Problème de chargement de la session",
+      "couldNotLoadAuthMethods": "Problème de chargement des méthodes d'authentification",
+      "failedPrecondition": "Échec de la précondition",
+      "sessionNotValid": "La session n'est pas valide"
     }
   },
   "mfa": {
     "verify": {
-      "title": "Verify your identity",
-      "description": "Choose one of the following factors.",
-      "noResults": "No second factors available to setup."
+      "title": "Vérifiez votre identité",
+      "description": "Choisissez l'un des facteurs d'authentification suivants.",
+      "noResults": "Aucun facteur secondaire disponible pour configuration."
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Choose one of the following second factors.",
-      "skip": "Skip"
+      "title": "Configurer l'authentification à deux facteurs",
+      "description": "Choisissez l'une des méthodes suivantes.",
+      "skip": "Ignorer"
     }
   },
   "otp": {
     "verify": {
-      "title": "One Time Code",
-      "otpDescription": "Please enter the code from your authenticator device",
-      "smsDescription": "Please enter the code received by text message",
-      "emailDescription": "Please enter the code received by email",
+      "title": "Code à usage unique",
+      "otpDescription": "Veuillez entrer le code de votre application d'authentification",
+      "smsDescription": "Veuillez entrer le code reçu par message texte",
+      "emailDescription": "Veuillez entrer le code reçu par courriel",
       "form": {
-        "label": "Security Code",
-        "noCodeReceived": "Didn't receive a code?",
-        "resendCode": "Resend code"
+        "label": "Code de sécurité",
+        "noCodeReceived": "Vous n'avez pas reçu de code?",
+        "resendCode": "Renvoyer le code"
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "totpDescription": "Scan the QR code with your authenticator app.",
-      "smsDescription": "Enter your phone number to receive a code via SMS.",
-      "emailDescription": "Enter your email address to receive a code via email.",
-      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-      "submit": "Continue",
+      "title": "Configurer l'authentification à deux facteurs",
+      "totpDescription": "Scannez le code QR avec votre application d'authentification.",
+      "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par message texte.",
+      "emailDescription": "Entrez votre adresse courriel pour recevoir un code par courriel.",
+      "totpRegisterDescription": "Scannez le code QR ou accédez au lien URL.",
+      "submit": "Continuer",
       "labels": {
         "code": "Code"
       },
       "required": {
-        "code": "This field is required"
+        "code": "Ce champ est obligatoire"
       }
     }
   },
   "signedin": {
-    "title": "Welcome {{user}}!",
-    "description": "You are signed in.",
-    "continue": "Continue",
+    "title": "Bienvenue {{user}}!",
+    "description": "Vous êtes connecté.",
+    "continue": "Continuer",
     "error": {
-      "title": "Error",
-      "description": "An error occurred while trying to sign in."
+      "title": "Erreur",
+      "description": "Une erreur s'est produite lors de la tentative de connexion."
     }
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
-      "password": "Password"
+      "passkey": "Clé d'accès",
+      "password": "Mot de passe"
     },
     "disabled": {
-      "title": "Registration disabled",
-      "description": "The registration is disabled. Please contact your administrator."
+      "title": "Inscription désactivée",
+      "description": "L'inscription est désactivée. Veuillez contacter votre administrateur."
     },
     "missingdata": {
-      "title": "Missing data",
-      "description": "Provide email, first and last name to register."
+      "title": "Données manquantes",
+      "description": "Veuillez fournir votre adresse courriel, prénom et nom de famille pour vous inscrire."
     },
-    "title": "Create your account",
-    "emailInputHint": "Use a government address only you can access, not a shared inbox.",
-
-    "description": "Create your GCForms account.",
-    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
-    "selectMethod": "Select the method you would like to authenticate",
-    "agreeTo": "To register you must agree to the terms and conditions",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
-    "submit": "Continue",
+    "title": "Créer votre compte",
+    "emailInputHint": "Utilisez une adresse courriel du gouvernement à laquelle vous seul avez accès, et non une boîte de réception partagée.",
+    "description": "Créez votre compte Formulaires GC.",
+    "noMethodAvailableWarning": "Aucune méthode d'authentification disponible. Veuillez contacter votre administrateur.",
+    "selectMethod": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
+    "agreeTo": "Pour vous inscrire, vous devez accepter les conditions d'utilisation",
+    "termsOfService": "Conditions d'utilisation",
+    "privacyPolicy": "Politique de confidentialité",
+    "submit": "Continuer",
     "labels": {
-      "firstname": "First name",
-      "lastname": "Last name",
-      "email": "E-mail"
+      "firstname": "Prénom",
+      "lastname": "Nom de famille",
+      "email": "Adresse courriel"
     },
     "required": {
-      "firstname": "This field is required",
-      "lastname": "This field is required",
-      "email": "This field is required"
+      "firstname": "Le champ Prénom est obligatoire",
+      "lastname": "Le champ Nom de famille est obligatoire",
+      "email": "Le champ Adresse courriel est obligatoire"
     },
     "terms": {
-      "agreement": "By creating an account you agree to the ",
-      "linkText": "Terms of use."
+      "agreement": "En créant un compte, vous acceptez les ",
+      "linkText": "conditions d'utilisation."
     },
     "validation": {
-      "required": "Complete the required field to continue.",
-      "requiredFirstname": "First name is required.",
-      "requiredLastname": "Last name is required.",
-      "requiredEmail": "Email is required.",
-      "validGovEmail": "Enter a valid government email address."
+      "required": "Veuillez remplir les champs obligatoires pour continuer.",
+      "requiredFirstname": "Votre prénom est obligatoire.",
+      "requiredLastname": "Votre nom de famille est obligatoire.",
+      "requiredEmail": "Votreadresse courriel est obligatoire.",
+      "validGovEmail": "Veuillez entrer une adresse courriel individuelle valide du gouvernement du Canada."
     },
     "errors": {
-      "couldNotCreateUser": "Could not create user",
-      "couldNotCreateSession": "Could not create session",
-      "userNotFound": "User not found in the system",
-      "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotCreateUser": "Problème de création de l'utilisateur",
+      "couldNotCreateSession": "Problème de création de la session",
+      "userNotFound": "Compte utilisateur non trouvé dans le système",
+      "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité au compte utilisateur",
+      "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
     }
   },
   "verify": {
-    "title": "Check your email for a security code",
-    "label": "Security code",
-    "hint": "Enter code within 15 minutes.",
-    "submit": "Continue",
-    "newCode": "Send a new code",
-    "sendingNewCode": "Sending new code...",
-    "sentNewCode": "New code sent",
-    "help": "Need help?",
+    "title": "Vérifiez votre courriel pour un code de sécurité",
+    "label": "Code de sécurité",
+    "hint": "Entrez le code dans les 15 minutes.",
+    "submit": "Continuer",
+    "newCode": "Envoyer un nouveau code",
+    "sendingNewCode": "Envoi d'un nouveau code...",
+    "sentNewCode": "Nouveau code envoyé",
+    "help": "Besoin d'aide?",
     "validation": {
-      "required": "Cannot be empty",
-      "length": "Must be 6 characters"
+      "required": "Ce champ ne peut pas être vide",
+      "length": "Doit contenir 6 caractères"
     },
     "errors": {
-      "couldNotVerifyEmail": "Could not verify email"
+      "couldNotVerifyEmail": "Problème de vérification du courriel",
     }
   }
 }
