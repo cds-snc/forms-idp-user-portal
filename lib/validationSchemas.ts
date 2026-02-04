@@ -105,10 +105,14 @@ export const validateUsername = async (formEntries: { [k: string]: FormDataEntry
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
-export const validateCode = async (formEntries: { [k: string]: FormDataEntryValue }, max = 10) => {
+export const validateCode = async (
+  formEntries: { [k: string]: FormDataEntryValue },
+  min = 1,
+  max = 10
+) => {
   const formValidationSchema = v.pipe(
     v.object({
-      ...codeSchema(max),
+      ...codeSchema(min, max),
     })
   );
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
