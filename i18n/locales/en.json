@@ -75,7 +75,8 @@
       "description": "Enter your own individual government email address."
     },
     "validation": {
-      "requiredUsername": "Email address is required."
+      "requiredUsername": "Email address is required.",
+      "validGovEmail": "Enter a valid individual Government of Canada email address."
     }
   },
   "logout": {
