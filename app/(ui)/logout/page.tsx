@@ -1,5 +1,4 @@
 import { SessionsClearList } from "./components/sessions-clear-list";
-import { I18n } from "@i18n";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getDefaultOrg } from "@lib/zitadel";
 import { loadSessionsFromCookies } from "@lib/server/session";
@@ -43,7 +42,7 @@ export default async function Page(props: {
     }
   }
 
-  let sessions = await loadSessions({ serviceUrl });
+  const sessions = await loadSessions({ serviceUrl });
 
   const params = new URLSearchParams();
 
