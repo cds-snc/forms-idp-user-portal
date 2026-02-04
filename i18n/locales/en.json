@@ -13,7 +13,7 @@
   },
   "header": {
     "lang-toggle": "Language selection",
-    "logout": "Logout"
+    "logout": "Sign out"
   },
   "fip": {
     "link": "http://canada.ca/en.html",
@@ -48,15 +48,15 @@
     "ariaLabel": "Footer"
   },
   "home": {
-    "description": "Welcome to GCForms super duper one stop shop for login",
-    "next": "Let's get started"
+    "description": "Welcome to GC Forms. Sign in to continue to your account or create a new account to try out the application.",
+    "next": "Get started"
   },
   "accounts": {
     "title": "Accounts",
     "description": "Select the account you want to use.",
     "addAnother": "Add another account",
-    "setUpMFA": "Edit 2-Factor Authentication",
-    "verifyEmail": "Verify your email",
+    "setUpMFA": "Change two-factor authentication",
+    "verifyEmail": "Verify your email address",
     "noResults": "No accounts found",
     "verified": "verified",
     "expired": "expired"
@@ -76,58 +76,58 @@
     }
   },
   "logout": {
-    "title": "Logout",
-    "description": "Click an account to end the session",
+    "title": "Sign out",
+    "description": "Click an account to end the session.",
     "noResults": "No accounts found",
-    "clear": "End Session",
+    "clear": "End session",
     "verifiedAt": "Last active: {time}",
     "success": {
-      "title": "Logout successful",
-      "description": "You have successfully logged out."
+      "title": "Sign-out was successful",
+      "description": "You've signed out."
     }
   },
   "password": {
     "verify": {
       "title": "Password",
-      "description": "Please enter your password or select a different account below",
+      "description": "Please enter your password or select a different account below.",
       "form": {
-        "resetPassword": "Reset Password",
+        "resetPassword": "Reset password",
         "label": "Password"
       }
     },
     "set": {
-      "title": "Set Password",
+      "title": "Set a password",
       "description": "Set the password for your account",
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
-      "resend": "Resend code",
+      "resend": "Send a new code",
       "submit": "Continue",
       "labels": {
-        "code": "Code",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "code": "Security code",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
-        "code": "This field is required",
-        "newPassword": "You have to provide a password!",
-        "confirmPassword": "This field is required"
+        "code": "This field is required.",
+        "newPassword": "You have to provide a new password.",
+        "confirmPassword": "You have to confirm your password."
       },
       "errors": {
         "couldNotSetPassword": "Could not set password",
-        "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotResetPassword": "Could not reset password.",
+        "couldNotVerifyPassword": "Could not verify password."
       }
     },
     "change": {
-      "title": "Change Password",
+      "title": "Change password",
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
-        "newPassword": "You have to provide a new password!",
+        "newPassword": "You have to provide a new password.",
         "confirmPassword": "This field is required"
       },
       "errors": {
@@ -137,20 +137,20 @@
       }
     },
     "create": {
-      "title": "Set Password",
+      "title": "Set your password",
       "submit": "Continue",
       "labels": {
         "password": "Password",
-        "confirmPassword": "Confirm Password"
+        "confirmPassword": "Confirm password"
       },
       "passwordHint": "Your password should be hard to guess with:",
       "disabled": {
         "title": "Registration disabled",
-        "description": "The registration is disabled. Please contact your administrator."
+        "description": "The registration is disabled. Please contact the administrator."
       },
       "missingOrInvalidData": {
-        "title": "Missing or Invalid data",
-        "description": "Provide a valid first name, last name, and email to register."
+        "title": "Missing or invalid data",
+        "description": "Provide your first name, last name, and email address to register."
       }
     },
     "complexity": {
@@ -166,24 +166,24 @@
       "equals": "Password confirmation matched.",
       "matches": "Matches",
       "doesNotMatch": "The entries for password must match.",
-      "success": "Succeeds",
-      "requiredPasswordSuccess": "Password provided is valid."
+      "success": "Success",
+      "requiredPasswordSuccess": "Valid password"
     },
     "errors": {
       "noHostFound": "No host found",
-      "couldNotSendResetLink": "Could not send Password Reset Link",
-      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotSendResetLink": "Could not send password reset link",
+      "couldNotCreateSessionForUser": "Could not create session for this user",
       "couldNotVerifyPassword": "Could not verify password",
-      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts. {lockoutMessage}",
       "failedToAuthenticateNoLimit": "Failed to authenticate.",
       "accountLockedContactAdmin": " Contact your administrator to unlock your account",
-      "userNotFound": "User not found in the system",
-      "initialUserNotSupported": "Initial User not supported",
-      "userInitialStateNotSupported": "User Initial State is not supported",
-      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
-      "verificationRequired": "User Verification Check has to be done",
+      "userNotFound": "User account not found in the system",
+      "initialUserNotSupported": "Initial user not supported",
+      "userInitialStateNotSupported": "User initial state is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid user verification check",
+      "verificationRequired": "User verification check required",
       "couldNotLoadSession": "Could not load session",
-      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "couldNotLoadAuthMethods": "Could not load authentication methods",
       "failedPrecondition": "Failed precondition",
       "sessionNotValid": "Session is not valid"
     }
@@ -191,35 +191,36 @@
   "mfa": {
     "verify": {
       "title": "Verify your identity",
-      "description": "Choose one of the following factors.",
-      "noResults": "No second factors available to setup."
+      "description": "Choose one of the following authentication factors.",
+      "noResults": "No second factors available to set up."
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Choose one of the following second factors.",
+      "title": "Set up two-factor authentication",
+      "description": "Choose one of the following methods.",
       "skip": "Skip",
-      "addAnother": "Add another factor",
+      "addAnother": "Add another method",
       "setAsDefault": "Set as my default authentication method",
       "setAsDefaultShort": "Set as default"
     }
   },
   "otp": {
     "verify": {
-      "title": "One Time Code",
-      "otpDescription": "Please enter the code from your authenticator device.",
-      "emailDescription": "Please enter the code received by email.",
+      "title": "One-time code",
+      "otpDescription": "Enter the code from your authenticator app",
+      "smsDescription": "Enter the code received by text message",
+      "emailDescription": "Enter the code received by email",
       "form": {
-        "label": "Security Code",
+        "label": "Security code",
         "noCodeReceived": "Didn't receive a code?",
-        "resendCode": "Resend code"
+        "resendCode": "Re-send code"
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
+      "title": "Set up two-factor authentication",
       "totpDescription": "Scan the QR code with your authenticator app.",
-      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "smsDescription": "Enter your phone number to receive a code via SMS text message.",
       "emailDescription": "Enter your email address to receive a code via email.",
-      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL link.",
       "submit": "Continue",
       "labels": {
         "code": "Code"
@@ -248,50 +249,49 @@
     },
     "missingdata": {
       "title": "Missing data",
-      "description": "Provide email, first and last name to register."
+      "description": "Provide your email, first name, and last name to register."
     },
-    "title": "Setup your account",
+    "title": "Create your account",
     "emailInputHint": "Use a government address only you can access, not a shared inbox.",
-
-    "description": "Create your GCForms account.",
+    "description": "Create your GC Forms account.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
-    "agreeTo": "To register you must agree to the terms and conditions",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
+    "agreeTo": "To register, you must agree to the terms of use",
+    "termsOfService": "Terms of service",
+    "privacyPolicy": "Privacy policy",
     "submit": "Continue",
     "labels": {
       "firstname": "First name",
       "lastname": "Last name",
-      "email": "E-mail"
+      "email": "Email address"
     },
     "required": {
-      "firstname": "This field is required",
-      "lastname": "This field is required",
-      "email": "This field is required"
+      "firstname": "First name is a required field.",
+      "lastname": "Last name is a required field.",
+      "email": "Email address is a required field."
     },
     "terms": {
       "agreement": "By creating an account you agree to the ",
-      "linkText": "Terms of use."
+      "linkText": "terms of use."
     },
     "validation": {
-      "required": "Complete the required field to continue.",
-      "requiredFirstname": "First name is required.",
-      "requiredLastname": "Last name is required.",
-      "requiredEmail": "Email is required.",
-      "validGovEmail": "Enter a valid government email address."
+      "required": "Complete the required fields to continue.",
+      "requiredFirstname": "Your first name is required.",
+      "requiredLastname": "Your last name is required.",
+      "requiredEmail": "Your email address is required.",
+      "validGovEmail": "Enter a valid individual Government of Canada email address."
     },
     "errors": {
       "couldNotCreateUser": "Could not create user",
       "couldNotCreateSession": "Could not create session",
-      "userNotFound": "User not found in the system",
-      "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "userNotFound": "User account not found in the system",
+      "couldNotLinkIDP": "Could not link identity provider to the user account",
+      "couldNotRegisterUser": "Could not register user account"
     }
   },
   "u2f": {
     "verify": {
-      "title": "Verify 2-Factor",
+      "title": "Verify two-factor authentication",
       "description": "Verify your account with your device.",
       "usePassword": "Use password",
       "submit": "Continue",
@@ -306,14 +306,14 @@
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
+      "title": "Set up two-factor authentication",
       "description": "Set up a device as a second factor.",
-      "registerInstructions": "Click Continue and insert your security key or use biometric authentication when prompted.",
+      "registerInstructions": "Continue and then insert your security key or use biometric authentication when prompted.",
       "submit": "Continue"
     }
   },
   "verify": {
-    "title": "Check your email for your account initialization code",
+    "title": "Check your email for your account security code",
     "description": "Please enter the code received by email. ",
     "label": "Security code",
     "hint": "Enter code within 15 minutes.",
