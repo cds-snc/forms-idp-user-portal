@@ -16,20 +16,12 @@
     "logout": "Se déconnecter"
   },
   "fip": {
-    "link": "http://canada.ca/en.html",
+    "link": "http://canada.ca/fr.html",
     "text": "Symbole du gouvernement du Canada",
     "label": "Page d'accueil du gouvernement du Canada"
   },
   "layout": {
     "skip-link": "Passer au contenu principal"
-  "accounts": {
-    "verifyEmail": "Vérifiez votre adresse e-mail",
-    "setUpMFA": "Modifier l'authentification à deux facteurs"
-  },
-  "start": {
-    "validation": {
-      "requiredUsername": "L'adresse e-mail est requise."
-    }
   },
   "footer": {
     "version": "Version",
@@ -63,6 +55,8 @@
     "title": "Comptes",
     "description": "Sélectionnez le compte que vous souhaitez utiliser.",
     "addAnother": "Ajouter un autre compte",
+    "setUpMFA": "Modifier l'authentification à deux facteurs",
+    "verifyEmail": "Vérifiez votre adresse courriel",
     "noResults": "Aucun compte trouvé",
     "verified": "verifié",
     "expired": "expiré"
@@ -83,7 +77,7 @@
   },
   "logout": {
     "title": "Se déconnecter",
-    "description": "Cliquez sure un compte pour mettre fin à la session.",
+    "description": "Cliquez sur un compte pour mettre fin à la session.",
     "noResults": "Aucun compte trouvé",
     "clear": "Mettre fin à la session",
     "verifiedAt": "Dernière activité : {time}",
@@ -94,8 +88,8 @@
   },
   "password": {
     "verify": {
-      "title": "Mot de pass",
-      "description": "Veuillez entrer votre mot de passe pour continuer.",
+      "title": "Mot de passe",
+      "description": "Veuillez entrer votre mot de passe ou sélectionner un autre compte ci-dessous.",
       "form": {
         "resetPassword": "Réinitialiser le mot de passe",
         "label": "Mot de passe"
@@ -193,7 +187,6 @@
       "failedPrecondition": "Échec de la précondition",
       "sessionNotValid": "La session n'est pas valide"
     }
-    "ariaLabel": "Bas de page"
   },
   "mfa": {
     "verify": {
@@ -204,28 +197,24 @@
     "set": {
       "title": "Configurer l'authentification à deux facteurs",
       "description": "Choisissez l'une des méthodes suivantes.",
-      "skip": "Ignorer"
+      "skip": "Ignorer",
       "addAnother": "Ajouter un autre facteur",
       "setAsDefault": "Définir comme ma méthode d'authentification par défaut",
       "setAsDefaultShort": "Définir par défaut"
     }
   },
-  "u2f": {
+  "otp": {
     "verify": {
-      "title": "Vérifier l'authentification à deux facteurs",
-      "description": "Vérifiez votre compte avec votre appareil.",
-      "usePassword": "Utiliser le mot de passe",
-      "submit": "Continuer",
-      "errors": {
-        "couldNotRequestChallenge": "Impossible de demander le défi de la clé de sécurité",
-        "couldNotVerifyPasskey": "Impossible de vérifier la clé de sécurité",
-        "noResponseReceived": "La vérification de la clé de sécurité a échoué - aucune réponse reçue",
-        "noRedirectProvided": "La vérification de la clé de sécurité est terminée mais aucune redirection n'a été fournie",
-        "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé de sécurité",
-        "verificationCancelled": "La vérification de la clé de sécurité a été annulée",
-        "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé de sécurité"
+      "title": "Code à usage unique",
+      "otpDescription": "Entrez le code de votre application d'authentification",
+      "smsDescription": "Entrez le code reçu par message texte",
+      "emailDescription": "Entrez le code reçu par courriel",
+      "form": {
+        "label": "Code de sécurité",
+        "noCodeReceived": "Vous n'avez pas reçu de code?",
+        "resendCode": "Renvoyer le code"
       }
-    },
+      },
     "set": {
       "title": "Configurer l'authentification à deux facteurs",
       "totpDescription": "Scannez le code QR avec votre application d'authentification.",
@@ -252,7 +241,6 @@
   },
   "register": {
     "methods": {
-      "passkey": "Clé d'accès",
       "password": "Mot de passe"
     },
     "disabled": {
@@ -301,8 +289,32 @@
       "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
     }
   },
+  "u2f":{
+    "verify": {
+     "title": "Vérifiez l'authentification à deux facteurs",
+     "description": "Vérifiez votre compte avec votre appareil.",
+     "usePassword": "Utiliser le mot de passe",
+     "submit": "Continuer",
+     "errors": {
+       "couldNotRequestChallenge": "Problème de demande de défi de clé de sécurité",
+       "couldNotVerifyPasskey": "Problème de vérification de la clé de sécurité",
+       "noResponseReceived": "La vérification de la clé de sécurité a échoué - aucune réponse reçue",
+       "noRedirectProvided": "Vérification de la clé de sécurité terminée mais aucune redirection fournie",
+       "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé de sécurité",
+       "verificationCancelled": "La vérification de la clé de sécurité a été annulée",
+       "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé de sécurité"
+      }
+    },
+    "set": {
+      "title": "Configurer l'authentification à deux facteurs",
+      "description": "Configurez un appareil comme deuxième facteur.",
+      "registerInstructions": "Continuer et insérez ensuite votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
+      "submit": "Continuer"
+    }
+  },
   "verify": {
-    "title": "Vérifiez votre courriel pour un code de sécurité",
+    "title": "Vérifiez votre courriel pour le code de sécurité de votre compte",
+    "description": "Veuillez entrer le code reçu par courriel. ",
     "label": "Code de sécurité",
     "hint": "Entrez le code dans les 15 minutes.",
     "submit": "Continuer",
@@ -316,27 +328,6 @@
     },
     "errors": {
       "couldNotVerifyEmail": "Problème de vérification du courriel"
-      "description": "Configurez un appareil comme deuxième facteur.",
-      "registerInstructions": "Cliquez sur Continuer et insérez votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
-      "submit": "Continuer"
-    }
-  },
-  "verify": {
-    "title": "Check your email for your account initialization code",
-    "description": "Please enter the code received by email. ",
-    "label": "Security code",
-    "hint": "Enter code within 15 minutes.",
-    "submit": "Continue",
-    "newCode": "Send a new code",
-    "sendingNewCode": "Sending new code...",
-    "sentNewCode": "New code sent",
-    "help": "Need help?",
-    "validation": {
-      "required": "Cannot be empty",
-      "length": "Must be 6 characters"
-    },
-    "errors": {
-      "couldNotVerifyEmail": "Could not verify email"
     }
   }
 }

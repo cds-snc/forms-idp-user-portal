@@ -55,8 +55,8 @@
     "title": "Accounts",
     "description": "Select the account you want to use.",
     "addAnother": "Add another account",
-    "setUpMFA": "Edit 2-Factor Authentication",
-    "verifyEmail": "Verify your email",
+    "setUpMFA": "Change two-factor authentication",
+    "verifyEmail": "Verify your email address",
     "noResults": "No accounts found",
     "verified": "verified",
     "expired": "expired"
@@ -89,7 +89,7 @@
   "password": {
     "verify": {
       "title": "Password",
-      "description": "Please enter your password or select a different account below",
+      "description": "Please enter your password or select a different account below.",
       "form": {
         "resetPassword": "Reset password",
         "label": "Password"
@@ -197,7 +197,7 @@
     "set": {
       "title": "Set up two-factor authentication",
       "description": "Choose one of the following methods.",
-      "skip": "Skip"
+      "skip": "Skip",
       "addAnother": "Add another method",
       "setAsDefault": "Set as my default authentication method",
       "setAsDefaultShort": "Set as default"
@@ -291,7 +291,7 @@
   },
   "u2f": {
     "verify": {
-      "title": "Verify 2-Factor",
+      "title": "Verify two-factor authentication",
       "description": "Verify your account with your device.",
       "usePassword": "Use password",
       "submit": "Continue",
@@ -306,14 +306,14 @@
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
+      "title": "Set up two-factor authentication",
       "description": "Set up a device as a second factor.",
-      "registerInstructions": "Click Continue and insert your security key or use biometric authentication when prompted.",
+      "registerInstructions": "Continue and then insert your security key or use biometric authentication when prompted.",
       "submit": "Continue"
     }
   },
   "verify": {
-    "title": "Check your email for your account initialization code",
+    "title": "Check your email for your account security code",
     "description": "Please enter the code received by email. ",
     "label": "Security code",
     "hint": "Enter code within 15 minutes.",
