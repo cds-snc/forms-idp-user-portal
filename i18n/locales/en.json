@@ -11,6 +11,9 @@
       "title": "Please correct the errors on the page."
     }
   },
+  "error": {
+    "title": "Oops! Something went wrong."
+  },
   "header": {
     "lang-toggle": "Language selection",
     "logout": "Sign out"

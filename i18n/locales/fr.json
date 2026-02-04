@@ -11,6 +11,9 @@
       "title": "Veuillez corriger les erreurs sur la page."
     }
   },
+  "error": {
+    "title": "Oups! Quelque chose s'est mal passé."
+  },
   "header": {
     "lang-toggle": "Sélection de la langue",
     "logout": "Se déconnecter"
