@@ -198,9 +198,7 @@
       "title": "Set up two-factor authentication",
       "description": "Choose one of the following methods.",
       "skip": "Skip",
-      "addAnother": "Add another method",
-      "setAsDefault": "Set as my default authentication method",
-      "setAsDefaultShort": "Set as default"
+      "addAnother": "Add another method"
     }
   },
   "otp": {

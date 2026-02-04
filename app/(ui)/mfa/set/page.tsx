@@ -85,7 +85,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
           {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
             <ChooseSecondFactorToSetup
-              userId={sessionFactors.factors?.user?.id}
               loginName={loginName}
               sessionId={sessionFactors.id}
               requestId={requestId}
@@ -99,9 +98,8 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             ></ChooseSecondFactorToSetup>
           )}
 
-          <div className="mt-8 flex w-full flex-row items-center">
+          <div className="mb-6 mt-8 flex w-full flex-row items-center">
             <BackButton />
-            <span className="flex-grow"></span>
           </div>
         </div>
       </div>

@@ -198,9 +198,7 @@
       "title": "Configurer l'authentification à deux facteurs",
       "description": "Choisissez l'une des méthodes suivantes.",
       "skip": "Ignorer",
-      "addAnother": "Ajouter un autre facteur",
-      "setAsDefault": "Définir comme ma méthode d'authentification par défaut",
-      "setAsDefaultShort": "Définir par défaut"
+      "addAnother": "Ajouter un autre facteur"
     }
   },
   "otp": {
@@ -214,7 +212,7 @@
         "noCodeReceived": "Vous n'avez pas reçu de code?",
         "resendCode": "Renvoyer le code"
       }
-      },
+    },
     "set": {
       "title": "Configurer l'authentification à deux facteurs",
       "totpDescription": "Scannez le code QR avec votre application d'authentification.",
@@ -289,20 +287,20 @@
       "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
     }
   },
-  "u2f":{
+  "u2f": {
     "verify": {
-     "title": "Vérifiez l'authentification à deux facteurs",
-     "description": "Vérifiez votre compte avec votre appareil.",
-     "usePassword": "Utiliser le mot de passe",
-     "submit": "Continuer",
-     "errors": {
-       "couldNotRequestChallenge": "Problème de demande de défi de clé de sécurité",
-       "couldNotVerifyPasskey": "Problème de vérification de la clé de sécurité",
-       "noResponseReceived": "La vérification de la clé de sécurité a échoué - aucune réponse reçue",
-       "noRedirectProvided": "Vérification de la clé de sécurité terminée mais aucune redirection fournie",
-       "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé de sécurité",
-       "verificationCancelled": "La vérification de la clé de sécurité a été annulée",
-       "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé de sécurité"
+      "title": "Vérifiez l'authentification à deux facteurs",
+      "description": "Vérifiez votre compte avec votre appareil.",
+      "usePassword": "Utiliser le mot de passe",
+      "submit": "Continuer",
+      "errors": {
+        "couldNotRequestChallenge": "Problème de demande de défi de clé de sécurité",
+        "couldNotVerifyPasskey": "Problème de vérification de la clé de sécurité",
+        "noResponseReceived": "La vérification de la clé de sécurité a échoué - aucune réponse reçue",
+        "noRedirectProvided": "Vérification de la clé de sécurité terminée mais aucune redirection fournie",
+        "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé de sécurité",
+        "verificationCancelled": "La vérification de la clé de sécurité a été annulée",
+        "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé de sécurité"
       }
     },
     "set": {

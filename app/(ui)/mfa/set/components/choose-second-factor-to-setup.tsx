@@ -1,6 +1,5 @@
 "use client";
 
-import { setPreferredMFAMethod, getPreferredMFAMethodForUser } from "@lib/server/mfa-preferences";
 import {
   LoginSettings,
   SecondFactorType,
@@ -8,13 +7,8 @@ import {
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
 import { EMAIL, TOTP, U2F } from "@serverComponents/AuthMethods/AuthMethods";
-import { I18n } from "@i18n";
-import { useState, useEffect } from "react";
-import { Alert } from "@clientComponents/globals";
-import { toast } from "@clientComponents/globals/Toast";
 
 type Props = {
-  userId: string;
   loginName?: string;
   sessionId?: string;
   requestId?: string;
@@ -28,7 +22,6 @@ type Props = {
 };
 
 export function ChooseSecondFactorToSetup({
-  userId,
   loginName,
   sessionId,
   requestId,
@@ -40,28 +33,6 @@ export function ChooseSecondFactorToSetup({
 }: Props) {
   const router = useRouter();
   const params = new URLSearchParams({});
-
-  const [error, setError] = useState<string>("");
-  const [selectedDefault, setSelectedDefault] = useState<AuthenticationMethodType | null>(
-    AuthenticationMethodType.OTP_EMAIL
-  );
-
-  // Load saved preference on mount
-  useEffect(() => {
-    const loadPreference = async () => {
-      try {
-        const preference = await getPreferredMFAMethodForUser(userId);
-        if (preference) {
-          setSelectedDefault(preference);
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Failed to load preferred MFA method:", err);
-      }
-    };
-
-    loadPreference();
-  }, [userId]);
 
   if (loginName) {
     params.append("loginName", loginName);
@@ -78,30 +49,6 @@ export function ChooseSecondFactorToSetup({
   if (checkAfter) {
     params.append("checkAfter", "true");
   }
-
-  const handleSetAsDefault = async (method: AuthenticationMethodType, checked: boolean) => {
-    if (checked) {
-      setSelectedDefault(method);
-      // Save immediately when checkbox is checked
-      const result = await setPreferredMFAMethod(userId, method);
-      if (!result.success) {
-        setError(result.error || "Failed to set default MFA method");
-        setSelectedDefault(null);
-        return;
-      }
-      toast.success("Default MFA method saved");
-    } else {
-      setSelectedDefault(null);
-      // Save immediately when checkbox is unchecked
-      const result = await setPreferredMFAMethod(userId, AuthenticationMethodType.OTP_EMAIL);
-      if (!result.success) {
-        setError(result.error || "Failed to reset default MFA method");
-        setSelectedDefault(method);
-        return;
-      }
-      toast.success("Default MFA method reset to Email");
-    }
-  };
 
   const handleFactorClick = async (method: AuthenticationMethodType, url: string) => {
     // Navigate to the setup page
@@ -153,31 +100,10 @@ export function ChooseSecondFactorToSetup({
               >
                 {component}
               </div>
-              <div className="mt-2 flex items-center gap-2 pl-4">
-                <input
-                  type="checkbox"
-                  id={`default-${method}`}
-                  checked={selectedDefault === method}
-                  onChange={(e) => handleSetAsDefault(method, e.target.checked)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="cursor-pointer"
-                />
-                <label
-                  htmlFor={`default-${method}`}
-                  className="cursor-pointer text-sm text-gray-700"
-                >
-                  <I18n i18nKey="set.setAsDefaultShort" namespace="mfa" />
-                </label>
-              </div>
             </div>
           );
         })}
       </div>
-      {error && (
-        <div className="py-4" data-testid="error">
-          <Alert.Danger>{error}</Alert.Danger>
-        </div>
-      )}
     </>
   );
 }
