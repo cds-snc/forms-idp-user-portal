@@ -19,7 +19,7 @@ import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
-const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_URL || "";
+const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 type FormState = {
   error?: string;
@@ -210,7 +210,7 @@ export function LoginOTP({
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: t(`validation.${issue.message}`),
+          fieldValue: t(`verify.validation.${issue.message}`),
         })),
         formData: { code },
       };

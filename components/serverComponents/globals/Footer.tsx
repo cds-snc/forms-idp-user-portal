@@ -3,6 +3,8 @@ import { cn } from "@lib/utils";
 import { getImageUrl } from "@lib/imageUrl";
 import { Version } from "@serverComponents/globals/Version";
 
+const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
+
 const BulletPoint = () => {
   return <span className="px-3">&#x2022;</span>;
 };
@@ -10,15 +12,15 @@ const BulletPoint = () => {
 const DefaultLinks = async () => {
   return (
     <span className="mr-10 inline-block">
-      <a className="whitespace-nowrap" href={"/about"} target="_blank">
+      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/about`} target="_blank">
         <I18n i18nKey="about.desc" namespace="footer" />
       </a>
       <BulletPoint />
-      <a className="whitespace-nowrap" href={"/terms-of-use"}>
+      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/terms-of-use`}>
         <I18n i18nKey="terms-of-use.desc" namespace="footer" />
       </a>
       <BulletPoint />
-      <a className="whitespace-nowrap" href="/sla">
+      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/sla`}>
         <I18n i18nKey="sla.desc" namespace="footer" />
       </a>
     </span>

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { I18n, useTranslation } from "@i18n";
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import Link from "next/link";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
@@ -15,7 +14,7 @@ import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
 
-const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_URL || "";
+const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 type FormState = {
   error?: string;
