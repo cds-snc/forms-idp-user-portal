@@ -70,7 +70,7 @@
       "description": "Entrez votre propre adresse courriel individuelledu gouvernement."
     },
     "validation": {
-      "requiredUsername": "L'adresse courriel est obligatoire.",
+      "requiredUsername": "L'adresse courriel est obligatoire."
     }
   },
   "logout": {
@@ -113,7 +113,7 @@
       "errors": {
         "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
         "couldNotResetPassword": "Le mot de passe n'a pas pu être réinitialisé.",
-        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié."
       }
     },
     "change": {
@@ -299,7 +299,7 @@
       "length": "Doit contenir 6 caractères"
     },
     "errors": {
-      "couldNotVerifyEmail": "Problème de vérification du courriel",
+      "couldNotVerifyEmail": "Problème de vérification du courriel"
     }
   }
 }
