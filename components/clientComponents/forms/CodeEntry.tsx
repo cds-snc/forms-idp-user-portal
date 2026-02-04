@@ -42,7 +42,7 @@ export const CodeEntry = ({
           id="code"
           defaultValue={state.formData?.code ?? code ?? ""}
           ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
-          className="w-36"
+          className="!w-36"
           required
         />
       </div>

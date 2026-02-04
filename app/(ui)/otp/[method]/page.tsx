@@ -81,10 +81,12 @@ export default async function Page(props: {
 
           <AuthPanelTitle i18nKey="verify.title" namespace="otp" />
 
-          <p className="mb-3">
-            {method === "email" && <I18n i18nKey="verify.emailDescription" namespace="otp" />}
-            {method === "time-based" && <I18n i18nKey="verify.otpDescription" namespace="otp" />}
-          </p>
+          {method === "email" && (
+            <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
+          )}
+          {method === "time-based" && (
+            <I18n i18nKey="verify.otpDescription" namespace="otp" tagName="p" className="mb-3" />
+          )}
 
           {sessionFactors && (
             <UserAvatar

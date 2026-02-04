@@ -19,6 +19,8 @@ import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 
+const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
+
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];
@@ -55,7 +57,10 @@ export function LoginOTP({
   loginSettings?: LoginSettings;
   children?: React.ReactNode;
 }) {
-  const { t } = useTranslation(["otp", "common"]);
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation(["otp", "common"]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string>("");
@@ -201,6 +206,7 @@ export function LoginOTP({
     // Validate form entries and map any errors to form state with translated messages
     const validationResult = await validateCode({ code });
     if (!validationResult.success) {
+      // TODO Move to util function
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
@@ -210,6 +216,7 @@ export function LoginOTP({
       };
     }
 
+    // TODO trime white space from code
     return submitCode({ code }, organization).then(async (response) => {
       if (response && "sessionId" in response) {
         setLoading(true);
@@ -270,6 +277,7 @@ export function LoginOTP({
       });
   };
 
+  // TODO Probably errasing session state in cookie :)
   const [state, formAction] = useActionState(localFormAction, {
     validationErrors: undefined,
     error: undefined,
@@ -292,10 +300,15 @@ export function LoginOTP({
 
       {(codeLoading || codeSent) && (
         <AlertNotification.Info>
-          <p className="mt-3 font-bold">
-            {codeLoading && <I18n i18nKey="sendingNewCode" namespace="verify" />}
-            {codeSent && <I18n i18nKey="sentNewCode" namespace="verify" />}
-          </p>
+          {codeLoading && (
+            <I18n
+              i18nKey="sendingNewCode"
+              namespace="verify"
+              tagName="p"
+              className="mt-3 font-bold"
+            />
+          )}
+          {codeSent && <I18n i18nKey="sentNewCode" namespace="verify" className="mt-3 font-bold" />}
         </AlertNotification.Info>
       )}
 
@@ -323,7 +336,7 @@ export function LoginOTP({
               <I18n i18nKey="newCode" namespace="verify" />
             </Button>
           )}
-          <Link href="/help">
+          <Link href={`${SUPPORT_URL}/${language}/support`}>
             <I18n i18nKey="help" namespace="verify" />
           </Link>
         </div>
