@@ -334,16 +334,3 @@ export async function logoutCurrentSession(
     return { error: "Failed to logout" };
   }
 }
-
-/**
- * Get the count of active sessions
- * @returns The number of sessions in cookies
- */
-export async function getSessionCount(): Promise<number> {
-  try {
-    const sessions = await getAllSessions();
-    return sessions.length;
-  } catch {
-    return 0;
-  }
-}
