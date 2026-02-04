@@ -1,7 +1,7 @@
-import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Alert } from "@clientComponents/globals";
-import { PASSKEYS, PASSWORD } from "@serverComponents/AuthMethods/AuthMethods";
+import { PASSWORD } from "@serverComponents/AuthMethods/AuthMethods";
 import { I18n } from "@i18n";
 
 type Props = {
@@ -11,7 +11,11 @@ type Props = {
 };
 
 export function ChooseAuthenticatorToSetup({ authMethods, params, loginSettings }: Props) {
-  if (authMethods.length !== 0) {
+  // Check if password can be set up
+  const canSetupPassword =
+    !authMethods.includes(AuthenticationMethodType.PASSWORD) && loginSettings.allowUsernamePassword;
+
+  if (!canSetupPassword && authMethods.length !== 0) {
     return (
       <Alert.Warning>
         <I18n i18nKey="allSetup" namespace="authenticator" />
@@ -20,12 +24,7 @@ export function ChooseAuthenticatorToSetup({ authMethods, params, loginSettings 
   } else {
     return (
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
-        {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-          loginSettings.allowUsernamePassword &&
-          PASSWORD(false, "/password/set?" + params)}
-        {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
-          loginSettings.passkeysType == PasskeysType.ALLOWED &&
-          PASSKEYS(false, "/passkey/set?" + params)}
+        {canSetupPassword && PASSWORD(false, "/password/set?" + params)}
       </div>
     );
   }

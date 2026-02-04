@@ -177,7 +177,7 @@ export function VerifyEmailForm({
         <form action={formAction} noValidate>
           <CodeEntry state={state} code={code ?? ""} className="mt-10" />
 
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mb-6 mt-8 flex items-center gap-4">
             <Button
               theme="link"
               type="button"
@@ -192,12 +192,9 @@ export function VerifyEmailForm({
             </Link>
           </div>
 
-          <div className="mt-4 flex items-center gap-4">
-            <BackButton />
-            <SubmitButtonAction>
-              <I18n i18nKey="submit" namespace="verify" />
-            </SubmitButtonAction>
-          </div>
+          <SubmitButtonAction>
+            <I18n i18nKey="submit" namespace="verify" />
+          </SubmitButtonAction>
         </form>
       </div>
     </>

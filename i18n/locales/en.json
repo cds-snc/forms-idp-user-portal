@@ -313,7 +313,8 @@
     }
   },
   "verify": {
-    "title": "Check your email for a security code",
+    "title": "Check your email for your account initialization code",
+    "description": "Please enter the code received by email. ",
     "label": "Security code",
     "hint": "Enter code within 15 minutes.",
     "submit": "Continue",

@@ -1,6 +1,8 @@
 import { I18n } from "@i18n";
 
-export default async function Page(props: { searchParams: Promise<any> }) {
+import { SearchParams } from "@lib/utils";
+
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   return (
     <>
       <div className="flex flex-col space-y-4">

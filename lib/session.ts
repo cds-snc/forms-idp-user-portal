@@ -4,7 +4,7 @@ import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname } from "./cookies";
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
 import {
   getLoginSettings,
@@ -35,6 +35,70 @@ export async function loadMostRecentSession({
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((resp: GetSessionResponse) => resp.session);
+}
+
+type SessionWithAuthData = {
+  factors?: Session["factors"];
+  authMethods: AuthenticationMethodType[];
+  phoneVerified: boolean;
+  emailVerified: boolean;
+  expirationDate?: Session["expirationDate"];
+};
+
+async function getAuthMethodsAndUser(
+  serviceUrl: string,
+  session?: Session
+): Promise<SessionWithAuthData> {
+  const userId = session?.factors?.user?.id;
+
+  if (!userId) {
+    throw Error("Could not get user id from session");
+  }
+
+  const methods = await listAuthenticationMethodTypes({
+    serviceUrl,
+    userId,
+  });
+
+  const user = await getUserByID({ serviceUrl, userId });
+  const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
+
+  return {
+    factors: session?.factors,
+    authMethods: methods.authMethodTypes ?? [],
+    phoneVerified: humanUser?.phone?.isVerified ?? false,
+    emailVerified: humanUser?.email?.isVerified ?? false,
+    expirationDate: session?.expirationDate,
+  };
+}
+
+export async function loadSessionById(
+  serviceUrl: string,
+  sessionId: string,
+  organization?: string
+): Promise<SessionWithAuthData> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+  const sessionResponse = await getSession({
+    serviceUrl,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  });
+  return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
+}
+
+export async function loadSessionByLoginname(
+  serviceUrl: string,
+  loginName?: string,
+  organization?: string
+): Promise<SessionWithAuthData> {
+  const session = await loadMostRecentSession({
+    serviceUrl,
+    sessionParams: {
+      loginName,
+      organization,
+    },
+  });
+  return getAuthMethodsAndUser(serviceUrl, session);
 }
 
 /**

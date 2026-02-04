@@ -6,7 +6,9 @@ import { getUserByID } from "@lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: { searchParams: Promise<any> }) {
+import { SearchParams } from "@lib/utils";
+
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();

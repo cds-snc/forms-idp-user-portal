@@ -82,5 +82,23 @@
       "registerInstructions": "Cliquez sur Continuer et insérez votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
       "submit": "Continuer"
     }
+  },
+  "verify": {
+    "title": "Check your email for your account initialization code",
+    "description": "Please enter the code received by email. ",
+    "label": "Security code",
+    "hint": "Enter code within 15 minutes.",
+    "submit": "Continue",
+    "newCode": "Send a new code",
+    "sendingNewCode": "Sending new code...",
+    "sentNewCode": "New code sent",
+    "help": "Need help?",
+    "validation": {
+      "required": "Cannot be empty",
+      "length": "Must be 6 characters"
+    },
+    "errors": {
+      "couldNotVerifyEmail": "Could not verify email"
+    }
   }
 }

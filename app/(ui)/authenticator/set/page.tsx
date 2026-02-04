@@ -4,19 +4,10 @@ import { ChooseAuthenticatorToSetup } from "./components/choose-authenticator-to
 
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getSessionCookieById } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { checkUserVerification } from "@lib/verify-helper";
-import {
-  getActiveIdentityProviders,
-  getLoginSettings,
-  getSession,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@lib/zitadel";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-// import { getLocale } from "next-intl/server";
+import { getActiveIdentityProviders, getLoginSettings } from "@lib/zitadel";
 import { Metadata } from "next";
 
 import { serverTranslation } from "@i18n/server";
@@ -40,60 +31,10 @@ export default async function Page(props: {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
-  async function getAuthMethodsAndUser(
-    serviceUrl: string,
-
-    session?: Session
-  ) {
-    const userId = session?.factors?.user?.id;
-
-    if (!userId) {
-      throw Error("Could not get user id from session");
-    }
-
-    return listAuthenticationMethodTypes({
-      serviceUrl,
-      userId,
-    }).then((methods) => {
-      return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
-
-        return {
-          factors: session?.factors,
-          authMethods: methods.authMethodTypes ?? [],
-          phoneVerified: humanUser?.phone?.isVerified ?? false,
-          emailVerified: humanUser?.email?.isVerified ?? false,
-          expirationDate: session?.expirationDate,
-        };
-      });
-    });
-  }
-
-  async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    }).then((session) => {
-      return getAuthMethodsAndUser(serviceUrl, session);
-    });
-  }
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
-    });
-  }
+  console.log("Loaded session with data:", sessionWithData);
 
   if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
     return (
@@ -108,13 +49,12 @@ export default async function Page(props: {
     organization: sessionWithData.factors.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 
-  // check if user was verified recently
+  // check if user was verified recently or if their email is already verified in Zitadel
   const isUserVerified = await checkUserVerification(sessionWithData.factors.user?.id);
 
-  if (!isUserVerified) {
+  if (!isUserVerified && !sessionWithData.emailVerified) {
     const params = new URLSearchParams({
       loginName: sessionWithData.factors.user.loginName as string,
-      invite: "true",
       send: "true", // set this to true to request a new code immediately
     });
 
