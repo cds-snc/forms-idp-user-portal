@@ -152,7 +152,6 @@ export async function verifyU2FLogin({
     serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
-    checks,
   });
 
   if (!session?.session) {

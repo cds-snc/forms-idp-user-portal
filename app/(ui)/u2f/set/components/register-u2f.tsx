@@ -12,10 +12,26 @@ import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { SubmitButton } from "@clientComponents/globals/Buttons";
 import { I18n } from "@i18n";
 
+type PublicKeyCredentialJSON = {
+  id: string | ArrayBuffer;
+  rawId: string;
+  type: string;
+  response: {
+    attestationObject: string;
+    clientDataJSON: string;
+  };
+};
+
+type CredentialOptionsData =
+  | {
+      publicKey?: PublicKeyCredentialCreationOptions;
+      [key: string]: unknown;
+    }
+  | undefined;
+
 type Props = {
   loginName?: string;
   sessionId: string;
-  sessionToken?: string;
   requestId?: string;
   organization?: string;
   checkAfter: boolean;
@@ -25,7 +41,6 @@ type Props = {
 export function RegisterU2f({
   loginName,
   sessionId,
-  sessionToken,
   organization,
   requestId,
   checkAfter,
@@ -40,7 +55,7 @@ export function RegisterU2f({
   async function submitVerify(
     u2fId: string,
     passkeyName: string,
-    publicKeyCredential: any,
+    publicKeyCredential: PublicKeyCredentialJSON,
     sessionId: string
   ) {
     setError("");
@@ -70,13 +85,10 @@ export function RegisterU2f({
   async function submitRegisterAndContinue(): Promise<boolean | void | null> {
     setError("");
     setLoading(true);
-    console.log("Starting U2F registration...");
     const response = await addU2F({
       sessionId,
     })
       .catch((err) => {
-        console.error("addU2F error:", err);
-        console.error("Error details:", err.message, err.stack);
         setError("An error on registering passkey: " + err.message);
         return;
       })
@@ -84,21 +96,15 @@ export function RegisterU2f({
         setLoading(false);
       });
 
-    console.log("addU2F response:", response);
-
     if (response && "error" in response && response?.error) {
-      console.error("Got error in response:", response?.error);
       setError(response?.error);
       return;
     }
 
     if (!response || !("u2fId" in response)) {
-      console.error("No u2fId in response:", response);
       setError("An error on registering passkey");
       return;
     }
-
-    console.log("Got u2fId, prompting for credentials...");
 
     const u2fResponse = response as unknown as RegisterU2FResponse;
 
@@ -106,31 +112,22 @@ export function RegisterU2f({
 
     // The publicKeyCredentialCreationOptions is a structpb.Struct
     // We need to extract the actual object from it
-    console.log("Raw options:", u2fResponse.publicKeyCredentialCreationOptions);
-    console.log("Options type:", typeof u2fResponse.publicKeyCredentialCreationOptions);
-
-    let credentialOptions: any = u2fResponse.publicKeyCredentialCreationOptions;
+    let credentialOptions: CredentialOptionsData = u2fResponse.publicKeyCredentialCreationOptions;
 
     // Try to convert protobuf Struct to plain object
     try {
       // Use JSON serialization to get a plain object
       credentialOptions = JSON.parse(JSON.stringify(credentialOptions));
-      console.log("Converted via JSON:", credentialOptions);
     } catch (e) {
-      console.error("Failed to convert options:", e);
+      // Handle error silently
     }
 
     if (!credentialOptions || !credentialOptions.publicKey) {
-      console.error("No valid publicKey in options:", credentialOptions);
       setError("Invalid credential options received");
       return;
     }
 
     const options: CredentialCreationOptions = { publicKey: credentialOptions.publicKey };
-    console.log("Final options for navigator.credentials.create:", options);
-    console.log("Challenge:", options.publicKey?.challenge);
-    console.log("User ID:", options.publicKey?.user);
-    console.log("Authenticator selection:", options.publicKey?.authenticatorSelection);
 
     if (options.publicKey) {
       // Force U2F hardware key (not passkey)
@@ -145,70 +142,26 @@ export function RegisterU2f({
       // For U2F, we want direct attestation to prevent passkey prompts
       options.publicKey.attestation = "direct" as AttestationConveyancePreference;
 
-      console.log("Updated authenticator selection:", options.publicKey.authenticatorSelection);
-      console.log("Attestation:", options.publicKey.attestation);
-      console.log("Converting challenge and user ID to ArrayBuffer...");
-
-      console.log(
-        "Challenge before conversion:",
-        options.publicKey.challenge,
-        typeof options.publicKey.challenge
-      );
-      console.log(
-        "User ID before conversion:",
-        options.publicKey.user.id,
-        typeof options.publicKey.user.id
-      );
-
       options.publicKey.challenge = coerceToArrayBuffer(options.publicKey.challenge, "challenge");
       options.publicKey.user.id = coerceToArrayBuffer(options.publicKey.user.id, "userid");
 
-      console.log("Challenge after conversion:", options.publicKey.challenge);
-      console.log("User ID after conversion:", options.publicKey.user.id);
-
       if (options.publicKey.excludeCredentials) {
-        options.publicKey.excludeCredentials.map((cred: any) => {
-          cred.id = coerceToArrayBuffer(cred.id as string, "excludeCredentials.id");
+        options.publicKey.excludeCredentials.map((cred: PublicKeyCredentialDescriptor) => {
+          cred.id = coerceToArrayBuffer(cred.id as unknown as string, "excludeCredentials.id");
           return cred;
         });
       }
 
-      console.log(
-        "Final complete options object:",
-        JSON.stringify(
-          {
-            publicKey: {
-              ...options.publicKey,
-              challenge: "[ArrayBuffer]",
-              user: {
-                ...options.publicKey.user,
-                id: "[ArrayBuffer]",
-              },
-            },
-          },
-          null,
-          2
-        )
-      );
-
-      console.log("Calling navigator.credentials.create...");
-      let resp;
+      let resp: PublicKeyCredential | null;
       try {
         // Add a timeout wrapper in case the call hangs
         const createPromise = window.navigator.credentials.create(options);
-        const timeoutPromise = new Promise((_, reject) =>
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error("Credential creation timed out after 60s")), 60000)
         );
 
-        resp = await Promise.race([createPromise, timeoutPromise]);
-        console.log("Got credential response:", resp);
-        console.log("Response type:", typeof resp);
-        console.log(
-          "Response has attestationObject:",
-          !!(resp as any)?.response?.attestationObject
-        );
+        resp = (await Promise.race([createPromise, timeoutPromise])) as PublicKeyCredential;
       } catch (credError) {
-        console.error("navigator.credentials.create error:", credError);
         setError("Failed to create credentials: " + (credError as Error).message);
         setLoading(false);
         return;
@@ -216,19 +169,20 @@ export function RegisterU2f({
 
       if (
         !resp ||
-        !(resp as any).response.attestationObject ||
-        !(resp as any).response.clientDataJSON ||
-        !(resp as any).rawId
+        !("response" in resp) ||
+        !("attestationObject" in resp.response) ||
+        !("clientDataJSON" in resp.response) ||
+        !("id" in resp)
       ) {
         setError("An error on registering passkey");
         return;
       }
 
-      const attestationObject = (resp as any).response.attestationObject;
-      const clientDataJSON = (resp as any).response.clientDataJSON;
-      const rawId = (resp as any).rawId;
+      const attestationObject = (resp.response as AuthenticatorAttestationResponse)
+        .attestationObject;
+      const clientDataJSON = (resp.response as AuthenticatorAttestationResponse).clientDataJSON;
+      const rawId = resp.id;
 
-      console.log("Converting response data to base64...");
       const data = {
         id: resp.id,
         rawId: coerceToBase64Url(rawId, "rawId"),
@@ -239,21 +193,13 @@ export function RegisterU2f({
         },
       };
 
-      console.log("Calling submitVerify with u2fId:", u2fId);
       const submitResponse = await submitVerify(u2fId, "", data, sessionId);
-      console.log("submitVerify response:", submitResponse);
 
       if (!submitResponse) {
         setError("An error on verifying passkey");
         setLoading(false);
         return;
       }
-
-      console.log("Verification successful! Processing redirect...");
-      console.log("checkAfter:", checkAfter);
-      console.log("requestId:", requestId);
-      console.log("sessionId:", sessionId);
-      console.log("loginName:", loginName);
 
       if (checkAfter) {
         const paramsToContinue = new URLSearchParams({});
@@ -271,12 +217,9 @@ export function RegisterU2f({
           paramsToContinue.append("requestId", requestId);
         }
 
-        console.log("Redirecting to /u2f with params:", paramsToContinue.toString());
         return router.push(`/u2f?` + paramsToContinue);
       } else {
-        console.log("No checkAfter, processing completion flow...");
         if (requestId && sessionId) {
-          console.log("Has requestId and sessionId, calling completeFlowOrGetUrl...");
           const callbackResponse = await completeFlowOrGetUrl(
             {
               sessionId: sessionId,
@@ -286,8 +229,6 @@ export function RegisterU2f({
             loginSettings?.defaultRedirectUri
           );
 
-          console.log("completeFlowOrGetUrl response:", callbackResponse);
-
           if ("error" in callbackResponse) {
             setError(callbackResponse.error);
             setLoading(false);
@@ -295,11 +236,9 @@ export function RegisterU2f({
           }
 
           if ("redirect" in callbackResponse) {
-            console.log("Redirecting to:", callbackResponse.redirect);
             return router.push(callbackResponse.redirect);
           }
         } else if (loginName) {
-          console.log("Has loginName, calling completeFlowOrGetUrl...");
           const callbackResponse = await completeFlowOrGetUrl(
             {
               loginName: loginName,
@@ -307,8 +246,6 @@ export function RegisterU2f({
             },
             loginSettings?.defaultRedirectUri
           );
-
-          console.log("completeFlowOrGetUrl response:", callbackResponse);
 
           if ("error" in callbackResponse) {
             setError(callbackResponse.error);
@@ -320,7 +257,6 @@ export function RegisterU2f({
           }
         } else {
           // No requestId or loginName - redirect to accounts page as fallback
-          console.log("No requestId or loginName, redirecting to accounts page...");
           setLoading(false);
           return router.push("/accounts");
         }
@@ -345,7 +281,7 @@ export function RegisterU2f({
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
 
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <SubmitButton
           type="button"
           loading={loading}
