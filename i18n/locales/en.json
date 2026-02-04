@@ -214,6 +214,10 @@
         "label": "Security code",
         "noCodeReceived": "Didn't receive a code?",
         "resendCode": "Re-send code"
+      },
+      "validation": {
+        "required": "Cannot be empty",
+        "maxLength": "Less than 10 characters"
       }
     },
     "set": {

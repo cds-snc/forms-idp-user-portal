@@ -210,7 +210,7 @@ export function LoginOTP({
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: t(`validation.${issue.message}`),
+          fieldValue: t(`verify.validation.${issue.message}`),
         })),
         formData: { code },
       };
