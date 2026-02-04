@@ -1,7 +1,7 @@
 import { Alert } from "@clientComponents/globals";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@lib/cookies";
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@lib/cookies";
 import { completeDeviceAuthorization } from "@lib/server/device";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
@@ -16,19 +16,6 @@ import { SearchParams } from "@lib/utils";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("signedin");
   return { title: t("title", { user: "" }) };
-}
-
-async function getSessionOnly(serviceUrl: string, sessionId: string, organization?: string) {
-  const recent = await getSessionCookieById({ sessionId, organization });
-  return getSession({
-    serviceUrl,
-    sessionId: recent.id,
-    sessionToken: recent.token,
-  }).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
 }
 
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
