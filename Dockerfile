@@ -1,7 +1,9 @@
 FROM node:22-alpine AS base
 
+ENV PORT=3000
 ENV NODE_ENV=production
 ENV NEXT_OUTPUT_STANDALONE=true
+ENV EMAIL_VERIFICATION=true
 ENV NEXT_PUBLIC_BASE_PATH=/ui/v2
 COPY . /src
 WORKDIR /src
@@ -12,9 +14,6 @@ RUN pnpm build
 
 FROM node:22-alpine AS final
 LABEL maintainer="-"
-
-ENV PORT=3000
-ENV NODE_ENV=production
 
 WORKDIR /src
 

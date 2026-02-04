@@ -15,6 +15,8 @@ import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { validateCode } from "@lib/validationSchemas";
 
+const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
+
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];
@@ -42,7 +44,10 @@ export function VerifyEmailForm({
 }) {
   const router = useRouter();
 
-  const { t } = useTranslation("verify");
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation("verify");
 
   const [error, setError] = useState<string>("");
 
@@ -187,7 +192,7 @@ export function VerifyEmailForm({
             >
               <I18n i18nKey="newCode" namespace="verify" />
             </Button>
-            <Link href="/help">
+            <Link href={`${SUPPORT_URL}/${language}/support`}>
               <I18n i18nKey="help" namespace="verify" />
             </Link>
           </div>
