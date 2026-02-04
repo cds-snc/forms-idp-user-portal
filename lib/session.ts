@@ -38,12 +38,15 @@ export async function loadMostRecentSession({
 }
 
 type SessionWithAuthData = {
+  id?: string;
   factors?: Session["factors"];
   authMethods: AuthenticationMethodType[];
   phoneVerified: boolean;
   emailVerified: boolean;
   expirationDate?: Session["expirationDate"];
 };
+
+export type { SessionWithAuthData };
 
 async function getAuthMethodsAndUser(
   serviceUrl: string,
@@ -63,7 +66,8 @@ async function getAuthMethodsAndUser(
   const user = await getUserByID({ serviceUrl, userId });
   const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
-  return {
+  reid: session?.id,
+    turn {
     factors: session?.factors,
     authMethods: methods.authMethodTypes ?? [],
     phoneVerified: humanUser?.phone?.isVerified ?? false,

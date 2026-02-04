@@ -11,13 +11,14 @@ import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
 import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("signedin");
   return { title: t("title", { user: "" }) };
 }
 
-async function loadSessionById(serviceUrl: string, sessionId: string, organization?: string) {
+async function getSessionOnly(serviceUrl: string, sessionId: string, organization?: string) {
   const recent = await getSessionCookieById({ sessionId, organization });
   return getSession({
     serviceUrl,
@@ -30,9 +31,7 @@ async function loadSessionById(serviceUrl: string, sessionId: string, organizati
   });
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
@@ -71,7 +70,7 @@ export default async function Page(props: {
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
+    ? await getSessionOnly(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },

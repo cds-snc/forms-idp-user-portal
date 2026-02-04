@@ -2,22 +2,19 @@ import { Alert } from "@clientComponents/globals";
 import { LoginU2F } from "./components/login-u2f";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getSessionCookieById } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { getSession } from "@lib/zitadel";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, requestId, sessionId, organization } = searchParams;
@@ -25,26 +22,12 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
-      });
+  const sessionData = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession({
-      serviceUrl,
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    }).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
-
+  // Extract just the session factors from the session data
+  const sessionFactors = sessionData ? { factors: sessionData.factors } : undefined;
   return (
     <>
       <div className="flex flex-col space-y-4">
