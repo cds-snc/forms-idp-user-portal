@@ -208,6 +208,10 @@
       "authenticator": {
         "title": "Authentication app",
         "description": "(ex: Microsoft Authenticator)"
+      },
+      "email": {
+        "title": "Email",
+        "description": "(ex: One-time code via email)"
       }
     }
   },
