@@ -11,7 +11,10 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Checks, SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
-import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
+import {
+  ReturnEmailVerificationCodeSchema,
+  SendEmailVerificationCodeSchema,
+} from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { FormData, RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
@@ -563,6 +566,29 @@ export async function sendEmailCode({
       value: create(SendEmailVerificationCodeSchema, {
         urlTemplate,
       }),
+    },
+  });
+
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.sendEmailCode(medium, {});
+}
+
+export async function sendEmailCodeWithReturn({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}): Promise<{ verificationCode?: string }> {
+  const medium = create(SendEmailCodeRequestSchema, {
+    userId,
+    verification: {
+      case: "returnCode",
+      value: create(ReturnEmailVerificationCodeSchema, {}),
     },
   });
 
