@@ -40,7 +40,7 @@ export function LoginOTP({
   const {
     t,
     i18n: { language },
-  } = useTranslation(["otp", "common"]);
+  } = useTranslation("otp");
   const [, setError] = useState<string>("");
   const [codeSent, setCodeSent] = useState<boolean>(false);
   const [codeLoading, setCodeLoading] = useState<boolean>(false);
