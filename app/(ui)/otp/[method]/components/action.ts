@@ -1,6 +1,7 @@
 import { completeFlowOrGetUrl } from "@lib/client";
 import { updateSession } from "@lib/server/session";
 import { create } from "@zitadel/client";
+import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { validateCode } from "@lib/validationSchemas";
@@ -36,23 +37,38 @@ type SessionResponse = {
   error?: string;
 };
 
-// Submits OTP code for verification
-async function submitOTPCode(
-  values: Inputs,
-  params: SubmitCodeParams
-): Promise<SessionResponse | undefined> {
-  const { loginName, sessionId, organization, requestId, method } = params;
+type OTPChallengeParams = {
+  host: string | null;
+  loginName?: string;
+  sessionId?: string;
+  organization?: string;
+  requestId?: string;
+  method: string;
+};
 
-  let checks;
+// Updates the session with the OTP challenge request
+export async function updateSessionForOTPChallenge(
+  params: OTPChallengeParams
+): Promise<{ error?: string; response?: SessionResponse }> {
+  const { host, loginName, sessionId, organization, requestId, method } = params;
+
+  let challenges;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   if (method === "email") {
-    checks = create(ChecksSchema, {
-      otpEmail: { code: values.code },
-    });
-  }
-  if (method === "time-based") {
-    checks = create(ChecksSchema, {
-      totp: { code: values.code },
+    challenges = create(RequestChallengesSchema, {
+      otpEmail: {
+        deliveryType: {
+          case: "sendCode",
+          value: host
+            ? {
+                urlTemplate:
+                  `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
+                  (requestId ? `&requestId=${requestId}` : ""),
+              }
+            : {},
+        },
+      },
     });
   }
 
@@ -61,7 +77,7 @@ async function submitOTPCode(
       loginName,
       sessionId,
       organization,
-      checks,
+      challenges,
       requestId,
     });
 
@@ -69,9 +85,9 @@ async function submitOTPCode(
       return { error: response.error };
     }
 
-    return response;
+    return { response };
   } catch {
-    return { error: "Could not verify OTP code" };
+    return { error: "Could not request OTP challenge" };
   }
 }
 
@@ -99,7 +115,7 @@ export async function handleOTPFormSubmit(
     };
   }
 
-  const response = await submitOTPCode({ code }, submitParams);
+  const response = await _submitOTPCode({ code }, submitParams);
 
   if (!response) {
     return {
@@ -159,4 +175,43 @@ export async function handleOTPFormSubmit(
     error: undefined,
     formData: { code },
   };
+}
+
+// Submits OTP code for verification
+async function _submitOTPCode(
+  values: Inputs,
+  params: SubmitCodeParams
+): Promise<SessionResponse | undefined> {
+  const { loginName, sessionId, organization, requestId, method } = params;
+
+  let checks;
+
+  if (method === "email") {
+    checks = create(ChecksSchema, {
+      otpEmail: { code: values.code },
+    });
+  }
+  if (method === "time-based") {
+    checks = create(ChecksSchema, {
+      totp: { code: values.code },
+    });
+  }
+
+  try {
+    const response = await updateSession({
+      loginName,
+      sessionId,
+      organization,
+      checks,
+      requestId,
+    });
+
+    if (response && "error" in response && response.error) {
+      return { error: response.error };
+    }
+
+    return response;
+  } catch {
+    return { error: "Could not verify OTP code" };
+  }
 }

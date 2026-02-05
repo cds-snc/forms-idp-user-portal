@@ -1,8 +1,5 @@
 "use client";
 import { useActionState } from "react";
-import { updateSession } from "@lib/server/session";
-import { create } from "@zitadel/client";
-import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -15,7 +12,7 @@ import { CodeEntry } from "@clientComponents/forms/CodeEntry";
 import Link from "next/link";
 import { Alert as AlertNotification, Button } from "@clientComponents/globals";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-import { handleOTPFormSubmit, FormState } from "./action";
+import { handleOTPFormSubmit, FormState, updateSessionForOTPChallenge } from "./action";
 
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
@@ -50,50 +47,25 @@ export function LoginOTP({
   const router = useRouter();
   const initialized = useRef(false);
 
-  async function updateSessionForOTPChallenge() {
-    let challenges;
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-    if (method === "email") {
-      challenges = create(RequestChallengesSchema, {
-        otpEmail: {
-          deliveryType: {
-            case: "sendCode",
-            value: host
-              ? {
-                  urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
-                    (requestId ? `&requestId=${requestId}` : ""),
-                }
-              : {},
-          },
-        },
-      });
-    }
-
-    const response = await updateSession({
+  const requestOTPChallenge = async () => {
+    const { error } = await updateSessionForOTPChallenge({
+      host,
       loginName,
       sessionId,
       organization,
-      challenges,
       requestId,
-    }).catch(() => {
-      setError("Could not request OTP challenge");
-      return;
+      method,
     });
 
-    if (response && "error" in response && response.error) {
-      setError(response.error);
-      return;
+    if (error) {
+      setError(error);
     }
-
-    return response;
-  }
+  };
 
   useEffect(() => {
     if (!initialized.current && ["email"].includes(method) && !code) {
       initialized.current = true;
-      updateSessionForOTPChallenge().catch((error) => {
+      requestOTPChallenge().catch((error) => {
         setError(error);
         return;
       });
@@ -124,7 +96,7 @@ export function LoginOTP({
   const resendCode = async () => {
     setCodeSent(false);
     setCodeLoading(true);
-    updateSessionForOTPChallenge()
+    requestOTPChallenge()
       .then(() => setCodeSent(true))
       .catch((error) => {
         setError(error);
