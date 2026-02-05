@@ -77,7 +77,7 @@ export default async function Page(props: {
       organization: "",
       requestId: "outer-account-id",
       suffix: "",
-      link: `/logout-session?returnUrl=/start?`,
+      link: `/logout-session?returnUrl=/start`,
       showDropdown: false,
     },
   ];
