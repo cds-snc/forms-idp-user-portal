@@ -21,16 +21,9 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
 
-  let currentSession;
-  try {
-    currentSession = await getMostRecentSessionCookie();
-  } catch {
-    currentSession = null;
-  }
-
-  const loginName = searchParams?.loginName ?? currentSession?.loginName;
+  const loginName = searchParams?.loginName;
   const requestId = searchParams?.requestId;
-  const organization = searchParams?.organization ?? currentSession?.organization;
+  const organization = searchParams?.organization;
   const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
 
@@ -62,6 +55,13 @@ export default async function Page(props: {
 
   const registerLink = `/register?${registerParams.toString()}`;
 
+  let currentSession;
+  try {
+    currentSession = await getMostRecentSessionCookie();
+  } catch {
+    currentSession = null;
+  }
+
   // Ideally this list could be simplified or moved/logic-moved into the AvatarList component
   const accounts: AvatarListItem[] = [
     {
@@ -73,11 +73,11 @@ export default async function Page(props: {
       showDropdown: false,
     },
     {
-      loginName: "Other account (Todo)",
-      organization: "Todo",
-      requestId: "Todo",
-      suffix: "Todo",
-      link: `/accounts`,
+      loginName: "Other account",
+      organization: "",
+      requestId: "outer-account-id",
+      suffix: "",
+      link: `/logout-session?returnUrl=/start?`,
       showDropdown: false,
     },
   ];
