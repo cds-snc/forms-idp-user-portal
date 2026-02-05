@@ -337,7 +337,7 @@
     "submit": "Continue",
     "newCode": "Send a new code",
     "sendingNewCode": "Sending new code...",
-    "sentNewCode": "New code sent",
+    "sentNewCode": "New code sent!",
     "help": "Need help?",
     "validation": {
       "required": "Cannot be empty",
