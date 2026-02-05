@@ -28,9 +28,6 @@ type FormState = {
     code?: string;
   };
 };
-// type FormState = {
-//   error?: string;
-// };
 
 type Inputs = {
   code: string;
@@ -212,6 +209,7 @@ export function LoginOTP({
           fieldKey: issue.path?.[0].key as string,
           fieldValue: t(`verify.validation.${issue.message}`),
         })),
+        error: undefined,
         formData: { code },
       };
     }
@@ -242,7 +240,7 @@ export function LoginOTP({
 
           if ("error" in callbackResponse) {
             return {
-              ...previousState,
+              validationErrors: undefined,
               formData: { code },
               error: callbackResponse.error,
             };
@@ -257,7 +255,8 @@ export function LoginOTP({
       }
 
       return {
-        ...previousState,
+        validationErrors: undefined,
+        error: undefined,
         formData: { code },
       };
     });
@@ -285,7 +284,7 @@ export function LoginOTP({
       code: "",
     },
   });
-  // const [state, formAction] = useActionState(localFormAction, {});
+
   return (
     <>
       {state.error && (
@@ -340,52 +339,6 @@ export function LoginOTP({
             <I18n i18nKey="help" namespace="verify" />
           </Link>
         </div>
-
-        {/* <form action={formAction}>
-          {["email", "sms"].includes(method) && (
-          <Alert type={ErrorStatus.INFO}>
-            <div className="flex flex-row">
-              <span className="mr-auto flex-1 text-left">{t("verify.form.noCodeReceived")}</span>
-              <button
-                aria-label="Resend OTP Code"
-                disabled={loading}
-                type="button"
-                onClick={() => {
-                  setLoading(true);
-                  updateSessionForOTPChallenge()
-                    .catch((error) => {
-                      setError(error);
-                      return;
-                    })
-                    .finally(() => {
-                      setLoading(false);
-                    });
-                }}
-                data-testid="resend-button"
-              >
-                {t("verify.form.resendCode")}
-              </button>
-            </div>
-          </Alert>
-        )}
-          <div className="mt-4">
-          <Label id={"label-otp"} htmlFor={"code"} className="required" required>
-            {t("verify.form.label")}
-          </Label>
-          <TextInput
-            className="h-10 w-full min-w-full rounded-xl"
-            type={"text"}
-            id={"code"}
-            required
-            defaultValue={""}
-          />
-        </div>
-          <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton data-testid="back-button" />
-          <span className="grow"></span>
-          <SubmitButtonAction>{t("button.submit", { ns: "common" })}</SubmitButtonAction>
-        </div>
-        </form> */}
       </div>
     </>
   );
