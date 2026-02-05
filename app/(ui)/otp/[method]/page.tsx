@@ -2,7 +2,6 @@ import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { LoginOTP } from "./components/LoginOTP";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getOriginalHost } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -26,7 +25,6 @@ export default async function Page(props: {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
 
   const {
     loginName, // send from password page
@@ -62,7 +60,6 @@ export default async function Page(props: {
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}
-          host={host}
           code={code}
         >
           {!sessionFactors && (

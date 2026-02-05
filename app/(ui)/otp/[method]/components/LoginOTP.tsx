@@ -17,7 +17,6 @@ import { handleOTPFormSubmit, FormState, updateSessionForOTPChallenge } from "./
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export function LoginOTP({
-  host,
   loginName,
   sessionId,
   requestId,
@@ -27,7 +26,6 @@ export function LoginOTP({
   loginSettings,
   children,
 }: {
-  host: string | null;
   loginName?: string; // either loginName or sessionId must be provided
   sessionId?: string;
   requestId?: string;
@@ -49,7 +47,6 @@ export function LoginOTP({
 
   const requestOTPChallenge = async () => {
     const { error } = await updateSessionForOTPChallenge({
-      host,
       loginName,
       sessionId,
       organization,
