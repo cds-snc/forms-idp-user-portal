@@ -29,7 +29,7 @@ export function UserAvatar({ loginName, displayName, showDropdown, searchParams 
   }
 
   return (
-    <div className="flex h-full flex-row items-center rounded-3xl border-2 border-gcds-gray-300 p-2">
+    <div className="flex h-full flex-row items-center rounded-3xl border-2 border-gcds-grayscale-300 p-2">
       {/* <div> */}
       <Avatar size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
       {/* </div> */}
