@@ -1,7 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "@i18n/client";
+import Image from "next/image";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { EMAIL, TOTP, U2F } from "@serverComponents/AuthMethods/AuthMethods";
+import { getImageUrl } from "@lib/imageUrl";
+import { Button } from "@clientComponents/globals/Buttons";
 
 type Props = {
   loginName?: string;
@@ -18,6 +23,11 @@ export function ChooseSecondFactor({
   organization,
   userMethods,
 }: Props) {
+  const router = useRouter();
+  const { t } = useTranslation("mfa");
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [nextUrl, setNextUrl] = useState<string>("");
+
   const params = new URLSearchParams({});
 
   if (loginName) {
@@ -33,17 +43,94 @@ export function ChooseSecondFactor({
     params.append("organization", organization);
   }
 
-  return (
-    <div className="grid w-full grid-cols-1 gap-5 pt-4">
-      {userMethods.map((method, i) => {
-        return (
-          <div key={"method-" + i}>
-            {method === AuthenticationMethodType.TOTP && TOTP(false, "/otp/time-based?" + params)}
-            {method === AuthenticationMethodType.U2F && U2F(false, "/u2f?" + params)}
-            {method === AuthenticationMethodType.OTP_EMAIL && EMAIL(false, "/otp/email?" + params)}
+  const handleMethodSelect = (method: string, url: string) => {
+    setSelectedMethod(method);
+    setNextUrl(url);
+  };
+
+  const handleContinue = () => {
+    if (nextUrl) {
+      router.push(nextUrl);
+    }
+  };
+
+  const renderOption = (
+    method: string,
+    title: string,
+    icon: string,
+    description: string,
+    url: string
+  ) => (
+    <div
+      className={`cursor-pointer rounded-md border-2 p-6 transition-all ${
+        selectedMethod === method
+          ? "border-gcds-blue-vivid bg-blue-50"
+          : "border-gray-300 hover:border-gray-400"
+      }`}
+      onClick={() => handleMethodSelect(method, url)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleMethodSelect(method, url);
+        }
+      }}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <Image src={getImageUrl(icon)} alt={title} width={32} height={32} className="mt-1" />
+          <div>
+            <div className="font-bold">{title}</div>
+            <div className="text-sm text-gray-600">{description}</div>
           </div>
-        );
-      })}
+        </div>
+        {selectedMethod === method && (
+          <Image src={getImageUrl("/img/check_24px.png")} alt="Selected" width={24} height={24} />
+        )}
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      <div className="grid w-full grid-cols-1 gap-5 pt-4">
+        {userMethods.map((method, i) => {
+          return (
+            <div key={"method-" + i}>
+              {method === AuthenticationMethodType.TOTP &&
+                renderOption(
+                  "authenticator",
+                  t("set.authenticator.title"),
+                  "/img/verified_user_24px.png",
+                  t("set.authenticator.description"),
+                  "/otp/time-based?" + params
+                )}
+              {method === AuthenticationMethodType.U2F &&
+                renderOption(
+                  "securityKey",
+                  t("set.securityKey.title"),
+                  "/img/fingerprint_24px.png",
+                  t("set.securityKey.description"),
+                  "/u2f?" + params
+                )}
+              {method === AuthenticationMethodType.OTP_EMAIL &&
+                renderOption(
+                  "email",
+                  t("set.email.title"),
+                  "/img/email_24px.png",
+                  t("set.email.description"),
+                  "/otp/email?" + params
+                )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-8 flex justify-start">
+        <Button theme="primary" disabled={!selectedMethod} onClick={handleContinue}>
+          {t("set.continue") || "Continue"}
+        </Button>
+      </div>
+    </>
   );
 }
