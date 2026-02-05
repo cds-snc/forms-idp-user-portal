@@ -8,7 +8,6 @@ import * as v from "valibot";
 
 import { PasswordComplexity } from "../../../password/components/password-complexity";
 
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { Hint } from "@clientComponents/forms/Hint";
@@ -158,7 +157,7 @@ export function SetRegisterPasswordForm({
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
       <form className="w-full" action={formAction} noValidate onChange={() => setDirty(true)}>
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
-          <div className="">
+          <div className="gcds-input-wrapper">
             <Label htmlFor="password" required>
               {t("create.labels.password")}
             </Label>
@@ -189,7 +188,7 @@ export function SetRegisterPasswordForm({
               onChange={(e) => setWatchPassword(e.target.value)}
             />
           </div>
-          <div className="">
+          <div className="gcds-input-wrapper">
             <Label htmlFor="confirmPassword" required>
               {t("create.labels.confirmPassword")}
             </Label>
@@ -209,14 +208,7 @@ export function SetRegisterPasswordForm({
           </div>
         </div>
 
-        <div className="mt-8 flex w-full flex-row items-center justify-between">
-          {/* TODO do we want to retain state and populate the register form when going back? */}
-          <BackButton data-testid="back-button" />
-          {/* <SubmitButtonAction disabled={!policyIsValid || watchPassword !== watchConfirmPassword}>
-            {t("submit")}
-          </SubmitButtonAction> */}
-          <SubmitButtonAction>{t("submit")}</SubmitButtonAction>
-        </div>
+        <SubmitButtonAction>{t("button.continue", { ns: "common" })}</SubmitButtonAction>
       </form>
     </>
   );

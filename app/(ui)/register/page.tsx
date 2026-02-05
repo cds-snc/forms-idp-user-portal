@@ -10,8 +10,7 @@ import {
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@lib/zitadel";
-// import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-// import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+
 import { Metadata } from "next";
 
 import { serverTranslation } from "@i18n/server";
@@ -66,24 +65,8 @@ export default async function Page(props: {
     });
   });
 
-  if (!loginSettings?.allowRegister) {
-    return (
-      <>
-        <div className="flex flex-col space-y-4">
-          <h1>
-            <I18n i18nKey="disabled.title" namespace="register" />
-          </h1>
-          <p>
-            <I18n i18nKey="disabled.description" namespace="register" />
-          </p>
-        </div>
-        <div className="w-full"></div>
-      </>
-    );
-  }
-
   return (
-    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="register">
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="register">
       {!organization && (
         <Alert.Danger>
           <I18n i18nKey="unknownContext" namespace="error" />

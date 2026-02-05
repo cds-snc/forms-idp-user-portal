@@ -1,33 +1,7 @@
-import { I18n } from "@i18n";
 import { cn } from "@lib/utils";
 import { getImageUrl } from "@lib/imageUrl";
 import { Version } from "@serverComponents/globals/Version";
-
-const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
-
-const BulletPoint = () => {
-  return <span className="px-3">&#x2022;</span>;
-};
-
-const DefaultLinks = async () => {
-  return (
-    <span className="mr-10 inline-block">
-      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/about`} target="_blank">
-        <I18n i18nKey="about.desc" namespace="footer" />
-      </a>
-      <BulletPoint />
-      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/terms-of-use`}>
-        <I18n i18nKey="terms-of-use.desc" namespace="footer" />
-      </a>
-      <BulletPoint />
-      <a className="whitespace-nowrap" href={`${FORMS_PRODUCTION_URL}/en/sla`}>
-        <I18n i18nKey="sla.desc" namespace="footer" />
-      </a>
-    </span>
-  );
-};
-
-export const Footer = async () => {
+export const Footer = async ({ children }: { children?: React.ReactNode }) => {
   return (
     <footer
       className={cn(
@@ -39,9 +13,7 @@ export const Footer = async () => {
       <div className="flex flex-row items-center justify-between pb-5 pt-10 lg:flex-col lg:items-start lg:gap-4">
         <div>
           <>
-            <nav className="inline-block">
-              <DefaultLinks />
-            </nav>
+            <nav className="inline-block">{children}</nav>
           </>
           <Version />
         </div>

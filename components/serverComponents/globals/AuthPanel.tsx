@@ -19,7 +19,9 @@ export const AuthPanel = ({
 }: AuthPanelProps) => {
   return (
     <div id="auth-panel">
-      <AuthPanelTitle i18nKey={titleI18nKey} namespace={namespace} data={titleData} />
+      {titleI18nKey !== "none" && (
+        <AuthPanelTitle i18nKey={titleI18nKey} namespace={namespace} data={titleData} />
+      )}
       {descriptionI18nKey !== "none" && (
         <I18n i18nKey={descriptionI18nKey} namespace={namespace} tagName="p" className="mb-6" />
       )}

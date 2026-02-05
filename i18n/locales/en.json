@@ -50,10 +50,6 @@
     },
     "ariaLabel": "Footer"
   },
-  "home": {
-    "description": "Welcome to GC Forms. Sign in to continue to your account or create a new account to try out the application.",
-    "next": "Get started"
-  },
   "accounts": {
     "title": "Accounts",
     "description": "Select the account you want to use.",
@@ -75,7 +71,8 @@
       "description": "Enter your own individual government email address."
     },
     "validation": {
-      "requiredUsername": "Email address is required."
+      "requiredUsername": "Email address is required.",
+      "validGovEmail": "Enter a valid individual Government of Canada email address."
     }
   },
   "logout": {
@@ -90,6 +87,7 @@
     }
   },
   "password": {
+    "title": "Enter your password",
     "verify": {
       "title": "Password",
       "description": "Please enter your password or select a different account below.",
@@ -198,10 +196,19 @@
       "noResults": "No second factors available to set up."
     },
     "set": {
-      "title": "Set up two-factor authentication",
-      "description": "Choose one of the following methods.",
+      "title": "Add a verification method",
+      "description": "When you sign in, you will be asked to confirm your identity in another way, as an extra layer of security. You’ll be able to add additional methods later in your account settings.",
       "skip": "Skip",
-      "addAnother": "Add another method"
+      "addAnother": "Add another method",
+      "securityKey": {
+        "title": "Security key",
+        "recommended": "Recommended",
+        "description": "(ex: Government-issued Yubikey, fingerprint)"
+      },
+      "authenticator": {
+        "title": "Authentication app",
+        "description": "(ex: Microsoft Authenticator)"
+      }
     }
   },
   "otp": {
@@ -248,17 +255,13 @@
     "methods": {
       "password": "Password"
     },
-    "disabled": {
-      "title": "Registration disabled",
-      "description": "The registration is disabled. Please contact your administrator."
-    },
     "missingdata": {
       "title": "Missing data",
       "description": "Provide your email, first name, and last name to register."
     },
     "title": "Create your account",
     "emailInputHint": "Use a government address only you can access, not a shared inbox.",
-    "description": "Create your GC Forms account.",
+    "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register, you must agree to the terms of use",
@@ -292,6 +295,10 @@
       "userNotFound": "User account not found in the system",
       "couldNotLinkIDP": "Could not link identity provider to the user account",
       "couldNotRegisterUser": "Could not register user account"
+    },
+    "password": {
+      "title": "Password creation",
+      "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider."
     }
   },
   "u2f": {

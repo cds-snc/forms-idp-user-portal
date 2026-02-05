@@ -1,24 +1,19 @@
 "use client";
 
-import {
-  LoginSettings,
-  SecondFactorType,
-} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
-import { EMAIL, TOTP, U2F } from "@serverComponents/AuthMethods/AuthMethods";
+import { useTranslation } from "@i18n/client";
+import Image from "next/image";
+import { getImageUrl } from "@lib/imageUrl";
 
 type Props = {
   loginName?: string;
   sessionId?: string;
   requestId?: string;
   organization?: string;
-  loginSettings: LoginSettings;
-  userMethods: AuthenticationMethodType[];
   checkAfter: boolean;
-  phoneVerified: boolean;
-  emailVerified: boolean;
-  force: boolean;
+  phoneVerified?: boolean;
+  emailVerified?: boolean;
+  force?: boolean;
 };
 
 export function ChooseSecondFactorToSetup({
@@ -26,12 +21,11 @@ export function ChooseSecondFactorToSetup({
   sessionId,
   requestId,
   organization,
-  loginSettings,
-  userMethods,
   checkAfter,
-  emailVerified,
 }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("mfa");
+
   const params = new URLSearchParams({});
 
   if (loginName) {
@@ -50,59 +44,69 @@ export function ChooseSecondFactorToSetup({
     params.append("checkAfter", "true");
   }
 
-  const handleFactorClick = async (method: AuthenticationMethodType, url: string) => {
-    // Navigate to the setup page
+  const handleFactorClick = (url: string) => {
     router.push(url);
   };
 
   return (
     <>
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
-        {loginSettings.secondFactors.map((factor) => {
-          let method: AuthenticationMethodType | null = null;
-          let url: string = "";
-          let component = null;
-
-          switch (factor) {
-            case SecondFactorType.OTP:
-              method = AuthenticationMethodType.TOTP;
-              url = "/otp/time-based/set?" + params;
-              component = TOTP(userMethods.includes(AuthenticationMethodType.TOTP), "#");
-              break;
-            case SecondFactorType.U2F:
-              method = AuthenticationMethodType.U2F;
-              url = "/u2f/set?" + params;
-              component = U2F(userMethods.includes(AuthenticationMethodType.U2F), "#");
-              break;
-            case SecondFactorType.OTP_EMAIL:
-              if (emailVerified) {
-                method = AuthenticationMethodType.OTP_EMAIL;
-                url = "/otp/email/set?" + params;
-                component = EMAIL(userMethods.includes(AuthenticationMethodType.OTP_EMAIL), "#");
-              }
-              break;
-          }
-
-          if (!method || !component) return null;
-
-          return (
-            <div key={`factor-${method}`}>
-              <div
-                className="cursor-pointer"
-                onClick={() => handleFactorClick(method, url)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    handleFactorClick(method, url);
-                  }
-                }}
-              >
-                {component}
+        {/* Security Key - U2F */}
+        <div
+          className="cursor-pointer rounded-md border-2 border-gray-300 p-6 hover:border-gray-400"
+          onClick={() => handleFactorClick("/u2f/set?" + params)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleFactorClick("/u2f/set?" + params);
+            }
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <Image
+              src={getImageUrl("/img/fingerprint_24px.png")}
+              alt={t("set.securityKey.title")}
+              width={32}
+              height={32}
+              className="mt-1"
+            />
+            <div>
+              <div className="font-bold">
+                {t("set.securityKey.title")} —{" "}
+                <span className="italic">{t("set.securityKey.recommended")}</span>
               </div>
+              <div className="text-sm text-gray-600">{t("set.securityKey.description")}</div>
             </div>
-          );
-        })}
+          </div>
+        </div>
+
+        {/* Authentication App - TOTP */}
+        <div
+          className="cursor-pointer rounded-md border-2 border-gray-300 p-6 hover:border-gray-400"
+          onClick={() => handleFactorClick("/otp/time-based/set?" + params)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleFactorClick("/otp/time-based/set?" + params);
+            }
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <Image
+              src={getImageUrl("/img/verified_user_24px.png")}
+              alt={t("set.authenticator.title")}
+              width={32}
+              height={32}
+              className="mt-1"
+            />
+            <div>
+              <div className="font-bold">{t("set.authenticator.title")}</div>
+              <div className="text-sm text-gray-600">{t("set.authenticator.description")}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
