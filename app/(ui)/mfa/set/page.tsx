@@ -1,9 +1,7 @@
 import { Alert } from "@clientComponents/globals";
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { ChooseSecondFactorToSetup } from "./components/choose-second-factor-to-setup";
 
 import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -59,50 +57,35 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   return (
     <>
       <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="mfa">
-        {sessionFactors && (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        )}
-      </AuthPanel>
+        <div className="w-full">
+          <div className="flex flex-col space-y-4">
+            {!(loginName || sessionId) && (
+              <Alert.Danger>
+                <I18n i18nKey="unknownContext" namespace="error" />
+              </Alert.Danger>
+            )}
 
-      <div className="w-full">
-        <div className="flex flex-col space-y-4">
-          {!(loginName || sessionId) && (
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          )}
+            {!valid && (
+              <Alert.Warning>
+                <I18n i18nKey="sessionExpired" namespace="error" />
+              </Alert.Warning>
+            )}
 
-          {!valid && (
-            <Alert.Warning>
-              <I18n i18nKey="sessionExpired" namespace="error" />
-            </Alert.Warning>
-          )}
-
-          {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
-            <ChooseSecondFactorToSetup
-              loginName={loginName}
-              sessionId={sessionFactors.id}
-              requestId={requestId}
-              organization={organization}
-              loginSettings={loginSettings}
-              userMethods={sessionFactors.authMethods ?? []}
-              phoneVerified={sessionFactors.phoneVerified ?? false}
-              emailVerified={sessionFactors.emailVerified ?? false}
-              checkAfter={checkAfter === "true"}
-              force={force === "true"}
-            ></ChooseSecondFactorToSetup>
-          )}
-
-          <div className="mb-6 mt-8 flex w-full flex-row items-center">
-            <BackButton />
+            {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
+              <ChooseSecondFactorToSetup
+                loginName={loginName}
+                sessionId={sessionFactors.id}
+                requestId={requestId}
+                organization={organization}
+                phoneVerified={sessionFactors.phoneVerified ?? false}
+                emailVerified={sessionFactors.emailVerified ?? false}
+                checkAfter={checkAfter === "true"}
+                force={force === "true"}
+              ></ChooseSecondFactorToSetup>
+            )}
           </div>
         </div>
-      </div>
+      </AuthPanel>
     </>
   );
 }
