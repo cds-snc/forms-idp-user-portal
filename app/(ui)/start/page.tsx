@@ -69,6 +69,7 @@ export default async function Page(props: {
       organization: organization || currentSession?.organization || "",
       requestId: requestId || "",
       suffix: suffix || "",
+      // TODO: probably just /accounts is fine since the info is pulled from the cookie/session on the accounts page
       link: `/accounts?loginName=${loginName ?? currentSession?.loginName}&organization=${organization ?? currentSession?.organization}&requestId=${requestId}&suffix=${suffix}`,
       showDropdown: false,
     },
