@@ -202,7 +202,7 @@
       "securityKey": {
         "title": "Clé de sécurité",
         "recommended": "Recommandé",
-        "description": "(ex : Yubikey émise par le gouvernement, empreinte digitale)"
+        "description": "(ex : Yubikey émise par le gouvernement)"
       },
       "authenticator": {
         "title": "Application d'authentification",
@@ -211,7 +211,9 @@
       "email": {
         "title": "Courriel",
         "description": "(ex : Code à usage unique par courriel)"
-      }
+      },
+      "byDefault": "Par défaut",
+      "continue": "Continuer"
     }
   },
   "otp": {

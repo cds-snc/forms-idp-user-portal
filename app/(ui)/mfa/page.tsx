@@ -32,7 +32,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   return (
     <>
       <div className="flex flex-col space-y-4">
-        <AuthPanelTitle i18nKey="set.title" namespace="mfa" />
+        <AuthPanelTitle i18nKey="title" namespace="mfa" />
 
         <I18n i18nKey="verify.description" namespace="mfa" tagName="p" className="mb-6" />
 
