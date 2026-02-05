@@ -8,6 +8,8 @@ import { headers } from "next/headers";
 import { UserNameForm } from "./components/UserNameForm";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import Link from "next/dist/client/link";
+import { getMostRecentSessionCookie } from "@lib/cookies";
+import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
@@ -19,9 +21,16 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
 
-  const loginName = searchParams?.loginName;
+  let currentSession;
+  try {
+    currentSession = await getMostRecentSessionCookie();
+  } catch {
+    currentSession = null;
+  }
+
+  const loginName = searchParams?.loginName ?? currentSession?.loginName;
   const requestId = searchParams?.requestId;
-  const organization = searchParams?.organization;
+  const organization = searchParams?.organization ?? currentSession?.organization;
   const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
 
@@ -37,6 +46,7 @@ export default async function Page(props: {
       defaultOrganization = org.id;
     }
   }
+
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: organization ?? defaultOrganization,
@@ -51,6 +61,43 @@ export default async function Page(props: {
   }
 
   const registerLink = `/register?${registerParams.toString()}`;
+
+  // Ideally this list could be simplified or moved/logic-moved into the AvatarList component
+  const accounts: AvatarListItem[] = [
+    {
+      loginName: loginName || currentSession?.loginName || "",
+      organization: organization || currentSession?.organization || "",
+      requestId: requestId || "",
+      suffix: suffix || "",
+      link: `/accounts?loginName=${loginName ?? currentSession?.loginName}&organization=${organization ?? currentSession?.organization}&requestId=${requestId}&suffix=${suffix}`,
+      showDropdown: false,
+    },
+    {
+      loginName: "Other account (Todo)",
+      organization: "Todo",
+      requestId: "Todo",
+      suffix: "Todo",
+      link: `/accounts`,
+      showDropdown: false,
+    },
+  ];
+
+  if (currentSession) {
+    return (
+      <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
+        <AvatarList avatars={accounts} />
+
+        <p className="mt-10">
+          <I18n i18nKey="register" namespace="start" />
+          &nbsp;
+          <Link href={registerLink}>
+            <I18n i18nKey="registerLinkText" namespace="start" />
+          </Link>
+          .
+        </p>
+      </AuthPanel>
+    );
+  }
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">

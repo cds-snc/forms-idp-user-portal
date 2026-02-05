@@ -65,7 +65,8 @@
     "signUpText": "If you do not have an account, you can",
     "signUpLink": "create one now.",
     "userName": "Name",
-    "register": "Register now",
+    "register": "If you do not have an account, you can",
+    "registerLinkText": "create one now",
     "form": {
       "label": "Email address",
       "description": "Enter your own individual government email address."
