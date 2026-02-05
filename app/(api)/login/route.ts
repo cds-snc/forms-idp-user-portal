@@ -49,12 +49,6 @@ export async function GET(request: NextRequest) {
     return handleOIDCFlowInitiation(flowParams);
   } else if (requestId.startsWith("saml_")) {
     return handleSAMLFlowInitiation(flowParams);
-  } else if (requestId.startsWith("device_")) {
-    // Device Authorization does not need to start here as it is handled on the /device endpoint
-    return NextResponse.json(
-      { error: "Device authorization should use /device endpoint" },
-      { status: 400 }
-    );
   } else {
     return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
   }
