@@ -107,6 +107,33 @@ export function ChooseSecondFactorToSetup({
             </div>
           </div>
         </div>
+
+        {/* Email - OTP_EMAIL */}
+        <div
+          className="cursor-pointer rounded-md border-2 border-gray-300 p-6 hover:border-gray-400"
+          onClick={() => handleFactorClick("/otp/email/set?" + params)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleFactorClick("/otp/email/set?" + params);
+            }
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <Image
+              src={getImageUrl("/img/mailbox.svg")}
+              alt={t("set.email.title")}
+              width={48}
+              height={48}
+              className="mt-1"
+            />
+            <div>
+              <div className="font-bold">{t("set.email.title")}</div>
+              <div className="text-sm text-gray-600">{t("set.email.description")}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

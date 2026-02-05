@@ -10,7 +10,7 @@ import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { CodeEntry } from "@clientComponents/forms/CodeEntry";
 import Link from "next/link";
-import { Alert as AlertNotification, Button } from "@clientComponents/globals";
+import { Button } from "@clientComponents/globals";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { handleOTPFormSubmit, FormState, updateSessionForOTPChallenge } from "./action";
 
@@ -122,22 +122,6 @@ export function LoginOTP({
 
       {children}
 
-      {(codeLoading || codeSent) && (
-        <AlertNotification.Info className="mt-8">
-          {codeLoading && (
-            <I18n
-              i18nKey="sendingNewCode"
-              namespace="verify"
-              tagName="p"
-              className="mt-3 font-bold"
-            />
-          )}
-          {codeSent && (
-            <I18n i18nKey="sentNewCode" namespace="verify" className="mt-3 font-bold" tagName="p" />
-          )}
-        </AlertNotification.Info>
-      )}
-
       <div className="w-full">
         <form action={formAction} noValidate>
           <CodeEntry state={state} code={code ?? ""} className="mt-8" />
@@ -151,19 +135,37 @@ export function LoginOTP({
         </form>
 
         <div className="mt-8 flex items-center gap-4">
-          {["email"].includes(method) && (
-            <Button
-              theme="link"
-              type="button"
-              onClick={() => resendCode()}
-              data-testid="resend-button"
-            >
-              <I18n i18nKey="newCode" namespace="verify" />
-            </Button>
-          )}
           <Link href={`${SUPPORT_URL}/${language}/support`}>
             <I18n i18nKey="help" namespace="verify" />
           </Link>
+          {["email"].includes(method) && (
+            <div className="flex whitespace-nowrap">
+              <Button
+                theme="link"
+                type="button"
+                onClick={() => resendCode()}
+                data-testid="resend-button"
+              >
+                <I18n i18nKey="newCode" namespace="verify" />
+              </Button>
+              {codeLoading && (
+                <I18n
+                  i18nKey="sendingNewCode"
+                  namespace="verify"
+                  tagName="p"
+                  className="ml-4 text-emerald-700"
+                />
+              )}
+              {codeSent && (
+                <I18n
+                  i18nKey="sentNewCode"
+                  namespace="verify"
+                  className="ml-4 text-emerald-700"
+                  tagName="span"
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
