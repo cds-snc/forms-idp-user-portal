@@ -32,6 +32,18 @@ export const emailSchema = () => ({
   ),
 });
 
+// TODO: is username always an email? If so, replace above with username
+export const usernameSchema = (min = 1) => ({
+  // username: v.pipe(v.string(), v.trim(), v.minLength(min, "requiredUsername")),
+  username: v.pipe(
+    v.string(),
+    v.toLowerCase(),
+    v.trim(),
+    v.minLength(min, "requiredUsername"),
+    v.check((input) => isValidGovEmail(input), "validGovEmail")
+  ),
+});
+
 // Password restrictions from Zitadel password settings
 export const passwordSchema = ({
   minLength,
@@ -77,10 +89,6 @@ export const codeSchema = (min = 1, max = 10) => ({
   ...{
     code: v.pipe(v.string(), v.trim(), v.minLength(min, "required"), v.maxLength(max, "maxLength")),
   },
-});
-
-export const usernameSchema = (min = 1) => ({
-  username: v.pipe(v.string(), v.trim(), v.minLength(min, "requiredUsername")),
 });
 
 // Shared "composed" validation functions using the above schemas
