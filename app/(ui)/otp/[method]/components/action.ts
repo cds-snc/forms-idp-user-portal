@@ -46,7 +46,6 @@ type OTPChallengeParams = {
   method: string;
 };
 
-// Updates the session with the OTP challenge request
 export async function updateSessionForOTPChallenge(
   params: OTPChallengeParams
 ): Promise<{ error?: string; response?: SessionResponse }> {
@@ -91,8 +90,6 @@ export async function updateSessionForOTPChallenge(
   }
 }
 
-// Handles the complete OTP form submission flow including validation,
-// session update, and redirect handling
 export async function handleOTPFormSubmit(
   code: string,
   params: SubmitCodeParams & {
@@ -177,7 +174,6 @@ export async function handleOTPFormSubmit(
   };
 }
 
-// Submits OTP code for verification
 async function _submitOTPCode(
   values: Inputs,
   params: SubmitCodeParams
