@@ -6,6 +6,7 @@ import { useTranslation } from "@i18n/client";
 import Image from "next/image";
 import { getImageUrl } from "@lib/imageUrl";
 import { Button } from "@clientComponents/globals/Buttons";
+import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 
 type Props = {
   loginName?: string;
@@ -109,14 +110,15 @@ export function ChooseSecondFactorToSetup({
     <>
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {/* Email - OTP_EMAIL (Default) */}
-        {renderOption(
-          "email",
-          t("set.email.title"),
-          true,
-          "/img/email_24px.png",
-          t("set.email.description"),
-          "/otp/email/set?" + params
-        )}
+        {ENABLE_EMAIL_OTP &&
+          renderOption(
+            "email",
+            t("set.email.title"),
+            true,
+            "/img/email_24px.png",
+            t("set.email.description"),
+            "/otp/email/set?" + params
+          )}
 
         {/* Authentication App - TOTP */}
         {renderOption(

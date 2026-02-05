@@ -7,6 +7,7 @@ import Image from "next/image";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getImageUrl } from "@lib/imageUrl";
 import { Button } from "@clientComponents/globals/Buttons";
+import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 
 type Props = {
   loginName?: string;
@@ -114,6 +115,7 @@ export function ChooseSecondFactor({
                   "/u2f?" + params
                 )}
               {method === AuthenticationMethodType.OTP_EMAIL &&
+                ENABLE_EMAIL_OTP &&
                 renderOption(
                   "email",
                   t("set.email.title"),
