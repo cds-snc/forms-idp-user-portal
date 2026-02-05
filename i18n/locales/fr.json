@@ -50,10 +50,6 @@
     },
     "ariaLabel": "Pied de page"
   },
-  "home": {
-    "description": "Bienvenue dans Formulaires GC. Connectez-vous pour accéder à votre compte ou créez un nouveau compte pour essayer l'application.",
-    "next": "Commencer"
-  },
   "accounts": {
     "title": "Comptes",
     "description": "Sélectionnez le compte que vous souhaitez utiliser.",
@@ -244,17 +240,13 @@
     "methods": {
       "password": "Mot de passe"
     },
-    "disabled": {
-      "title": "Inscription désactivée",
-      "description": "L'inscription est désactivée. Veuillez contacter votre administrateur."
-    },
     "missingdata": {
       "title": "Données manquantes",
       "description": "Veuillez fournir votre adresse courriel, prénom et nom de famille pour vous inscrire."
     },
     "title": "Créer votre compte",
     "emailInputHint": "Utilisez une adresse courriel du gouvernement à laquelle vous seul avez accès, et non une boîte de réception partagée.",
-    "description": "Créez votre compte Formulaires GC.",
+    "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider. [FR]",
     "noMethodAvailableWarning": "Aucune méthode d'authentification disponible. Veuillez contacter votre administrateur.",
     "selectMethod": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
     "agreeTo": "Pour vous inscrire, vous devez accepter les conditions d'utilisation",
@@ -288,6 +280,10 @@
       "userNotFound": "Compte utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité au compte utilisateur",
       "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
+    },
+    "password": {
+      "title": "Password creation",
+      "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider."
     }
   },
   "u2f": {

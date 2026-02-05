@@ -50,10 +50,6 @@
     },
     "ariaLabel": "Footer"
   },
-  "home": {
-    "description": "Welcome to GC Forms. Sign in to continue to your account or create a new account to try out the application.",
-    "next": "Get started"
-  },
   "accounts": {
     "title": "Accounts",
     "description": "Select the account you want to use.",
@@ -248,17 +244,13 @@
     "methods": {
       "password": "Password"
     },
-    "disabled": {
-      "title": "Registration disabled",
-      "description": "The registration is disabled. Please contact your administrator."
-    },
     "missingdata": {
       "title": "Missing data",
       "description": "Provide your email, first name, and last name to register."
     },
     "title": "Create your account",
     "emailInputHint": "Use a government address only you can access, not a shared inbox.",
-    "description": "Create your GC Forms account.",
+    "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register, you must agree to the terms of use",
@@ -292,6 +284,10 @@
       "userNotFound": "User account not found in the system",
       "couldNotLinkIDP": "Could not link identity provider to the user account",
       "couldNotRegisterUser": "Could not register user account"
+    },
+    "password": {
+      "title": "Password creation",
+      "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider."
     }
   },
   "u2f": {

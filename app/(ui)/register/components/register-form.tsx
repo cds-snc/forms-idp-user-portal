@@ -4,7 +4,6 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n";
 
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { validateAccount } from "@lib/validationSchemas";
@@ -43,7 +42,7 @@ type Props = {
 };
 
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
-  const { t, i18n } = useTranslation(["register", "validation", "errorSummary"]);
+  const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
 
   const router = useRouter();
 
@@ -157,7 +156,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
         </p>
 
         <div>
-          <SubmitButtonAction>{t("submit")}</SubmitButtonAction>
+          <SubmitButtonAction>{t("button.continue", { ns: "common" })}</SubmitButtonAction>
         </div>
       </form>
     </>

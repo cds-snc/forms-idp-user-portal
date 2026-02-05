@@ -383,7 +383,7 @@ export function LoginOTP({
           <div className="mt-8 flex w-full flex-row items-center">
           <BackButton data-testid="back-button" />
           <span className="grow"></span>
-          <SubmitButtonAction>{t("button.submit")}</SubmitButtonAction>
+          <SubmitButtonAction>{t("button.submit", { ns: "common" })}</SubmitButtonAction>
         </div>
         </form> */}
       </div>

@@ -1,19 +1,16 @@
 import { SetRegisterPasswordForm } from "./components/set-register-password-form";
-import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getSerializableObject } from "@lib/utils";
 import { validateAccount } from "@lib/validationSchemas";
 import {
   getDefaultOrg,
   getLegalAndSupportSettings,
-  getLoginSettings,
   getPasswordComplexitySettings,
 } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
-// import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
@@ -53,33 +50,16 @@ export default async function Page(props: {
     organization,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  }).then((obj) => getSerializableObject(obj));
-
   if (missingData || !validateData.success) {
-    return (
-      <AuthPanel
-        titleI18nKey="create.missingOrInvalidData.title"
-        descriptionI18nKey="create.missingOrInvalidData.description"
-        namespace="password"
-      />
-    );
-  }
-
-  if (!loginSettings?.allowRegister || !loginSettings.allowUsernamePassword) {
-    return (
-      <AuthPanel
-        titleI18nKey="disabled.title"
-        descriptionI18nKey="disabled.description"
-        namespace="password"
-      />
-    );
+    redirect(`/register/`);
   }
 
   return (
-    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="password">
+    <AuthPanel
+      titleI18nKey="password.title"
+      descriptionI18nKey="password.description"
+      namespace="register"
+    >
       {legal && passwordComplexitySettings && (
         <SetRegisterPasswordForm
           passwordComplexitySettings={passwordComplexitySettings}
