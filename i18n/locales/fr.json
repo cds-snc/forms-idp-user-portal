@@ -86,6 +86,7 @@
     }
   },
   "password": {
+    "title": "Enter your password [FR]",
     "verify": {
       "title": "Mot de passe",
       "description": "Veuillez entrer votre mot de passe ou sélectionner un autre compte ci-dessous.",

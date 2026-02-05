@@ -87,6 +87,7 @@
     }
   },
   "password": {
+    "title": "Enter your password",
     "verify": {
       "title": "Password",
       "description": "Please enter your password or select a different account below.",
