@@ -203,7 +203,7 @@
       "securityKey": {
         "title": "Security key",
         "recommended": "Recommended",
-        "description": "(ex: Government-issued Yubikey, fingerprint)"
+        "description": "(ex: Government-issued Yubikey)"
       },
       "authenticator": {
         "title": "Authentication app",
@@ -212,7 +212,9 @@
       "email": {
         "title": "Email",
         "description": "(ex: One-time code via email)"
-      }
+      },
+      "byDefault": "By default",
+      "continue": "Continue"
     }
   },
   "otp": {
