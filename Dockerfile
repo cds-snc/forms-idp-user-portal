@@ -1,9 +1,7 @@
 FROM node:22-alpine AS base
 
 ENV PORT=3000
-ENV NODE_ENV=production
 ENV NEXT_OUTPUT_STANDALONE=true
-ENV EMAIL_VERIFICATION=true
 ENV NEXT_PUBLIC_BASE_PATH=/ui/v2
 ENV NEXT_PUBLIC_FORMS_PRODUCTION_URL=https://forms-formulaires.alpha.canada.ca
 COPY . /src
@@ -12,6 +10,9 @@ WORKDIR /src
 RUN corepack enable
 RUN pnpm install
 RUN pnpm build
+
+ENV NODE_ENV=production
+ENV EMAIL_VERIFICATION=true
 
 FROM node:22-alpine AS final
 LABEL maintainer="-"
