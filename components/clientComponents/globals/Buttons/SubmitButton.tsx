@@ -86,7 +86,7 @@ export const SubmitButton = ({
       className={
         loading || disabled
           ? cn(themes["base"], themes.disabled, disabledClass, className)
-          : cn(themes["base"], themes[theme], className)
+          : cn(themes["base"], themes[theme], className, "outline")
       }
       ref={buttonRef}
       data-testid={dataTestId}

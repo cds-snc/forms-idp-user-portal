@@ -11,6 +11,7 @@ import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { Logout } from "@serverComponents/globals/Logout";
 import { GcdsHeader } from "@serverComponents/globals/GcdsHeader/GcdsHeader";
+import { FooterLinks } from "@clientComponents/globals/FooterLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
               </div>
             </div>
           </div>
-          <Footer />
+          <Footer>
+            <FooterLinks />
+          </Footer>
         </div>
       </body>
     </html>
