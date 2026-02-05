@@ -207,6 +207,10 @@
       "authenticator": {
         "title": "Application d'authentification",
         "description": "(ex : Microsoft Authenticator)"
+      },
+      "email": {
+        "title": "Courriel",
+        "description": "(ex : Code à usage unique par courriel)"
       }
     }
   },
