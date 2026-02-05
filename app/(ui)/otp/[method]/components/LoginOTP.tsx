@@ -139,7 +139,7 @@ export function LoginOTP({
             <I18n i18nKey="help" namespace="verify" />
           </Link>
           {["email"].includes(method) && (
-            <div className="flex whitespace-nowrap">
+            <div className="flex whitespace-nowrap" aria-live="polite">
               <Button
                 theme="link"
                 type="button"
