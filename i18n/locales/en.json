@@ -87,6 +87,7 @@
     }
   },
   "password": {
+    "title": "Enter your password",
     "verify": {
       "title": "Password",
       "description": "Please enter your password or select a different account below.",
@@ -195,10 +196,19 @@
       "noResults": "No second factors available to set up."
     },
     "set": {
-      "title": "Set up two-factor authentication",
-      "description": "Choose one of the following methods.",
+      "title": "Add a verification method",
+      "description": "When you sign in, you will be asked to confirm your identity in another way, as an extra layer of security. You’ll be able to add additional methods later in your account settings.",
       "skip": "Skip",
-      "addAnother": "Add another method"
+      "addAnother": "Add another method",
+      "securityKey": {
+        "title": "Security key",
+        "recommended": "Recommended",
+        "description": "(ex: Government-issued Yubikey, fingerprint)"
+      },
+      "authenticator": {
+        "title": "Authentication app",
+        "description": "(ex: Microsoft Authenticator)"
+      }
     }
   },
   "otp": {

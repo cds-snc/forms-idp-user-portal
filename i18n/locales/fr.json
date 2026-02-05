@@ -86,6 +86,7 @@
     }
   },
   "password": {
+    "title": "Enter your password [FR]",
     "verify": {
       "title": "Mot de passe",
       "description": "Veuillez entrer votre mot de passe ou sélectionner un autre compte ci-dessous.",
@@ -194,10 +195,19 @@
       "noResults": "Aucun facteur secondaire disponible pour configuration."
     },
     "set": {
-      "title": "Configurer l'authentification à deux facteurs",
-      "description": "Choisissez l'une des méthodes suivantes.",
+      "title": "Ajouter une méthode de vérification",
+      "description": "Lors de la connexion, on vous demandera de confirmer votre identité d'une autre façon, comme couche de sécurité supplémentaire. Vous pourrez ajouter d'autres méthodes plus tard dans les paramètres de votre compte.",
       "skip": "Ignorer",
-      "addAnother": "Ajouter un autre facteur"
+      "addAnother": "Ajouter une autre méthode",
+      "securityKey": {
+        "title": "Clé de sécurité",
+        "recommended": "Recommandé",
+        "description": "(ex : Yubikey émise par le gouvernement, empreinte digitale)"
+      },
+      "authenticator": {
+        "title": "Application d'authentification",
+        "description": "(ex : Microsoft Authenticator)"
+      }
     }
   },
   "otp": {

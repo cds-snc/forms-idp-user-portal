@@ -58,7 +58,7 @@ export default async function Page(props: {
   }).then((obj) => getSerializableObject(obj));
 
   return (
-    <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="password">
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="password">
       {sessionFactors && (
         <div className="mb-6">
           <UserAvatar
