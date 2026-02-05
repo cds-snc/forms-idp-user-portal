@@ -1,17 +1,16 @@
 "use server";
 
 import {
-  createInviteCode,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
+  sendEmailCodeWithReturn,
   verifyEmail,
-  verifyInviteCode,
   verifyTOTPRegistration,
-  sendEmailCode as zitadelSendEmailCode,
 } from "@lib/zitadel";
 import crypto from "crypto";
+import { GCNotifyConnector } from "@gcforms/connectors";
 
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -24,7 +23,6 @@ import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
-import { getOriginalHostWithProtocol } from "./host";
 import { serverTranslation } from "@i18n/server";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
@@ -55,7 +53,6 @@ type VerifyUserByEmailCommand = {
   loginName?: string; // to determine already existing session
   organization?: string;
   code: string;
-  isInvite: boolean;
   requestId?: string;
 };
 
@@ -64,23 +61,14 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const verifyResponse = command.isInvite
-    ? await verifyInviteCode({
-        serviceUrl,
-        userId: command.userId,
-        verificationCode: command.code,
-      }).catch((error) => {
-        console.warn(error);
-        return { error: t("errors.couldNotVerifyInvite") };
-      })
-    : await verifyEmail({
-        serviceUrl,
-        userId: command.userId,
-        verificationCode: command.code,
-      }).catch((error) => {
-        console.warn(error);
-        return { error: t("errors.couldNotVerifyEmail") };
-      });
+  const verifyResponse = await verifyEmail({
+    serviceUrl,
+    userId: command.userId,
+    verificationCode: command.code,
+  }).catch((error) => {
+    console.warn(error);
+    return { error: t("errors.couldNotVerifyEmail") };
+  });
 
   if ("error" in verifyResponse) {
     return verifyResponse;
@@ -251,65 +239,77 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   );
 }
 
-type resendVerifyEmailCommand = {
+type SendVerificationEmailCommand = {
   userId: string;
-  isInvite: boolean;
-  requestId?: string;
 };
 
-export async function resendVerification(command: resendVerifyEmailCommand) {
+export async function sendVerificationEmail(command: SendVerificationEmailCommand) {
   const { t } = await serverTranslation("verify");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const hostWithProtocol = await getOriginalHostWithProtocol();
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-  return command.isInvite
-    ? createInviteCode({
-        serviceUrl,
-        userId: command.userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
-      }).catch((error) => {
-        if (error.code === 9) {
-          return { error: t("errors.userAlreadyVerified") };
-        }
-        return { error: t("errors.couldNotResendInvite") };
-      })
-    : zitadelSendEmailCode({
-        userId: command.userId,
-        serviceUrl,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
-      });
-}
-
-type SendEmailCommand = {
-  userId: string;
-  urlTemplate: string;
-};
-
-export async function sendEmailCode(command: SendEmailCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  return zitadelSendEmailCode({
+  // Get verification code from Zitadel (returnCode mode - does not send email)
+  const codeResponse = await sendEmailCodeWithReturn({
     serviceUrl,
     userId: command.userId,
-    urlTemplate: command.urlTemplate,
+  }).catch((error) => {
+    console.error("Could not get verification code from Zitadel", error);
+    return { error: t("errors.couldNotGenerateCode") };
   });
-}
 
-export async function sendInviteEmailCode(command: SendEmailCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  if ("error" in codeResponse) {
+    return codeResponse;
+  }
 
-  return createInviteCode({
+  if (!codeResponse.verificationCode) {
+    return { error: t("errors.couldNotGenerateCode") };
+  }
+
+  // Get user's email address
+  const userResponse = await getUserByID({
     serviceUrl,
     userId: command.userId,
-    urlTemplate: command.urlTemplate,
   });
+
+  if (!userResponse?.user) {
+    return { error: t("errors.couldNotLoadUser") };
+  }
+
+  const user = userResponse.user;
+  let email: string | undefined;
+
+  if (user.type.case === "human") {
+    email = user.type.value.email?.email;
+  }
+
+  if (!email) {
+    return { error: t("errors.couldNotLoadUserEmail") };
+  }
+
+  // Send email via GC Notify
+  const apiKey = process.env.NOTIFY_API_KEY;
+  const templateId = process.env.TEMPLATE_ID;
+
+  if (!apiKey || !templateId) {
+    console.error("Missing NOTIFY_API_KEY or TEMPLATE_ID environment variables");
+    return { error: t("errors.emailConfigurationError") };
+  }
+
+  try {
+    const gcNotify = GCNotifyConnector.default(apiKey);
+    await gcNotify.sendEmail(email, templateId, {
+      subject: "Your security code | Votre code de sécurité",
+      formResponse: `
+**Your security code | Votre code de sécurité**
+
+
+
+${codeResponse.verificationCode}`,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send verification email via GC Notify", error);
+    return { error: t("errors.emailSendFailed") };
+  }
 }

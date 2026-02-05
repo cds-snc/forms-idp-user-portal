@@ -1,8 +1,5 @@
-import { Alert } from "@clientComponents/globals";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@lib/cookies";
-import { completeDeviceAuthorization } from "@lib/server/device";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -25,36 +22,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, requestId, organization, sessionId } = searchParams;
-
-  // complete device authorization flow if device requestId is present
-  if (requestId && requestId.startsWith("device_")) {
-    const cookie = sessionId
-      ? await getSessionCookieById({ sessionId, organization })
-      : await getMostRecentCookieWithLoginname({
-          loginName: loginName,
-          organization: organization,
-        });
-
-    await completeDeviceAuthorization(requestId.replace("device_", ""), {
-      sessionId: cookie.id,
-      sessionToken: cookie.token,
-    }).catch((err) => {
-      return (
-        <>
-          <div className="flex flex-col space-y-4">
-            <h1>
-              <I18n i18nKey="error.title" namespace="signedin" />
-            </h1>
-            <p className="ztdl-p mb-6 block">
-              <I18n i18nKey="error.description" namespace="signedin" />
-            </p>
-            <Alert.Danger>{err.message}</Alert.Danger>
-          </div>
-          <div className="w-full"></div>
-        </>
-      );
-    });
-  }
 
   const sessionFactors = sessionId
     ? await loadSessionFactorsById(serviceUrl, sessionId, organization)
@@ -81,18 +48,11 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
       <UserAvatar
         loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
         displayName={sessionFactors?.factors?.user?.displayName}
-        showDropdown={!(requestId && requestId.startsWith("device_"))}
+        showDropdown={true}
         searchParams={searchParams}
       />
 
       <div className="w-full">
-        {requestId && requestId.startsWith("device_") && (
-          <Alert.Info>
-            You can now close this window and return to the device where you started the
-            authorization process to continue.
-          </Alert.Info>
-        )}
-
         {loginSettings?.defaultRedirectUri && (
           <div className="mt-8 flex w-full flex-row items-center">
             <span className="grow"></span>

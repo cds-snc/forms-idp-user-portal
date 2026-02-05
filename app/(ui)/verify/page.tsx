@@ -3,8 +3,7 @@ import { Alert } from "@clientComponents/globals";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { VerifyEmailForm } from "./components/verify-email-form";
-import { sendEmailCode, sendInviteEmailCode } from "@lib/server/verify";
-import { getOriginalHostWithProtocol } from "@lib/server/host";
+import { sendVerificationEmail } from "@lib/server/verify";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getUserByID } from "@lib/zitadel";
@@ -23,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
+  const { userId, loginName, code, organization, requestId, send } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -31,39 +30,20 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   let sessionFactors;
   let user: User | undefined;
   let human: HumanUser | undefined;
-  let id: string | undefined;
 
   let error: string | undefined;
 
   const doSend = send === "true";
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
   // Email sending function
-  async function sendEmail(userId: string) {
-    const hostWithProtocol = await getOriginalHostWithProtocol();
-
-    if (invite === "true") {
-      await sendInviteEmailCode({
-        userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-          (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((apiError) => {
-        console.error("Could not send invitation email", apiError);
-        error = "inviteSendFailed";
-      });
-    } else {
-      await sendEmailCode({
-        userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-          (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((apiError) => {
-        console.error("Could not send verification email", apiError);
-        error = "emailSendFailed";
-      });
+  async function sendEmail(userId: string): Promise<string | undefined> {
+    const result = await sendVerificationEmail({ userId });
+    if (result && "error" in result) {
+      // eslint-disable-next-line no-console
+      console.error("Could not send verification email", result.error);
+      return "emailSendFailed";
     }
+    return undefined;
   }
 
   if ("loginName" in searchParams) {
@@ -76,11 +56,11 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmail(sessionFactors.factors.user.id);
+      error = await sendEmail(sessionFactors.factors.user.id);
     }
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
-      await sendEmail(userId);
+      error = await sendEmail(userId);
     }
 
     const userResponse = await getUserByID({
@@ -95,7 +75,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     }
   }
 
-  id = userId ?? sessionFactors?.factors?.user?.id;
+  const id = userId ?? sessionFactors?.factors?.user?.id;
 
   if (!id) {
     throw Error("Failed to get user id");
@@ -128,7 +108,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         organization={organization}
         userId={id}
         code={code}
-        isInvite={invite === "true"}
         requestId={requestId}
       >
         <div className="my-8">

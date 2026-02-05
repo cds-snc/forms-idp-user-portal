@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { resendVerification, sendVerification } from "@lib/server/verify";
+import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -30,14 +30,12 @@ export function VerifyEmailForm({
   organization,
   requestId,
   code,
-  isInvite,
   children,
 }: {
   userId: string;
   loginName?: string;
   organization?: string;
   code?: string;
-  isInvite: boolean;
   requestId?: string;
   children?: React.ReactNode;
 }) {
@@ -58,9 +56,8 @@ export function VerifyEmailForm({
     setCodeLoading(true);
 
     try {
-      const response = await resendVerification({
+      const response = await sendVerificationEmail({
         userId,
-        isInvite: isInvite,
       });
 
       if (response && "error" in response && response.error) {
@@ -80,13 +77,12 @@ export function VerifyEmailForm({
       sendVerification({
         code: code,
         userId,
-        isInvite: isInvite,
         loginName: loginName,
         organization: organization,
         requestId: requestId,
       });
     }
-  }, [code, userId, isInvite, loginName, organization, requestId]);
+  }, [code, userId, loginName, organization, requestId]);
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const code = (formData.get("code") as string) || "";
@@ -106,7 +102,6 @@ export function VerifyEmailForm({
     const response = await sendVerification({
       code: code,
       userId,
-      isInvite: isInvite,
       loginName: loginName,
       organization: organization,
       requestId: requestId,

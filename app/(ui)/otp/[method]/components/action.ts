@@ -1,7 +1,7 @@
 import { completeFlowOrGetUrl } from "@lib/client";
 import { updateSession } from "@lib/server/session";
+import { sendOtpEmail } from "@lib/server/otp";
 import { create } from "@zitadel/client";
-import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { validateCode } from "@lib/validationSchemas";
@@ -38,7 +38,6 @@ type SessionResponse = {
 };
 
 type OTPChallengeParams = {
-  host: string | null;
   loginName?: string;
   sessionId?: string;
   organization?: string;
@@ -49,34 +48,39 @@ type OTPChallengeParams = {
 export async function updateSessionForOTPChallenge(
   params: OTPChallengeParams
 ): Promise<{ error?: string; response?: SessionResponse }> {
-  const { host, loginName, sessionId, organization, requestId, method } = params;
+  const { loginName, sessionId, organization, requestId, method } = params;
 
-  let challenges;
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
+  // For email OTP, use GC Notify to send the code
   if (method === "email") {
-    challenges = create(RequestChallengesSchema, {
-      otpEmail: {
-        deliveryType: {
-          case: "sendCode",
-          value: host
-            ? {
-                urlTemplate:
-                  `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
-                  (requestId ? `&requestId=${requestId}` : ""),
-              }
-            : {},
-        },
-      },
+    const result = await sendOtpEmail({
+      loginName,
+      sessionId,
+      organization,
+      requestId,
     });
+
+    if (result.error) {
+      return { error: result.error };
+    }
+
+    if (result.success) {
+      return {
+        response: {
+          sessionId: result.sessionId,
+          factors: result.factors,
+        },
+      };
+    }
+
+    return { error: "Failed to send OTP email" };
   }
 
+  // For SMS OTP, we don't have challenges to set
   try {
     const response = await updateSession({
       loginName,
       sessionId,
       organization,
-      challenges,
       requestId,
     });
 

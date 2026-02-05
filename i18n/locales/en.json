@@ -191,6 +191,7 @@
     }
   },
   "mfa": {
+    "title": "Select a verification method",
     "verify": {
       "title": "Verify your identity",
       "description": "Choose one of the following authentication factors.",
@@ -204,7 +205,7 @@
       "securityKey": {
         "title": "Security key",
         "recommended": "Recommended",
-        "description": "(ex: Government-issued Yubikey, fingerprint)"
+        "description": "(ex: Government-issued Yubikey)"
       },
       "authenticator": {
         "title": "Authentication app",
@@ -213,7 +214,9 @@
       "email": {
         "title": "Email",
         "description": "(ex: One-time code via email)"
-      }
+      },
+      "byDefault": "By default",
+      "continue": "Continue"
     }
   },
   "otp": {
