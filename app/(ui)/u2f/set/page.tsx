@@ -1,7 +1,4 @@
-import { Alert } from "@clientComponents/globals";
-
 import { RegisterU2f } from "./components/register-u2f";
-import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -40,6 +37,14 @@ export default async function Page(props: {
     },
   });
 
+  if (!sessionFactors) {
+    throw new Error("No session factors found");
+  }
+
+  if (!loginName || !sessionFactors.id) {
+    throw new Error("No loginName or sessionId provided");
+  }
+
   return (
     <AuthPanel
       titleI18nKey="set.title"
@@ -59,14 +64,6 @@ export default async function Page(props: {
       )}
 
       <div className="w-full">
-        {!sessionFactors && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          </div>
-        )}
-
         {sessionFactors?.id && (
           <RegisterU2f
             loginName={loginName}

@@ -1,6 +1,4 @@
-import { Alert } from "@clientComponents/globals";
 import { LoginU2F } from "./components/login-u2f";
-import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -29,6 +27,15 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData ? { factors: sessionData.factors } : undefined;
+
+  if (!sessionFactors) {
+    throw new Error("No session factors found");
+  }
+
+  if (!loginName || !sessionFactors.factors?.user?.id) {
+    throw new Error("No loginName or sessionId provided");
+  }
+
   return (
     <AuthPanel
       titleI18nKey="verify.title"
@@ -43,11 +50,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           showDropdown
           searchParams={searchParams}
         ></UserAvatar>
-      )}
-      {!(loginName || sessionId) && (
-        <Alert.Warning>
-          <I18n i18nKey="unknownContext" namespace="error" />
-        </Alert.Warning>
       )}
       <div className="w-full">
         {(loginName || sessionId) && (

@@ -1,7 +1,5 @@
-import { Alert } from "@clientComponents/globals";
 import { ChooseSecondFactorToSetup } from "./components/choose-second-factor-to-setup";
 
-import { I18n } from "@i18n";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -54,23 +52,23 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const { valid } = isSessionValid(sessionFactors);
 
+  if (!loginName || !sessionId) {
+    throw new Error("No loginName or sessionId provided");
+  }
+
+  if (!valid || !sessionFactors.factors?.user?.id) {
+    throw new Error("Session is not valid anymore");
+  }
+
+  if (!loginSettings) {
+    throw new Error("No login settings found");
+  }
+
   return (
     <>
       <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="mfa">
         <div className="w-full">
           <div className="flex flex-col space-y-4">
-            {!(loginName || !sessionId) && (
-              <Alert.Danger>
-                <I18n i18nKey="unknownContext" namespace="error" />
-              </Alert.Danger>
-            )}
-
-            {!valid && (
-              <Alert.Warning>
-                <I18n i18nKey="sessionExpired" namespace="error" />
-              </Alert.Warning>
-            )}
-
             {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
               <ChooseSecondFactorToSetup
                 loginName={loginName}
