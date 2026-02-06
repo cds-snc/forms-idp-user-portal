@@ -222,7 +222,7 @@
   "otp": {
     "verify": {
       "title": "One-time code",
-      "otpDescription": "Enter the code from your authenticator app",
+      "authAppTitle": "Use authentication app",
       "smsDescription": "Enter the code received by text message",
       "emailDescription": "Enter the code received by email",
       "form": {

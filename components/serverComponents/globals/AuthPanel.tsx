@@ -6,6 +6,7 @@ interface AuthPanelProps {
   titleI18nKey: string;
   descriptionI18nKey: string;
   namespace: string;
+  beforeTitle?: ReactNode;
   titleData?: Record<string, string | undefined>;
   children?: ReactNode;
 }

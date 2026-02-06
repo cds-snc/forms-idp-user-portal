@@ -125,7 +125,6 @@ export function LoginOTP({
       <div className="w-full">
         <form action={formAction} noValidate>
           <CodeEntry state={state} code={code ?? ""} className="mt-8" />
-
           <div className="mt-6 flex items-center gap-4">
             <BackButton />
             <SubmitButtonAction>

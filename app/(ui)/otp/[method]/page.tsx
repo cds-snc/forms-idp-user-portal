@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { LoginOTP } from "./components/LoginOTP";
 import { I18n } from "@i18n";
@@ -10,6 +11,8 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getSerializableObject, SearchParams } from "@lib/utils";
+import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { getImageUrl } from "@lib/imageUrl";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -51,7 +54,21 @@ export default async function Page(props: {
   }).then((obj) => getSerializableObject(obj));
 
   return (
-    <div id="auth-panel">
+    <AuthPanel titleI18nKey="none" descriptionI18nKey="none" namespace="otp">
+      {method === "time-based" && (
+        <div className="mb-6 flex justify-center">
+          <Image src={getImageUrl("/img/auth-app-icon.png")} alt="" width={125} height={96} />
+        </div>
+      )}
+
+      <div className="flex justify-center">
+        <AuthPanelTitle
+          i18nKey={method === "time-based" ? "verify.authAppTitle" : "verify.title"}
+          namespace="otp"
+          data={undefined}
+        />
+      </div>
+
       {method && sessionFactors && (
         <LoginOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -70,30 +87,20 @@ export default async function Page(props: {
             </div>
           )}
 
-          <AuthPanel titleI18nKey="verify.title" descriptionI18nKey="none" namespace="otp">
-            {method === "email" && (
-              <I18n
-                i18nKey="verify.emailDescription"
-                namespace="otp"
-                tagName="p"
-                className="mb-3"
-              />
-            )}
-            {method === "time-based" && (
-              <I18n i18nKey="verify.otpDescription" namespace="otp" tagName="p" className="mb-3" />
-            )}
+          {method === "email" && (
+            <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
+          )}
 
-            {sessionFactors && (
-              <UserAvatar
-                loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-                displayName={sessionFactors.factors?.user?.displayName}
-                showDropdown
-                searchParams={searchParams}
-              />
-            )}
-          </AuthPanel>
+          {sessionFactors && (
+            <UserAvatar
+              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+              displayName={sessionFactors.factors?.user?.displayName}
+              showDropdown
+              searchParams={searchParams}
+            />
+          )}
         </LoginOTP>
       )}
-    </div>
+    </AuthPanel>
   );
 }

@@ -219,6 +219,7 @@
   "otp": {
     "verify": {
       "title": "Code à usage unique",
+      "authAppTitle": "Use authentication app [FR]",
       "otpDescription": "Entrez le code de votre application d'authentification",
       "smsDescription": "Entrez le code reçu par message texte",
       "emailDescription": "Entrez le code reçu par courriel",
