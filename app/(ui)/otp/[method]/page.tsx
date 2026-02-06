@@ -2,7 +2,6 @@ import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { LoginOTP } from "./components/LoginOTP";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getOriginalHost } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -26,7 +25,6 @@ export default async function Page(props: {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
 
   const {
     loginName, // send from password page
@@ -53,7 +51,12 @@ export default async function Page(props: {
   }).then((obj) => getSerializableObject(obj));
 
   return (
-    <div id="auth-panel">
+    <AuthPanel
+      titleI18nKey={method === "time-based" ? "verify.authAppTitle" : "verify.title"}
+      descriptionI18nKey="none"
+      namespace="otp"
+      imageSrc={method === "time-based" ? "/img/auth-app-icon.png" : undefined}
+    >
       {method && sessionFactors && (
         <LoginOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -62,7 +65,6 @@ export default async function Page(props: {
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}
-          host={host}
           code={code}
         >
           {!sessionFactors && (
@@ -73,30 +75,20 @@ export default async function Page(props: {
             </div>
           )}
 
-          <AuthPanel titleI18nKey="verify.title" descriptionI18nKey="none" namespace="otp">
-            {method === "email" && (
-              <I18n
-                i18nKey="verify.emailDescription"
-                namespace="otp"
-                tagName="p"
-                className="mb-3"
-              />
-            )}
-            {method === "time-based" && (
-              <I18n i18nKey="verify.otpDescription" namespace="otp" tagName="p" className="mb-3" />
-            )}
+          {method === "email" && (
+            <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
+          )}
 
-            {sessionFactors && (
-              <UserAvatar
-                loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-                displayName={sessionFactors.factors?.user?.displayName}
-                showDropdown
-                searchParams={searchParams}
-              />
-            )}
-          </AuthPanel>
+          {sessionFactors && (
+            <UserAvatar
+              loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+              displayName={sessionFactors.factors?.user?.displayName}
+              showDropdown
+              searchParams={searchParams}
+            />
+          )}
         </LoginOTP>
       )}
-    </div>
+    </AuthPanel>
   );
 }

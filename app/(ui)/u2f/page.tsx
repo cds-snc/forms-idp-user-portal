@@ -30,28 +30,25 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData ? { factors: sessionData.factors } : undefined;
   return (
-    <>
-      <AuthPanel
-        titleI18nKey="verify.title"
-        descriptionI18nKey="verify.description"
-        namespace="u2f"
-      >
-        {sessionFactors && (
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        )}
-
-        {!(loginName || sessionId) && (
-          <Alert.Warning>
-            <I18n i18nKey="unknownContext" namespace="error" />
-          </Alert.Warning>
-        )}
-      </AuthPanel>
-
+    <AuthPanel
+      titleI18nKey="verify.title"
+      descriptionI18nKey="none"
+      namespace="u2f"
+      imageSrc="/img/key-icon.png"
+    >
+      {sessionFactors && (
+        <UserAvatar
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+          displayName={sessionFactors.factors?.user?.displayName}
+          showDropdown
+          searchParams={searchParams}
+        ></UserAvatar>
+      )}
+      {!(loginName || sessionId) && (
+        <Alert.Warning>
+          <I18n i18nKey="unknownContext" namespace="error" />
+        </Alert.Warning>
+      )}
       <div className="w-full">
         {(loginName || sessionId) && (
           <LoginU2F
@@ -64,6 +61,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           />
         )}
       </div>
-    </>
+    </AuthPanel>
   );
 }

@@ -272,17 +272,10 @@ export function RegisterU2f({
         </div>
       )}
 
-      <div className="py-4">
-        <p className="text-sm">
-          <I18n i18nKey="set.registerInstructions" namespace="u2f" />
-        </p>
-      </div>
-
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
-
-        <span className="grow"></span>
         <SubmitButton
+          className="ml-4"
           type="button"
           loading={loading}
           disabled={loading}

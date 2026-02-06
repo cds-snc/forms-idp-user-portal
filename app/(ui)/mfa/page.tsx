@@ -1,5 +1,4 @@
 import { Alert } from "@clientComponents/globals/Alert/Alert";
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { ChooseSecondFactor } from "./components/choose-second-factor";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
@@ -8,9 +7,16 @@ import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { Metadata } from "next";
 import { serverTranslation } from "i18n/server";
 import { headers } from "next/headers";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { SearchParams } from "@lib/utils";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+
+const POSSIBLE_METHODS = [
+  AuthenticationMethodType.TOTP,
+  AuthenticationMethodType.U2F,
+  AuthenticationMethodType.OTP_EMAIL,
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -29,13 +35,13 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
+  if (!sessionFactors) {
+    throw new Error("No session factors found");
+  }
+
   return (
-    <>
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="verify.description" namespace="mfa">
       <div className="flex flex-col space-y-4">
-        <AuthPanelTitle i18nKey="set.title" namespace="mfa" />
-
-        <I18n i18nKey="verify.description" namespace="mfa" tagName="p" className="mb-6" />
-
         {sessionFactors && (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -46,27 +52,22 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         )}
       </div>
 
-      <div className="w-full">
-        {!(loginName || sessionId) && (
-          <Alert.Danger>
-            <I18n i18nKey="unknownContext" namespace="error" />
-          </Alert.Danger>
-        )}
-        {sessionFactors ? (
-          <ChooseSecondFactor
-            loginName={loginName}
-            sessionId={sessionId}
-            requestId={requestId}
-            organization={organization}
-            userMethods={sessionFactors.authMethods ?? []}
-          ></ChooseSecondFactor>
-        ) : (
-          <Alert.Warning>
-            <I18n i18nKey="verify.noResults" namespace="mfa" />
-          </Alert.Warning>
-        )}
+      {sessionFactors ? (
+        <ChooseSecondFactor
+          loginName={loginName}
+          sessionId={sessionId}
+          requestId={requestId}
+          organization={organization}
+          userMethods={sessionFactors.authMethods ?? []}
+        ></ChooseSecondFactor>
+      ) : (
+        <Alert.Warning>
+          <I18n i18nKey="verify.noResults" namespace="mfa" />
+        </Alert.Warning>
+      )}
 
-        {sessionFactors && (
+      {sessionFactors &&
+        !POSSIBLE_METHODS.every((method) => sessionFactors.authMethods?.includes(method)) && (
           <div className="mt-6">
             <Link
               href={`/mfa/set?${new URLSearchParams({
@@ -81,12 +82,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             </Link>
           </div>
         )}
-
-        <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton />
-          <span className="flex-grow"></span>
-        </div>
-      </div>
-    </>
+    </AuthPanel>
   );
 }

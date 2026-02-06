@@ -8,6 +8,8 @@ import { headers } from "next/headers";
 import { UserNameForm } from "./components/UserNameForm";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import Link from "next/dist/client/link";
+import { getMostRecentSessionCookie } from "@lib/cookies";
+import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
@@ -37,6 +39,7 @@ export default async function Page(props: {
       defaultOrganization = org.id;
     }
   }
+
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: organization ?? defaultOrganization,
@@ -51,6 +54,51 @@ export default async function Page(props: {
   }
 
   const registerLink = `/register?${registerParams.toString()}`;
+
+  let currentSession;
+  try {
+    currentSession = await getMostRecentSessionCookie();
+  } catch {
+    currentSession = null;
+  }
+
+  // Ideally this list could be simplified or moved/logic-moved into the AvatarList component
+  const accounts: AvatarListItem[] = [
+    {
+      loginName: loginName || currentSession?.loginName || "",
+      organization: organization || currentSession?.organization || "",
+      requestId: requestId || "",
+      suffix: suffix || "",
+      // TODO: probably just /accounts is fine since the info is pulled from the cookie/session on the accounts page
+      link: `/accounts?loginName=${loginName ?? currentSession?.loginName}&organization=${organization ?? currentSession?.organization}&requestId=${requestId}&suffix=${suffix}`,
+      showDropdown: false,
+    },
+    {
+      loginName: "Other account",
+      organization: "",
+      requestId: "outer-account-id",
+      suffix: "",
+      link: `/logout-session?returnUrl=/start`,
+      showDropdown: false,
+    },
+  ];
+
+  if (currentSession) {
+    return (
+      <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
+        <AvatarList avatars={accounts} />
+
+        <p className="mt-10">
+          <I18n i18nKey="register" namespace="start" />
+          &nbsp;
+          <Link href={registerLink}>
+            <I18n i18nKey="registerLinkText" namespace="start" />
+          </Link>
+          .
+        </p>
+      </AuthPanel>
+    );
+  }
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">

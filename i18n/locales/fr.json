@@ -202,17 +202,24 @@
       "securityKey": {
         "title": "Clé de sécurité",
         "recommended": "Recommandé",
-        "description": "(ex : Yubikey émise par le gouvernement, empreinte digitale)"
+        "description": "(ex : Yubikey émise par le gouvernement)"
       },
       "authenticator": {
         "title": "Application d'authentification",
         "description": "(ex : Microsoft Authenticator)"
-      }
+      },
+      "email": {
+        "title": "Courriel",
+        "description": "(ex : Code à usage unique par courriel)"
+      },
+      "byDefault": "Par défaut",
+      "continue": "Continuer"
     }
   },
   "otp": {
     "verify": {
       "title": "Code à usage unique",
+      "authAppTitle": "Use authentication app [FR]",
       "otpDescription": "Entrez le code de votre application d'authentification",
       "smsDescription": "Entrez le code reçu par message texte",
       "emailDescription": "Entrez le code reçu par courriel",
@@ -313,9 +320,7 @@
       }
     },
     "set": {
-      "title": "Configurer l'authentification à deux facteurs",
-      "description": "Configurez un appareil comme deuxième facteur.",
-      "registerInstructions": "Continuer et insérez ensuite votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
+      "title": "Activate your key [FR]",
       "submit": "Continuer"
     }
   },
