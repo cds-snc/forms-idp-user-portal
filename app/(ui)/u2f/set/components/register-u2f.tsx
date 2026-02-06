@@ -256,9 +256,9 @@ export function RegisterU2f({
             return router.push(callbackResponse.redirect);
           }
         } else {
-          // No requestId or loginName - redirect to accounts page as fallback
+          // No requestId or loginName - redirect to signed in page as fallback
           setLoading(false);
-          return router.push("/accounts");
+          return router.push("/signedin");
         }
       }
     }

@@ -1,5 +1,4 @@
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
-import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
@@ -8,6 +7,7 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,26 +16,32 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
-  const searchParams = await props.searchParams;
-
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const { loginName, requestId, organization, sessionId } = searchParams;
-
-  const sessionFactors = sessionId
-    ? await loadSessionFactorsById(serviceUrl, sessionId, organization)
-    : await loadMostRecentSession({
-        serviceUrl,
-        sessionParams: { loginName, organization },
-      });
-
+  let sessionFactors;
   let loginSettings;
-  if (!requestId) {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization,
-    });
+
+  try {
+    const searchParams = await props.searchParams;
+
+    const _headers = await headers();
+    const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+    const { loginName, requestId, organization, sessionId } = searchParams;
+
+    sessionFactors = sessionId
+      ? await loadSessionFactorsById(serviceUrl, sessionId, organization)
+      : await loadMostRecentSession({
+          serviceUrl,
+          sessionParams: { loginName, organization },
+        });
+
+    if (!requestId) {
+      loginSettings = await getLoginSettings({
+        serviceUrl,
+        organization,
+      });
+    }
+  } catch (error) {
+    redirect("/start");
   }
 
   return (
@@ -45,13 +51,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
       namespace="signedin"
       titleData={{ user: sessionFactors?.factors?.user?.displayName }}
     >
-      <UserAvatar
-        loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
-        displayName={sessionFactors?.factors?.user?.displayName}
-        showDropdown={true}
-        searchParams={searchParams}
-      />
-
       <div className="w-full">
         {loginSettings?.defaultRedirectUri && (
           <div className="mt-8 flex w-full flex-row items-center">

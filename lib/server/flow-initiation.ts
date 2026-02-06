@@ -37,7 +37,7 @@ const gotoAccounts = ({
   requestId: string;
   organization?: string;
 }): NextResponse<unknown> => {
-  const accountsUrl = constructUrl(request, "/accounts");
+  const accountsUrl = constructUrl(request, "/signedin");
 
   if (requestId) {
     accountsUrl.searchParams.set("requestId", requestId);

@@ -79,7 +79,7 @@ export default async function Page(props: {
   }
 
   const paramsToContinue = new URLSearchParams({});
-  let urlToContinue = "/accounts";
+  let urlToContinue = "/signedin";
 
   if (sessionId) {
     paramsToContinue.append("sessionId", sessionId);

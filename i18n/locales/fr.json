@@ -245,7 +245,7 @@
     }
   },
   "signedin": {
-    "title": "Bienvenue {{user}}!",
+    "title": "Bienvenue {{user}}",
     "description": "Vous êtes connecté.",
     "continue": "Continuer",
     "error": {

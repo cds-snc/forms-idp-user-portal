@@ -251,7 +251,7 @@
     }
   },
   "signedin": {
-    "title": "Welcome {{user}}!",
+    "title": "Welcome {{user}}",
     "description": "You are signed in.",
     "continue": "Continue",
     "error": {
