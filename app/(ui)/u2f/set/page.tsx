@@ -41,7 +41,12 @@ export default async function Page(props: {
   });
 
   return (
-    <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="u2f">
+    <AuthPanel
+      titleI18nKey="set.title"
+      descriptionI18nKey="none"
+      namespace="u2f"
+      imageSrc="/img/key-icon.png"
+    >
       {sessionFactors && (
         <div className="mb-6">
           <UserAvatar

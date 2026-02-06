@@ -9,9 +9,6 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { SearchParams } from "@lib/utils";
-import Image from "next/image";
-import { getImageUrl } from "@lib/imageUrl";
-import { AuthPanelTitle } from "@serverComponents/globals/AuthPanelTitle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
@@ -33,15 +30,12 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData ? { factors: sessionData.factors } : undefined;
   return (
-    <AuthPanel titleI18nKey="none" descriptionI18nKey="none" namespace="u2f">
-      <div className="mb-6 flex justify-center">
-        <Image src={getImageUrl("/img/key-icon.png")} alt="" width={125} height={96} />
-      </div>
-
-      <div className="flex justify-center">
-        <AuthPanelTitle i18nKey="verify.title" namespace="u2f" />
-      </div>
-
+    <AuthPanel
+      titleI18nKey="verify.title"
+      descriptionI18nKey="none"
+      namespace="u2f"
+      imageSrc="/img/key-icon.png"
+    >
       {sessionFactors && (
         <UserAvatar
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}

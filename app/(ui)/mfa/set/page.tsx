@@ -56,7 +56,12 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   return (
     <>
-      <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="mfa">
+      <AuthPanel
+        titleI18nKey="set.title"
+        descriptionI18nKey="set.description"
+        namespace="mfa"
+        imageSrc="/img/key-icon.png"
+      >
         <div className="w-full">
           <div className="flex flex-col space-y-4">
             {!(loginName || !sessionId) && (

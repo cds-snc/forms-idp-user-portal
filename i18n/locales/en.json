@@ -326,9 +326,7 @@
       }
     },
     "set": {
-      "title": "Set up two-factor authentication",
-      "description": "Set up a device as a second factor.",
-      "registerInstructions": "Continue and then insert your security key or use biometric authentication when prompted.",
+      "title": "Activate your key",
       "submit": "Continue"
     }
   },

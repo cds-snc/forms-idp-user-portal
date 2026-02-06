@@ -320,9 +320,7 @@
       }
     },
     "set": {
-      "title": "Configurer l'authentification à deux facteurs",
-      "description": "Configurez un appareil comme deuxième facteur.",
-      "registerInstructions": "Continuer et insérez ensuite votre clé de sécurité ou utilisez l'authentification biométrique lorsque vous y êtes invité.",
+      "title": "Activate your key [FR]",
       "submit": "Continuer"
     }
   },
