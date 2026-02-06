@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 
 ENV PORT=3000
 ENV NODE_ENV=production
@@ -13,9 +13,7 @@ RUN corepack enable
 RUN pnpm install
 RUN pnpm build
 
-
-
-FROM node:22-alpine AS final
+FROM node:24-alpine AS final
 LABEL maintainer="-"
 
 ENV NODE_ENV=production
