@@ -5,13 +5,14 @@ import { TotpRegister } from "./components/totp-register";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { addOTPEmail, addOTPSMS, getLoginSettings, registerTOTP } from "@lib/zitadel";
+import { loadMostRecentSession, loadSessionById } from "@lib/session";
+import { addOTPEmail, addOTPSMS, registerTOTP } from "@lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getSessionCredentials } from "@lib/cookies";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getSerializableObject } from "@lib/utils";
+import { getSerializableLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export default async function Page(props: {
@@ -21,16 +22,19 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const { loginName, organization, sessionId, requestId, checkAfter } = searchParams;
+  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const checkAfter = searchParams.checkAfter === "true";
+
   const { method } = params;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const loginSettings = await getLoginSettings({
+  const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
+  const loginSettings = await getSerializableLoginSettings({
     serviceUrl,
-    organization,
-  }).then((obj) => getSerializableObject(obj));
+    organizationId: sessionFactors.factors?.user?.organizationId,
+  });
 
   const session = await loadMostRecentSession({
     serviceUrl,
@@ -92,24 +96,12 @@ export default async function Page(props: {
   }
 
   if (checkAfter) {
-    if (requestId) {
-      paramsToContinue.append("requestId", requestId);
-    }
     urlToContinue = `/otp/${method}?` + paramsToContinue;
-
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
-  } else if (requestId && sessionId) {
-    if (requestId) {
-      paramsToContinue.append("authRequest", requestId);
-    }
-    urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (requestId) {
-      paramsToContinue.append("requestId", requestId);
-    }
     urlToContinue = `/signedin?` + paramsToContinue;
   }
 
@@ -133,14 +125,6 @@ export default async function Page(props: {
           </p>
         )}
 
-        {!session && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          </div>
-        )}
-
         {error && (
           <div className="py-4">
             <Alert.Warning>{error?.message}</Alert.Warning>
@@ -152,7 +136,6 @@ export default async function Page(props: {
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
             showDropdown
-            searchParams={searchParams}
           ></UserAvatar>
         )}
       </AuthPanel>
@@ -165,9 +148,8 @@ export default async function Page(props: {
               secret={totpResponse.secret as string}
               loginName={loginName}
               sessionId={sessionId}
-              requestId={requestId}
               organization={organization}
-              checkAfter={checkAfter === "true"}
+              checkAfter={checkAfter}
               loginSettings={loginSettings}
             ></TotpRegister>
           </div>
