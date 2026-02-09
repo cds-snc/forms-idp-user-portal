@@ -1,15 +1,17 @@
 "use server";
 
-import { getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
+import { getSession, getLoginSettings, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 import { create } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Duration } from "@zitadel/proto/google/protobuf/duration_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
 import { continueWithSession } from "./session";
+import { setSessionAndUpdateCookie } from "./cookie";
 import { U2F_ERRORS } from "./u2f-errors";
 
 type RegisterU2FCommand = {
@@ -170,6 +172,7 @@ export async function verifyU2FLogin({
   loginName,
   sessionId,
   organization,
+  checks,
   requestId,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
@@ -186,15 +189,28 @@ export async function verifyU2FLogin({
     return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
-  const session = await getSession({
+  // Get login settings to determine lifetime
+  const loginSettings = await getLoginSettings({
     serviceUrl,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
+    organization,
   });
 
-  if (!session?.session) {
+  const lifetime = loginSettings?.multiFactorCheckLifetime ?? {
+    seconds: BigInt(60 * 60 * 24), // default to 24 hours
+    nanos: 0,
+  };
+
+  // Actually verify the U2F credential by updating the session with the checks
+  const updatedSession = await setSessionAndUpdateCookie({
+    recentCookie: sessionCookie,
+    checks,
+    requestId,
+    lifetime: lifetime as Duration,
+  });
+
+  if (!updatedSession) {
     return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
   }
 
-  return continueWithSession({ ...session.session, requestId });
+  return continueWithSession({ ...updatedSession, requestId });
 }
