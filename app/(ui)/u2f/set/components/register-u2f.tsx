@@ -32,7 +32,6 @@ type CredentialOptionsData =
 type Props = {
   loginName?: string;
   sessionId: string;
-  requestId?: string;
   organization?: string;
   checkAfter: boolean;
   loginSettings?: LoginSettings;
@@ -42,7 +41,6 @@ export function RegisterU2f({
   loginName,
   sessionId,
   organization,
-  requestId,
   checkAfter,
   loginSettings,
 }: Props) {
@@ -203,43 +201,9 @@ export function RegisterU2f({
       }
 
       if (checkAfter) {
-        const paramsToContinue = new URLSearchParams({});
-
-        if (sessionId) {
-          paramsToContinue.append("sessionId", sessionId);
-        }
-        if (loginName) {
-          paramsToContinue.append("loginName", loginName);
-        }
-        if (organization) {
-          paramsToContinue.append("organization", organization);
-        }
-        if (requestId) {
-          paramsToContinue.append("requestId", requestId);
-        }
-
-        return router.push(`/u2f?` + paramsToContinue);
+        return router.push(`/u2f`);
       } else {
-        if (requestId && sessionId) {
-          const callbackResponse = await completeFlowOrGetUrl(
-            {
-              sessionId: sessionId,
-              requestId: requestId,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri
-          );
-
-          if ("error" in callbackResponse) {
-            setError(callbackResponse.error);
-            setLoading(false);
-            return;
-          }
-
-          if ("redirect" in callbackResponse) {
-            return router.push(callbackResponse.redirect);
-          }
-        } else if (loginName) {
+        if (loginName) {
           const callbackResponse = await completeFlowOrGetUrl(
             {
               loginName: loginName,
@@ -257,7 +221,6 @@ export function RegisterU2f({
             return router.push(callbackResponse.redirect);
           }
         } else {
-          // No requestId or loginName - redirect to signed in page as fallback
           setLoading(false);
           return router.push("/signedin");
         }
