@@ -11,7 +11,6 @@ import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 type Props = {
   loginName?: string;
   sessionId?: string;
-  requestId?: string;
   organization?: string;
   checkAfter: boolean;
   phoneVerified?: boolean;
@@ -22,7 +21,6 @@ type Props = {
 export function ChooseSecondFactorToSetup({
   loginName,
   sessionId,
-  requestId,
   organization,
   checkAfter,
 }: Props) {
@@ -39,9 +37,7 @@ export function ChooseSecondFactorToSetup({
   if (sessionId) {
     params.append("sessionId", sessionId);
   }
-  if (requestId) {
-    params.append("requestId", requestId);
-  }
+
   if (organization) {
     params.append("organization", organization);
   }

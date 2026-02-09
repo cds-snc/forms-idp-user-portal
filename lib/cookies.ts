@@ -343,3 +343,21 @@ export async function getMostRecentCookieWithLoginname<T>({
     return Promise.reject("Could not read session cookie");
   }
 }
+
+/**
+ * Get session credentials from the http-only session cookie
+ * @param organizationOverride optional organization to override the cookie's organization
+ * @returns sessionId, loginName, and organization
+ */
+export async function getSessionCredentials(organizationOverride?: string) {
+  try {
+    const sessionCookie = await getMostRecentSessionCookie();
+    return {
+      sessionId: sessionCookie.id,
+      loginName: sessionCookie.loginName,
+      organization: organizationOverride || sessionCookie.organization,
+    };
+  } catch (error) {
+    throw new Error("No session found in cookies");
+  }
+}

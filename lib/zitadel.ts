@@ -39,6 +39,7 @@ import { serverTranslation } from "@i18n/server";
 import { getUserAgent } from "./fingerprint";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
+import { getSerializableObject } from "./utils";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -122,6 +123,25 @@ export async function getLoginSettings({
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
+}
+
+export async function getSerializableLoginSettings({
+  serviceUrl,
+  organizationId,
+}: {
+  serviceUrl: string;
+  organizationId?: string;
+}) {
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization: organizationId,
+  }).then((obj) => getSerializableObject(obj));
+
+  if (!loginSettings) {
+    throw new Error("No login settings found");
+  }
+
+  return loginSettings;
 }
 
 export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
