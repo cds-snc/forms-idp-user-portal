@@ -147,6 +147,8 @@ export function RegisterU2f({
       if (options.publicKey.excludeCredentials) {
         options.publicKey.excludeCredentials.map((cred: PublicKeyCredentialDescriptor) => {
           cred.id = coerceToArrayBuffer(cred.id as unknown as string, "excludeCredentials.id");
+          // Only allow hardware key transports (USB, NFC, BLE) - excludes platform/internal transports
+          cred.transports = ["usb", "ble", "nfc"] as AuthenticatorTransport[];
           return cred;
         });
       }

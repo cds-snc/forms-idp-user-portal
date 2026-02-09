@@ -164,6 +164,8 @@ export function LoginU2F({
     if (publicKey.allowCredentials) {
       publicKey.allowCredentials.map((listItem: PublicKeyCredentialDescriptor) => {
         listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
+        // Only allow hardware key transports (USB, NFC, BLE) - excludes platform/internal transports
+        listItem.transports = ["usb", "ble", "nfc"] as AuthenticatorTransport[];
       });
     }
 
