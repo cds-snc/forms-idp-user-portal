@@ -10,17 +10,41 @@ import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
 import { continueWithSession } from "./session";
+import { U2F_ERRORS } from "./u2f-errors";
 
 type RegisterU2FCommand = {
   sessionId: string;
 };
 
+type PublicKeyCredentialJSON = {
+  id: string;
+  rawId: string;
+  type: string;
+  response: {
+    attestationObject: string;
+    clientDataJSON: string;
+  };
+};
+
 type VerifyU2FCommand = {
   u2fId: string;
   passkeyName?: string;
-  publicKeyCredential: any;
+  publicKeyCredential: PublicKeyCredentialJSON;
   sessionId: string;
 };
+
+interface ProtobufMessage {
+  toJson(): unknown;
+}
+
+function isProtobufMessage(obj: unknown): obj is ProtobufMessage {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "toJson" in obj &&
+    typeof (obj as Record<string, unknown>).toJson === "function"
+  );
+}
 
 export async function addU2F(command: RegisterU2FCommand) {
   const _headers = await headers();
@@ -32,7 +56,7 @@ export async function addU2F(command: RegisterU2FCommand) {
   });
 
   if (!sessionCookie) {
-    return { error: "Could not get session" };
+    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
   const session = await getSession({
@@ -50,7 +74,7 @@ export async function addU2F(command: RegisterU2FCommand) {
   const userId = session?.session?.factors?.user?.id;
 
   if (!session || !userId) {
-    return { error: "Could not get session" };
+    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
   const result = await registerU2F({ serviceUrl, userId, domain: hostname });
@@ -58,11 +82,11 @@ export async function addU2F(command: RegisterU2FCommand) {
   // The publicKeyCredentialCreationOptions is a structpb.Struct
   // We need to use toJson() to get a plain object
   const options = result.publicKeyCredentialCreationOptions;
-  let serializedOptions = null;
+  let serializedOptions: unknown = null;
 
-  if (options && typeof (options as any).toJson === "function") {
+  if (isProtobufMessage(options)) {
     // Use protobuf's toJson() method
-    serializedOptions = (options as any).toJson();
+    serializedOptions = options.toJson();
   } else if (options) {
     // Fallback to JSON serialization
     serializedOptions = JSON.parse(JSON.stringify(options));
@@ -79,6 +103,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   let passkeyName = command.passkeyName;
+
   if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
@@ -94,7 +119,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   });
 
   if (!sessionCookie) {
-    return { error: "Could not get session cookie" };
+    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
   const session = await getSession({
@@ -106,7 +131,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   const userId = session?.session?.factors?.user?.id;
 
   if (!userId) {
-    return { error: "Could not get session" };
+    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
   const request = create(VerifyU2FRegistrationRequestSchema, {
@@ -116,14 +141,28 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  return verifyU2FRegistration({ serviceUrl, request });
+  const result = await verifyU2FRegistration({ serviceUrl, request });
+
+  // Check if the error is due to credential already being registered
+  if (result && "error" in result && result.error) {
+    const errorMessage = String(result.error).toLowerCase();
+    if (
+      errorMessage.includes("already") ||
+      errorMessage.includes("duplicate") ||
+      errorMessage.includes("exists")
+    ) {
+      return { error: U2F_ERRORS.CREDENTIAL_ALREADY_REGISTERED };
+    }
+  }
+
+  return result;
 }
 
 type VerifyU2FLoginCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
-  checks: Checks;
+  checks?: Checks;
   requestId?: string;
 };
 
@@ -131,7 +170,6 @@ export async function verifyU2FLogin({
   loginName,
   sessionId,
   organization,
-  checks,
   requestId,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
@@ -145,7 +183,7 @@ export async function verifyU2FLogin({
   }
 
   if (!sessionCookie) {
-    return { error: "Could not get session" };
+    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
   const session = await getSession({
@@ -155,7 +193,7 @@ export async function verifyU2FLogin({
   });
 
   if (!session?.session) {
-    return { error: "Session verification failed" };
+    return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
   }
 
   return continueWithSession({ ...session.session, requestId });

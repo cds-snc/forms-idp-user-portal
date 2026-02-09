@@ -327,7 +327,17 @@
     },
     "set": {
       "title": "Activate your key",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "sessionNotFound": "Session not found. Please start again.",
+        "credentialRegistrationFailed": "Failed to register your security key. Please try again.",
+        "credentialCreationFailed": "Failed to create credential. Please try again.",
+        "invalidCredentialOptions": "Invalid credential options received. Please try again.",
+        "verificationFailed": "Could not verify security key. Please try again.",
+        "verificationCancelled": "Security key verification was cancelled.",
+        "sessionVerificationFailed": "Session verification failed. Please start again.",
+        "credentialAlreadyRegistered": "You already registered this device. You don't have to register it again."
+      }
     }
   },
   "verify": {

@@ -320,8 +320,18 @@
       }
     },
     "set": {
-      "title": "Activate your key [FR]",
-      "submit": "Continuer"
+      "title": "Activez votre clé",
+      "submit": "Continuer",
+      "errors": {
+        "sessionNotFound": "Session non trouvée. Veuillez recommencer.",
+        "credentialRegistrationFailed": "Impossible d'enregistrer votre clé de sécurité. Veuillez réessayer.",
+        "credentialCreationFailed": "Impossible de créer les identifiants. Veuillez réessayer.",
+        "invalidCredentialOptions": "Options d'identifiants invalides reçues. Veuillez réessayer.",
+        "verificationFailed": "Impossible de vérifier la clé de sécurité. Veuillez réessayer.",
+        "verificationCancelled": "La vérification de la clé de sécurité a été annulée.",
+        "sessionVerificationFailed": "La vérification de la session a échoué. Veuillez recommencer.",
+        "credentialAlreadyRegistered": "Vous avez déjà enregistré cet appareil. Vous n'avez pas besoin de l'enregistrer à nouveau."
+      }
     }
   },
   "verify": {

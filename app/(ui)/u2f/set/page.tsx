@@ -45,27 +45,21 @@ export default async function Page(props: {
       namespace="u2f"
       imageSrc="/img/key-icon.png"
     >
-      {sessionFactors && (
-        <div className="mb-6">
-          <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
-          ></UserAvatar>
-        </div>
-      )}
-
-      <div className="w-full">
-        {sessionFactors?.id && (
-          <RegisterU2f
-            loginName={loginName}
-            sessionId={sessionFactors.id}
-            organization={organization}
-            checkAfter={checkAfter === "true"}
-            loginSettings={loginSettings}
-          />
-        )}
+      <div className="mb-6">
+        <UserAvatar
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+          displayName={sessionFactors.factors?.user?.displayName}
+          showDropdown={false}
+        ></UserAvatar>
       </div>
+
+      <RegisterU2f
+        loginName={loginName}
+        sessionId={sessionFactors.id}
+        organization={organization}
+        checkAfter={checkAfter === "true"}
+        loginSettings={loginSettings}
+      />
     </AuthPanel>
   );
 }
