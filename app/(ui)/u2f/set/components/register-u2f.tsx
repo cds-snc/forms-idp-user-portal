@@ -13,7 +13,7 @@ import { SubmitButton } from "@clientComponents/globals/Buttons";
 import { I18n } from "@i18n";
 
 type PublicKeyCredentialJSON = {
-  id: string | ArrayBuffer;
+  id: string;
   rawId: string;
   type: string;
   response: {
@@ -47,9 +47,7 @@ export function RegisterU2f({
   loginSettings,
 }: Props) {
   const [error, setError] = useState<string>("");
-
   const [loading, setLoading] = useState<boolean>(false);
-
   const router = useRouter();
 
   async function submitVerify(
@@ -60,6 +58,7 @@ export function RegisterU2f({
   ) {
     setError("");
     setLoading(true);
+
     const response = await verifyU2F({
       u2fId,
       passkeyName,
@@ -67,7 +66,7 @@ export function RegisterU2f({
       sessionId,
     })
       .catch(() => {
-        setError("An error on verifying passkey occurred");
+        setError("set.errors.verificationFailed");
         return;
       })
       .finally(() => {
@@ -85,11 +84,12 @@ export function RegisterU2f({
   async function submitRegisterAndContinue(): Promise<boolean | void | null> {
     setError("");
     setLoading(true);
+
     const response = await addU2F({
       sessionId,
     })
-      .catch((err) => {
-        setError("An error on registering passkey: " + err.message);
+      .catch(() => {
+        setError("set.errors.credentialRegistrationFailed");
         return;
       })
       .finally(() => {
@@ -102,7 +102,7 @@ export function RegisterU2f({
     }
 
     if (!response || !("u2fId" in response)) {
-      setError("An error on registering passkey");
+      setError("set.errors.credentialRegistrationFailed");
       return;
     }
 
@@ -123,7 +123,7 @@ export function RegisterU2f({
     }
 
     if (!credentialOptions || !credentialOptions.publicKey) {
-      setError("Invalid credential options received");
+      setError("set.errors.invalidCredentialOptions");
       return;
     }
 
@@ -162,7 +162,7 @@ export function RegisterU2f({
 
         resp = (await Promise.race([createPromise, timeoutPromise])) as PublicKeyCredential;
       } catch (credError) {
-        setError("Failed to create credentials: " + (credError as Error).message);
+        setError("set.errors.credentialCreationFailed");
         setLoading(false);
         return;
       }
@@ -174,7 +174,7 @@ export function RegisterU2f({
         !("clientDataJSON" in resp.response) ||
         !("id" in resp)
       ) {
-        setError("An error on registering passkey");
+        setError("set.errors.credentialRegistrationFailed");
         return;
       }
 
@@ -196,7 +196,7 @@ export function RegisterU2f({
       const submitResponse = await submitVerify(u2fId, "", data, sessionId);
 
       if (!submitResponse) {
-        setError("An error on verifying passkey");
+        setError("set.errors.verificationFailed");
         setLoading(false);
         return;
       }
@@ -265,10 +265,12 @@ export function RegisterU2f({
   }
 
   return (
-    <form className="w-full" onSubmit={(e) => e.preventDefault()}>
+    <form onSubmit={(e) => e.preventDefault()}>
       {error && (
-        <div className="py-4">
-          <Alert type={ErrorStatus.ERROR}>{error}</Alert>
+        <div>
+          <Alert type={ErrorStatus.ERROR}>
+            <I18n i18nKey={error} namespace="u2f" />
+          </Alert>
         </div>
       )}
 

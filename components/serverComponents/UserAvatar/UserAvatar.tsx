@@ -6,28 +6,9 @@ type Props = {
   loginName?: string;
   displayName?: string;
   showDropdown: boolean;
-  searchParams?: Record<string | number | symbol, string | undefined>;
 };
 
-export function UserAvatar({ loginName, displayName, showDropdown, searchParams }: Props) {
-  const params = new URLSearchParams({});
-
-  if (searchParams?.sessionId) {
-    params.set("sessionId", searchParams.sessionId);
-  }
-
-  if (searchParams?.organization) {
-    params.set("organization", searchParams.organization);
-  }
-
-  if (searchParams?.requestId) {
-    params.set("requestId", searchParams.requestId);
-  }
-
-  if (searchParams?.loginName) {
-    params.set("loginName", searchParams.loginName);
-  }
-
+export function UserAvatar({ loginName, displayName, showDropdown }: Props) {
   return (
     <div className="flex h-full flex-row items-center rounded-3xl border-2 border-gcds-grayscale-300 p-2">
       {/* <div> */}
@@ -37,7 +18,7 @@ export function UserAvatar({ loginName, displayName, showDropdown, searchParams 
       <span className="grow"></span>
       {showDropdown && (
         <Link
-          href={"/signedin?" + params}
+          href={"/signedin"}
           className={`ml-4 mr-1 flex items-center justify-center p-1 transition-all hover:bg-black/10 dark:hover:bg-white/10 `}
         >
           <ChevronDown className="size-4" />

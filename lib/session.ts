@@ -1,4 +1,4 @@
-import { timestampDate } from "@zitadel/client";
+import { timestampDate, Timestamp } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -12,6 +12,23 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "../lib/zitadel";
+
+export function checkSessionFactorValidity(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+  const stillValid = session.expirationDate
+    ? timestampDate(session.expirationDate) > new Date()
+    : true;
+
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
+
+  return { valid, verifiedAt };
+}
 
 type LoadMostRecentSessionParams = {
   serviceUrl: string;

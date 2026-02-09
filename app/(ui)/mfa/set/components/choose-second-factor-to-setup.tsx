@@ -9,23 +9,11 @@ import { Button } from "@clientComponents/globals/Buttons";
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 
 type Props = {
-  loginName?: string;
-  sessionId?: string;
-  requestId?: string;
-  organization?: string;
   checkAfter: boolean;
-  phoneVerified?: boolean;
-  emailVerified?: boolean;
   force?: boolean;
 };
 
-export function ChooseSecondFactorToSetup({
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  checkAfter,
-}: Props) {
+export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
   const router = useRouter();
   const { t } = useTranslation("mfa");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -33,18 +21,6 @@ export function ChooseSecondFactorToSetup({
 
   const params = new URLSearchParams({});
 
-  if (loginName) {
-    params.append("loginName", loginName);
-  }
-  if (sessionId) {
-    params.append("sessionId", sessionId);
-  }
-  if (requestId) {
-    params.append("requestId", requestId);
-  }
-  if (organization) {
-    params.append("organization", organization);
-  }
   if (checkAfter) {
     params.append("checkAfter", "true");
   }
@@ -117,7 +93,7 @@ export function ChooseSecondFactorToSetup({
             true,
             "/img/email_24px.png",
             t("set.email.description"),
-            "/otp/email/set?" + params
+            "/otp/email/set" + params
           )}
 
         {/* Authentication App - TOTP */}
