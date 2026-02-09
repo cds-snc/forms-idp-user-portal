@@ -9,7 +9,7 @@ import { userAgent } from "next/server";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
-import { continueWithSession } from "./session";
+import { updateSession, continueWithSession, ContinueWithSessionCommand } from "./session";
 import { U2F_ERRORS } from "./u2f-errors";
 
 type RegisterU2FCommand = {
@@ -171,6 +171,7 @@ export async function verifyU2FLogin({
   sessionId,
   organization,
   requestId,
+  checks,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -196,5 +197,19 @@ export async function verifyU2FLogin({
     return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
   }
 
-  return continueWithSession({ ...session.session, requestId });
+  // Verify the U2F assertion by updating the session with the checks
+  const updatedSession = await updateSession({
+    sessionId,
+    organization,
+    checks,
+    requestId,
+  });
+
+  if (!updatedSession || ("error" in updatedSession && updatedSession.error)) {
+    return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
+  }
+
+  // Extract the session data (exclude error property if present)
+  const { error, ...sessionData } = updatedSession;
+  return continueWithSession({ ...sessionData, requestId } as ContinueWithSessionCommand);
 }
