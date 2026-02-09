@@ -84,7 +84,6 @@ export default async function Page(props: {
               loginName={loginName ?? sessionFactors.factors?.user?.loginName}
               displayName={sessionFactors.factors?.user?.displayName}
               showDropdown
-              searchParams={searchParams}
             />
           )}
         </LoginOTP>

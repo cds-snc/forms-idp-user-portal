@@ -17,6 +17,15 @@ import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { SubmitButton, Button } from "@clientComponents/globals/Buttons";
 
+type PublicKeyCredentialRequestOptionsData = {
+  challenge: BufferSource | string;
+  timeout?: number;
+  rpId?: string;
+  allowCredentials?: PublicKeyCredentialDescriptor[];
+  userVerification?: "required" | "preferred" | "discouraged";
+  [key: string]: unknown;
+};
+
 // either loginName or sessionId must be provided
 type Props = {
   loginName?: string;
@@ -57,7 +66,7 @@ export function LoginU2F({
             return;
           }
 
-          return submitLoginAndContinue(pK)
+          return submitLoginAndContinue(pK as PublicKeyCredentialRequestOptionsData)
             .catch((error) => {
               setError(error);
               return;
@@ -148,27 +157,33 @@ export function LoginU2F({
     }
   }
 
-  async function submitLoginAndContinue(publicKey: any): Promise<boolean | void> {
+  async function submitLoginAndContinue(
+    publicKey: PublicKeyCredentialRequestOptionsData
+  ): Promise<boolean | void> {
     publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
-    publicKey.allowCredentials.map((listItem: any) => {
-      listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
-    });
+    if (publicKey.allowCredentials) {
+      publicKey.allowCredentials.map((listItem: PublicKeyCredentialDescriptor) => {
+        listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
+      });
+    }
 
     return navigator.credentials
       .get({
         publicKey,
-      })
-      .then((assertedCredential: any) => {
-        if (!assertedCredential) {
+      } as CredentialRequestOptions)
+      .then((credential: Credential | null) => {
+        if (!credential) {
           setError(t("verify.errors.couldNotRetrievePasskey"));
           return;
         }
 
-        const authData = new Uint8Array(assertedCredential.response.authenticatorData);
-        const clientDataJSON = new Uint8Array(assertedCredential.response.clientDataJSON);
+        const assertedCredential = credential as PublicKeyCredential;
+        const assertionResponse = assertedCredential.response as AuthenticatorAssertionResponse;
+        const authData = new Uint8Array(assertionResponse.authenticatorData);
+        const clientDataJSON = new Uint8Array(assertionResponse.clientDataJSON);
         const rawId = new Uint8Array(assertedCredential.rawId);
-        const sig = new Uint8Array(assertedCredential.response.signature);
-        const userHandle = new Uint8Array(assertedCredential.response.userHandle);
+        const sig = new Uint8Array(assertionResponse.signature);
+        const userHandle = new Uint8Array(assertionResponse.userHandle || []);
         const data = {
           id: assertedCredential.id,
           rawId: coerceToBase64Url(rawId, "rawId"),
@@ -183,7 +198,7 @@ export function LoginU2F({
 
         return submitLogin(data);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         // Handle U2F verification cancellation or errors
         if (error?.name === "NotAllowedError") {
           setError(t("verify.errors.verificationCancelled"));
@@ -257,7 +272,7 @@ export function LoginU2F({
 
             setLoading(true);
 
-            return submitLoginAndContinue(pK)
+            return submitLoginAndContinue(pK as PublicKeyCredentialRequestOptionsData)
               .catch((error) => {
                 setError(error);
                 return;
