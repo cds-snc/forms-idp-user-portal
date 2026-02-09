@@ -321,6 +321,8 @@
     },
     "set": {
       "title": "Activez votre clé",
+      "label": "Nommez",
+      "hint": "Donnez un nom à votre clé",
       "submit": "Continuer",
       "errors": {
         "sessionNotFound": "Session non trouvée. Veuillez recommencer.",

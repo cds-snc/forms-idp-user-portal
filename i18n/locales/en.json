@@ -327,6 +327,8 @@
     },
     "set": {
       "title": "Activate your key",
+      "label": "Name",
+      "hint": "Give your key a name",
       "submit": "Continue",
       "errors": {
         "sessionNotFound": "Session not found. Please start again.",

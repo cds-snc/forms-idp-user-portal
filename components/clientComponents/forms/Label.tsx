@@ -37,7 +37,7 @@ export const Label = (props: LabelProps): React.ReactElement => {
         </span>
       )}
 
-      {hint && <span className="gcds-hint">{hint}</span>}
+      {hint && hint}
     </>
   );
 

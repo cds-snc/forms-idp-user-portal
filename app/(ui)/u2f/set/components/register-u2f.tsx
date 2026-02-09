@@ -8,7 +8,7 @@ import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButton } from "@clientComponents/globals/Buttons";
 import { I18n } from "@i18n";
 
@@ -47,6 +47,7 @@ export function RegisterU2f({
   loginSettings,
 }: Props) {
   const [error, setError] = useState<string>("");
+  const [keyName, setKeyName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -193,7 +194,7 @@ export function RegisterU2f({
         },
       };
 
-      const submitResponse = await submitVerify(u2fId, "", data, sessionId);
+      const submitResponse = await submitVerify(u2fId, keyName, data, sessionId);
 
       if (!submitResponse) {
         setError("set.errors.verificationFailed");
@@ -273,6 +274,31 @@ export function RegisterU2f({
           </Alert>
         </div>
       )}
+
+      <div className="mb-4">
+        <div className="gcds-input-wrapper">
+          <Label
+            id={"label-keyName"}
+            htmlFor={"keyName"}
+            hint={
+              <I18n
+                i18nKey="set.hint"
+                namespace="u2f"
+                tagName="div"
+                className="text-base font-normal text-gcds-grayscale-500"
+              />
+            }
+          >
+            <I18n i18nKey="set.label" namespace="u2f" />
+          </Label>
+          <TextInput
+            id={"keyName"}
+            type="text"
+            onChange={(e) => setKeyName((e.target as HTMLInputElement).value)}
+            placeholder="e.g., My YubiKey"
+          />
+        </div>
+      </div>
 
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
