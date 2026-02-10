@@ -162,8 +162,9 @@ type VerifyU2FLoginCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
-  checks?: Checks;
+  checks: Checks;
   requestId?: string;
+  redirect?: string | null;
 };
 
 export async function verifyU2FLogin({
@@ -172,6 +173,7 @@ export async function verifyU2FLogin({
   organization,
   requestId,
   checks,
+  redirect,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -211,5 +213,5 @@ export async function verifyU2FLogin({
 
   // Extract the session data (exclude error property if present)
   const { error, ...sessionData } = updatedSession;
-  return continueWithSession({ ...sessionData, requestId } as ContinueWithSessionCommand);
+  return continueWithSession({ ...sessionData, requestId, redirect } as ContinueWithSessionCommand);
 }

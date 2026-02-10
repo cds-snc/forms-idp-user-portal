@@ -24,6 +24,7 @@ type SubmitCodeParams = {
   organization?: string;
   requestId?: string;
   method: string;
+  redirect?: string | null;
 };
 
 type SessionResponse = {
@@ -139,6 +140,7 @@ export async function handleOTPFormSubmit(
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Use unified approach that handles both OIDC/SAML and regular flows
+    const redirectUrl = submitParams.redirect || loginSettings?.defaultRedirectUri;
     const callbackResponse = await completeFlowOrGetUrl(
       submitParams.requestId && response.sessionId
         ? {
@@ -150,7 +152,7 @@ export async function handleOTPFormSubmit(
             loginName: response.factors.user.loginName,
             organization: response.factors.user.organizationId,
           },
-      loginSettings?.defaultRedirectUri
+      redirectUrl
     );
 
     if ("error" in callbackResponse) {

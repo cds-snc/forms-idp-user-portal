@@ -351,7 +351,8 @@
       "length": "Doit contenir 6 caractères"
     },
     "errors": {
-      "couldNotVerifyEmail": "Problème de vérification du courriel"
+      "couldNotVerifyEmail": "Problème de vérification du courriel",
+      "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer."
     }
   }
 }

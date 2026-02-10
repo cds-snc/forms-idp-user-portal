@@ -34,6 +34,7 @@ type Props = {
   altPassword: boolean;
   login?: boolean;
   organization?: string;
+  redirect?: string | null;
 };
 
 export function LoginU2F({
@@ -43,6 +44,7 @@ export function LoginU2F({
   altPassword,
   organization,
   login = true,
+  redirect,
 }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -131,6 +133,7 @@ export function LoginU2F({
         webAuthN: { credentialAssertionData: data },
       } as Checks,
       requestId,
+      redirect,
     })
       .catch(() => {
         setError(t("verify.errors.couldNotVerifyPasskey"));
