@@ -24,6 +24,7 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
+  redirect,
   children,
 }: {
   loginName?: string; // either loginName or sessionId must be provided
@@ -33,6 +34,7 @@ export function LoginOTP({
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
+  redirect?: string | null;
   children?: React.ReactNode;
 }) {
   const {
@@ -79,6 +81,7 @@ export function LoginOTP({
       requestId,
       method,
       loginSettings,
+      redirect,
       t,
     });
 
