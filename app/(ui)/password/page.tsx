@@ -1,40 +1,27 @@
-import { Alert, ErrorStatus } from "@clientComponents/forms/Alert";
-import { getSerializableObject } from "@lib/utils";
 import { PasswordForm } from "./components/PasswordForm";
-import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getDefaultOrg, getLoginSettings } from "@lib/zitadel";
+import { getSerializableLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { getSessionCredentials } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
-  const searchParams = await props.searchParams;
-  const { loginName, organization, requestId } = searchParams;
-
+export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
+  const { loginName, organization } = await getSessionCredentials();
 
-    if (org) {
-      defaultOrganization = org.id;
-    }
+  if (!loginName) {
+    throw new Error("No login name found in session");
   }
 
   // also allow no session to be found (ignoreUnkownUsername)
@@ -52,10 +39,10 @@ export default async function Page(props: {
     console.warn(error);
   }
 
-  const loginSettings = await getLoginSettings({
+  const loginSettings = await getSerializableLoginSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
-  }).then((obj) => getSerializableObject(obj));
+    organizationId: organization,
+  });
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="password">
@@ -70,23 +57,11 @@ export default async function Page(props: {
       )}
 
       <div>
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
-          <div className="py-4">
-            <Alert type={ErrorStatus.ERROR}>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert>
-          </div>
-        )}
-
-        {loginName && (
-          <PasswordForm
-            loginName={loginName}
-            requestId={requestId}
-            organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-            loginSettings={loginSettings}
-          />
-        )}
+        <PasswordForm
+          loginName={loginName}
+          organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+          loginSettings={loginSettings}
+        />
       </div>
     </AuthPanel>
   );

@@ -3,12 +3,13 @@
 import { useActionState, useEffect } from "react";
 import { Alert, Label, TextInput, ErrorStatus } from "@clientComponents/forms";
 import { useTranslation } from "@i18n/client";
-import { sendLoginname } from "@lib/server/username";
+
 import { useRouter } from "next/navigation";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { validateUsername } from "@lib/validationSchemas";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { sendLoginname } from "@lib/server/username";
 
 type Props = {
   loginName: string | undefined;
