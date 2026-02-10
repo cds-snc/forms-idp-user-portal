@@ -8,6 +8,7 @@ import {
   sendEmailCodeWithReturn,
   verifyEmail,
   verifyTOTPRegistration,
+  addOTPEmail,
 } from "@lib/zitadel";
 import crypto from "crypto";
 import { GCNotifyConnector } from "@gcforms/connectors";
@@ -15,11 +16,13 @@ import { GCNotifyConnector } from "@gcforms/connectors";
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
+import { logMessage } from "../../lib/logger";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
@@ -66,7 +69,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     userId: command.userId,
     verificationCode: command.code,
   }).catch((error) => {
-    console.warn(error);
+    logMessage.error({ error }, "Failed to verify email");
     return { error: t("errors.couldNotVerifyEmail") };
   });
 
@@ -76,6 +79,17 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   if (!verifyResponse) {
     return { error: t("errors.couldNotVerify") };
+  }
+
+  // Automatically add OTPEmail as an authentication method after email verification
+  try {
+    await addOTPEmail({
+      serviceUrl,
+      userId: command.userId,
+    });
+  } catch (error) {
+    logMessage.error({ error }, "Failed to add OTPEmail");
+    return { error: t("errors.failedToAddOTPEmail") };
   }
 
   let session: Session | undefined;
@@ -93,8 +107,8 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: "loginName" in command ? command.loginName : user.preferredLoginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error); // checked later
+  }).catch(() => {
+    // Ignored error, checked later
   });
 
   if (sessionCookie) {
@@ -119,12 +133,15 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: t("errors.couldNotLoadAuthenticators") };
   }
 
-  // if no authmethods are found on the user, redirect to set one up
-  if (
-    authMethodResponse &&
-    authMethodResponse.authMethodTypes &&
-    authMethodResponse.authMethodTypes.length == 0
-  ) {
+  // Filter to check if user has U2F or TOTP (OTPEmail alone is not sufficient)
+  const hasStrongMFA =
+    authMethodResponse.authMethodTypes?.some(
+      (method) =>
+        method === AuthenticationMethodType.U2F || method === AuthenticationMethodType.TOTP
+    ) || false;
+
+  // If user doesn't have U2F or TOTP, redirect them to set one up
+  if (!hasStrongMFA) {
     if (!sessionCookie) {
       const checks = create(ChecksSchema, {
         user: {
@@ -142,18 +159,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     if (!session) {
+      logMessage.error({ userId: command.userId }, "Failed to create session for MFA setup");
       return { error: t("errors.couldNotCreateSession") };
     }
 
-    const params = new URLSearchParams({
-      sessionId: session.id,
-    });
-
-    if (session.factors?.user?.loginName) {
-      params.set("loginName", session.factors?.user?.loginName);
-    }
-
-    // set hash of userId and userAgentId to prevent attacks, checks are done for users with invalid sessions and invalid userAgentId
+    // set hash of userId and userAgentId to prevent attacks
     const cookiesList = await cookies();
     const userAgentId = await getOrSetFingerprintId();
 
@@ -170,32 +180,12 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       maxAge: 300, // 5 minutes
     });
 
-    return { redirect: `/authenticator/set?${params}` };
+    return { redirect: `/mfa/set` };
   }
 
-  // if no session found only show success page,
-  // if user is invited, recreate invite flow to not depend on session
+  // Session required to proceed with MFA verification
   if (!session?.factors?.user?.id) {
-    const verifySuccessParams = new URLSearchParams({});
-
-    if (command.userId) {
-      verifySuccessParams.set("userId", command.userId);
-    }
-
-    if (("loginName" in command && command.loginName) || user.preferredLoginName) {
-      verifySuccessParams.set(
-        "loginName",
-        "loginName" in command && command.loginName ? command.loginName : user.preferredLoginName
-      );
-    }
-    if (command.requestId) {
-      verifySuccessParams.set("requestId", command.requestId);
-    }
-    if (command.organization) {
-      verifySuccessParams.set("organization", command.organization);
-    }
-
-    return { redirect: `/verify/success?${verifySuccessParams}` };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -253,7 +243,7 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
     serviceUrl,
     userId: command.userId,
   }).catch((error) => {
-    console.error("Could not get verification code from Zitadel", error);
+    logMessage.error({ error }, "Failed to get verification code");
     return { error: t("errors.couldNotGenerateCode") };
   });
 
@@ -291,7 +281,6 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
   const templateId = process.env.TEMPLATE_ID;
 
   if (!apiKey || !templateId) {
-    console.error("Missing NOTIFY_API_KEY or TEMPLATE_ID environment variables");
     return { error: t("errors.emailConfigurationError") };
   }
 
@@ -309,7 +298,7 @@ ${codeResponse.verificationCode}`,
 
     return { success: true };
   } catch (error) {
-    console.error("Failed to send verification email via GC Notify", error);
+    logMessage.error({ error }, "Failed to send verification email");
     return { error: t("errors.emailSendFailed") };
   }
 }

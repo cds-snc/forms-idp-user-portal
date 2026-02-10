@@ -357,7 +357,8 @@
       "length": "Must be 6 characters"
     },
     "errors": {
-      "couldNotVerifyEmail": "Could not verify email"
+      "couldNotVerifyEmail": "Could not verify email",
+      "failedToAddOTPEmail": "Could not set up email verification. Please try again."
     }
   }
 }
