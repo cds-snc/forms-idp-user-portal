@@ -13,7 +13,7 @@ import {
 } from "@lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { cookies, headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
@@ -59,18 +59,10 @@ export async function registerUser(command: RegisterUserCommand) {
     organization: command.organization,
   });
 
-  let checkPayload: any = {
+  const checks = create(ChecksSchema, {
     user: { search: { case: "userId", value: addResponse.userId } },
-  };
-
-  if (command.password) {
-    checkPayload = {
-      ...checkPayload,
-      password: { password: command.password },
-    } as ChecksJson;
-  }
-
-  const checks = create(ChecksSchema, checkPayload);
+    ...(command.password && { password: { password: command.password } }),
+  });
 
   const session = await createSessionAndUpdateCookie({
     checks,
