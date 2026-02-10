@@ -176,8 +176,10 @@ export async function continueWithSession({
       targetRedirect
     );
   } else if (session.factors?.user) {
+    // Always include sessionId to ensure we load the exact session that was just updated
     return completeFlowOrGetUrl(
       {
+        sessionId: session.id,
         loginName: session.factors.user.loginName,
         organization: session.factors.user.organizationId,
       },

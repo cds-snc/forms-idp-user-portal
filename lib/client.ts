@@ -5,12 +5,12 @@ type FinishFlowCommand =
       sessionId: string;
       requestId: string;
     }
-  | { loginName: string };
+  | { loginName: string; sessionId?: string };
 
 function goToSignedInPage(
   props:
     | { sessionId: string; organization?: string; requestId?: string }
-    | { organization?: string; loginName: string; requestId?: string }
+    | { organization?: string; loginName: string; sessionId?: string; requestId?: string }
 ) {
   const params = new URLSearchParams({});
 

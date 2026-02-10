@@ -1,6 +1,6 @@
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
+import { isSessionValid, loadMostRecentSession, loadSessionFactorsById } from "@lib/session";
 import { getLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
@@ -8,6 +8,7 @@ import { serverTranslation } from "@i18n/server";
 import { I18n } from "@i18n";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,6 +35,16 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           sessionParams: { loginName, organization },
         });
 
+    // Verify the session is fully authenticated
+    if (!sessionFactors) {
+      redirect("/start");
+    }
+
+    const valid = await isSessionValid({ serviceUrl, session: sessionFactors });
+    if (!valid) {
+      redirect("/start");
+    }
+
     if (!requestId) {
       loginSettings = await getLoginSettings({
         serviceUrl,
@@ -41,6 +52,10 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
       });
     }
   } catch (error) {
+    // Let redirect errors propagate - they're not real errors
+    if (isRedirectError(error)) {
+      throw error;
+    }
     redirect("/start");
   }
 
