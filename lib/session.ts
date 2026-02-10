@@ -6,6 +6,7 @@ import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_se
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
+import { logMessage } from "./logger";
 import {
   getLoginSettings,
   getSession,
@@ -154,7 +155,7 @@ export async function isSessionValid({
 }): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
-    console.warn("Session has no user");
+    logMessage.info("Session has no user");
     return false;
   }
 
@@ -207,16 +208,17 @@ export async function isSessionValid({
       mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
 
       if (!mfaValid) {
-        console.warn(
-          "Session has no valid MFA factor. Configured methods:",
-          mfaMethods,
-          "Session factors:",
+        logMessage.info(
           {
-            totp: session.factors.totp?.verifiedAt,
-            otpEmail: session.factors.otpEmail?.verifiedAt,
-            otpSms: session.factors.otpSms?.verifiedAt,
-            webAuthN: session.factors.webAuthN?.verifiedAt,
-          }
+            mfaMethods,
+            sessionFactors: {
+              totp: session.factors.totp?.verifiedAt,
+              otpEmail: session.factors.otpEmail?.verifiedAt,
+              otpSms: session.factors.otpSms?.verifiedAt,
+              webAuthN: session.factors.webAuthN?.verifiedAt,
+            },
+          },
+          "Session has no valid MFA factor"
         );
       }
     } else {
@@ -230,7 +232,7 @@ export async function isSessionValid({
 
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
       if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
+        logMessage.info({ sessionFactors: session.factors }, "Session has no valid multifactor");
       }
     }
   }
@@ -242,11 +244,13 @@ export async function isSessionValid({
     : true;
 
   if (!stillValid) {
-    console.warn(
-      "Session is expired",
-      session.expirationDate
-        ? timestampDate(session.expirationDate).toDateString()
-        : "no expiration date"
+    logMessage.info(
+      {
+        expirationDate: session.expirationDate
+          ? timestampDate(session.expirationDate).toDateString()
+          : "no expiration date",
+      },
+      "Session is expired"
     );
     return false;
   }
@@ -272,9 +276,9 @@ export async function isSessionValid({
       userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
     if (humanUser && !humanUser.email?.isVerified) {
-      console.warn(
-        "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled",
-        session.factors.user.id
+      logMessage.info(
+        { userId: session.factors.user.id },
+        "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled"
       );
       return false;
     }
@@ -322,6 +326,7 @@ export async function findValidSession({
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
+    // eslint-disable-next-line no-await-in-loop
     if (await isSessionValid({ serviceUrl, session })) {
       return session;
     }
