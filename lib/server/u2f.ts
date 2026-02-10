@@ -1,17 +1,16 @@
 "use server";
 
 import { getSession, getLoginSettings, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
-import { create } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { Duration } from "@zitadel/proto/google/protobuf/duration_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
 import { setSessionAndUpdateCookie } from "./cookie";
-import { updateSession, continueWithSession, ContinueWithSessionCommand } from "./session";
+import { continueWithSession } from "./session";
 import { U2F_ERRORS } from "./u2f-errors";
 
 type RegisterU2FCommand = {
@@ -175,7 +174,6 @@ export async function verifyU2FLogin({
   organization,
   checks,
   requestId,
-  checks,
   redirect,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
@@ -215,5 +213,5 @@ export async function verifyU2FLogin({
     return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
   }
 
-  return continueWithSession({ ...updatedSession, requestId });
+  return continueWithSession({ ...updatedSession, requestId, redirect });
 }
