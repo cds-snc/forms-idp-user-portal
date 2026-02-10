@@ -34,6 +34,7 @@ export default async function Page(props: {
     code,
   } = searchParams;
 
+  // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
 
   const sessionData = sessionId

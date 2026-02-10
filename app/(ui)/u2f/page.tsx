@@ -13,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("verify.title") };
 }
 
+// Hardware key login page
 export default async function Page() {
   const { sessionId, loginName, organization } = await getSessionCredentials();
 
