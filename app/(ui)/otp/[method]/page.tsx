@@ -10,6 +10,7 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getSerializableObject, SearchParams } from "@lib/utils";
+import { getSafeRedirectUrl } from "@lib/redirect-validator";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -32,8 +33,10 @@ export default async function Page(props: {
     sessionId,
     organization,
     code,
+    redirect,
   } = searchParams;
 
+  // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
 
   const sessionData = sessionId
@@ -44,6 +47,8 @@ export default async function Page(props: {
   const sessionFactors = sessionData
     ? { factors: sessionData.factors, expirationDate: sessionData.expirationDate }
     : undefined;
+
+  const safeRedirect = getSafeRedirectUrl(redirect);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
@@ -66,6 +71,7 @@ export default async function Page(props: {
           method={method}
           loginSettings={loginSettings}
           code={code}
+          redirect={safeRedirect}
         >
           {!sessionFactors && (
             <div className="py-4">
@@ -84,7 +90,6 @@ export default async function Page(props: {
               loginName={loginName ?? sessionFactors.factors?.user?.loginName}
               displayName={sessionFactors.factors?.user?.displayName}
               showDropdown
-              searchParams={searchParams}
             />
           )}
         </LoginOTP>

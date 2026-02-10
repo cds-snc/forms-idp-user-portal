@@ -146,9 +146,13 @@ export async function skipMFAAndContinueWithNextUrl({
   return { error: "Could not skip MFA and continue" };
 }
 
-export type ContinueWithSessionCommand = Session & { requestId?: string };
+export type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
 
-export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
+export async function continueWithSession({
+  requestId,
+  redirect,
+  ...session
+}: ContinueWithSessionCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -159,6 +163,9 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
     organization: session.factors?.user?.organizationId,
   });
 
+  // Use provided redirect if available, otherwise use defaultRedirectUri
+  const targetRedirect = redirect || loginSettings?.defaultRedirectUri;
+
   if (requestId && session.id && session.factors?.user) {
     return completeFlowOrGetUrl(
       {
@@ -166,7 +173,7 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
         requestId: requestId,
         organization: session.factors.user.organizationId,
       },
-      loginSettings?.defaultRedirectUri
+      targetRedirect
     );
   } else if (session.factors?.user) {
     // Always include sessionId to ensure we load the exact session that was just updated
@@ -176,7 +183,7 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
         loginName: session.factors.user.loginName,
         organization: session.factors.user.organizationId,
       },
-      loginSettings?.defaultRedirectUri
+      targetRedirect
     );
   }
 

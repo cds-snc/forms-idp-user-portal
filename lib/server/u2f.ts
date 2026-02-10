@@ -10,8 +10,8 @@ import { userAgent } from "next/server";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { getOriginalHost } from "./host";
-import { continueWithSession } from "./session";
 import { setSessionAndUpdateCookie } from "./cookie";
+import { updateSession, continueWithSession, ContinueWithSessionCommand } from "./session";
 import { U2F_ERRORS } from "./u2f-errors";
 
 type RegisterU2FCommand = {
@@ -164,8 +164,9 @@ type VerifyU2FLoginCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
-  checks?: Checks;
+  checks: Checks;
   requestId?: string;
+  redirect?: string | null;
 };
 
 export async function verifyU2FLogin({
@@ -174,6 +175,8 @@ export async function verifyU2FLogin({
   organization,
   checks,
   requestId,
+  checks,
+  redirect,
 }: VerifyU2FLoginCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);

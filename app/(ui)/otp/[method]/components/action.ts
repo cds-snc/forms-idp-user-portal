@@ -24,6 +24,7 @@ type SubmitCodeParams = {
   organization?: string;
   requestId?: string;
   method: string;
+  redirect?: string | null;
 };
 
 type SessionResponse = {
@@ -138,7 +139,8 @@ export async function handleOTPFormSubmit(
     // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Use unified approach that handles both OIDC/SAML and regular flows
+    const redirectUrl = submitParams.redirect || loginSettings?.defaultRedirectUri;
+
     // Always include sessionId to ensure we load the exact session that was just updated
     const callbackResponse = await completeFlowOrGetUrl(
       submitParams.requestId
@@ -152,7 +154,7 @@ export async function handleOTPFormSubmit(
             loginName: response.factors.user.loginName,
             organization: response.factors.user.organizationId,
           },
-      loginSettings?.defaultRedirectUri
+      redirectUrl
     );
 
     if ("error" in callbackResponse) {

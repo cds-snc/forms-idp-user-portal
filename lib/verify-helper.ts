@@ -109,13 +109,17 @@ export async function checkMFAFactors(
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.OTP_SMS ||
       m === AuthenticationMethodType.OTP_EMAIL ||
       m === AuthenticationMethodType.U2F
   );
 
-  // if user has only one additional mfa factor, redirect to that
-  if (availableMultiFactors?.length == 1) {
+  // Filter out OTP_EMAIL from single-factor auto-routing (show selection page instead)
+  const preferredFactors = availableMultiFactors?.filter(
+    (m: AuthenticationMethodType) => m !== AuthenticationMethodType.OTP_EMAIL
+  );
+
+  // if user has only one preferred mfa factor, redirect to that
+  if (preferredFactors?.length === 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
@@ -131,30 +135,24 @@ export async function checkMFAFactors(
       );
     }
 
-    const factor = availableMultiFactors[0];
+    const factor = preferredFactors[0];
     // if passwordless is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_SMS) {
-      return { redirect: `/otp/sms?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-      return { redirect: `/otp/email?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableMultiFactors?.length > 1) {
+  } else if (availableMultiFactors?.length > 1 || preferredFactors?.length === 0) {
     // Check if user has a preferred MFA method
     if (session.factors?.user?.id) {
       try {
         // Try to get preferred method from cookie first
         const preferredMethod = await getPreferredMFAMethodForUser(session.factors.user.id);
 
-        // If user has a preferred method and it's available, use it
+        // If user has a preferred method and it's available, use it (but skip OTP_EMAIL for login)
         if (
           preferredMethod &&
           (preferredMethod === AuthenticationMethodType.TOTP ||
-            preferredMethod === AuthenticationMethodType.OTP_SMS ||
-            preferredMethod === AuthenticationMethodType.OTP_EMAIL ||
             preferredMethod === AuthenticationMethodType.U2F)
         ) {
           const params = new URLSearchParams({
@@ -175,10 +173,6 @@ export async function checkMFAFactors(
           // Redirect to the preferred method
           if (preferredMethod === AuthenticationMethodType.TOTP) {
             return { redirect: `/otp/time-based?` + params };
-          } else if (preferredMethod === AuthenticationMethodType.OTP_SMS) {
-            return { redirect: `/otp/sms?` + params };
-          } else if (preferredMethod === AuthenticationMethodType.OTP_EMAIL) {
-            return { redirect: `/otp/email?` + params };
           } else if (preferredMethod === AuthenticationMethodType.U2F) {
             return { redirect: `/u2f?` + params };
           }

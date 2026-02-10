@@ -98,14 +98,12 @@ export default async function Page(props: {
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
             showDropdown
-            searchParams={searchParams}
           ></UserAvatar>
         ) : user ? (
           <UserAvatar
             loginName={user?.preferredLoginName}
             displayName={displayName}
             showDropdown
-            searchParams={searchParams}
           ></UserAvatar>
         ) : null}
       </div>

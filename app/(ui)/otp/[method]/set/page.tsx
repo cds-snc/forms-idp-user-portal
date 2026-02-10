@@ -6,12 +6,11 @@ import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionById } from "@lib/session";
-import { addOTPEmail, addOTPSMS, registerTOTP } from "@lib/zitadel";
+import { registerTOTP } from "@lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCredentials } from "@lib/cookies";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getSerializableLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
@@ -59,24 +58,8 @@ export default async function Page(props: {
         .catch((err) => {
           error = err;
         });
-    } else if (method === "sms") {
-      await addOTPSMS({
-        serviceUrl,
-        userId: session.factors.user.id,
-      }).catch((_error) => {
-        // TODO: Throw this error?
-        new Error("Could not add OTP via SMS");
-      });
-    } else if (method === "email") {
-      await addOTPEmail({
-        serviceUrl,
-        userId: session.factors.user.id,
-      }).catch((_error) => {
-        // TODO: Throw this error?
-        new Error("Could not add OTP via Email");
-      });
     } else {
-      throw new Error("Invalid method");
+      throw new Error("Invalid authentication method");
     }
   } else {
     throw new Error("No session found");
@@ -97,10 +80,6 @@ export default async function Page(props: {
 
   if (checkAfter) {
     urlToContinue = `/otp/${method}?` + paramsToContinue;
-    // immediately check the OTP on the next page if sms or email was set up
-    if (["email", "sms"].includes(method)) {
-      return redirect(urlToContinue);
-    }
   } else if (loginName) {
     urlToContinue = `/signedin?` + paramsToContinue;
   }
@@ -115,15 +94,7 @@ export default async function Page(props: {
             tagName="p"
             className="mb-6"
           />
-        ) : (
-          <p>
-            {method === "email"
-              ? "Code via email was successfully added."
-              : method === "sms"
-                ? "Code via SMS was successfully added."
-                : ""}
-          </p>
-        )}
+        ) : null}
 
         {error && (
           <div className="py-4">

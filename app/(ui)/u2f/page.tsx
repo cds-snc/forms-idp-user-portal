@@ -7,14 +7,20 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSessionCredentials } from "@lib/cookies";
+import { getSafeRedirectUrl } from "@lib/redirect-validator";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
   return { title: t("verify.title") };
 }
 
-export default async function Page() {
+// Hardware key login page
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const { redirect } = searchParams;
   const { sessionId, loginName, organization } = await getSessionCredentials();
+  const safeRedirect = getSafeRedirectUrl(redirect);
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -50,6 +56,7 @@ export default async function Page() {
             altPassword={false}
             organization={organization}
             login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
+            redirect={safeRedirect}
           />
         )}
       </div>
