@@ -93,7 +93,7 @@
       "title": "Password",
       "description": "Please enter your password or select a different account below.",
       "form": {
-        "resetPassword": "Reset password",
+        "resetPassword": "Forgot password?",
         "label": "Password"
       }
     },

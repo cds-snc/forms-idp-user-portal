@@ -2,7 +2,6 @@ import { PasswordForm } from "./components/PasswordForm";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getSerializableLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
@@ -39,11 +38,6 @@ export default async function Page() {
     console.warn(error);
   }
 
-  const loginSettings = await getSerializableLoginSettings({
-    serviceUrl,
-    organizationId: organization,
-  });
-
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="password">
       {sessionFactors && (
@@ -60,7 +54,6 @@ export default async function Page() {
         <PasswordForm
           loginName={loginName}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-          loginSettings={loginSettings}
         />
       </div>
     </AuthPanel>

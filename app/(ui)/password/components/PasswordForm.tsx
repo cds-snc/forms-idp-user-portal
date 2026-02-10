@@ -4,7 +4,6 @@ import { useActionState } from "react";
 import { resetPassword, sendPassword } from "@lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "@i18n";
@@ -12,7 +11,6 @@ import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 
 type Props = {
-  loginSettings: LoginSettings | undefined;
   loginName: string;
   organization?: string;
   requestId?: string;
@@ -22,7 +20,7 @@ type FormState = {
   error?: string;
 };
 
-export function PasswordForm({ loginSettings, loginName, organization, requestId }: Props) {
+export function PasswordForm({ loginName, organization, requestId }: Props) {
   const { t } = useTranslation(["password", "common"]);
 
   const [info, setInfo] = useState<string>("");
@@ -120,16 +118,15 @@ export function PasswordForm({ loginSettings, loginName, organization, requestId
             {t("verify.form.label")}
           </Label>
           <TextInput type={"password"} id={"password"} required defaultValue={""} />
-          {!loginSettings?.hidePasswordReset && (
-            <button
-              onClick={() => resetPasswordAndContinue()}
-              type="button"
-              disabled={loading}
-              data-testid="reset-button"
-            >
-              {t("verify.form.resetPassword")}
-            </button>
-          )}
+
+          <button
+            onClick={() => resetPasswordAndContinue()}
+            type="button"
+            disabled={loading}
+            data-testid="reset-button"
+          >
+            {t("verify.form.resetPassword")}
+          </button>
 
           {loginName && (
             <input type="hidden" name="loginName" autoComplete="username" value={loginName} />
