@@ -8,10 +8,9 @@
 export function validateAuthRequest(searchParams: URLSearchParams): string | null {
   const oidcRequestId = searchParams.get("authRequest");
   const samlRequestId = searchParams.get("samlRequest");
-  
-  const requestId = searchParams.get("requestId") ??
+  const requestId =
+    searchParams.get("requestId") ??
     (oidcRequestId ? `oidc_${oidcRequestId}` : samlRequestId ? `saml_${samlRequestId}` : undefined);
-  
   return requestId || null;
 }
 

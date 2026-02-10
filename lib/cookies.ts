@@ -3,6 +3,7 @@
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "@i18n";
+import { logMessage } from "./logger";
 
 // TODO: improve this to handle overflow
 const MAX_COOKIE_SIZE = 2048;
@@ -23,7 +24,7 @@ type SessionCookie<T> = Cookie & T;
 async function setSessionHttpOnlyCookie<T>(
   sessions: SessionCookie<T>[],
   iFrameEnabled: boolean = false
-) {
+): Promise<void> {
   const cookiesList = await cookies();
 
   // "none" is required for iframe embedding (with secure flag)
@@ -37,7 +38,7 @@ async function setSessionHttpOnlyCookie<T>(
     resolvedSameSite = "lax";
   }
 
-  return cookiesList.set({
+  await cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
     httpOnly: true,
@@ -66,7 +67,7 @@ export async function addSessionToCookie<T>({
   session: SessionCookie<T>;
   cleanup?: boolean;
   iFrameEnabled?: boolean;
-}): Promise<any> {
+}): Promise<void> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -82,7 +83,7 @@ export async function addSessionToCookie<T>({
     const temp = [...currentSessions, session];
 
     if (JSON.stringify(temp).length >= MAX_COOKIE_SIZE) {
-      console.log("WARNING COOKIE OVERFLOW");
+      logMessage.warn("WARNING COOKIE OVERFLOW");
       // TODO: improve cookie handling
       // this replaces the first session (oldest) with the new one
       currentSessions = [session].concat(currentSessions.slice(1));
@@ -98,9 +99,9 @@ export async function addSessionToCookie<T>({
         ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
         : true
     );
-    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
+    await setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
   } else {
-    return setSessionHttpOnlyCookie(currentSessions, iFrameEnabled);
+    await setSessionHttpOnlyCookie(currentSessions, iFrameEnabled);
   }
 }
 
@@ -114,7 +115,7 @@ export async function updateSessionCookie<T>({
   session: SessionCookie<T>;
   cleanup?: boolean;
   iFrameEnabled?: boolean;
-}): Promise<any> {
+}): Promise<void> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -133,9 +134,9 @@ export async function updateSessionCookie<T>({
           ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
           : true
       );
-      return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
+      await setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
     } else {
-      return setSessionHttpOnlyCookie(sessions, iFrameEnabled);
+      await setSessionHttpOnlyCookie(sessions, iFrameEnabled);
     }
   } else {
     throw "updateSessionCookie<T>: session id now found";
@@ -166,13 +167,13 @@ export async function removeSessionFromCookie<T>({
         ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
         : true
     );
-    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
+    await setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
   } else {
-    return setSessionHttpOnlyCookie(reducedSessions, iFrameEnabled);
+    await setSessionHttpOnlyCookie(reducedSessions, iFrameEnabled);
   }
 }
 
-export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
+export async function getMostRecentSessionCookie<T>(): Promise<SessionCookie<T>> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -294,7 +295,7 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
       return sessions;
     }
   } else {
-    console.log("getAllSessions: No session cookie found, returning empty array");
+    logMessage.info("getAllSessions: No session cookie found, returning empty array");
     return [];
   }
 }
@@ -311,7 +312,7 @@ export async function getMostRecentCookieWithLoginname<T>({
 }: {
   loginName?: string;
   organization?: string;
-}): Promise<any> {
+}): Promise<SessionCookie<T>> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 

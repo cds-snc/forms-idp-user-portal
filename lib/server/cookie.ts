@@ -1,6 +1,7 @@
 "use server";
 
 import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecks,
@@ -55,7 +56,7 @@ export async function createSessionAndUpdateCookie(command: {
   let sessionLifetime = command.lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No session lifetime provided, using default of 24 hours.");
+    logMessage.warn("No session lifetime provided, using default of 24 hours.");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -134,7 +135,7 @@ export async function createSessionForIdpAndUpdateCookie({
   let sessionLifetime = lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No IDP session lifetime provided, using default of 24 hours.");
+    logMessage.warn("No IDP session lifetime provided, using default of 24 hours.");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -148,7 +149,7 @@ export async function createSessionForIdpAndUpdateCookie({
     idpIntent,
     lifetime: sessionLifetime,
   }).catch((error: ErrorDetail | CredentialsCheckError) => {
-    console.error("Could not set session", error);
+    logMessage.error("Could not set session");
     if ("failedAttempts" in error && error.failedAttempts) {
       throw {
         error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
