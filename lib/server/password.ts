@@ -33,7 +33,6 @@ import {
 import { createServerTransport } from "../../lib/zitadel";
 
 import { serverTranslation } from "@i18n/server";
-import { logMessage } from "@lib/logger";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -86,7 +85,7 @@ export async function sendPassword(
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
 
-  let sessionCookie = await getSessionCookieByLoginName({
+  const sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
   }).catch((error) => {
@@ -292,7 +291,7 @@ export async function sendPassword(
 
   const mfaFactorCheck = await checkMFAFactors(serviceUrl, session, loginSettings, authMethods);
 
-  if (mfaFactorCheck?.redirect) {
+  if (mfaFactorCheck && "redirect" in mfaFactorCheck) {
     return mfaFactorCheck;
   }
 
