@@ -6,7 +6,7 @@ import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import {
-  getBrandingSettings,
+  // getBrandingSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
   getUserByID,
@@ -45,10 +45,10 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  // const branding = await getBrandingSettings({
+  //   serviceUrl,
+  //   organization,
+  // });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceUrl,
