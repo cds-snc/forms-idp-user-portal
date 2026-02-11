@@ -247,9 +247,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     serviceUrl,
     session,
     loginSettings,
-    authMethods || [], // Pass empty array if no auth methods
-    command.organization,
-    command.requestId
+    authMethods || [] // Pass empty array
   );
 
   if (mfaFactorCheck?.redirect) {
