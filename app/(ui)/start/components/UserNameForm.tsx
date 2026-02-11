@@ -9,7 +9,7 @@ import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButt
 import { validateUsername } from "@lib/validationSchemas";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-import { sendLoginname } from "@lib/server/username";
+import { submitUserNameForm } from "../actions";
 
 type Props = {
   loginName: string | undefined;
@@ -52,7 +52,7 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
       };
     }
 
-    const result = await sendLoginname({
+    const result = await submitUserNameForm({
       loginName: username,
       organization,
       requestId,
@@ -66,7 +66,7 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
       };
     });
 
-    if (result?.error) {
+    if (result && "error" in result && result.error) {
       return {
         ...previousState,
         error: result.error,
@@ -76,7 +76,7 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
       };
     }
 
-    if (result?.redirect) {
+    if (result && "redirect" in result && result.redirect) {
       router.push(result.redirect);
     }
 
