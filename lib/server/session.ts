@@ -308,14 +308,13 @@ export async function clearSession(options: ClearSessionOptions) {
 }
 
 type LogoutCurrentSessionOptions = {
-  organization?: string;
   postLogoutRedirectUri?: string;
 };
 
 export async function logoutCurrentSession(
   options: LogoutCurrentSessionOptions = {}
 ): Promise<{ redirect: string } | { error: string }> {
-  const { organization, postLogoutRedirectUri } = options;
+  const { postLogoutRedirectUri } = options;
 
   try {
     const mostRecentSession = await getMostRecentSessionCookie();
@@ -331,12 +330,7 @@ export async function logoutCurrentSession(
       return { redirect: postLogoutRedirectUri };
     }
 
-    const params = new URLSearchParams();
-    if (organization) {
-      params.set("organization", organization);
-    }
-
-    const redirectUrl = `/logout/done${params.toString() ? `?${params.toString()}` : ""}`;
+    const redirectUrl = `/start`;
     return { redirect: redirectUrl };
   } catch (error) {
     logMessage.error({ error }, "Error during logout");
