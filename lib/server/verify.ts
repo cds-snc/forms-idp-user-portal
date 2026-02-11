@@ -201,7 +201,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     authMethodResponse.authMethodTypes
   );
 
-  if (mfaFactorCheck?.redirect) {
+  if (mfaFactorCheck && "redirect" in mfaFactorCheck) {
     return mfaFactorCheck;
   }
 
