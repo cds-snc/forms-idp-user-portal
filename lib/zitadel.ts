@@ -18,6 +18,7 @@ import {
 import type { FormData, RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
+  ReturnPasswordResetCodeSchema,
   SendPasswordResetLinkSchema,
 } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import { SearchQuery, SearchQuerySchema } from "@zitadel/proto/zitadel/user/v2/query_pb";
@@ -1298,6 +1299,36 @@ export async function passwordReset({
       userId,
       medium: {
         case: "sendLink",
+        value: medium,
+      },
+    },
+    {}
+  );
+}
+
+/**
+ * Request a password reset code that is returned instead of sent via email.
+ * This allows sending the code via GC Notify instead of Zitadel's built-in email.
+ */
+export async function passwordResetWithReturn({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}): Promise<{ verificationCode?: string }> {
+  const medium = create(ReturnPasswordResetCodeSchema, {});
+
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.passwordReset(
+    {
+      userId,
+      medium: {
+        case: "returnCode",
         value: medium,
       },
     },

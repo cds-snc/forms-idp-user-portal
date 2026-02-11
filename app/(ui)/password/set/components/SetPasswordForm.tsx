@@ -24,7 +24,6 @@ type Props = {
   userId: string;
   organization?: string;
   requestId?: string;
-  codeRequired: boolean;
 };
 
 export function SetPasswordForm({
@@ -33,7 +32,6 @@ export function SetPasswordForm({
   requestId,
   loginName,
   userId,
-  codeRequired,
 }: Props) {
   const { t } = useTranslation("password");
 
@@ -62,6 +60,7 @@ export function SetPasswordForm({
 
   const localFormAction = async (previousState: { error?: string }, formData: FormData) => {
     const password = formData?.get("password");
+    const code = formData?.get("code");
 
     if (typeof password !== "string") {
       return {
@@ -69,22 +68,11 @@ export function SetPasswordForm({
       };
     }
 
-    let payload: { userId: string; password: string; code?: string } = {
+    const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password,
+      code: typeof code === "string" ? code : undefined,
     };
-
-    // this is not required for initial password setup
-    if (codeRequired) {
-      const code = formData?.get("code");
-
-      if (typeof code !== "string") {
-        return {
-          error: "Invalid Field",
-        };
-      }
-      payload = { ...payload, code };
-    }
 
     const changeResponse = await changePassword(payload).catch(() => {
       return {
@@ -102,15 +90,6 @@ export function SetPasswordForm({
       return {
         error: t("set.errors.couldNotSetPassword"),
       };
-    }
-
-    const params = new URLSearchParams({});
-
-    if (loginName) {
-      params.append("loginName", loginName);
-    }
-    if (organization) {
-      params.append("organization", organization);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
@@ -163,33 +142,31 @@ export function SetPasswordForm({
   return (
     <form className="w-full" action={formAction}>
       <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
-        {codeRequired && (
-          <Alert type={ErrorStatus.INFO}>
-            <div className="flex flex-row">
-              <span className="mr-auto flex-1 text-left">
-                <I18n i18nKey="set.noCodeReceived" namespace="password" />
-              </span>
-              <button
-                aria-label="Resend OTP Code"
-                disabled={loading}
-                type="button"
-                className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
-                onClick={() => {
-                  resendCode();
-                }}
-                data-testid="resend-button"
-              >
-                <I18n i18nKey="set.resend" namespace="password" />
-              </button>
-            </div>
-          </Alert>
-        )}
-        {codeRequired && (
-          <div>
-            <Label htmlFor="code">{t("set.labels.code")}</Label>
-            <TextInput id="code" type="text" required autoComplete="one-time-code" />
+        <Alert type={ErrorStatus.INFO}>
+          <div className="flex flex-row">
+            <span className="mr-auto flex-1 text-left">
+              <I18n i18nKey="set.noCodeReceived" namespace="password" />
+            </span>
+            <button
+              aria-label="Resend OTP Code"
+              disabled={loading}
+              type="button"
+              className="ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              onClick={() => {
+                resendCode();
+              }}
+              data-testid="resend-button"
+            >
+              <I18n i18nKey="set.resend" namespace="password" />
+            </button>
           </div>
-        )}
+        </Alert>
+
+        <div>
+          <Label htmlFor="code">{t("set.labels.code")}</Label>
+          <TextInput id="code" type="text" required autoComplete="one-time-code" />
+        </div>
+
         <div>
           <Label htmlFor="password">{t("set.labels.newPassword")}</Label>
           <TextInput

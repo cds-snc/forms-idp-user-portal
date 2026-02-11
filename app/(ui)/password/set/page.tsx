@@ -1,6 +1,6 @@
 import { Alert } from "@clientComponents/globals";
 
-import { SetPasswordForm } from "./components/set-password-form";
+import { SetPasswordForm } from "./components/SetPasswordForm";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -17,18 +17,18 @@ import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSerializableObject } from "@lib/utils";
+import { getSessionCredentials } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password.set");
   return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
-  const searchParams = await props.searchParams;
+export default async function Page() {
+  // const searchParams = await props.searchParams;
 
-  const { userId, loginName, organization, requestId, code, initial } = searchParams;
+  // const { userId, loginName, organization, requestId, code, initial } = searchParams;
+  const { loginName, organization } = await getSessionCredentials();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -44,6 +44,8 @@ export default async function Page(props: {
       },
     });
   }
+
+  const userId = session?.factors?.user?.id;
 
   // const branding = await getBrandingSettings({
   //   serviceUrl,
@@ -80,7 +82,7 @@ export default async function Page(props: {
         <h1>
           {session?.factors?.user?.displayName ?? <I18n i18nKey="set.title" namespace="password" />}
         </h1>
-        <p className="ztdl-p mb-6 block">
+        <p className="mb-6 block">
           <I18n i18nKey="set.description" namespace="password" />
         </p>
 
@@ -109,23 +111,20 @@ export default async function Page(props: {
       </div>
 
       <div className="w-full">
-        {!initial && (
+        {/* {!initial && (
           <Alert.Info>
             <I18n i18nKey="set.codeSent" namespace="password" />
           </Alert.Info>
-        )}
+        )} */}
 
         {passwordComplexity &&
         (loginName ?? user?.preferredLoginName) &&
         (userId ?? session?.factors?.user?.id) ? (
           <SetPasswordForm
-            code={code}
             userId={userId ?? (session?.factors?.user?.id as string)}
             loginName={loginName ?? (user?.preferredLoginName as string)}
-            requestId={requestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
-            codeRequired={!(initial === "true")}
           />
         ) : (
           <div className="py-4">
