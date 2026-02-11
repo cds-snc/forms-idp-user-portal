@@ -2,13 +2,14 @@ import { Alert } from "@clientComponents/globals";
 import { ChangePasswordForm } from "./components/change-password-form";
 
 import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar";
+// import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+import { getLoginSettings, getPasswordComplexitySettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
@@ -34,10 +35,10 @@ export default async function Page(props: {
     },
   });
 
-  const branding = await getBrandingSettings({
-    serviceUrl,
-    organization,
-  });
+  // const branding = await getBrandingSettings({
+  //   serviceUrl,
+  //   organization,
+  // });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceUrl,
@@ -51,14 +52,11 @@ export default async function Page(props: {
 
   return (
     <>
-      <div className="flex flex-col space-y-4">
-        <h1>
-          <I18n i18nKey="change.title" namespace="password" />
-        </h1>
-        <p className="ztdl-p mb-6 block">
-          <I18n i18nKey="change.description" namespace="password" />
-        </p>
-
+      <AuthPanel
+        titleI18nKey="change.title"
+        descriptionI18nKey="change.description"
+        namespace="password"
+      >
         {/* show error only if usernames should be shown to be unknown */}
         {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
           <div className="py-4">
@@ -68,16 +66,14 @@ export default async function Page(props: {
           </div>
         )}
 
-        {sessionFactors && (
+        {/* {sessionFactors && (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
           ></UserAvatar>
-        )}
-      </div>
+        )} */}
 
-      <div className="w-full">
         {passwordComplexity && loginName && sessionFactors?.factors?.user?.id ? (
           <ChangePasswordForm
             sessionId={sessionFactors.id}
@@ -93,7 +89,7 @@ export default async function Page(props: {
             </Alert.Warning>
           </div>
         )}
-      </div>
+      </AuthPanel>
     </>
   );
 }
