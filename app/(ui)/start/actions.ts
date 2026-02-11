@@ -1,20 +1,15 @@
 "use server";
 
+import { serverTranslation } from "@i18n/server";
+import { logMessage } from "@lib/logger";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getLoginSettings, searchUsers, SearchUsersCommand } from "@lib/zitadel";
+import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { serverTranslation } from "@i18n/server";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import {
-  getLoginSettings,
-  listAuthenticationMethodTypes,
-  searchUsers,
-  SearchUsersCommand,
-} from "@lib/zitadel";
-import { headers } from "next/headers";
-import { createSessionAndUpdateCookie } from "./cookie";
+import { createSessionAndUpdateCookie } from "@lib/server/cookie";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { logMessage } from "@lib/logger";
+import { checkEmailVerification } from "@lib/verify-helper";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -23,11 +18,7 @@ export type SendLoginnameCommand = {
   suffix?: string;
 };
 
-/**
- * NOTE: this is replaced by start/actions.ts
- * This file should be deleted when oidc/saml files are removed.
- */
-export async function sendLoginname(command: SendLoginnameCommand) {
+export const submitUserNameForm = async (command: SendLoginnameCommand) => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -52,9 +43,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const searchResult = await searchUsers(searchUsersRequest);
 
-  // @TODO: verify these checks
-
-  // Safety check: ensure searchResult is defined
   if (!searchResult) {
     logMessage.error("searchUsers returned undefined or null");
     return { error: t("errors.couldNotSearchUsers") };
@@ -72,7 +60,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const { result: potentialUsers } = searchResult;
 
-  // Additional safety check: treat undefined result as empty array
   const users = potentialUsers ?? [];
 
   // Note: searchUsers already returns an error if multiple users are found,
@@ -82,7 +69,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   const user = users[0];
-  const userId = users[0].userId;
+  const userId = user.userId;
+  const humanUser = user.type.case === "human" ? user.type.value : undefined;
+
+  if (user.state === UserState.INITIAL) {
+    return { error: t("errors.initialUserNotSupported") };
+  }
 
   const checks = create(ChecksSchema, {
     user: { search: { case: "userId", value: userId } },
@@ -108,19 +100,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: t("errors.couldNotCreateSession") };
   }
 
-  // TODO: check if handling of userstate INITIAL is needed
-  if (user.state === UserState.INITIAL) {
-    return { error: t("errors.initialUserNotSupported") };
+  const emailVerificationCheck = checkEmailVerification(
+    session,
+    humanUser,
+    command.organization,
+    command.requestId
+  );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
   }
 
-  const methods = await listAuthenticationMethodTypes({
-    serviceUrl,
-    userId: session.factors?.user?.id,
-  });
-
-  if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-    return { redirect: "/password" };
-  }
-
-  return { redirect: "/register" };
-}
+  return { redirect: "/password" };
+};

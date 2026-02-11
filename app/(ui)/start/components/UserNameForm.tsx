@@ -9,7 +9,7 @@ import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButt
 import { validateUsername } from "@lib/validationSchemas";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-import { sendLoginname } from "@lib/server/username";
+import { submitUserNameForm } from "../actions";
 
 type Props = {
   loginName: string | undefined;
@@ -52,7 +52,7 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
       };
     }
 
-    const result = await sendLoginname({
+    const result = await submitUserNameForm({
       loginName: username,
       organization,
       requestId,
