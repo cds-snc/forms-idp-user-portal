@@ -290,14 +290,7 @@ export async function sendPassword(
     return { error: t("errors.couldNotVerifyPassword") };
   }
 
-  const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
-    session,
-    loginSettings,
-    authMethods,
-    command.organization,
-    command.requestId
-  );
+  const mfaFactorCheck = await checkMFAFactors(serviceUrl, session, loginSettings, authMethods);
 
   if (mfaFactorCheck?.redirect) {
     return mfaFactorCheck;
