@@ -62,15 +62,13 @@ export default async function Page(props: {
     currentSession = null;
   }
 
-  // Ideally this list could be simplified or moved/logic-moved into the AvatarList component
   const accounts: AvatarListItem[] = [
     {
       loginName: loginName || currentSession?.loginName || "",
       organization: organization || currentSession?.organization || "",
       requestId: requestId || "",
       suffix: suffix || "",
-      // TODO: probably just /signedin is fine since the info is pulled from the cookie/session on the signedin page
-      link: `/signedin?loginName=${loginName ?? currentSession?.loginName}&organization=${organization ?? currentSession?.organization}&requestId=${requestId}&suffix=${suffix}`,
+      link: `/password`,
       showDropdown: false,
     },
     {
