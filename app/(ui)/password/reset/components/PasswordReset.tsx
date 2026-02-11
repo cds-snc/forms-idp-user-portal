@@ -18,19 +18,19 @@ export function PasswordReset({
   requestId,
   loginName,
 }: {
-  userId: string;
-  code: string;
-  passwordComplexitySettings: PasswordComplexitySettings;
-  organization: string;
+  userId?: string;
+  code?: string;
+  passwordComplexitySettings?: PasswordComplexitySettings;
+  organization?: string;
   requestId?: string;
-  loginName: string;
+  loginName?: string;
 }) {
   const { t } = useTranslation(["password"]);
   const router = useRouter();
   const [error, setError] = useState("");
 
   const successCallback = async ({ password }: { password: string }) => {
-    console.log("success callback with password: " + password); // TODO remove
+    if (!userId) return;
 
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
@@ -68,7 +68,7 @@ export function PasswordReset({
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
 
     const passwordResponse = await sendPassword({
-      loginName,
+      loginName: loginName ?? "",
       organization,
       checks: create(ChecksSchema, {
         password: { password },
@@ -85,6 +85,10 @@ export function PasswordReset({
       router.push(passwordResponse.redirect);
     }
   };
+
+  if (!userId || !passwordComplexitySettings) {
+    return <Alert type={ErrorStatus.ERROR}>{t("reset.errors.missingRequiredInformation")}</Alert>;
+  }
 
   return (
     <>
