@@ -9,6 +9,7 @@ import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { getUserByID } from "../lib/zitadel";
+import { logMessage } from "./logger";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -122,28 +123,32 @@ export async function checkMFAFactors(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string)
-      );
-    }
-
     const factor = availableMultiFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
+      logMessage.info(
+        { userId: session.factors?.user?.id },
+        "Redirecting user to TOTP verification"
+      );
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
+      logMessage.info(
+        { userId: session.factors?.user?.id },
+        "Redirecting user to U2F verification"
+      );
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableMultiFactors?.length > 1 || !availableMultiFactors?.length) {
+  } else if (availableMultiFactors?.length > 1) {
     // Show MFA selection page
-
+    logMessage.info(
+      { userId: session.factors?.user?.id, methodCount: availableMultiFactors.length },
+      "Redirecting user to MFA selection page"
+    );
     return { redirect: `/mfa` };
   } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
+    logMessage.info(
+      { userId: session.factors?.user?.id },
+      "Redirecting user to MFA setup - MFA enforced"
+    );
     return { redirect: `/mfa/set` };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
@@ -173,13 +178,19 @@ export async function checkMFAFactors(
 
       if (!(timeDifference > mfaInitSkipLifetimeMillis)) {
         // if the time difference is smaller than the lifetime, skip the mfa setup
+        logMessage.info(
+          { userId: session.factors?.user?.id },
+          "Skipping MFA setup - user skipped recently"
+        );
         return;
       }
     }
 
-    // the user has never skipped the mfa init but we have a setting so we redirect
-
-    return { redirect: `/mfa/set?` };
+    logMessage.info(
+      { userId: session.factors?.user?.id },
+      "Redirecting user to MFA setup - skip lifetime expired"
+    );
+    return { redirect: `/mfa/set` };
   }
 }
 
