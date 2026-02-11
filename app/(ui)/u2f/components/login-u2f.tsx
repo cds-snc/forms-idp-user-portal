@@ -11,11 +11,8 @@ import {
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation, I18n } from "@i18n";
-
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
+import { useTranslation } from "@i18n";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { SubmitButton, Button } from "@clientComponents/globals/Buttons";
 
 type PublicKeyCredentialRequestOptionsData = {
   challenge: BufferSource | string;
@@ -31,7 +28,6 @@ type Props = {
   loginName?: string;
   sessionId?: string;
   requestId?: string;
-  altPassword: boolean;
   login?: boolean;
   organization?: string;
   redirect?: string | null;
@@ -41,13 +37,11 @@ export function LoginU2F({
   loginName,
   sessionId,
   requestId,
-  altPassword,
   organization,
   login = true,
   redirect,
 }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
 
   const { t } = useTranslation("u2f");
   const router = useRouter();
@@ -57,32 +51,25 @@ export function LoginU2F({
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
-      setLoading(true);
       updateSessionForChallenge()
         .then((response) => {
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
           if (!pK) {
             setError(t("verify.errors.couldNotRequestChallenge"));
-            setLoading(false);
             return;
           }
 
-          return submitLoginAndContinue(pK as PublicKeyCredentialRequestOptionsData)
-            .catch((error) => {
+          return submitLoginAndContinue(pK as PublicKeyCredentialRequestOptionsData).catch(
+            (error) => {
               setError(error);
               return;
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+            }
+          );
         })
         .catch((error) => {
           setError(error);
           return;
-        })
-        .finally(() => {
-          setLoading(false);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,7 +81,6 @@ export function LoginU2F({
       : UserVerificationRequirement.DISCOURAGED
   ) {
     setError("");
-    setLoading(true);
     const session = await updateSession({
       loginName,
       sessionId,
@@ -106,14 +92,10 @@ export function LoginU2F({
         },
       }),
       requestId,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotRequestChallenge"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("verify.errors.couldNotRequestChallenge"));
+      return;
+    });
 
     if (session && "error" in session && session.error) {
       setError(session.error);
@@ -124,7 +106,6 @@ export function LoginU2F({
   }
 
   async function submitLogin(data: JsonObject) {
-    setLoading(true);
     const response = await verifyU2FLogin({
       loginName,
       sessionId,
@@ -134,14 +115,10 @@ export function LoginU2F({
       } as Checks,
       requestId,
       redirect,
-    })
-      .catch(() => {
-        setError(t("verify.errors.couldNotVerifyPasskey"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch(() => {
+      setError(t("verify.errors.couldNotVerifyPasskey"));
+      return;
+    });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
@@ -210,9 +187,6 @@ export function LoginU2F({
         } else {
           setError(t("verify.errors.verificationFailed"));
         }
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }
 
@@ -223,74 +197,6 @@ export function LoginU2F({
           <Alert type={ErrorStatus.ERROR}>{error}</Alert>
         </div>
       )}
-      <div className="mt-8 flex w-full flex-row items-center">
-        {altPassword ? (
-          <Button
-            type="button"
-            theme="secondary"
-            onClick={() => {
-              const params = new URLSearchParams();
-
-              if (loginName) {
-                params.append("loginName", loginName);
-              }
-
-              if (sessionId) {
-                params.append("sessionId", sessionId);
-              }
-
-              if (requestId) {
-                params.append("requestId", requestId);
-              }
-
-              if (organization) {
-                params.append("organization", organization);
-              }
-
-              return router.push(
-                "/password?" + params // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
-              );
-            }}
-            data-testid="password-button"
-          >
-            <I18n i18nKey="verify.usePassword" namespace="u2f" />
-          </Button>
-        ) : (
-          <BackButton />
-        )}
-
-        <span className="grow"></span>
-        <SubmitButton
-          type="submit"
-          loading={loading}
-          onClick={async () => {
-            const response = await updateSessionForChallenge().finally(() => {
-              setLoading(false);
-            });
-
-            const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
-
-            if (!pK) {
-              setError(t("verify.errors.couldNotRequestChallenge"));
-              return;
-            }
-
-            setLoading(true);
-
-            return submitLoginAndContinue(pK as PublicKeyCredentialRequestOptionsData)
-              .catch((error) => {
-                setError(error);
-                return;
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          }}
-          data-testid="submit-button"
-        >
-          <I18n i18nKey="verify.submit" namespace="u2f" />
-        </SubmitButton>
-      </div>
     </div>
   );
 }

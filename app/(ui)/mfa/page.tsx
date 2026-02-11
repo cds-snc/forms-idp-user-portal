@@ -8,9 +8,9 @@ import { serverTranslation } from "i18n/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { SearchParams } from "@lib/utils";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+import { getSessionCredentials } from "@lib/cookies";
 
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
@@ -20,10 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: { searchParams: Promise<SearchParams> }) {
-  const searchParams = await props.searchParams;
-
-  const { loginName, requestId, organization, sessionId } = searchParams;
+export default async function Page() {
+  const { loginName, organization, sessionId } = await getSessionCredentials();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -56,13 +54,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             showDropdown
           ></UserAvatar>
         </div>
-        <ChooseSecondFactor
-          loginName={loginName}
-          sessionId={sessionId}
-          requestId={requestId}
-          organization={organization}
-          userMethods={sessionFactors.authMethods ?? []}
-        ></ChooseSecondFactor>
+        <ChooseSecondFactor userMethods={sessionFactors.authMethods ?? []} />
         <div className="mt-6">
           <Link
             href="/mfa/set"
