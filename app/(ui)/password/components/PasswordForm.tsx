@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { resetPassword, sendPassword } from "@lib/server/password";
+import { resetPassword } from "@lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useTranslation } from "@i18n";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import { submitPasswordForm } from "../actions";
 
 type Props = {
   loginName: string;
@@ -41,7 +42,7 @@ export function PasswordForm({ loginName, organization, requestId }: Props) {
       };
     }
 
-    const response = await sendPassword({
+    const response = await submitPasswordForm({
       loginName,
       organization,
       checks: create(ChecksSchema, {
