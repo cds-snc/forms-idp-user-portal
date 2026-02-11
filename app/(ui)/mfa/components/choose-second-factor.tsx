@@ -9,6 +9,8 @@ import { getImageUrl } from "@lib/imageUrl";
 import { Button } from "@clientComponents/globals/Buttons";
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 
+import { cn } from "@lib/utils";
+
 type Props = {
   loginName?: string;
   sessionId?: string;
@@ -17,32 +19,22 @@ type Props = {
   userMethods: AuthenticationMethodType[];
 };
 
-export function ChooseSecondFactor({
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  userMethods,
-}: Props) {
+export function ChooseSecondFactor({ userMethods }: Props) {
   const router = useRouter();
   const { t } = useTranslation("mfa");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [nextUrl, setNextUrl] = useState<string>("");
 
-  const params = new URLSearchParams({});
+  const authMehods = userMethods.filter((method) => {
+    if (!ENABLE_EMAIL_OTP && method === AuthenticationMethodType.OTP_EMAIL) {
+      return false;
+    }
 
-  if (loginName) {
-    params.append("loginName", loginName);
-  }
-  if (sessionId) {
-    params.append("sessionId", sessionId);
-  }
-  if (requestId) {
-    params.append("requestId", requestId);
-  }
-  if (organization) {
-    params.append("organization", organization);
-  }
+    if (method === AuthenticationMethodType.PASSWORD) {
+      return false;
+    }
+    return true;
+  });
 
   const handleMethodSelect = (method: string, url: string) => {
     setSelectedMethod(method);
@@ -63,11 +55,12 @@ export function ChooseSecondFactor({
     url: string
   ) => (
     <div
-      className={`cursor-pointer rounded-md border-2 p-6 transition-all ${
+      className={cn(
+        "cursor-pointer rounded-md border-2 p-6 transition-all",
         selectedMethod === method
           ? "border-gcds-blue-vivid bg-blue-50"
           : "border-gray-300 hover:border-gray-400"
-      }`}
+      )}
       onClick={() => handleMethodSelect(method, url)}
       role="button"
       tabIndex={0}
@@ -94,8 +87,8 @@ export function ChooseSecondFactor({
 
   return (
     <>
-      <div className="grid w-full grid-cols-1 gap-5 pt-4">
-        {userMethods.map((method, i) => {
+      <div className={cn("grid w-full grid-cols-1  pt-4", authMehods.length >= 2 && "gap-5")}>
+        {authMehods.map((method, i) => {
           return (
             <div key={"method-" + i}>
               {method === AuthenticationMethodType.TOTP &&
@@ -104,7 +97,7 @@ export function ChooseSecondFactor({
                   t("set.authenticator.title"),
                   "/img/verified_user_24px.png",
                   t("set.authenticator.description"),
-                  "/otp/time-based?" + params
+                  "/otp/time-based"
                 )}
               {method === AuthenticationMethodType.U2F &&
                 renderOption(
@@ -112,16 +105,15 @@ export function ChooseSecondFactor({
                   t("set.securityKey.title"),
                   "/img/fingerprint_24px.png",
                   t("set.securityKey.description"),
-                  "/u2f?" + params
+                  "/u2f"
                 )}
               {method === AuthenticationMethodType.OTP_EMAIL &&
-                ENABLE_EMAIL_OTP &&
                 renderOption(
                   "email",
                   t("set.email.title"),
                   "/img/email_24px.png",
                   t("set.email.description"),
-                  "/otp/email?" + params
+                  "/otp/email"
                 )}
             </div>
           );

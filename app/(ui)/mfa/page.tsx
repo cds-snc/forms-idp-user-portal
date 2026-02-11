@@ -1,4 +1,3 @@
-import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { ChooseSecondFactor } from "./components/choose-second-factor";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
@@ -7,26 +6,22 @@ import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { Metadata } from "next";
 import { serverTranslation } from "i18n/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { SearchParams } from "@lib/utils";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+import { getSessionCredentials } from "@lib/cookies";
 
-const POSSIBLE_METHODS = [
-  AuthenticationMethodType.TOTP,
-  AuthenticationMethodType.U2F,
-  AuthenticationMethodType.OTP_EMAIL,
-];
+// Strong MFA methods that must be configured before accessing the MFA selection page
+const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: { searchParams: Promise<SearchParams> }) {
-  const searchParams = await props.searchParams;
-
-  const { loginName, requestId, organization, sessionId } = searchParams;
+export default async function Page() {
+  const { loginName, organization, sessionId } = await getSessionCredentials();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -39,48 +34,36 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     throw new Error("No session factors found");
   }
 
+  // Check if user has at least one strong MFA method (TOTP or U2F)
+  const hasStrongMFA = STRONG_MFA_METHODS.some((method) =>
+    sessionFactors.authMethods?.includes(method)
+  );
+
+  // Redirect to MFA setup if no strong MFA method is configured
+  if (!hasStrongMFA) {
+    redirect("/mfa/set");
+  }
+
   return (
-    <AuthPanel titleI18nKey="title" descriptionI18nKey="verify.description" namespace="mfa">
-      <div className="flex flex-col space-y-4">
-        {sessionFactors && (
+    <>
+      <AuthPanel titleI18nKey="title" descriptionI18nKey="verify.description" namespace="mfa">
+        <div className="flex flex-col space-y-4">
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
           ></UserAvatar>
-        )}
-      </div>
-
-      {sessionFactors ? (
-        <ChooseSecondFactor
-          loginName={loginName}
-          sessionId={sessionId}
-          requestId={requestId}
-          organization={organization}
-          userMethods={sessionFactors.authMethods ?? []}
-        ></ChooseSecondFactor>
-      ) : (
-        <Alert.Warning>
-          <I18n i18nKey="verify.noResults" namespace="mfa" />
-        </Alert.Warning>
-      )}
-
-      {sessionFactors &&
-        !POSSIBLE_METHODS.every((method) => sessionFactors.authMethods?.includes(method)) && (
-          <div className="mt-6">
-            <Link
-              href={`/mfa/set?${new URLSearchParams({
-                ...(loginName && { loginName }),
-                ...(sessionId && { sessionId }),
-                ...(requestId && { requestId }),
-                ...(organization && { organization }),
-              }).toString()}`}
-              className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
-            >
-              <I18n i18nKey="set.addAnother" namespace="mfa" />
-            </Link>
-          </div>
-        )}
-    </AuthPanel>
+        </div>
+        <ChooseSecondFactor userMethods={sessionFactors.authMethods ?? []} />
+        <div className="mt-6">
+          <Link
+            href="/mfa/set"
+            className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
+          >
+            <I18n i18nKey="set.addAnother" namespace="mfa" />
+          </Link>
+        </div>
+      </AuthPanel>
+    </>
   );
 }

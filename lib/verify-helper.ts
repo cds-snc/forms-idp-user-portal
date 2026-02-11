@@ -9,7 +9,7 @@ import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { getUserByID } from "../lib/zitadel";
-import { getPreferredMFAMethodForUser } from "./server/mfa-preferences";
+import { logMessage } from "./logger";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -102,126 +102,36 @@ export async function checkMFAFactors(
   serviceUrl: string,
   session: Session,
   loginSettings: LoginSettings | undefined,
-  authMethods: AuthenticationMethodType[],
-  organization?: string,
-  requestId?: string
+  authMethods: AuthenticationMethodType[]
 ) {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
-      m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.OTP_EMAIL ||
-      m === AuthenticationMethodType.U2F
+      m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
-  // Filter out OTP_EMAIL from single-factor auto-routing (show selection page instead)
-  const preferredFactors = availableMultiFactors?.filter(
-    (m: AuthenticationMethodType) => m !== AuthenticationMethodType.OTP_EMAIL
-  );
+  // if user has only one mfa factor that is not OTP_EMAIL, redirect to that
+  const hasSingleStrongFactor = availableMultiFactors?.length === 1;
 
-  // if user has only one preferred mfa factor, redirect to that
-  if (preferredFactors?.length === 1) {
+  if (hasSingleStrongFactor) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string)
-      );
-    }
-
-    const factor = preferredFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
+    const factor = availableMultiFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
+      logMessage.info("Redirecting user to TOTP verification");
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
+      logMessage.info("Redirecting user to U2F verification");
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableMultiFactors?.length > 1 || preferredFactors?.length === 0) {
-    // Check if user has a preferred MFA method
-    if (session.factors?.user?.id) {
-      try {
-        // Try to get preferred method from cookie first
-        const preferredMethod = await getPreferredMFAMethodForUser(session.factors.user.id);
-
-        // If user has a preferred method and it's available, use it (but skip OTP_EMAIL for login)
-        if (
-          preferredMethod &&
-          (preferredMethod === AuthenticationMethodType.TOTP ||
-            preferredMethod === AuthenticationMethodType.U2F)
-        ) {
-          const params = new URLSearchParams({
-            loginName: session.factors?.user?.loginName as string,
-          });
-
-          if (requestId) {
-            params.append("requestId", requestId);
-          }
-
-          if (organization || session.factors?.user?.organizationId) {
-            params.append(
-              "organization",
-              organization ?? (session.factors?.user?.organizationId as string)
-            );
-          }
-
-          // Redirect to the preferred method
-          if (preferredMethod === AuthenticationMethodType.TOTP) {
-            return { redirect: `/otp/time-based?` + params };
-          } else if (preferredMethod === AuthenticationMethodType.U2F) {
-            return { redirect: `/u2f?` + params };
-          }
-        }
-      } catch {
-        // Fall through to showing MFA selection page
-      }
-    }
-
-    // Show MFA selection page if no preferred method or it's not available
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-    });
-
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string)
-      );
-    }
-
-    return { redirect: `/mfa?` + params };
+  } else if (availableMultiFactors?.length > 1) {
+    // Show MFA selection page
+    logMessage.info("Redirecting user to MFA selection page");
+    return { redirect: `/mfa` };
   } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-      force: "true", // this defines if the mfa is forced in the settings
-      checkAfter: "true", // this defines if the check is directly made after the setup
-    });
-
-    if (session.id) {
-      params.append("sessionId", session.id);
-    }
-
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string)
-      );
-    }
-
-    return { redirect: `/mfa/set?` + params };
+    logMessage.info("Redirecting user to MFA setup - MFA enforced");
+    return { redirect: `/mfa/set` };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
     (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
@@ -250,34 +160,19 @@ export async function checkMFAFactors(
 
       if (!(timeDifference > mfaInitSkipLifetimeMillis)) {
         // if the time difference is smaller than the lifetime, skip the mfa setup
+        logMessage.info(
+          { userId: session.factors?.user?.id },
+          "Skipping MFA setup - user skipped recently"
+        );
         return;
       }
     }
 
-    // the user has never skipped the mfa init but we have a setting so we redirect
-
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-      force: "false", // this defines if the mfa is not forced in the settings and can be skipped
-      checkAfter: "true", // this defines if the check is directly made after the setup
-    });
-
-    if (session.id) {
-      params.append("sessionId", session.id);
-    }
-
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
-    if (organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string)
-      );
-    }
-
-    return { redirect: `/mfa/set?` + params };
+    logMessage.info(
+      { userId: session.factors?.user?.id },
+      "Redirecting user to MFA setup - skip lifetime expired"
+    );
+    return { redirect: `/mfa/set` };
   }
 }
 

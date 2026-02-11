@@ -198,9 +198,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     serviceUrl,
     session,
     loginSettings,
-    authMethodResponse.authMethodTypes,
-    command.organization,
-    command.requestId
+    authMethodResponse.authMethodTypes
   );
 
   if (mfaFactorCheck?.redirect) {
