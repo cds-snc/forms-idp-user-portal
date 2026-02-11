@@ -15,6 +15,7 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
     "upgrade": "next upgrade"
   },
   "dependencies": {
