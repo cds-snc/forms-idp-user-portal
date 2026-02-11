@@ -69,7 +69,7 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
     if (result?.error) {
       return {
         ...previousState,
-        error: result.error,
+        error: result?.error,
         formData: {
           username: username,
         },
