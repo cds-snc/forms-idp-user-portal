@@ -32,6 +32,11 @@ type CustomCookieData = {
   requestId?: string; // if its linked to an OIDC flow
 };
 
+export type CreateSessionFailedError = {
+  error: string;
+  failedAttempts?: number;
+};
+
 const passwordAttemptsHandler = (error: ConnectError) => {
   const details = error.findDetails(CredentialsCheckErrorSchema);
 
