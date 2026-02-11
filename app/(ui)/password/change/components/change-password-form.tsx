@@ -14,8 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState, useActionState } from "react";
 import { useTranslation, I18n } from "@i18n";
 
-import { PasswordComplexity } from "../../components/password-complexity";
-
+import { PasswordComplexity } from "@clientComponents/forms/PasswordCreation/PasswordComplexity";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction, BackButton } from "@clientComponents/globals/Buttons";
 
@@ -148,7 +147,6 @@ export function ChangePasswordForm({
           id="password-complexity-requirements"
           passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
-          equals={!!watchPassword && watchPassword === watchConfirmPassword}
           ready={watchPassword.length > 0}
         />
       )}

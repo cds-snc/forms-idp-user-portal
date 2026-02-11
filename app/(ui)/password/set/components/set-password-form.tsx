@@ -11,7 +11,7 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
-import { PasswordComplexity } from "../../components/password-complexity";
+import { PasswordComplexity } from "@clientComponents/forms/PasswordCreation/PasswordComplexity";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction, BackButton } from "@clientComponents/globals/Buttons";
 import { useState, useActionState } from "react";
@@ -217,7 +217,7 @@ export function SetPasswordForm({
           ready
           passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
-          equals={!!watchPassword && watchPassword === watchConfirmPassword}
+          // equals={!!watchPassword && watchPassword === watchConfirmPassword}
         />
       )}
 

@@ -89,6 +89,7 @@
   },
   "password": {
     "title": "Enter your password",
+    "forgot": "Forgot password?",
     "verify": {
       "title": "Password",
       "description": "Please enter your password or select a different account below.",
@@ -170,6 +171,18 @@
       "doesNotMatch": "The entries for password must match.",
       "success": "Success",
       "requiredPasswordSuccess": "Valid password"
+    },
+    "reset": {
+      "title": "Reset your password",
+      "description": "Enter your email address to receive a password reset link.",
+      "submit": "Continue",
+      "labels": {
+        "email": "Email address"
+      },
+      "validation": {
+        "requiredEmail": "Email address is required.",
+        "validGovEmail": "Enter a valid individual Government of Canada email address."
+      }
     },
     "errors": {
       "noHostFound": "No host found",
