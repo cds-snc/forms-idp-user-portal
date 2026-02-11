@@ -1,16 +1,15 @@
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { I18n } from "@i18n";
+import { useEffect, useReducer } from "react";
+
 import {
   lowerCaseValidator,
   numberValidator,
   symbolValidator,
   upperCaseValidator,
 } from "@lib/validators";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
-import { I18n, useTranslation } from "@i18n";
-import { TFunction } from "i18next";
-import { useEffect, useReducer } from "react";
-
-function CheckIcon({ title }: { title: string }) {
+function CheckIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -19,16 +18,15 @@ function CheckIcon({ title }: { title: string }) {
       strokeWidth={1.5}
       stroke="currentColor"
       className="mr-2 size-6 flex-none text-lg text-green-500 dark:text-green-500"
-      // role="img"
+      // Update announced to SR in validation instead
       aria-hidden="true"
     >
-      {/* <title>{title}</title> */}
       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
     </svg>
   );
 }
 
-function CrossIcon({ title }: { title: string }) {
+function CrossIcon() {
   return (
     <svg
       className="mr-2 size-6 flex-none text-lg"
@@ -37,21 +35,16 @@ function CrossIcon({ title }: { title: string }) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      // role="img"
+      // Update announced to SR in validation instead
       aria-hidden="true"
     >
-      {/* <title>{title}</title> */}
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
   );
 }
 
-function renderIcon(matched: boolean, t: TFunction) {
-  return matched ? (
-    <CheckIcon title={t("complexity.matches")} />
-  ) : (
-    <CrossIcon title={t("complexity.doesNotMatch")} />
-  );
+function renderIcon(matched: boolean) {
+  return matched ? <CheckIcon /> : <CrossIcon />;
 }
 const desc = "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
@@ -75,17 +68,16 @@ function useDelayedUpdate(allValid: boolean, delay: number) {
 export function PasswordComplexity({
   passwordComplexitySettings,
   password,
-  equals,
   id,
   ready,
+  // equals,
 }: {
   passwordComplexitySettings: PasswordComplexitySettings;
   password: string;
-  equals: boolean;
   id: string;
   ready: boolean;
+  // equals?: boolean;
 }) {
-  const { t } = useTranslation("password");
   const hasMinLength = password?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(password);
   const hasNumber = numberValidator(password);
@@ -102,7 +94,7 @@ export function PasswordComplexity({
       <ol id={id} className="mb-4 pl-0">
         {passwordComplexitySettings.minLength && (
           <li className="mb-2 flex flex-row items-center" data-testid="length-check">
-            {renderIcon(hasMinLength, t)}
+            {renderIcon(hasMinLength)}
             <span className={desc}>
               <I18n
                 i18nKey="complexity.minLength"
@@ -121,7 +113,7 @@ export function PasswordComplexity({
           </li>
         )}
         <li className="mb-2 flex flex-row items-center" data-testid="number-check">
-          {renderIcon(hasNumber, t)}
+          {renderIcon(hasNumber)}
           <span className={desc}>
             <I18n i18nKey="complexity.hasNumber" namespace="password" />
           </span>
@@ -135,7 +127,7 @@ export function PasswordComplexity({
           </span>
         </li>
         <li className="mb-2 flex flex-row items-center" data-testid="uppercase-check">
-          {renderIcon(hasUppercase, t)}
+          {renderIcon(hasUppercase)}
           <span className={desc}>
             <I18n i18nKey="complexity.hasUppercase" namespace="password" />
           </span>
@@ -149,7 +141,7 @@ export function PasswordComplexity({
           </span>
         </li>
         <li className="mb-2 flex flex-row items-center" data-testid="lowercase-check">
-          {renderIcon(hasLowercase, t)}
+          {renderIcon(hasLowercase)}
           <span className={desc}>
             <I18n i18nKey="complexity.hasLowercase" namespace="password" />
           </span>
@@ -163,7 +155,7 @@ export function PasswordComplexity({
           </span>
         </li>
         <li className="mb-2 flex flex-row items-center" data-testid="symbol-check">
-          {renderIcon(hasSymbol, t)}
+          {renderIcon(hasSymbol)}
           <span className={desc}>
             <I18n i18nKey="complexity.hasSymbol" namespace="password" />
           </span>
