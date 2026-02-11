@@ -46,7 +46,7 @@ const getUserId = async ({
         organizationId: organization,
       });
 
-      if (users.details?.totalResult && users.result[0]?.userId) {
+      if (users.details?.totalResult && BigInt(1) && users.result[0]?.userId) {
         resolvedUserId = users.result[0].userId;
       }
     }

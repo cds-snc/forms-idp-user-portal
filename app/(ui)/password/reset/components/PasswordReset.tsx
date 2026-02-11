@@ -6,7 +6,7 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
-import { PasswordCreation } from "@clientComponents/forms/PasswordCreation/PasswordCreation";
+import { PasswordForm } from "@clientComponents/forms/PasswordValidation/PasswordForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { changePassword, sendPassword } from "@lib/server/password";
 
@@ -31,6 +31,8 @@ export function PasswordReset({
 
   const successCallback = async ({ password }: { password: string }) => {
     if (!userId) return;
+
+    // TODO validate password again
 
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
@@ -93,7 +95,7 @@ export function PasswordReset({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordCreation
+      <PasswordForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />

@@ -39,7 +39,7 @@ const validateCreatePassword = async (
   return temp;
 };
 
-export function PasswordCreation({
+export function PasswordForm({
   passwordComplexitySettings,
   successCallback,
 }: {

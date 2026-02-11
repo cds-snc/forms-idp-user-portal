@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState, useActionState } from "react";
 import { useTranslation, I18n } from "@i18n";
 
-import { PasswordComplexity } from "@clientComponents/forms/PasswordCreation/PasswordComplexity";
+import { PasswordComplexity } from "@clientComponents/forms/PasswordValidation/PasswordComplexity";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction, BackButton } from "@clientComponents/globals/Buttons";
 
