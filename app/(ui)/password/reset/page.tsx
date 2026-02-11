@@ -55,13 +55,14 @@ const getUserId = async ({
   }
 };
 
-export default async function Page(props: {
+export default async function Page({
+  searchParams,
+}: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const searchParams = await props.searchParams;
-  const { userId, loginName, organization, requestId, code } = searchParams;
+  const { userId, loginName, organization, requestId, code } = await searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
