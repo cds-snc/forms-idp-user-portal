@@ -4,51 +4,36 @@ import { ChangePasswordForm } from "./components/change-password-form";
 import { I18n } from "@i18n";
 // import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
-import { getLoginSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+import { loadAndValidateSession } from "@lib/session";
+import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("change.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const searchParams = await props.searchParams;
+  const { session, loginName, organization, requestId } = await loadAndValidateSession(
+    serviceUrl
+  ).catch(() => redirect("/start"));
 
-  const { loginName, organization, requestId } = searchParams;
-
-  // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
-    sessionParams: {
-      loginName,
-      organization,
-    },
+    organization: session?.factors?.user?.organizationId,
   });
 
-  // const branding = await getBrandingSettings({
+  // const loginSettings = await getLoginSettings({
   //   serviceUrl,
-  //   organization,
+  //   organization: session?.factors?.user?.organizationId,
   // });
-
-  const passwordComplexity = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization: sessionFactors?.factors?.user?.organizationId,
-  });
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: sessionFactors?.factors?.user?.organizationId,
-  });
 
   return (
     <>
@@ -58,13 +43,13 @@ export default async function Page(props: {
         namespace="password"
       >
         {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+        {/* {(!session || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
           <div className="py-4">
             <Alert.Danger>
               <I18n i18nKey="unknownContext" namespace="error" />
             </Alert.Danger>
           </div>
-        )}
+        )} */}
 
         {/* {sessionFactors && (
           <UserAvatar
@@ -74,13 +59,13 @@ export default async function Page(props: {
           ></UserAvatar>
         )} */}
 
-        {passwordComplexity && loginName && sessionFactors?.factors?.user?.id ? (
+        {passwordComplexitySettings && loginName && session?.factors?.user?.id ? (
           <ChangePasswordForm
-            sessionId={sessionFactors.id}
+            sessionId={session.id}
             loginName={loginName}
             requestId={requestId}
             organization={organization}
-            passwordComplexitySettings={passwordComplexity}
+            passwordComplexitySettings={passwordComplexitySettings}
           />
         ) : (
           <div className="py-4">

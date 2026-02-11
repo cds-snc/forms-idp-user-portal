@@ -143,7 +143,53 @@ export async function loadSessionFactorsById(
 }
 
 /**
- * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+ * Loads and validates the most recent session, extracting session data and user information.
+ *
+ * // TODO: this may become redundant if the session is checked in middleware
+ * // TODO: Uncomment line 176 to enable MFA check - off to simplify dev for now
+ * Also validates MFA
+ *
+ * @param serviceUrl - The service URL for making API calls
+ * @returns Object containing session data and user information
+ * @throws Redirects to /start if session is invalid or doesn't exist
+ */
+export async function loadAndValidateSession(serviceUrl: string): Promise<{
+  session: Session;
+  userId?: string;
+  loginName?: string;
+  organization?: string;
+  requestId?: string;
+}> {
+  const { getMostRecentSessionCookie } = await import("./cookies");
+
+  const sessionCookie = await getMostRecentSessionCookie();
+  const sessionResponse = await getSession({
+    serviceUrl,
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
+
+  const session = sessionResponse.session;
+  if (!session) {
+    throw new Error("Session not found");
+  }
+
+  // const valid = await isSessionValid({ serviceUrl, session });
+  // if (!valid) {
+  //   throw new Error("Session is not valid");
+  // }
+
+  return {
+    session,
+    userId: session.factors?.user?.id,
+    loginName: session.factors?.user?.loginName,
+    organization: session.factors?.user?.organizationId,
+    requestId: sessionCookie.requestId,
+  };
+}
+
+/**
+``` * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
 export async function isSessionValid({
