@@ -147,7 +147,6 @@ export function ChangePasswordForm({
           id="password-complexity-requirements"
           passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
-          equals={!!watchPassword && watchPassword === watchConfirmPassword}
           ready={watchPassword.length > 0}
         />
       )}
