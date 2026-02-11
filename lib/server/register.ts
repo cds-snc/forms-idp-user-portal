@@ -250,7 +250,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
     authMethods || [] // Pass empty array
   );
 
-  if (mfaFactorCheck?.redirect) {
+  if (mfaFactorCheck && "redirect" in mfaFactorCheck) {
     return mfaFactorCheck;
   }
 
