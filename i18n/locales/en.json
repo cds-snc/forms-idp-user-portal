@@ -342,6 +342,7 @@
       "title": "Activate your key",
       "label": "Name",
       "hint": "Give your key a name",
+      "placeholder": "e.g., My Security Key",
       "submit": "Continue",
       "errors": {
         "sessionNotFound": "Session not found. Please start again.",

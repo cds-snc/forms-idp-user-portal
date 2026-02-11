@@ -11,6 +11,7 @@ import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButton } from "@clientComponents/globals/Buttons";
 import { I18n } from "@i18n";
+import { useTranslation } from "@i18n/client";
 
 type PublicKeyCredentialJSON = {
   id: string;
@@ -44,6 +45,7 @@ export function RegisterU2f({
   checkAfter,
   loginSettings,
 }: Props) {
+  const { t } = useTranslation("u2f");
   const [error, setError] = useState<string>("");
   const [keyName, setKeyName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -260,7 +262,7 @@ export function RegisterU2f({
             id={"keyName"}
             type="text"
             onChange={(e) => setKeyName((e.target as HTMLInputElement).value)}
-            placeholder="e.g., My YubiKey"
+            placeholder={t("set.placeholder")}
           />
         </div>
       </div>
