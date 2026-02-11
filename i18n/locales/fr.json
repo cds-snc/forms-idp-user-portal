@@ -323,6 +323,7 @@
       "title": "Activez votre clé",
       "label": "Nommez",
       "hint": "Donnez un nom à votre clé",
+      "placeholder": "p. ex., Ma clé de sécurité",
       "submit": "Continuer",
       "errors": {
         "sessionNotFound": "Session non trouvée. Veuillez recommencer.",

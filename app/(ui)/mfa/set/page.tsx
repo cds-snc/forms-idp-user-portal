@@ -36,7 +36,7 @@ export default async function Page() {
         <div className="w-full">
           <div className="flex flex-col space-y-4">
             {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
-              <ChooseSecondFactorToSetup checkAfter={true}></ChooseSecondFactorToSetup>
+              <ChooseSecondFactorToSetup checkAfter={true} />
             )}
           </div>
         </div>
