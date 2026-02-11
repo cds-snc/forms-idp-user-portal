@@ -66,17 +66,17 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
       };
     });
 
-    if (result?.error) {
+    if (result && "error" in result && result.error) {
       return {
         ...previousState,
-        error: result?.error,
+        error: result.error,
         formData: {
           username: username,
         },
       };
     }
 
-    if (result?.redirect) {
+    if (result && "redirect" in result && result.redirect) {
       router.push(result.redirect);
     }
 
