@@ -36,28 +36,3 @@ export async function setPreferredMFAMethod(
     };
   }
 }
-
-/**
- * Get the user's preferred MFA method from cookie
- */
-export async function getPreferredMFAMethodForUser(
-  userId: string
-): Promise<AuthenticationMethodType | undefined> {
-  try {
-    const cookieStore = await cookies();
-    const key = `mfa-preference-${userId}`;
-    const value = cookieStore.get(key)?.value;
-
-    if (!value) {
-      return undefined;
-    }
-
-    // Convert string back to enum value
-    const methodValue = AuthenticationMethodType[value as keyof typeof AuthenticationMethodType];
-    return methodValue;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Error getting preferred MFA method:", error);
-    return undefined;
-  }
-}
