@@ -18,7 +18,9 @@ export type SendLoginnameCommand = {
   suffix?: string;
 };
 
-export const submitUserNameForm = async (command: SendLoginnameCommand) => {
+export const submitUserNameForm = async (
+  command: SendLoginnameCommand
+): Promise<{ error: string } | { redirect: string }> => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
