@@ -102,21 +102,15 @@ export async function checkMFAFactors(
   serviceUrl: string,
   session: Session,
   loginSettings: LoginSettings | undefined,
-  authMethods: AuthenticationMethodType[],
-  organization?: string,
-  requestId?: string
+  authMethods: AuthenticationMethodType[]
 ) {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
-      m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.OTP_EMAIL ||
-      m === AuthenticationMethodType.U2F
+      m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
   // if user has only one mfa factor that is not OTP_EMAIL, redirect to that
-  const hasSingleStrongFactor =
-    availableMultiFactors?.length === 1 &&
-    availableMultiFactors[0] !== AuthenticationMethodType.OTP_EMAIL;
+  const hasSingleStrongFactor = availableMultiFactors?.length === 1;
 
   if (hasSingleStrongFactor) {
     const params = new URLSearchParams({
@@ -125,30 +119,18 @@ export async function checkMFAFactors(
 
     const factor = availableMultiFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
-      logMessage.info(
-        { userId: session.factors?.user?.id },
-        "Redirecting user to TOTP verification"
-      );
+      logMessage.info("Redirecting user to TOTP verification");
       return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
-      logMessage.info(
-        { userId: session.factors?.user?.id },
-        "Redirecting user to U2F verification"
-      );
+      logMessage.info("Redirecting user to U2F verification");
       return { redirect: `/u2f?` + params };
     }
   } else if (availableMultiFactors?.length > 1) {
     // Show MFA selection page
-    logMessage.info(
-      { userId: session.factors?.user?.id, methodCount: availableMultiFactors.length },
-      "Redirecting user to MFA selection page"
-    );
+    logMessage.info("Redirecting user to MFA selection page");
     return { redirect: `/mfa` };
   } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
-    logMessage.info(
-      { userId: session.factors?.user?.id },
-      "Redirecting user to MFA setup - MFA enforced"
-    );
+    logMessage.info("Redirecting user to MFA setup - MFA enforced");
     return { redirect: `/mfa/set` };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
