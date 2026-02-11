@@ -7,16 +7,10 @@ import { useState } from "react";
 type LogoutButtonProps = {
   className?: string;
   label: string;
-  organization?: string;
   postLogoutRedirectUri?: string;
 };
 
-export function LogoutButton({
-  className,
-  label,
-  organization,
-  postLogoutRedirectUri,
-}: LogoutButtonProps) {
+export function LogoutButton({ className, label, postLogoutRedirectUri }: LogoutButtonProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -27,7 +21,6 @@ export function LogoutButton({
 
     try {
       const result = await logoutCurrentSession({
-        organization,
         postLogoutRedirectUri,
       });
 
