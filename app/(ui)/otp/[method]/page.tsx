@@ -1,16 +1,24 @@
-import { Alert } from "@clientComponents/globals/Alert/Alert";
-import { LoginOTP } from "./components/LoginOTP";
-import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { getLoginSettings } from "@lib/zitadel";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
+import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
+
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
+import { getLoginSettings } from "@lib/zitadel";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSerializableObject, SearchParams } from "@lib/utils";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
+import { LoginOTP } from "@components/mfa/otp/LoginOTP";
+import { UserAvatar } from "@serverComponents/UserAvatar";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { getSessionCredentials } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -27,14 +35,9 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const {
-    loginName, // send from password page
-    requestId,
-    sessionId,
-    organization,
-    code,
-    redirect,
-  } = searchParams;
+  const { code, redirect } = searchParams;
+
+  const { sessionId, loginName, organization } = await getSessionCredentials();
 
   // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
@@ -66,21 +69,12 @@ export default async function Page(props: {
         <LoginOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
-          requestId={requestId}
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}
           code={code}
           redirect={safeRedirect}
         >
-          {!sessionFactors && (
-            <div className="py-4">
-              <Alert.Danger>
-                <I18n i18nKey="unknownContext" namespace="error" />
-              </Alert.Danger>
-            </div>
-          )}
-
           {method === "email" && (
             <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
           )}

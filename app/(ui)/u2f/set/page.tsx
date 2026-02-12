@@ -1,13 +1,21 @@
-import { RegisterU2f } from "./components/register-u2f";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { Metadata } from "next";
+import { headers } from "next/headers";
+
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
+import { getSerializableLoginSettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
 import { getSessionCredentials } from "@lib/cookies";
-import { getSerializableLoginSettings } from "@lib/zitadel";
-import { Metadata } from "next";
-import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
+import { RegisterU2f } from "@components/mfa/u2f/RegisterU2f";
+import { UserAvatar } from "@serverComponents/UserAvatar";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");

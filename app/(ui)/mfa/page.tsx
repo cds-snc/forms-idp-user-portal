@@ -1,15 +1,28 @@
-import { ChooseSecondFactor } from "./components/choose-second-factor";
-import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { Metadata } from "next";
-import { serverTranslation } from "i18n/server";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Metadata } from "next";
+import { I18n } from "@i18n";
+import { serverTranslation } from "i18n/server";
+
+/*--------------------------------------------*
+ * Types and Constants
+ *--------------------------------------------*/
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
+
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
+import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
+import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
 
 // Strong MFA methods that must be configured before accessing the MFA selection page
