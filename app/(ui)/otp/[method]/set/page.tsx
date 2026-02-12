@@ -1,17 +1,27 @@
-import { Alert } from "@clientComponents/globals";
-import { BackButton, Button } from "@clientComponents/globals/Buttons";
-
-import { TotpRegister } from "./components/totp-register";
 import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar";
+import Link from "next/link";
+import { headers } from "next/headers";
+
+/*--------------------------------------------*
+ * Types and Constants
+ *--------------------------------------------*/
+import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
+import { registerTOTP, getSerializableLoginSettings } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionById } from "@lib/session";
-import { registerTOTP } from "@lib/zitadel";
-import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCredentials } from "@lib/cookies";
-import { headers } from "next/headers";
-import Link from "next/link";
-import { getSerializableLoginSettings } from "@lib/zitadel";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
+import { TotpRegister } from "@components/mfa/otp/TotpRegister";
+import { Alert } from "@clientComponents/globals";
+import { BackButton, Button } from "@clientComponents/globals/Buttons";
+import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export default async function Page(props: {
@@ -65,23 +75,12 @@ export default async function Page(props: {
     throw new Error("No session found");
   }
 
-  const paramsToContinue = new URLSearchParams({});
   let urlToContinue = "/signedin";
 
-  if (sessionId) {
-    paramsToContinue.append("sessionId", sessionId);
-  }
-  if (loginName) {
-    paramsToContinue.append("loginName", loginName);
-  }
-  if (organization) {
-    paramsToContinue.append("organization", organization);
-  }
-
   if (checkAfter) {
-    urlToContinue = `/otp/${method}?` + paramsToContinue;
+    urlToContinue = `/otp/${method}?`;
   } else if (loginName) {
-    urlToContinue = `/signedin?` + paramsToContinue;
+    urlToContinue = `/signedin?`;
   }
 
   return (
