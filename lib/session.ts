@@ -143,7 +143,7 @@ export async function loadSessionFactorsById(
 }
 
 /**
-``` * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+ * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
 export async function isSessionValid({
