@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n/client";
+
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Button } from "@clientComponents/globals/Buttons";
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
+
 import { MethodOptionCard } from "./MethodOptionCard";
 
 import { cn } from "@lib/utils";

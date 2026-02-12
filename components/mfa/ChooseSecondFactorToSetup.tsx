@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n/client";
-import { Button } from "@clientComponents/globals/Buttons";
+
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 import { MethodOptionCard } from "./MethodOptionCard";
+
+import { Button } from "@clientComponents/globals/Buttons";
 
 type Props = {
   checkAfter: boolean;
