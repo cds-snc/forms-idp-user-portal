@@ -35,11 +35,10 @@ const validateCreatePassword = async (
       ["confirmPassword"]
     )
   );
-  const temp = v.safeParse(passwordValidationSchema, formEntries, { abortPipeEarly: true });
-  return temp;
+  return v.safeParse(passwordValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
-export function PasswordCreation({
+export function PasswordValidationForm({
   passwordComplexitySettings,
   successCallback,
 }: {

@@ -2,28 +2,25 @@
 import { useState } from "react";
 import { useTranslation } from "@i18n";
 import { useRouter } from "next/navigation";
-
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { changePassword, sendPassword } from "@lib/server/password";
 
-import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { changePassword, sendPassword } from "@lib/server/password";
 
 export function PasswordReset({
   userId,
   code,
   passwordComplexitySettings,
   organization,
-  requestId,
   loginName,
 }: {
   userId?: string;
   code?: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;
-  requestId?: string;
   loginName?: string;
 }) {
   const { t } = useTranslation(["password"]);
@@ -74,7 +71,6 @@ export function PasswordReset({
       checks: create(ChecksSchema, {
         password: { password },
       }),
-      requestId,
     }).catch(() => setError(t("reset.errors.couldNotVerifyPassword")));
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {

@@ -1,13 +1,13 @@
 "use client";
+import { useState } from "react";
+import { useTranslation } from "@i18n";
+import { validateAccount } from "@lib/validationSchemas";
 import { registerUser } from "@lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 
-import { PasswordCreation } from "@clientComponents/forms/PasswordCreation/PasswordCreation";
+import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { useState } from "react";
-import { useTranslation } from "@i18n";
-import { validateAccount } from "@lib/validationSchemas";
 
 export function SetRegisterPasswordForm({
   passwordComplexitySettings,
@@ -59,7 +59,7 @@ export function SetRegisterPasswordForm({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordCreation
+      <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />
