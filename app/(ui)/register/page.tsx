@@ -1,6 +1,6 @@
 import { Alert } from "@clientComponents/globals";
 
-import { RegisterForm } from "./components/register-form";
+import { RegisterForm } from "./components/RegisterForm";
 import { I18n } from "@i18n";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import {

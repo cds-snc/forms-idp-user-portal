@@ -29,8 +29,6 @@ export function SetRegisterPasswordForm({
   const [error, setError] = useState("");
 
   const successCallback = async ({ password }: { password: string }) => {
-    // TODO validate password again
-
     // Validate account data again to be safe
     const validateAccountData = await validateAccount({ firstname, lastname, email } as {
       [k: string]: FormDataEntryValue;

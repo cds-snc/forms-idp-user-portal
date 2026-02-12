@@ -31,7 +31,6 @@ export function ChangePasswordForm({
   const [error, setError] = useState("");
 
   const successCallback = async ({ password }: { password: string }) => {
-    // TODO validate password again instead
     if (typeof password !== "string") {
       setError("Invalid Field");
     }

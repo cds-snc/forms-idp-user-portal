@@ -15,14 +15,12 @@ export function PasswordReset({
   code,
   passwordComplexitySettings,
   organization,
-  requestId,
   loginName,
 }: {
   userId?: string;
   code?: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;
-  requestId?: string;
   loginName?: string;
 }) {
   const { t } = useTranslation(["password"]);
@@ -31,8 +29,6 @@ export function PasswordReset({
 
   const successCallback = async ({ password }: { password: string }) => {
     if (!userId) return;
-
-    // TODO validate password again
 
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
@@ -75,7 +71,6 @@ export function PasswordReset({
       checks: create(ChecksSchema, {
         password: { password },
       }),
-      requestId,
     }).catch(() => setError(t("reset.errors.couldNotVerifyPassword")));
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
