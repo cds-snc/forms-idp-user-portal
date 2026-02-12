@@ -5,9 +5,9 @@ import { useState } from "react";
 import { I18n } from "@i18n";
 import { useTranslation } from "@i18n/client";
 
+import { addU2F, verifyU2F } from "./actions";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 import { completeFlowOrGetUrl } from "@lib/client";
-import { addU2F, verifyU2F } from "@lib/server/u2f";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 

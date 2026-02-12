@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@i18n";
 
-import { verifyU2FLogin } from "@lib/server/u2f";
+import { verifyU2FLogin } from "./actions";
 import { updateSession } from "@lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import {
