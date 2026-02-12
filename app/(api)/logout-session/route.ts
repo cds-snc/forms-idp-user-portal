@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const returnUrl = searchParams.get("returnUrl") || "/start";
+  const returnUrl = searchParams.get("returnUrl") || "/";
 
   await logoutCurrentSession({
     postLogoutRedirectUri: returnUrl,
