@@ -1,7 +1,9 @@
+import { headers } from "next/headers";
+
 import { Alert } from "@clientComponents/globals";
 import { BackButton, Button } from "@clientComponents/globals/Buttons";
 
-import { TotpRegister } from "./components/totp-register";
+import { TotpRegister } from "@components/mfa/otp/TotpRegister";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -9,7 +11,7 @@ import { loadMostRecentSession, loadSessionById } from "@lib/session";
 import { registerTOTP } from "@lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCredentials } from "@lib/cookies";
-import { headers } from "next/headers";
+
 import Link from "next/link";
 import { getSerializableLoginSettings } from "@lib/zitadel";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";

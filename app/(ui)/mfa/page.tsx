@@ -1,4 +1,4 @@
-import { ChooseSecondFactor } from "./components/choose-second-factor";
+import { ChooseSecondFactor } from "../../../components/mfa/ChooseSecondFactor";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { getServiceUrlFromHeaders } from "@lib/service-url";

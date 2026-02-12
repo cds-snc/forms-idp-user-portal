@@ -9,7 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useTranslation, I18n } from "@i18n";
 import { useActionState } from "react";
 
-import { CopyToClipboard } from "./copy-to-clipboard";
+import { CopyToClipboard } from "./CopyToClipboard";
 
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";

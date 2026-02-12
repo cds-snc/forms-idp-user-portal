@@ -1,16 +1,18 @@
-import { Alert } from "@clientComponents/globals/Alert/Alert";
-import { LoginOTP } from "./components/LoginOTP";
-import { I18n } from "@i18n";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { getLoginSettings } from "@lib/zitadel";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
+import { I18n } from "@i18n";
+
 import { serverTranslation } from "@i18n/server";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getLoginSettings } from "@lib/zitadel";
 import { getSerializableObject, SearchParams } from "@lib/utils";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
+
+import { LoginOTP } from "@components/mfa/otp/LoginOTP";
+import { Alert } from "@clientComponents/globals/Alert/Alert";
+import { UserAvatar } from "@serverComponents/UserAvatar";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
