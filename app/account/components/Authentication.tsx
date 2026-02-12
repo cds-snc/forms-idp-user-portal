@@ -2,7 +2,7 @@
 import { Button } from "@components/clientComponents/globals";
 import Image from "next/image";
 
-// TODO may not need to be a client component if Link can be used instead of butt
+// TODO may not need to be a client component if Link can be used instead of button
 // TODO add translation strings
 
 export const Authentication = () => {
