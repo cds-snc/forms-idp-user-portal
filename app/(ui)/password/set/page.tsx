@@ -34,11 +34,10 @@ export default async function Page() {
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
-    organization: session?.factors?.user?.organizationId,
+    organization,
   });
 
-  // ??
-  if (!loginName || !session?.id || !organization) {
+  if (!loginName || !session || !organization) {
     throw new Error("No session.");
   }
 

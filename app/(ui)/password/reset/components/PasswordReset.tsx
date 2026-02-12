@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { useTranslation } from "@i18n";
 import { useRouter } from "next/navigation";
+
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-
-import { PasswordCreation } from "@clientComponents/forms/PasswordCreation/PasswordCreation";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { changePassword, sendPassword } from "@lib/server/password";
+
+import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 
 export function PasswordReset({
   userId,
@@ -93,7 +94,7 @@ export function PasswordReset({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordCreation
+      <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />

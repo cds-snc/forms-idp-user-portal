@@ -1,30 +1,20 @@
-import { SetRegisterPasswordForm } from "./components/set-register-password-form";
-import { serverTranslation } from "@i18n/server";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { validateAccount } from "@lib/validationSchemas";
-import {
-  getDefaultOrg,
-  getLegalAndSupportSettings,
-  getPasswordComplexitySettings,
-} from "@lib/zitadel";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { serverTranslation } from "@i18n/server";
+
+import { getSessionCredentials } from "@lib/cookies";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { validateAccount } from "@lib/validationSchemas";
+
+import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { SetRegisterPasswordForm } from "./components/SetRegisterPasswordForm";
+import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("create.title") };
 }
-
-const getOrg = async (serviceUrl: string) => {
-  const org = await getDefaultOrg({
-    serviceUrl,
-  });
-  if (org) {
-    return org.id;
-  }
-};
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -34,7 +24,8 @@ export default async function Page(props: {
 
   const searchParams = await props.searchParams;
   const { firstname, lastname, email, requestId } = searchParams;
-  const organization = searchParams.organization ?? (await getOrg(serviceUrl));
+
+  const { organization } = await getSessionCredentials();
 
   const missingData = !firstname || !lastname || !email || !organization;
   const validateData = await validateAccount({ firstname, lastname, email } as {
@@ -45,6 +36,7 @@ export default async function Page(props: {
     serviceUrl,
     organization,
   });
+
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
     organization,
