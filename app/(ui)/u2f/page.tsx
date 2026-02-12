@@ -1,6 +1,9 @@
 import { headers } from "next/headers";
 import { Metadata } from "next";
 
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { SearchParams } from "@lib/utils";
@@ -8,6 +11,9 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
 import { LoginU2F } from "@components/mfa/u2f/LoginU2F";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";

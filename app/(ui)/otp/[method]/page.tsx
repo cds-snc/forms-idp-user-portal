@@ -1,17 +1,22 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { I18n } from "@i18n";
-
 import { serverTranslation } from "@i18n/server";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
+
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
 import { getLoginSettings } from "@lib/zitadel";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSerializableObject, SearchParams } from "@lib/utils";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
 import { LoginOTP } from "@components/mfa/otp/LoginOTP";
-import { Alert } from "@clientComponents/globals/Alert/Alert";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -75,14 +80,6 @@ export default async function Page(props: {
           code={code}
           redirect={safeRedirect}
         >
-          {!sessionFactors && (
-            <div className="py-4">
-              <Alert.Danger>
-                <I18n i18nKey="unknownContext" namespace="error" />
-              </Alert.Danger>
-            </div>
-          )}
-
           {method === "email" && (
             <I18n i18nKey="verify.emailDescription" namespace="otp" tagName="p" className="mb-3" />
           )}
