@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { UserNameForm } from "./components/UserNameForm";
+import { UserNameForm } from "../components/UserNameForm";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import Link from "next/dist/client/link";
 import { getMostRecentSessionCookie } from "@lib/cookies";

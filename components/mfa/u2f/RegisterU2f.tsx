@@ -231,7 +231,7 @@ export function RegisterU2f({
           }
         } else {
           setLoading(false);
-          return router.push("/signedin");
+          return router.push("/account");
         }
       }
     }

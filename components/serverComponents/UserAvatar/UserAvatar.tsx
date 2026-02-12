@@ -18,7 +18,7 @@ export function UserAvatar({ loginName, displayName, showDropdown }: Props) {
       <span className="grow"></span>
       {showDropdown && (
         <Link
-          href={"/signedin"}
+          href={"/account"}
           className={`ml-4 mr-1 flex items-center justify-center p-1 transition-all hover:bg-black/10 dark:hover:bg-white/10 `}
         >
           <ChevronDown className="size-4" />

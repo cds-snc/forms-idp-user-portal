@@ -23,6 +23,7 @@ import { Alert } from "@clientComponents/globals";
 import { BackButton, Button } from "@clientComponents/globals/Buttons";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -75,12 +76,12 @@ export default async function Page(props: {
     throw new Error("No session found");
   }
 
-  let urlToContinue = "/signedin";
+  let urlToContinue = LOGGED_IN_HOME_PAGE;
 
   if (checkAfter) {
     urlToContinue = `/otp/${method}?`;
   } else if (loginName) {
-    urlToContinue = `/signedin?`;
+    urlToContinue = LOGGED_IN_HOME_PAGE;
   }
 
   return (
