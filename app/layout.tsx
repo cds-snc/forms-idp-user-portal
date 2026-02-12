@@ -66,7 +66,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 <main id="content">
                   <Link
                     className="mb-6 mr-10 inline-flex no-underline focus:bg-white"
-                    href={`/${process.env.NEXT_PUBLIC_BASE_PATH}`}
+                    href={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/`}
                   >
                     <span className="">
                       <SiteLogo />
