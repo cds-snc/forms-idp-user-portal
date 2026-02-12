@@ -1,12 +1,14 @@
 import { Metadata } from "next";
-import { serverTranslation } from "@i18n/server";
-import { AccountInformation } from "./components/AccountInformation";
 import { headers } from "next/headers";
+import { serverTranslation } from "@i18n/server";
+
+import { getUserByID } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
 import { loadSessionById } from "@lib/session";
-import { getUserByID } from "@lib/zitadel";
+
 import { Authentication } from "./components/Authentication";
+import { AccountInformation } from "./components/AccountInformation";
 
 // TODO add translation strings
 
