@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { useRegistration } from "../../context/RegistrationContext";
 
 export function SetRegisterPasswordForm({
   passwordComplexitySettings,
@@ -16,6 +17,7 @@ export function SetRegisterPasswordForm({
   lastname,
   organization,
   requestId,
+  onSubmitSuccess,
 }: {
   passwordComplexitySettings: PasswordComplexitySettings;
   email: string;
@@ -23,9 +25,11 @@ export function SetRegisterPasswordForm({
   lastname: string;
   organization: string;
   requestId?: string;
+  onSubmitSuccess?: () => void;
 }) {
   const { t } = useTranslation(["password"]);
   const router = useRouter();
+  const { clearRegistrationData } = useRegistration();
   const [error, setError] = useState("");
 
   const successCallback = async ({ password }: { password: string }) => {
@@ -52,6 +56,10 @@ export function SetRegisterPasswordForm({
     }
 
     if (response && "redirect" in response && response.redirect) {
+      // Signal successful submission before clearing data
+      onSubmitSuccess?.();
+      // Clear registration data from sessionStorage on successful registration
+      clearRegistrationData();
       router.push(response.redirect);
     }
   };

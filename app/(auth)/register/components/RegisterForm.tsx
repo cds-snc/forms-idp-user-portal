@@ -3,6 +3,7 @@ import { useActionState } from "react";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n";
+import { useRegistration } from "../context/RegistrationContext";
 
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
@@ -12,14 +13,6 @@ import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
 import { Hint } from "@clientComponents/forms/Hint";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-
-type RegisterData = {
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  organization?: string;
-  requestId?: string;
-};
 
 type FormState = {
   error?: string;
@@ -45,7 +38,7 @@ const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
-
+  const { setRegistrationData } = useRegistration();
   const router = useRouter();
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
@@ -68,12 +61,13 @@ export function RegisterForm({ email, firstname, lastname, organization, request
       };
     }
 
-    const registerParams: RegisterData = {
+    // Store registration data in context (persisted to sessionStorage)
+    setRegistrationData({
       ...validationResult.output,
       ...(organization && { organization }),
       ...(requestId && { requestId }),
-    };
-    router.push(`/register/password?` + new URLSearchParams(registerParams));
+    });
+    router.push("/register/password?step=2");
 
     return previousState;
   };
