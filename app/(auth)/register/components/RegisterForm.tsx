@@ -67,7 +67,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
       ...(organization && { organization }),
       ...(requestId && { requestId }),
     });
-    router.push("/register/password?step=2");
+    router.push("/register/password");
 
     return previousState;
   };
