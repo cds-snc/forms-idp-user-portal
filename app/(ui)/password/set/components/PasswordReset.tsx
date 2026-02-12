@@ -12,13 +12,11 @@ import { changePassword, sendPassword } from "@lib/server/password";
 
 export function PasswordReset({
   userId,
-  code,
   passwordComplexitySettings,
   organization,
   loginName,
 }: {
   userId?: string;
-  code?: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;
   loginName?: string;
@@ -27,13 +25,13 @@ export function PasswordReset({
   const router = useRouter();
   const [error, setError] = useState("");
 
-  const successCallback = async ({ password }: { password: string }) => {
+  const submitPasswordForm = async ({ password, code }: { password: string; code?: string }) => {
     if (!userId) return;
 
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password,
-      code,
+      ...(code ? { code } : {}),
     };
 
     const changeResponse = await changePassword(payload).catch(() =>
@@ -49,21 +47,6 @@ export function PasswordReset({
       setError(t("reset.errors.couldNotSetPassword"));
       return;
     }
-
-    ContinueAuthenticationFlow({ password });
-  };
-
-  const ContinueAuthenticationFlow = async ({ password }: { password: string }) => {
-    const params = new URLSearchParams({});
-
-    if (loginName) {
-      params.append("loginName", loginName);
-    }
-    if (organization) {
-      params.append("organization", organization);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
 
     const passwordResponse = await sendPassword({
       loginName: loginName ?? "",
@@ -92,7 +75,8 @@ export function PasswordReset({
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
       <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
-        successCallback={successCallback}
+        successCallback={submitPasswordForm}
+        requireConfirmationCode={true}
       />
     </>
   );

@@ -3,11 +3,10 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { useActionState, useState } from "react";
 import { I18n, useTranslation } from "@i18n";
 import * as v from "valibot";
-
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { Hint } from "@clientComponents/forms/Hint";
-import { confirmPasswordSchema, passwordSchema } from "@lib/validationSchemas";
+import { confirmPasswordSchema, passwordSchema, codeSchema } from "@lib/validationSchemas";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import { PasswordComplexity } from "./PasswordComplexity";
@@ -18,51 +17,71 @@ type FormState = {
   formData?: {
     password?: string;
     confirmPassword?: string;
+    code?: string;
   };
 };
 
 const validateCreatePassword = async (
   formEntries: { [k: string]: FormDataEntryValue },
-  passwordComplexitySettings = {}
+  passwordComplexitySettings = {},
+  requireConfirmationCode = false
 ) => {
-  const passwordValidationSchema = v.pipe(
+  const baseSchemaEntries = {
+    ...passwordSchema(passwordComplexitySettings),
+    ...confirmPasswordSchema(),
+  };
+
+  const schemaWithCode = v.pipe(
     v.object({
-      ...passwordSchema(passwordComplexitySettings),
-      ...confirmPasswordSchema(),
+      ...baseSchemaEntries,
+      ...codeSchema(),
     }),
     v.forward(
       v.check((input) => input.password === input.confirmPassword, "mustMatch"),
       ["confirmPassword"]
     )
   );
+
+  const schemaWithoutCode = v.pipe(
+    v.object(baseSchemaEntries),
+    v.forward(
+      v.check((input) => input.password === input.confirmPassword, "mustMatch"),
+      ["confirmPassword"]
+    )
+  );
+
+  const passwordValidationSchema = requireConfirmationCode ? schemaWithCode : schemaWithoutCode;
   return v.safeParse(passwordValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
 export function PasswordValidationForm({
   passwordComplexitySettings,
   successCallback,
+  requireConfirmationCode = false,
 }: {
   passwordComplexitySettings: PasswordComplexitySettings;
-  successCallback?: ({ password }: { password: string }) => void;
+  successCallback?: ({ password, code }: { password: string; code?: string }) => void;
+  requireConfirmationCode?: boolean;
 }) {
   const { t } = useTranslation(["password"]);
 
   const [watchPassword, setWatchPassword] = useState("");
-  // const [watchConfirmPassword, setWatchConfirmPassword] = useState("");
 
-  // TODO could also be a client (not server) function
-  const localFormAction = async (previousState: FormState, formData: FormData) => {
+  const validateAndSubmit = async (previousState: FormState, formData: FormData) => {
     const formEntries = {
       password: (formData.get("password") as string) || "",
       confirmPassword: (formData.get("confirmPassword") as string) || "",
+      ...((requireConfirmationCode && { code: (formData.get("code") as string) || "" }) || {}),
     };
 
     // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = Object.fromEntries(formData.entries());
     const validationResult = await validateCreatePassword(
       formEntriesData,
-      passwordComplexitySettings
+      passwordComplexitySettings,
+      requireConfirmationCode
     );
+
     if (!validationResult.success) {
       return {
         validationErrors: validationResult.issues.map((issue) => ({
@@ -74,18 +93,22 @@ export function PasswordValidationForm({
     }
 
     if (validationResult.success) {
-      successCallback?.({ password: formEntries.password as string });
+      successCallback?.({
+        password: formEntries.password as string,
+        ...(requireConfirmationCode ? { code: formEntries.code as string } : {}),
+      });
     }
 
     return previousState;
   };
 
-  const [state, formAction] = useActionState(localFormAction, {
+  const [state, formAction] = useActionState(validateAndSubmit, {
     error: undefined,
     validationErrors: undefined,
     formData: {
       password: "",
       confirmPassword: "",
+      ...(requireConfirmationCode ? { code: "" } : {}),
     },
   });
 
@@ -100,6 +123,23 @@ export function PasswordValidationForm({
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
       <form className="w-full" action={formAction} noValidate onChange={() => setDirty(true)}>
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
+          {requireConfirmationCode && (
+            <div className="gcds-input-wrapper">
+              <Label htmlFor="code" required>
+                {t("reset.labels.confirmationCode")}
+              </Label>
+              {getError("code") && (
+                <ErrorMessage id={"errorMessageCode"}>{t(getError("code"))}</ErrorMessage>
+              )}
+              <TextInput
+                id="code"
+                className="w-full"
+                type="text"
+                required
+                autoComplete="one-time-code"
+              />
+            </div>
+          )}
           <div className="gcds-input-wrapper">
             <Label htmlFor="password" required>
               {t("create.labels.password")}
@@ -115,7 +155,6 @@ export function PasswordValidationForm({
                 <PasswordComplexity
                   passwordComplexitySettings={passwordComplexitySettings}
                   password={watchPassword}
-                  // equals={!!watchPassword && watchPassword === watchConfirmPassword}
                   id="password-complexity-requirements"
                   ready={dirty}
                 />
@@ -146,7 +185,6 @@ export function PasswordValidationForm({
               type="password"
               required
               defaultValue={state.formData?.confirmPassword ?? ""}
-              // onChange={(e) => setWatchConfirmPassword(e.target.value)}
             />
           </div>
         </div>
