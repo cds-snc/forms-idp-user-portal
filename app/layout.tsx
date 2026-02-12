@@ -61,7 +61,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <div id="page-container" className="gc-authpages">
             <div className="account-wrapper mt-10 flex items-center justify-center">
               <div
-                className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[768px] has-[#auth-panel]:tablet:w-[658px] laptop:w-[850px]`}
+                className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[658px] has-[#auth-panel]:tablet:w-[658px] laptop:w-[850px]`}
               >
                 <main id="content">
                   <Link
