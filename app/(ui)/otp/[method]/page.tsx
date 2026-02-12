@@ -18,6 +18,7 @@ import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { LoginOTP } from "@components/mfa/otp/LoginOTP";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { getSessionCredentials } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
@@ -34,14 +35,9 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const {
-    loginName, // send from password page
-    requestId,
-    sessionId,
-    organization,
-    code,
-    redirect,
-  } = searchParams;
+  const { code, redirect } = searchParams;
+
+  const { sessionId, loginName, organization } = await getSessionCredentials();
 
   // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
@@ -73,7 +69,6 @@ export default async function Page(props: {
         <LoginOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
-          requestId={requestId}
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           method={method}
           loginSettings={loginSettings}

@@ -75,23 +75,12 @@ export default async function Page(props: {
     throw new Error("No session found");
   }
 
-  const paramsToContinue = new URLSearchParams({});
   let urlToContinue = "/signedin";
 
-  if (sessionId) {
-    paramsToContinue.append("sessionId", sessionId);
-  }
-  if (loginName) {
-    paramsToContinue.append("loginName", loginName);
-  }
-  if (organization) {
-    paramsToContinue.append("organization", organization);
-  }
-
   if (checkAfter) {
-    urlToContinue = `/otp/${method}?` + paramsToContinue;
+    urlToContinue = `/otp/${method}?`;
   } else if (loginName) {
-    urlToContinue = `/signedin?` + paramsToContinue;
+    urlToContinue = `/signedin?`;
   }
 
   return (
