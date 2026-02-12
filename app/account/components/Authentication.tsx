@@ -40,7 +40,7 @@ export const Authentication = () => {
                 height={32}
                 className="mr-2 inline-block"
               />
-              <span className="font-semibold">Authenticator app</span>
+              <span className="mr-2 font-semibold">Authenticator app</span>
               <span>(e.g Google/Microsoft authenticator, Authy)</span>
               <span className="mx-2">&#8226;</span>
               <Button onClick={handleRemove} theme="link">

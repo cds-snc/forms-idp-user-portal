@@ -11,8 +11,8 @@ import { Authentication } from "./components/Authentication";
 // TODO add translation strings
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await serverTranslation("otp");
-  return { title: t("account.title") };
+  const { t } = await serverTranslation("account");
+  return { title: t("title") };
 }
 
 export default async function Page() {
