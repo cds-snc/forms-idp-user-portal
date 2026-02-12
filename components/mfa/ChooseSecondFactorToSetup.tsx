@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n/client";
-import Image from "next/image";
-import { getImageUrl } from "@lib/imageUrl";
 import { Button } from "@clientComponents/globals/Buttons";
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
+import { MethodOptionCard } from "./MethodOptionCard";
 
 type Props = {
   checkAfter: boolean;
@@ -36,85 +35,45 @@ export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
     }
   };
 
-  const renderOption = (
-    method: string,
-    title: string,
-    isDefault: boolean,
-    icon: string,
-    description: string,
-    url: string
-  ) => (
-    <div
-      className={`cursor-pointer rounded-md border-2 p-6 transition-all ${
-        selectedMethod === method
-          ? "border-gcds-blue-vivid bg-blue-50"
-          : "border-gray-300 hover:border-gray-400"
-      }`}
-      onClick={() => handleMethodSelect(method, url)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          handleMethodSelect(method, url);
-        }
-      }}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <Image src={getImageUrl(icon)} alt={title} width={32} height={32} className="mt-1" />
-          <div>
-            <div className="font-bold">
-              {title}
-              {isDefault && (
-                <>
-                  {" "}
-                  — <span className="italic">{t("set.byDefault")}</span>
-                </>
-              )}
-            </div>
-            <div className="text-sm text-gray-600">{description}</div>
-          </div>
-        </div>
-        {selectedMethod === method && (
-          <Image src={getImageUrl("/img/check_24px.png")} alt="Selected" width={24} height={24} />
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <>
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {/* Email - OTP_EMAIL (Default) */}
-        {ENABLE_EMAIL_OTP &&
-          renderOption(
-            "email",
-            t("set.email.title"),
-            true,
-            "/img/email_24px.png",
-            t("set.email.description"),
-            "/otp/email/set" + params
-          )}
+        {ENABLE_EMAIL_OTP && (
+          <MethodOptionCard
+            method="email"
+            title={t("set.email.title")}
+            icon="/img/email_24px.png"
+            description={t("set.email.description")}
+            url={"/otp/email/set?" + params}
+            isSelected={selectedMethod === "email"}
+            isDefault={true}
+            defaultText={t("set.byDefault")}
+            onSelect={handleMethodSelect}
+          />
+        )}
 
         {/* Authentication App - TOTP */}
-        {renderOption(
-          "authenticator",
-          t("set.authenticator.title"),
-          false,
-          "/img/verified_user_24px.png",
-          t("set.authenticator.description"),
-          "/otp/time-based/set?" + params
-        )}
+        <MethodOptionCard
+          method="authenticator"
+          title={t("set.authenticator.title")}
+          icon="/img/verified_user_24px.png"
+          description={t("set.authenticator.description")}
+          url={"/otp/time-based/set?" + params}
+          isSelected={selectedMethod === "authenticator"}
+          onSelect={handleMethodSelect}
+        />
 
         {/* Security Key - U2F */}
-        {renderOption(
-          "securityKey",
-          t("set.securityKey.title"),
-          false,
-          "/img/fingerprint_24px.png",
-          t("set.securityKey.description"),
-          "/u2f/set?" + params
-        )}
+        <MethodOptionCard
+          method="securityKey"
+          title={t("set.securityKey.title")}
+          icon="/img/fingerprint_24px.png"
+          description={t("set.securityKey.description")}
+          url={"/u2f/set?" + params}
+          isSelected={selectedMethod === "securityKey"}
+          onSelect={handleMethodSelect}
+        />
       </div>
 
       <div className="mt-8 flex justify-start">
