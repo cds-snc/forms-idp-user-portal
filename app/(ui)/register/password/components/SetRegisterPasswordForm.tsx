@@ -6,7 +6,7 @@ import { registerUser } from "@lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 
-import { PasswordForm } from "@components/PasswordValidation/PasswordForm";
+import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 
 export function SetRegisterPasswordForm({
@@ -59,7 +59,7 @@ export function SetRegisterPasswordForm({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordForm
+      <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />

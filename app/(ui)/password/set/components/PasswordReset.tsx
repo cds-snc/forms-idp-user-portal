@@ -6,7 +6,7 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
-import { PasswordForm } from "@components/PasswordValidation/PasswordForm";
+import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { changePassword, sendPassword } from "@lib/server/password";
 
@@ -90,7 +90,7 @@ export function PasswordReset({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordForm
+      <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />

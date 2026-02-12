@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { checkSessionAndSetPassword, sendPassword } from "@lib/server/password";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { PasswordForm } from "@components/PasswordValidation/PasswordForm";
+import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -81,7 +81,7 @@ export function ChangePasswordForm({
   return (
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
-      <PasswordForm
+      <PasswordValidationForm
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={successCallback}
       />
