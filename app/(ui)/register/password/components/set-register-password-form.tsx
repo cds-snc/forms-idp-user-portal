@@ -6,7 +6,7 @@ import { registerUser } from "@lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 
-import { PasswordForm } from "@clientComponents/forms/PasswordValidation/PasswordForm";
+import { PasswordForm } from "@components/PasswordValidation/PasswordForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 
 export function SetRegisterPasswordForm({

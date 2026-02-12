@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { checkSessionAndSetPassword, sendPassword } from "@lib/server/password";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { PasswordForm } from "@clientComponents/forms/PasswordValidation/PasswordForm";
+import { PasswordForm } from "@components/PasswordValidation/PasswordForm";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
