@@ -9,6 +9,33 @@
     "required": "obligatoire",
     "errorSummary": {
       "title": "Veuillez corriger les erreurs sur la page."
+    },
+    "account": {
+      "settings": "Paramètres du compte",
+      "title": "Compte",
+      "nav": {
+        "account": "Compte",
+        "profile": "Profil"
+      },
+      "information": "Informations du compte",
+      "change": "Modifier",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse courriel",
+      "password": "Mot de passe",
+      "authentication": "Authentification",
+      "securityKey": "Clé de sécurité",
+      "governmentIssued": "Yubikey émise par le gouvernement",
+      "authenticatorApp": "Application d'authentification",
+      "googleMicrosoft": "par exemple Google/Microsoft authenticator, Authy",
+      "remove": "Supprimer",
+      "profileDescription": "Gérez vos paramètres de profil et vos préférences",
+      "preferences": "Préférences",
+      "language": "Langue",
+      "quickActions": "Actions rapides",
+      "changePassword": "Changer le mot de passe",
+      "addAuthMethod": "Ajouter une méthode d'authentification",
+      "manageNotifications": "Gérer les notifications"
     }
   },
   "error": {

@@ -3,8 +3,15 @@ import Link from "next/link";
 import { cn } from "@lib/utils";
 import { SiteLogo } from "@serverComponents/icons";
 import { I18n } from "@i18n";
+import LanguageToggle from "@clientComponents/globals/LanguageToggle";
 
-export const GcFormsHeader = ({ children }: { children: React.ReactNode }) => {
+export const GcFormsHeader = ({
+  children,
+  showLanguageToggle = false,
+}: {
+  children?: React.ReactNode;
+  showLanguageToggle?: boolean;
+}) => {
   return (
     <>
       <header className={cn("mb-5 border-b-1 border-gray-500 bg-white px-0")}>
@@ -22,7 +29,14 @@ export const GcFormsHeader = ({ children }: { children: React.ReactNode }) => {
               <I18n i18nKey="title" namespace="common" />
             </span>
           </Link>
-          {children}
+          <div className="flex items-center justify-end gap-4">
+            {children}
+            {showLanguageToggle && (
+              <div className="gc-language-toggle">
+                <LanguageToggle />
+              </div>
+            )}
+          </div>
         </div>
       </header>
     </>

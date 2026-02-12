@@ -9,6 +9,33 @@
     "required": "required",
     "errorSummary": {
       "title": "Please correct the errors on the page."
+    },
+    "account": {
+      "settings": "Account settings",
+      "title": "Account",
+      "nav": {
+        "account": "Account",
+        "profile": "Profile"
+      },
+      "information": "Account information",
+      "change": "Change",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "authentication": "Authentication",
+      "securityKey": "Security key",
+      "governmentIssued": "Government issued Yubikey",
+      "authenticatorApp": "Authenticator App",
+      "googleMicrosoft": "e.g Google/Microsoft authenticator, Authy",
+      "remove": "Remove",
+      "profileDescription": "Manage your profile settings and preferences",
+      "preferences": "Preferences",
+      "language": "Language",
+      "quickActions": "Quick Actions",
+      "changePassword": "Change Password",
+      "addAuthMethod": "Add Authentication Method",
+      "manageNotifications": "Manage Notifications"
     }
   },
   "error": {
