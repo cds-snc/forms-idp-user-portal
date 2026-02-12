@@ -37,7 +37,7 @@ const gotoAccounts = ({
   requestId: string;
   organization?: string;
 }): NextResponse<unknown> => {
-  const accountsUrl = constructUrl(request, "/signedin");
+  const accountsUrl = constructUrl(request, "/account");
 
   if (requestId) {
     accountsUrl.searchParams.set("requestId", requestId);
@@ -132,7 +132,7 @@ export async function handleOIDCFlowInitiation(
           return NextResponse.redirect(ldapUrl);
         }
 
-        let provider = idpTypeToSlug(identityProviderType);
+        const provider = idpTypeToSlug(identityProviderType);
 
         const params = new URLSearchParams({
           requestId: requestId,
@@ -283,7 +283,7 @@ export async function handleOIDCFlowInitiation(
 
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({
+      const selectedSession = await findValidSession({
         serviceUrl,
         sessions,
         authRequest,
@@ -388,7 +388,7 @@ export async function handleSAMLFlowInitiation(
   }
 
   // Try to find a valid session
-  let selectedSession = await findValidSession({
+  const selectedSession = await findValidSession({
     serviceUrl,
     sessions,
     samlRequest,

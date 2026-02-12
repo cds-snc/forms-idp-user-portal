@@ -30,7 +30,7 @@ function goToSignedInPage(
     params.append("requestId", props.requestId);
   }
 
-  return `/signedin?` + params;
+  return `/account?` + params;
 }
 
 /**
