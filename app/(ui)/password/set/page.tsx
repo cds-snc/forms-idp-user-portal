@@ -1,10 +1,10 @@
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { loadMostRecentSession } from "@lib/session";
+import { getPasswordComplexitySettings } from "@lib/zitadel";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-
-import { getPasswordComplexitySettings } from "@lib/zitadel";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionById } from "@lib/session";
 import { getSessionCredentials } from "@lib/cookies";
 
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
@@ -15,26 +15,29 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("reset.title") };
 }
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page() {
+  const { loginName, organization } = await getSessionCredentials();
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const params = await searchParams;
-  const code = params.code;
-
-  const { sessionId, loginName, organization } = await getSessionCredentials();
-  const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
+  // also allow no session to be found (ignoreUnkownUsername)
+  let session: Session | undefined;
+  if (loginName) {
+    session = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: {
+        loginName,
+        organization,
+      },
+    });
+  }
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
     organization,
   });
 
-  if (!loginName || !sessionId || !organization) {
+  if (!loginName || !session || !organization) {
     throw new Error("No session.");
   }
 
@@ -45,9 +48,8 @@ export default async function Page({
       namespace="password"
     >
       <PasswordReset
-        userId={sessionFactors.factors?.user?.id}
+        userId={session.factors?.user?.id}
         passwordComplexitySettings={passwordComplexitySettings}
-        code={code}
         organization={organization}
         loginName={loginName}
       />

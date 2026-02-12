@@ -103,7 +103,7 @@ export async function checkMFAFactors(
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[]
-) {
+): Promise<{ error: string } | { redirect: string }> {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
@@ -164,7 +164,9 @@ export async function checkMFAFactors(
           { userId: session.factors?.user?.id },
           "Skipping MFA setup - user skipped recently"
         );
-        return;
+        return {
+          error: "MFA Skipped",
+        };
       }
     }
 
@@ -174,6 +176,8 @@ export async function checkMFAFactors(
     );
     return { redirect: `/mfa/set` };
   }
+
+  return { error: "No MFA factors available" };
 }
 
 /**
