@@ -206,7 +206,7 @@ export async function handleOIDCFlowInitiation(
         }
       }
 
-      const loginNameUrl = constructUrl(request, "/start");
+      const loginNameUrl = constructUrl(request, "/");
       loginNameUrl.searchParams.set("requestId", requestId);
 
       if (authRequest.loginHint) {
@@ -343,7 +343,7 @@ export async function handleOIDCFlowInitiation(
       }
     }
   } else {
-    const loginNameUrl = constructUrl(request, "/start");
+    const loginNameUrl = constructUrl(request, "/");
     loginNameUrl.searchParams.set("requestId", requestId);
 
     if (authRequest?.loginHint) {
@@ -382,7 +382,7 @@ export async function handleSAMLFlowInitiation(
 
   // Early return: No sessions available - redirect to login
   if (sessions.length === 0) {
-    const loginNameUrl = constructUrl(request, "/start");
+    const loginNameUrl = constructUrl(request, "/");
     loginNameUrl.searchParams.set("requestId", requestId);
     return NextResponse.redirect(loginNameUrl);
   }

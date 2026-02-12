@@ -37,13 +37,13 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
     // Verify the session is fully authenticated
     if (!sessionFactors) {
-      redirect("/start");
+      redirect("/");
     }
 
     // @TODO: need something stricter than this - must have password + "strong" mfa
     const valid = await isSessionValid({ serviceUrl, session: sessionFactors });
     if (!valid) {
-      redirect("/start");
+      redirect("/");
     }
 
     if (!requestId) {
@@ -57,7 +57,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     if (isRedirectError(error)) {
       throw error;
     }
-    redirect("/start");
+    redirect("/");
   }
 
   return (
