@@ -1,13 +1,20 @@
-import { ChooseSecondFactorToSetup } from "./components/choose-second-factor-to-setup";
+import { headers } from "next/headers";
+import { Metadata } from "next";
 
+/*--------------------------------------------*
+ * Methods
+ *--------------------------------------------*/
+import { getSerializableLoginSettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, checkSessionFactorValidity } from "@lib/session";
 import { getSessionCredentials } from "@lib/cookies";
-import { getSerializableLoginSettings } from "@lib/zitadel";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
+import { ChooseSecondFactorToSetup } from "@components/mfa/ChooseSecondFactorToSetup";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { Metadata } from "next";
-import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");

@@ -1,7 +1,10 @@
 "use client";
 
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
-import { verifyU2FLogin } from "@lib/server/u2f";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "@i18n";
+
+import { verifyU2FLogin } from "./actions";
 import { updateSession } from "@lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import {
@@ -9,9 +12,11 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "@i18n";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+
+/*--------------------------------------------*
+ * Components
+ *--------------------------------------------*/
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 
 type PublicKeyCredentialRequestOptionsData = {
