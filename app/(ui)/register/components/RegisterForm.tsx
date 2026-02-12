@@ -41,6 +41,8 @@ type Props = {
   idpCount: number;
 };
 
+const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
+
 export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
 
@@ -149,10 +151,11 @@ export function RegisterForm({ email, firstname, lastname, organization, request
           </div>
         </div>
 
-        {/* TODO terms page or link to app? */}
         <p className="-mt-2 mb-10">
           {t("terms.agreement")}
-          <Link href={`/${i18n.language}/terms-of-use`}>{t("terms.linkText")}</Link>
+          <Link href={`${FORMS_PRODUCTION_URL}/${i18n.language}/terms-of-use`}>
+            {t("terms.linkText")}
+          </Link>
         </p>
 
         <div>
