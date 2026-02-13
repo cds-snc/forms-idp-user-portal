@@ -93,7 +93,7 @@ export async function loginWithOIDCAndSession({
             return { redirect: loginSettings.defaultRedirectUri };
           }
 
-          const signedinUrl = "/signedin";
+          const signedinUrl = "/account";
 
           const params = new URLSearchParams();
           if (selectedSession.factors?.user?.loginName) {

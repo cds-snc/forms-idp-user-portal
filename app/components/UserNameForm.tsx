@@ -1,9 +1,8 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { Alert, Label, TextInput, ErrorStatus } from "@clientComponents/forms";
 import { useTranslation } from "@i18n/client";
-
 import { useRouter } from "next/navigation";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { validateUsername } from "@lib/validationSchemas";
@@ -12,12 +11,7 @@ import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
 import { submitUserNameForm } from "../actions";
 
 type Props = {
-  loginName: string | undefined;
-  requestId: string | undefined;
-
   organization?: string;
-  suffix?: string;
-  submit: boolean;
 };
 
 type FormState = {
@@ -28,7 +22,7 @@ type FormState = {
   validationErrors?: { fieldKey: string; fieldValue: string }[];
 };
 
-export const UserNameForm = ({ loginName, requestId, organization, suffix, submit }: Props) => {
+export const UserNameForm = ({ organization }: Props) => {
   const { t } = useTranslation(["start", "common"]);
 
   const router = useRouter();
@@ -55,8 +49,6 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
     const result = await submitUserNameForm({
       loginName: username,
       organization,
-      requestId,
-      suffix,
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -86,24 +78,10 @@ export const UserNameForm = ({ loginName, requestId, organization, suffix, submi
 
   const [state, formAction] = useActionState(localFormAction, {
     formData: {
-      username: loginName ? loginName : "",
+      username: "",
     },
     validationErrors: undefined,
   });
-
-  // Handle auto-submit effect when component mounts with the submit flag
-  useEffect(() => {
-    if (submit && loginName) {
-      // Small delay to ensure the form input has been rendered and populated
-      const timer = setTimeout(() => {
-        const formElement = document.getElementById("login") as HTMLFormElement;
-        if (formElement) {
-          formElement.requestSubmit();
-        }
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [submit, loginName]);
 
   const getError = (fieldKey: string) => {
     return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";

@@ -13,9 +13,8 @@ import { checkEmailVerification } from "@lib/verify-helper";
 
 export type SendLoginnameCommand = {
   loginName: string;
-  requestId?: string;
   organization?: string;
-  suffix?: string;
+  requestId?: string;
 };
 
 export const submitUserNameForm = async (
@@ -40,7 +39,6 @@ export const submitUserNameForm = async (
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
-    suffix: command.suffix,
   };
 
   const searchResult = await searchUsers(searchUsersRequest);

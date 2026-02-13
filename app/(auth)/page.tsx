@@ -1,6 +1,5 @@
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getDefaultOrg, getLoginSettings } from "@lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getLoginSettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
@@ -8,52 +7,28 @@ import { headers } from "next/headers";
 import { UserNameForm } from "../components/UserNameForm";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import Link from "next/dist/client/link";
-import { getMostRecentSessionCookie } from "@lib/cookies";
+import { getMostRecentSessionCookie, getSessionCredentials } from "@lib/cookies";
 import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
+import { isSessionValid, loadMostRecentSession } from "@lib/session";
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
   return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
-  const searchParams = await props.searchParams;
-
-  const loginName = searchParams?.loginName;
-  const requestId = searchParams?.requestId;
-  const organization = searchParams?.organization;
-  const suffix = searchParams?.suffix;
-  const submit: boolean = searchParams?.submit === "true";
-
+export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const organization = ZITADEL_ORGANIZATION;
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: organization,
   });
 
-  const registerParams = new URLSearchParams();
-  if (organization) {
-    registerParams.append("organization", organization);
-  }
-  if (requestId) {
-    registerParams.append("requestId", requestId);
-  }
-
-  const registerLink = `/register?${registerParams.toString()}`;
+  const registerLink = "/register";
 
   let currentSession;
   try {
@@ -62,13 +37,29 @@ export default async function Page(props: {
     currentSession = null;
   }
 
+  let isAuthenticated = false;
+  let session;
+
+  try {
+    const { loginName } = await getSessionCredentials();
+
+    session = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: { loginName, organization },
+    });
+
+    isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
+  } catch (error) {
+    session = null;
+  }
+
   const accounts: AvatarListItem[] = [
     {
-      loginName: loginName || currentSession?.loginName || "",
+      loginName: currentSession?.loginName || "",
       organization: organization || currentSession?.organization || "",
-      requestId: requestId || "",
-      suffix: suffix || "",
-      link: `/password`,
+      requestId: "",
+      suffix: "",
+      link: isAuthenticated ? "/account" : "/password",
       showDropdown: false,
     },
     {
@@ -110,13 +101,7 @@ export default async function Page(props: {
         </div>
       )}
 
-      <UserNameForm
-        loginName={loginName}
-        requestId={requestId}
-        organization={organization}
-        suffix={suffix}
-        submit={submit}
-      />
+      <UserNameForm organization={organization} />
     </AuthPanel>
   );
 }
