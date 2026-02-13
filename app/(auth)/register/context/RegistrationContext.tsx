@@ -8,7 +8,6 @@ export type RegistrationData = {
   lastname: string;
   email: string;
   organization?: string;
-  requestId?: string;
 };
 
 type RegistrationContextType = {

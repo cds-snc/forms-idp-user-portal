@@ -1,6 +1,5 @@
 "use client";
 import { useActionState } from "react";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n";
 import { useRegistration } from "../context/RegistrationContext";
@@ -8,7 +7,6 @@ import { useRegistration } from "../context/RegistrationContext";
 import { Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { validateAccount } from "@lib/validationSchemas";
-// import { ErrorCharacterCount } from "@clientComponents/forms/ErrorCharacterCount";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
 import { Hint } from "@clientComponents/forms/Hint";
@@ -25,18 +23,12 @@ type FormState = {
 };
 
 type Props = {
-  firstname?: string;
-  lastname?: string;
-  email?: string;
   organization: string;
-  requestId?: string;
-  loginSettings?: LoginSettings;
-  idpCount: number;
 };
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
-export function RegisterForm({ email, firstname, lastname, organization, requestId }: Props) {
+export function RegisterForm({ organization }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
   const { setRegistrationData } = useRegistration();
   const router = useRouter();
@@ -65,7 +57,6 @@ export function RegisterForm({ email, firstname, lastname, organization, request
     setRegistrationData({
       ...validationResult.output,
       ...(organization && { organization }),
-      ...(requestId && { requestId }),
     });
     router.push("/register/password");
 
@@ -103,10 +94,9 @@ export function RegisterForm({ email, firstname, lastname, organization, request
               id="firstname"
               autoComplete="given-name"
               required
-              defaultValue={state.formData?.firstname ?? firstname ?? ""}
+              defaultValue={state.formData?.firstname ?? ""}
               ariaDescribedbyIds={getError("firstname") ? ["errorMessageFirstname"] : undefined}
             />
-            {/* TODO? <ErrorCharacterCount id="characterCountMessageFirstname" maxLength={50} /> */}
           </div>
           <div className="gcds-input-wrapper">
             <Label htmlFor="lastname" required>
@@ -121,7 +111,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
               autoComplete="family-name"
               required
               id="lastname"
-              defaultValue={state.formData?.lastname ?? lastname ?? ""}
+              defaultValue={state.formData?.lastname ?? ""}
               ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
             />
           </div>
@@ -139,7 +129,7 @@ export function RegisterForm({ email, firstname, lastname, organization, request
               autoComplete="email"
               required
               id="email"
-              defaultValue={state.formData?.email ?? email ?? ""}
+              defaultValue={state.formData?.email ?? ""}
               ariaDescribedbyIds={getError("email") ? ["errorMessageEmail"] : undefined}
             />
           </div>
