@@ -37,7 +37,6 @@ export default async function Page() {
 
   return (
     <>
-      <div>Account</div>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
       <Authentication />
