@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         </div>
       </SiteHeader>
       <main className="mx-auto max-w-[71.25rem] px-6 py-2 laptop:px-0">
-        ˝<div className="mb-20 px-16">{children}</div>
+        <div className="mb-20 px-16">{children}</div>
       </main>
     </div>
   );
