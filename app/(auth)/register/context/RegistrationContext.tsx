@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 const STORAGE_KEY = "registration-data";
 
@@ -48,23 +48,23 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   // Note: This will be false during SSR but true on client
   const isHydrated = typeof window !== "undefined";
 
-  const setRegistrationData = useCallback((data: RegistrationData) => {
+  const setRegistrationData = (data: RegistrationData) => {
     setRegistrationDataState(data);
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       // sessionStorage may not be available
     }
-  }, []);
+  };
 
-  const clearRegistrationData = useCallback(() => {
+  const clearRegistrationData = () => {
     setRegistrationDataState(null);
     try {
       sessionStorage.removeItem(STORAGE_KEY);
     } catch {
       // sessionStorage may not be available
     }
-  }, []);
+  };
 
   return (
     <RegistrationContext.Provider
