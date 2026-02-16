@@ -51,7 +51,7 @@ export function ChooseSecondFactorToSetup({ checkAfter, requestId }: Props) {
             description={t("set.email.description")}
             url={
               buildUrlWithRequestId("/otp/email/set", requestId) +
-              (params.toString() ? "&" + params : "")
+              (params.toString() ? (requestId ? "&" : "?") + params : "")
             }
             isSelected={selectedMethod === "email"}
             isDefault={true}
@@ -68,7 +68,7 @@ export function ChooseSecondFactorToSetup({ checkAfter, requestId }: Props) {
           description={t("set.authenticator.description")}
           url={
             buildUrlWithRequestId("/otp/time-based/set", requestId) +
-            (params.toString() ? "&" + params : "")
+            (params.toString() ? (requestId ? "&" : "?") + params : "")
           }
           isSelected={selectedMethod === "authenticator"}
           onSelect={handleMethodSelect}
@@ -81,7 +81,7 @@ export function ChooseSecondFactorToSetup({ checkAfter, requestId }: Props) {
           icon="/img/fingerprint_24px.png"
           description={t("set.securityKey.description")}
           url={
-            buildUrlWithRequestId("/u2f/set", requestId) + (params.toString() ? "&" + params : "")
+            buildUrlWithRequestId("/u2f/set", requestId) + (params.toString() ? (requestId ? "&" : "?") + params : "")
           }
           isSelected={selectedMethod === "securityKey"}
           onSelect={handleMethodSelect}
