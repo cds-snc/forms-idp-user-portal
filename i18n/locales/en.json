@@ -175,7 +175,10 @@
     "reset": {
       "title": "Reset your password",
       "description": "Reset your password to continue using GC Forms.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "labels": {
+        "confirmationCode": "Confirmation code"
+      }
     },
     "errors": {
       "noHostFound": "No host found",
