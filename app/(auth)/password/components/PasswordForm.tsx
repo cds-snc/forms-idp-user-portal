@@ -112,6 +112,7 @@ export function PasswordForm({ loginName, organization, requestId }: Props) {
             type="button"
             disabled={loading}
             data-testid="reset-button"
+            className="mb-4"
           >
             {t("verify.form.resetPassword")}
           </button>

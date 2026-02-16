@@ -330,7 +330,7 @@ export async function logoutCurrentSession(
       return { redirect: postLogoutRedirectUri };
     }
 
-    const redirectUrl = `/start`;
+    const redirectUrl = `/`;
     return { redirect: redirectUrl };
   } catch (error) {
     logMessage.error({ error }, "Error during logout");

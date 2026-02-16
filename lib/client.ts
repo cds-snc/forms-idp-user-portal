@@ -7,32 +7,6 @@ type FinishFlowCommand =
     }
   | { loginName: string; sessionId?: string };
 
-function goToSignedInPage(
-  props:
-    | { sessionId: string; organization?: string; requestId?: string }
-    | { organization?: string; loginName: string; sessionId?: string; requestId?: string }
-) {
-  const params = new URLSearchParams({});
-
-  if ("loginName" in props && props.loginName) {
-    params.append("loginName", props.loginName);
-  }
-
-  if ("sessionId" in props && props.sessionId) {
-    params.append("sessionId", props.sessionId);
-  }
-
-  if (props.organization) {
-    params.append("organization", props.organization);
-  }
-
-  if (props.requestId) {
-    params.append("requestId", props.requestId);
-  }
-
-  return `/signedin?` + params;
-}
-
 /**
  * Complete authentication flow or get next URL for navigation
  * - For OIDC/SAML flows with sessionId+requestId: completes flow directly via server action
@@ -78,6 +52,5 @@ export async function getNextUrl(
     return defaultRedirectUri;
   }
 
-  const result = goToSignedInPage(command);
-  return result;
+  return "/account";
 }
