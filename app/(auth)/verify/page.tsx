@@ -3,7 +3,6 @@ import { Alert } from "@clientComponents/globals";
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
 import { VerifyEmailForm } from "./components/VerifyEmailForm";
-import { sendVerificationEmail } from "@lib/server/verify";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getUserByID } from "@lib/zitadel";
@@ -22,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, send } = searchParams;
+  const { userId, loginName, code, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -30,21 +29,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   let sessionFactors;
   let user: User | undefined;
   let human: HumanUser | undefined;
-
-  let error: string | undefined;
-
-  const doSend = send === "true";
-
-  // Email sending function
-  async function sendEmail(userId: string): Promise<string | undefined> {
-    const result = await sendVerificationEmail({ userId });
-    if (result && "error" in result) {
-      // eslint-disable-next-line no-console
-      console.error("Could not send verification email", result.error);
-      return "emailSendFailed";
-    }
-    return undefined;
-  }
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
@@ -54,15 +38,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         organization,
       },
     });
-
-    if (doSend && sessionFactors?.factors?.user?.id) {
-      error = await sendEmail(sessionFactors.factors.user.id);
-    }
   } else if ("userId" in searchParams && userId) {
-    if (doSend) {
-      error = await sendEmail(userId);
-    }
-
     const userResponse = await getUserByID({
       serviceUrl,
       userId,
@@ -79,26 +55,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   if (!id) {
     throw Error("Failed to get user id");
-  }
-
-  const params = new URLSearchParams({
-    initial: "true", // defines that a code is not required and is therefore not shown in the UI
-  });
-
-  if (userId) {
-    params.set("userId", userId);
-  }
-
-  if (loginName) {
-    params.set("loginName", loginName);
-  }
-
-  if (organization) {
-    params.set("organization", organization);
-  }
-
-  if (requestId) {
-    params.set("requestId", requestId);
   }
 
   return (
@@ -127,14 +83,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             )
           )}
         </div>
-
-        {error && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey={`errors.${error}`} namespace="verify" />
-            </Alert.Danger>
-          </div>
-        )}
 
         {!id && (
           <div className="py-4">
