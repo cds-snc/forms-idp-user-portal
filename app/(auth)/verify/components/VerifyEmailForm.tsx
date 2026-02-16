@@ -80,9 +80,13 @@ export function VerifyEmailForm({
         loginName: loginName,
         organization: organization,
         requestId: requestId,
+      }).then((response) => {
+        if (response && "redirect" in response && response?.redirect) {
+          router.push(response?.redirect);
+        }
       });
     }
-  }, [code, userId, loginName, organization, requestId]);
+  }, [code, userId, loginName, organization, requestId, router]);
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const code = (formData.get("code") as string) || "";

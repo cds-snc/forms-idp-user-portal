@@ -32,7 +32,7 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const checkAfter = searchParams.checkAfter === "true";
 
   const { method } = params;
@@ -120,6 +120,7 @@ export default async function Page(props: {
               loginName={loginName}
               sessionId={sessionId}
               organization={organization}
+              requestId={requestId}
               checkAfter={checkAfter}
               loginSettings={loginSettings}
             ></TotpRegister>

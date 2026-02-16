@@ -69,3 +69,16 @@ export function getSerializableObject<T>(obj: T): T {
   // This new object is guaranteed to be serializable
   return JSON.parse(jsonString);
 }
+
+/**
+ * Builds a URL with requestId as a query parameter if provided
+ * @param {string} path - The base path for the URL
+ * @param {string | undefined} requestId - Optional requestId to add as query parameter
+ * @returns {string} The path with requestId query parameter if provided
+ */
+export function buildUrlWithRequestId(path: string, requestId?: string): string {
+  if (!requestId) return path;
+  const params = new URLSearchParams();
+  params.set("requestId", requestId);
+  return `${path}?${params.toString()}`;
+}

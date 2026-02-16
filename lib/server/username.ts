@@ -15,6 +15,7 @@ import { createSessionAndUpdateCookie } from "./cookie";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { logMessage } from "@lib/logger";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -78,7 +79,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // Note: searchUsers already returns an error if multiple users are found,
   // so we only need to handle 0 or 1 user here
   if (users.length === 0 || !users[0].userId) {
-    return { redirect: "/register" };
+    return { redirect: buildUrlWithRequestId("/register", command.requestId) };
   }
 
   const user = users[0];
@@ -119,8 +120,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   });
 
   if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-    return { redirect: "/password" };
+    return { redirect: buildUrlWithRequestId("/password", command.requestId) };
   }
 
-  return { redirect: "/register" };
+  return { redirect: buildUrlWithRequestId("/register", command.requestId) };
 }

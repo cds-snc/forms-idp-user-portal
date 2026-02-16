@@ -33,7 +33,5 @@ export function StateBadge({
   evenPadding = false,
   children,
 }: StateBadgeProps) {
-  return (
-    <span className={`${getBadgeClasses(state, evenPadding)}`}>{children}</span>
-  );
+  return <span className={`${getBadgeClasses(state, evenPadding)}`}>{children}</span>;
 }

@@ -17,7 +17,7 @@ export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const { loginName, organization } = await getSessionCredentials();
+  const { loginName, organization, requestId } = await getSessionCredentials();
 
   if (!loginName) {
     throw new Error("No login name found in session");
@@ -54,6 +54,7 @@ export default async function Page() {
         <PasswordForm
           loginName={loginName}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+          requestId={requestId}
         />
       </div>
     </AuthPanel>

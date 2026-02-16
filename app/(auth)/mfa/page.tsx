@@ -24,6 +24,7 @@ import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
@@ -34,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, organization, sessionId } = await getSessionCredentials();
+  const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -54,7 +55,7 @@ export default async function Page() {
 
   // Redirect to MFA setup if no strong MFA method is configured
   if (!hasStrongMFA) {
-    redirect("/mfa/set");
+    redirect(buildUrlWithRequestId("/mfa/set", requestId));
   }
 
   return (
@@ -67,10 +68,16 @@ export default async function Page() {
             showDropdown
           ></UserAvatar>
         </div>
-        <ChooseSecondFactor userMethods={sessionFactors.authMethods ?? []} />
+        <ChooseSecondFactor
+          userMethods={sessionFactors.authMethods ?? []}
+          loginName={loginName}
+          sessionId={sessionId}
+          requestId={requestId}
+          organization={organization}
+        />
         <div className="mt-6">
           <Link
-            href="/mfa/set"
+            href={buildUrlWithRequestId("/mfa/set", requestId)}
             className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
           >
             <I18n i18nKey="set.addAnother" namespace="mfa" />

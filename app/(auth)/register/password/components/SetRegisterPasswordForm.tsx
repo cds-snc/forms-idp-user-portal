@@ -16,6 +16,7 @@ export function SetRegisterPasswordForm({
   firstname,
   lastname,
   organization,
+  requestId,
   onSubmitSuccess,
 }: {
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -23,6 +24,7 @@ export function SetRegisterPasswordForm({
   firstname: string;
   lastname: string;
   organization: string;
+  requestId?: string;
   onSubmitSuccess?: () => void;
 }) {
   const { t } = useTranslation(["password"]);
@@ -45,6 +47,7 @@ export function SetRegisterPasswordForm({
       lastName: lastname,
       password,
       organization: organization,
+      requestId,
     }).catch(() => setError(t("errors.couldNotRegisterUser")));
 
     if (response && "error" in response && response.error) {
