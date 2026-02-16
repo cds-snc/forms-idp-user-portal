@@ -1,4 +1,5 @@
 import { Cookie } from "@lib/cookies";
+import { buildUrlWithRequestId } from "@lib/utils";
 import { sendLoginname, SendLoginnameCommand } from "./server/username";
 import { createResponse, getLoginSettings } from "@lib/zitadel";
 import { create } from "@zitadel/client";
@@ -164,7 +165,7 @@ export async function loginWithSAMLAndSession({
             return { redirect: loginSettings.defaultRedirectUri };
           }
 
-          const signedinUrl = "/account";
+          const signedinUrl = buildUrlWithRequestId("/account", `saml_${samlRequest}`);
 
           const params = new URLSearchParams();
           if (selectedSession.factors?.user?.loginName) {
@@ -173,7 +174,7 @@ export async function loginWithSAMLAndSession({
           if (selectedSession.factors?.user?.organizationId) {
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          return { redirect: signedinUrl + "?" + params.toString() };
+          return { redirect: signedinUrl + (params.toString() ? "&" + params.toString() : "") };
         } else {
           return { error: "Unknown error occurred" };
         }

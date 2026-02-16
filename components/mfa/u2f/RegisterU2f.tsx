@@ -7,6 +7,7 @@ import { useTranslation } from "@i18n/client";
 
 import { addU2F, verifyU2F } from "./actions";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { buildUrlWithRequestId } from "@lib/utils";
 import { completeFlowOrGetUrl } from "@lib/client";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -239,7 +240,7 @@ export function RegisterU2f({
           }
         } else {
           setLoading(false);
-          return router.push("/account");
+          return router.push(buildUrlWithRequestId("/account", requestId));
         }
       }
     }

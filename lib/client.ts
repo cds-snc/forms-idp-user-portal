@@ -1,4 +1,5 @@
 import { completeAuthFlow } from "./server/auth-flow";
+import { buildUrlWithRequestId } from "./utils";
 
 type FinishFlowCommand =
   | {
@@ -31,7 +32,8 @@ export async function completeFlowOrGetUrl(
   }
 
   // For all other cases, return URL for navigation
-  const url = await getNextUrl(command, defaultRedirectUri);
+  const requestId = "requestId" in command ? command.requestId : undefined;
+  const url = await getNextUrl(command, defaultRedirectUri, requestId);
   const result = { redirect: url };
   return result;
 }
@@ -44,7 +46,8 @@ export async function completeFlowOrGetUrl(
  */
 export async function getNextUrl(
   command: FinishFlowCommand & { organization?: string },
-  defaultRedirectUri?: string
+  defaultRedirectUri?: string,
+  requestId?: string
 ): Promise<string> {
   // OIDC/SAML flows are now handled by completeAuthFlowAction() server action
 
@@ -52,5 +55,5 @@ export async function getNextUrl(
     return defaultRedirectUri;
   }
 
-  return "/account";
+  return buildUrlWithRequestId("/account", requestId);
 }

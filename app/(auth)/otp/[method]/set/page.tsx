@@ -14,6 +14,7 @@ import { registerTOTP, getSerializableLoginSettings } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession, loadSessionById } from "@lib/session";
 import { getSessionCredentials } from "@lib/cookies";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 /*--------------------------------------------*
  * Components
@@ -76,12 +77,12 @@ export default async function Page(props: {
     throw new Error("No session found");
   }
 
-  let urlToContinue = LOGGED_IN_HOME_PAGE;
+  let urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
 
   if (checkAfter) {
     urlToContinue = `/otp/${method}?`;
   } else if (loginName) {
-    urlToContinue = LOGGED_IN_HOME_PAGE;
+    urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
   }
 
   return (
