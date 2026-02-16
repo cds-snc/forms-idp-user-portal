@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { I18n, useTranslation } from "@i18n";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
@@ -40,6 +40,7 @@ export function VerifyEmailForm({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const processedCodeRef = useRef<string | null>(null);
 
   const {
     t,
@@ -73,7 +74,9 @@ export function VerifyEmailForm({
   }
 
   useEffect(() => {
-    if (code) {
+    // Only process if code exists and hasn't been processed yet
+    if (code && processedCodeRef.current !== code) {
+      processedCodeRef.current = code;
       sendVerification({
         code: code,
         userId,
@@ -142,18 +145,8 @@ export function VerifyEmailForm({
           id="zitadelError"
         >
           <I18n i18nKey={state.error} namespace="verify" />
-          {/* {state.authError.callToActionLink ? (
-            <Link href={state.authError.callToActionLink}>{state.authError.callToActionText}</Link>
-          ) : undefined} */}
         </Alert>
       )}
-      {/* {state.error && (
-        <div className="py-4" data-testid="error">
-          <Alert.Danger>
-            <p className="mt-3 font-bold">{state.error}</p>
-          </Alert.Danger>
-        </div>
-      )} */}
 
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
 
