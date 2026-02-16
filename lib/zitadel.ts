@@ -1515,3 +1515,41 @@ export function createServerTransport(token: string, baseUrl: string) {
         ],
   });
 }
+
+// Check if TOTP (Time-based One-Time Password) authenticator is enabled for a user
+// Note: This only indicates if TOTP is enabled, NOT which authenticator app is used
+// The server only stores the TOTP secret, not the app name.
+export async function getTOTPStatus({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+  const authMethodsResponse = await userService.listAuthenticationMethodTypes({ userId });
+  const authMethodTypes = authMethodsResponse.authMethodTypes ?? [];
+  // AuthenticationMethodType.TOTP has value 4
+  return authMethodTypes.includes(4);
+}
+
+// Get all u2fTokens registered for a user - these will be Yubikeys
+export async function getU2FInfo({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+  const authFactorsResponse = await userService.listAuthenticationFactors({ userId });
+  return authFactorsResponse.result
+    .filter((factor) => factor.type.case === "u2f")
+    .map((factor) => {
+      if (factor.type.case === "u2f") {
+        return factor.type.value;
+      }
+      return undefined;
+    })
+    .filter((token): token is NonNullable<typeof token> => token !== undefined);
+}
