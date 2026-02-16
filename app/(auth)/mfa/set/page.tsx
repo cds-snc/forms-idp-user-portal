@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const { sessionId, organization } = await getSessionCredentials();
+  const { sessionId, organization, requestId } = await getSessionCredentials();
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
   const loginSettings = await getSerializableLoginSettings({
     serviceUrl,
@@ -43,7 +43,7 @@ export default async function Page() {
         <div className="w-full">
           <div className="flex flex-col space-y-4">
             {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
-              <ChooseSecondFactorToSetup checkAfter={true} />
+              <ChooseSecondFactorToSetup checkAfter={true} requestId={requestId} />
             )}
           </div>
         </div>
