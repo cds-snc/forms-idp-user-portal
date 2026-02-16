@@ -6,15 +6,17 @@ import { useTranslation } from "@i18n/client";
 
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 import { MethodOptionCard } from "./MethodOptionCard";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 import { Button } from "@clientComponents/globals/Buttons";
 
 type Props = {
   checkAfter: boolean;
+  requestId?: string;
   force?: boolean;
 };
 
-export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
+export function ChooseSecondFactorToSetup({ checkAfter, requestId }: Props) {
   const router = useRouter();
   const { t } = useTranslation("mfa");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -47,7 +49,10 @@ export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
             title={t("set.email.title")}
             icon="/img/email_24px.png"
             description={t("set.email.description")}
-            url={"/otp/email/set?" + params}
+            url={
+              buildUrlWithRequestId("/otp/email/set", requestId) +
+              (params.toString() ? "&" + params : "")
+            }
             isSelected={selectedMethod === "email"}
             isDefault={true}
             defaultText={t("set.byDefault")}
@@ -61,7 +66,10 @@ export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
           title={t("set.authenticator.title")}
           icon="/img/verified_user_24px.png"
           description={t("set.authenticator.description")}
-          url={"/otp/time-based/set?" + params}
+          url={
+            buildUrlWithRequestId("/otp/time-based/set", requestId) +
+            (params.toString() ? "&" + params : "")
+          }
           isSelected={selectedMethod === "authenticator"}
           onSelect={handleMethodSelect}
         />
@@ -72,7 +80,9 @@ export function ChooseSecondFactorToSetup({ checkAfter }: Props) {
           title={t("set.securityKey.title")}
           icon="/img/fingerprint_24px.png"
           description={t("set.securityKey.description")}
-          url={"/u2f/set?" + params}
+          url={
+            buildUrlWithRequestId("/u2f/set", requestId) + (params.toString() ? "&" + params : "")
+          }
           isSelected={selectedMethod === "securityKey"}
           onSelect={handleMethodSelect}
         />

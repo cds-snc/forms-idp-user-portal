@@ -213,7 +213,7 @@ export function RegisterU2f({
       }
 
       if (checkAfter) {
-        return router.push(`/u2f`);
+        return router.push(buildUrlWithRequestId(`/u2f`, requestId));
       } else {
         if (loginName) {
           const callbackResponse = await completeFlowOrGetUrl(
