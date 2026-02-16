@@ -11,7 +11,7 @@ import { getMostRecentSessionCookie, getSessionCredentials } from "@lib/cookies"
 import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import { SearchParams } from "@lib/utils";
+import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
@@ -32,8 +32,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     organization: organization,
   });
 
-  const registerLink = "/register";
-
   let currentSession;
   let cookieRequestId;
   try {
@@ -45,6 +43,8 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   // Prefer search params requestId (from /login redirect), fallback to cookie requestId
   const requestId = searchParamsRequestId || cookieRequestId;
+
+  const registerLink = buildUrlWithRequestId("/register", requestId);
 
   let isAuthenticated = false;
   let session;
@@ -68,7 +68,9 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
       organization: organization || currentSession?.organization || "",
       requestId: "",
       suffix: "",
-      link: isAuthenticated ? "/account" : "/password",
+      link: isAuthenticated
+        ? buildUrlWithRequestId("/account", requestId)
+        : buildUrlWithRequestId("/password", requestId),
       showDropdown: false,
     },
     {
