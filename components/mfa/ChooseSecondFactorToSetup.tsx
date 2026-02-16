@@ -81,7 +81,8 @@ export function ChooseSecondFactorToSetup({ checkAfter, requestId }: Props) {
           icon="/img/fingerprint_24px.png"
           description={t("set.securityKey.description")}
           url={
-            buildUrlWithRequestId("/u2f/set", requestId) + (params.toString() ? (requestId ? "&" : "?") + params : "")
+            buildUrlWithRequestId("/u2f/set", requestId) +
+            (params.toString() ? (requestId ? "&" : "?") + params : "")
           }
           isSelected={selectedMethod === "securityKey"}
           onSelect={handleMethodSelect}

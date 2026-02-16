@@ -41,6 +41,7 @@ export function VerifyEmailForm({
 }) {
   const router = useRouter();
   const processedCodeRef = useRef<string | null>(null);
+  const emailSentRef = useRef<boolean>(false);
 
   const {
     t,
@@ -72,6 +73,18 @@ export function VerifyEmailForm({
       setCodeLoading(false);
     }
   }
+
+  // Send verification email once on component mount
+  useEffect(() => {
+    if (!emailSentRef.current) {
+      emailSentRef.current = true;
+      sendVerificationEmail({
+        userId,
+      }).catch(() => {
+        // Silently fail - user can click resend if needed
+      });
+    }
+  }, [userId]);
 
   useEffect(() => {
     // Only process if code exists and hasn't been processed yet
