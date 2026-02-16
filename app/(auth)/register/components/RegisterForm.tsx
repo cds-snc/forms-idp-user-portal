@@ -11,6 +11,7 @@ import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
 import { Hint } from "@clientComponents/forms/Hint";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 type FormState = {
   error?: string;
@@ -24,11 +25,12 @@ type FormState = {
 
 type Props = {
   organization: string;
+  requestId?: string;
 };
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
-export function RegisterForm({ organization }: Props) {
+export function RegisterForm({ organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
   const { setRegistrationData } = useRegistration();
   const router = useRouter();
@@ -57,8 +59,9 @@ export function RegisterForm({ organization }: Props) {
     setRegistrationData({
       ...validationResult.output,
       ...(organization && { organization }),
+      ...(requestId && { requestId }),
     });
-    router.push("/register/password");
+    router.push(buildUrlWithRequestId("/register/password", requestId));
 
     return previousState;
   };

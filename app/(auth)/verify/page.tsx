@@ -2,7 +2,7 @@ import { Alert } from "@clientComponents/globals";
 
 import { I18n } from "@i18n";
 import { UserAvatar } from "@serverComponents/UserAvatar";
-import { VerifyEmailForm } from "./components/verify-email-form";
+import { VerifyEmailForm } from "./components/VerifyEmailForm";
 import { sendVerificationEmail } from "@lib/server/verify";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";

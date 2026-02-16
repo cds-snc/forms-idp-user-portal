@@ -6,13 +6,17 @@ import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("register");
   return { title: t("title") };
 }
 
-export default async function Page() {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const { requestId } = searchParams;
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -31,7 +35,7 @@ export default async function Page() {
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="register">
       {legal && passwordComplexitySettings && organization && (
-        <RegisterForm organization={organization}></RegisterForm>
+        <RegisterForm organization={organization} requestId={requestId}></RegisterForm>
       )}
     </AuthPanel>
   );

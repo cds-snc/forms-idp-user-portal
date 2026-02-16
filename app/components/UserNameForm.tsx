@@ -12,6 +12,7 @@ import { submitUserNameForm } from "../actions";
 
 type Props = {
   organization?: string;
+  requestId?: string;
 };
 
 type FormState = {
@@ -22,7 +23,7 @@ type FormState = {
   validationErrors?: { fieldKey: string; fieldValue: string }[];
 };
 
-export const UserNameForm = ({ organization }: Props) => {
+export const UserNameForm = ({ organization, requestId }: Props) => {
   const { t } = useTranslation(["start", "common"]);
 
   const router = useRouter();
@@ -49,6 +50,7 @@ export const UserNameForm = ({ organization }: Props) => {
     const result = await submitUserNameForm({
       loginName: username,
       organization,
+      requestId,
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error);

@@ -9,6 +9,7 @@ import { useTranslation } from "@i18n";
 import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { resetPassword, submitPasswordForm } from "../actions";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 type Props = {
   loginName: string;
@@ -95,7 +96,7 @@ export function PasswordForm({ loginName, organization, requestId }: Props) {
 
     setInfo(t("verify.info.passwordResetSent"));
 
-    return router.push("/password/set");
+    return router.push(buildUrlWithRequestId("/password/set", requestId));
   }
 
   return (

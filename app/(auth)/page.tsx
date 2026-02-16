@@ -11,13 +11,17 @@ import { getMostRecentSessionCookie, getSessionCredentials } from "@lib/cookies"
 import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { SearchParams } from "@lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
   return { title: t("title") };
 }
 
-export default async function Page() {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const searchParamsRequestId = searchParams.requestId;
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -31,11 +35,16 @@ export default async function Page() {
   const registerLink = "/register";
 
   let currentSession;
+  let cookieRequestId;
   try {
     currentSession = await getMostRecentSessionCookie();
+    cookieRequestId = currentSession.requestId;
   } catch {
     currentSession = null;
   }
+
+  // Prefer search params requestId (from /login redirect), fallback to cookie requestId
+  const requestId = searchParamsRequestId || cookieRequestId;
 
   let isAuthenticated = false;
   let session;
@@ -101,7 +110,7 @@ export default async function Page() {
         </div>
       )}
 
-      <UserNameForm organization={organization} />
+      <UserNameForm organization={organization} requestId={requestId} />
     </AuthPanel>
   );
 }

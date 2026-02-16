@@ -359,6 +359,9 @@
     "sendingNewCode": "Sending new code...",
     "sentNewCode": "New code sent!",
     "help": "Need help?",
+    "successTitle": "Email initialized and validated",
+    "successDescription": "Your email has been verified. Continue to set up two-factor authentication to secure your account.",
+    "continueButton": "Continue setup",
     "validation": {
       "required": "Cannot be empty",
       "length": "Must be 6 characters"

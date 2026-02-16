@@ -37,7 +37,7 @@ export default async function Page(props: {
 
   const { code, redirect } = searchParams;
 
-  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
 
   // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
@@ -70,6 +70,7 @@ export default async function Page(props: {
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
+          requestId={requestId}
           method={method}
           loginSettings={loginSettings}
           code={code}

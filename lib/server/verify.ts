@@ -180,7 +180,14 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       maxAge: 300, // 5 minutes
     });
 
-    return { redirect: `/mfa/set` };
+    const redirectParams = new URLSearchParams({
+      loginName: user.preferredLoginName,
+      ...(user.details?.resourceOwner && { organization: user.details.resourceOwner }),
+      userId: user.userId,
+      ...(command.requestId && { requestId: command.requestId }),
+    });
+
+    return { redirect: `/verify/success?${redirectParams.toString()}` };
   }
 
   // Session required to proceed with MFA verification
@@ -198,7 +205,8 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     serviceUrl,
     session,
     loginSettings,
-    authMethodResponse.authMethodTypes
+    authMethodResponse.authMethodTypes,
+    command.requestId
   );
 
   if (mfaFactorCheck && "redirect" in mfaFactorCheck) {

@@ -10,6 +10,7 @@ import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { getUserByID } from "../lib/zitadel";
 import { logMessage } from "./logger";
+import { buildUrlWithRequestId } from "./utils";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -102,7 +103,8 @@ export async function checkMFAFactors(
   serviceUrl: string,
   session: Session,
   loginSettings: LoginSettings | undefined,
-  authMethods: AuthenticationMethodType[]
+  authMethods: AuthenticationMethodType[],
+  requestId?: string
 ): Promise<{ error: string } | { redirect: string }> {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
@@ -117,6 +119,10 @@ export async function checkMFAFactors(
       loginName: session.factors?.user?.loginName as string,
     });
 
+    if (requestId) {
+      params.append("requestId", requestId);
+    }
+
     const factor = availableMultiFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
       logMessage.info("Redirecting user to TOTP verification");
@@ -128,10 +134,10 @@ export async function checkMFAFactors(
   } else if (availableMultiFactors?.length > 1) {
     // Show MFA selection page
     logMessage.info("Redirecting user to MFA selection page");
-    return { redirect: `/mfa` };
+    return { redirect: buildUrlWithRequestId(`/mfa`, requestId) };
   } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
     logMessage.info("Redirecting user to MFA setup - MFA enforced");
-    return { redirect: `/mfa/set` };
+    return { redirect: buildUrlWithRequestId(`/mfa/set`, requestId) };
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
     (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
@@ -174,7 +180,7 @@ export async function checkMFAFactors(
       { userId: session.factors?.user?.id },
       "Redirecting user to MFA setup - skip lifetime expired"
     );
-    return { redirect: `/mfa/set` };
+    return { redirect: buildUrlWithRequestId(`/mfa/set`, requestId) };
   }
 
   return { error: "No MFA factors available" };
