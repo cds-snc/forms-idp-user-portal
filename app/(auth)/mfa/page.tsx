@@ -24,6 +24,7 @@ import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
 import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
@@ -54,7 +55,7 @@ export default async function Page() {
 
   // Redirect to MFA setup if no strong MFA method is configured
   if (!hasStrongMFA) {
-    redirect("/mfa/set");
+    redirect(buildUrlWithRequestId("/mfa/set", requestId));
   }
 
   return (
@@ -76,7 +77,7 @@ export default async function Page() {
         />
         <div className="mt-6">
           <Link
-            href="/mfa/set"
+            href={buildUrlWithRequestId("/mfa/set", requestId)}
             className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
           >
             <I18n i18nKey="set.addAnother" namespace="mfa" />

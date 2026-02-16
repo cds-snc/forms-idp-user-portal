@@ -145,7 +145,13 @@ export const submitPasswordForm = async (
     return { error: t("errors.couldNotVerifyPassword") };
   }
 
-  const mfaFactorCheck = await checkMFAFactors(serviceUrl, session, loginSettings, authMethods);
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods,
+    command.requestId
+  );
 
   return mfaFactorCheck;
 };

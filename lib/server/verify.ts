@@ -184,6 +184,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       loginName: user.preferredLoginName,
       ...(user.details?.resourceOwner && { organization: user.details.resourceOwner }),
       userId: user.userId,
+      ...(command.requestId && { requestId: command.requestId }),
     });
 
     return { redirect: `/verify/success?${redirectParams.toString()}` };
@@ -204,7 +205,8 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     serviceUrl,
     session,
     loginSettings,
-    authMethodResponse.authMethodTypes
+    authMethodResponse.authMethodTypes,
+    command.requestId
   );
 
   if (mfaFactorCheck && "redirect" in mfaFactorCheck) {

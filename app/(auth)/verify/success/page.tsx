@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { headers } from "next/headers";
-import { SearchParams } from "@lib/utils";
+import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
 import { I18n } from "@i18n";
@@ -10,6 +10,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const searchParams = await props.searchParams;
 
   const _headers = await headers();
+  const { requestId } = searchParams;
 
   return (
     <AuthPanel
@@ -26,7 +27,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           className="mx-auto mb-4"
         />
 
-        <LinkButton.Primary href="/mfa/set" className="mt-10">
+        <LinkButton.Primary href={buildUrlWithRequestId("/mfa/set", requestId)} className="mt-10">
           <I18n i18nKey="continueButton" namespace="verify" />
         </LinkButton.Primary>
       </div>
