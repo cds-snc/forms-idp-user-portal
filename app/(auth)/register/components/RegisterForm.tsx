@@ -11,6 +11,7 @@ import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
 import Link from "next/link";
 import { Hint } from "@clientComponents/forms/Hint";
 import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 type FormState = {
   error?: string;
@@ -60,7 +61,7 @@ export function RegisterForm({ organization, requestId }: Props) {
       ...(organization && { organization }),
       ...(requestId && { requestId }),
     });
-    router.push("/register/password");
+    router.push(buildUrlWithRequestId("/register/password", requestId));
 
     return previousState;
   };

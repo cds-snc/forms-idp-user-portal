@@ -10,6 +10,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { checkEmailVerification } from "@lib/verify-helper";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -65,7 +66,7 @@ export const submitUserNameForm = async (
   // Note: searchUsers already returns an error if multiple users are found,
   // so we only need to handle 0 or 1 user here
   if (users.length === 0 || !users[0].userId) {
-    return { redirect: "/register" };
+    return { redirect: buildUrlWithRequestId("/register", command.requestId) };
   }
 
   const user = users[0];
@@ -111,5 +112,5 @@ export const submitUserNameForm = async (
     return emailVerificationCheck;
   }
 
-  return { redirect: "/password" };
+  return { redirect: buildUrlWithRequestId("/password", command.requestId) };
 };
