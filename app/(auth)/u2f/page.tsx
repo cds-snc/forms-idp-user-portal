@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { redirect } = searchParams;
-  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const safeRedirect = getSafeRedirectUrl(redirect);
 
   const _headers = await headers();
@@ -62,6 +62,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             loginName={loginName}
             sessionId={sessionId}
             organization={organization}
+            requestId={requestId}
             login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
             redirect={safeRedirect}
           />

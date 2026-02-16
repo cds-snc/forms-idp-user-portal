@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, organization, sessionId } = await getSessionCredentials();
+  const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -67,7 +67,13 @@ export default async function Page() {
             showDropdown
           ></UserAvatar>
         </div>
-        <ChooseSecondFactor userMethods={sessionFactors.authMethods ?? []} />
+        <ChooseSecondFactor
+          userMethods={sessionFactors.authMethods ?? []}
+          loginName={loginName}
+          sessionId={sessionId}
+          requestId={requestId}
+          organization={organization}
+        />
         <div className="mt-6">
           <Link
             href="/mfa/set"

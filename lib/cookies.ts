@@ -348,7 +348,7 @@ export async function getMostRecentCookieWithLoginname<T>({
 /**
  * Get session credentials from the http-only session cookie
  * @param organizationOverride optional organization to override the cookie's organization
- * @returns sessionId, loginName, and organization
+ * @returns sessionId, loginName, organization, and requestId (if linked to OIDC/SAML flow)
  */
 export async function getSessionCredentials(organizationOverride?: string) {
   try {
@@ -357,6 +357,7 @@ export async function getSessionCredentials(organizationOverride?: string) {
       sessionId: sessionCookie.id,
       loginName: sessionCookie.loginName,
       organization: organizationOverride || sessionCookie.organization,
+      requestId: sessionCookie.requestId, // Include requestId for OIDC/SAML flows
     };
   } catch (error) {
     throw new Error("No session found in cookies");

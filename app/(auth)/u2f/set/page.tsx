@@ -31,7 +31,7 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
   const loginSettings = await getSerializableLoginSettings({
     serviceUrl,
@@ -65,6 +65,7 @@ export default async function Page(props: {
         loginName={loginName}
         sessionId={sessionFactors.id}
         organization={organization}
+        requestId={requestId}
         checkAfter={checkAfter === "true"}
         loginSettings={loginSettings}
       />

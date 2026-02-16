@@ -39,6 +39,7 @@ type Props = {
   loginName?: string;
   sessionId: string;
   organization?: string;
+  requestId?: string;
   checkAfter: boolean;
   loginSettings?: LoginSettings;
 };
@@ -47,6 +48,7 @@ export function RegisterU2f({
   loginName,
   sessionId,
   organization,
+  requestId,
   checkAfter,
   loginSettings,
 }: Props) {
@@ -214,10 +216,16 @@ export function RegisterU2f({
       } else {
         if (loginName) {
           const callbackResponse = await completeFlowOrGetUrl(
-            {
-              loginName: loginName,
-              organization: organization,
-            },
+            requestId
+              ? {
+                  sessionId,
+                  requestId,
+                  organization,
+                }
+              : {
+                  loginName: loginName,
+                  organization: organization,
+                },
             loginSettings?.defaultRedirectUri
           );
 

@@ -24,11 +24,12 @@ type FormState = {
 
 type Props = {
   organization: string;
+  requestId?: string;
 };
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
-export function RegisterForm({ organization }: Props) {
+export function RegisterForm({ organization, requestId }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
   const { setRegistrationData } = useRegistration();
   const router = useRouter();
@@ -57,6 +58,7 @@ export function RegisterForm({ organization }: Props) {
     setRegistrationData({
       ...validationResult.output,
       ...(organization && { organization }),
+      ...(requestId && { requestId }),
     });
     router.push("/register/password");
 
