@@ -8,8 +8,6 @@ import { useTranslation } from "@i18n/client";
 import { addU2F, verifyU2F } from "./actions";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 import { buildUrlWithRequestId } from "@lib/utils";
-import { completeFlowOrGetUrl } from "@lib/client";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
@@ -37,22 +35,12 @@ type CredentialOptionsData =
   | undefined;
 
 type Props = {
-  loginName?: string;
   sessionId: string;
-  organization?: string;
   requestId?: string;
   checkAfter: boolean;
-  loginSettings?: LoginSettings;
 };
 
-export function RegisterU2f({
-  loginName,
-  sessionId,
-  organization,
-  requestId,
-  checkAfter,
-  loginSettings,
-}: Props) {
+export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
   const { t } = useTranslation("u2f");
   const [error, setError] = useState<string>("");
   const [keyName, setKeyName] = useState<string>("");
@@ -213,35 +201,16 @@ export function RegisterU2f({
       }
 
       if (checkAfter) {
-        return router.push(buildUrlWithRequestId(`/u2f`, requestId));
-      } else {
-        if (loginName) {
-          const callbackResponse = await completeFlowOrGetUrl(
-            requestId
-              ? {
-                  sessionId,
-                  requestId,
-                  organization,
-                }
-              : {
-                  loginName: loginName,
-                  organization: organization,
-                },
-            loginSettings?.defaultRedirectUri
-          );
-
-          if ("error" in callbackResponse) {
-            setError(callbackResponse.error);
-            return;
-          }
-
-          if ("redirect" in callbackResponse) {
-            return router.push(callbackResponse.redirect);
-          }
-        } else {
-          setLoading(false);
-          return router.push(buildUrlWithRequestId("/account", requestId));
+        const params = new URLSearchParams({});
+        if (requestId) {
+          params.append("requestId", requestId);
         }
+        params.append("checkAfter", "true");
+        params.append("method", "u2f");
+        return router.push(`/all-set?` + params);
+      } else {
+        // Redirect to all-set page after successful setup
+        return router.push(buildUrlWithRequestId("/all-set", requestId));
       }
     }
   }
