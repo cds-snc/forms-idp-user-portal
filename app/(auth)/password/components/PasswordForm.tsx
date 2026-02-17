@@ -102,6 +102,16 @@ export function PasswordForm({ loginName, organization, requestId }: Props) {
   return (
     <form action={formAction}>
       <div>
+        {info && (
+          <div className="py-4">
+            <Alert type={ErrorStatus.INFO}>{info}</Alert>
+          </div>
+        )}
+        {error && (
+          <div className="py-4" data-testid="error">
+            <Alert type={ErrorStatus.ERROR}>{error}</Alert>
+          </div>
+        )}
         <div className="gcds-input-wrapper">
           <Label id={"label-password"} htmlFor={"password"} className="required" required>
             {t("verify.form.label")}
@@ -123,18 +133,6 @@ export function PasswordForm({ loginName, organization, requestId }: Props) {
           )}
         </div>
       </div>
-
-      {info && (
-        <div className="py-4">
-          <Alert type={ErrorStatus.INFO}>{info}</Alert>
-        </div>
-      )}
-
-      {error && (
-        <div className="py-4" data-testid="error">
-          <Alert type={ErrorStatus.ERROR}>{error}</Alert>
-        </div>
-      )}
 
       <SubmitButtonAction>{t("button.continue")}</SubmitButtonAction>
     </form>
