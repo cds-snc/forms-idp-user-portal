@@ -1,5 +1,4 @@
 import { I18n } from "@i18n";
-import Link from "next/link";
 import { serverTranslation } from "@i18n/server";
 
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -10,6 +9,8 @@ import { GcdsHeader } from "@serverComponents/globals/GcdsHeader/GcdsHeader";
 import { Footer } from "@serverComponents/globals/Footer";
 import { FooterLinks } from "@clientComponents/globals/FooterLinks";
 import { SiteLogo } from "@serverComponents/icons";
+
+const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const {
@@ -30,14 +31,17 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
             className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[658px] has-[#auth-panel-wide]:tablet:w-[950px] laptop:w-[850px] has-[#auth-panel-wide]:laptop:w-[1200px]`}
           >
             <main id="content">
-              <Link className="mb-6 mr-10 inline-flex no-underline focus:bg-white" href={`/about`}>
+              <a
+                className="mb-6 mr-10 inline-flex no-underline focus:bg-white"
+                href={`${FORMS_PRODUCTION_URL}/${language}/about`}
+              >
                 <span className="">
                   <SiteLogo />
                 </span>
                 <span className="ml-3 inline-block text-[24px] font-semibold leading-10 text-[#1B00C2]">
                   <I18n i18nKey="title" namespace="common" />
                 </span>
-              </Link>
+              </a>
               <Tooltip.Provider>{children}</Tooltip.Provider>
               <ToastContainer autoClose={false} containerId="default" />
             </main>
