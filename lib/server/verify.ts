@@ -308,3 +308,62 @@ ${codeResponse.verificationCode}`,
     return { error: t("errors.emailSendFailed") };
   }
 }
+
+type SendPasswordChangedEmailCommand = {
+  userId: string;
+};
+
+export async function sendPasswordChangedEmail(command: SendPasswordChangedEmailCommand) {
+  const { t } = await serverTranslation("password");
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  // Get user's email address
+  const userResponse = await getUserByID({
+    serviceUrl,
+    userId: command.userId,
+  });
+
+  if (!userResponse?.user) {
+    return { error: t("errors.couldNotLoadUser") };
+  }
+
+  const user = userResponse.user;
+  let email: string | undefined;
+
+  if (user.type.case === "human") {
+    email = user.type.value.email?.email;
+  }
+
+  if (!email) {
+    return { error: t("errors.couldNotLoadUserEmail") };
+  }
+
+  // Send email via GC Notify
+  const apiKey = process.env.NOTIFY_API_KEY;
+  const templateId = process.env.TEMPLATE_ID;
+
+  if (!apiKey || !templateId) {
+    return { error: t("errors.emailConfigurationError") };
+  }
+
+  try {
+    const gcNotify = GCNotifyConnector.default(apiKey);
+    await gcNotify.sendEmail(email, templateId, {
+      subject: "Password changed | Mot de passe modifié",
+      formResponse: `
+**Password changed | Mot de passe modifié**
+
+Your password has been successfully changed. If you did not make this change, please contact support immediately.
+
+---
+
+Votre mot de passe a été modifié avec succès. Si vous n'avez pas effectué ce changement, veuillez contacter le support immédiatement.`,
+    });
+
+    return { success: true };
+  } catch (error) {
+    logMessage.error({ error }, "Failed to send password changed email");
+    return { error: t("errors.emailSendFailed") };
+  }
+}
