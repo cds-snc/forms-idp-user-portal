@@ -181,6 +181,9 @@ export async function getLockoutSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+/**
+ * @security Requires authenticated session. Use protectedGetPasswordExpirySettings from lib/server/zitadel-protected.ts
+ */
 export async function getPasswordExpirySettings({
   serviceUrl,
   orgId,
@@ -200,6 +203,9 @@ export async function getPasswordExpirySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+/**
+ * @security Requires authenticated session. Use protectedListIDPLinks from lib/server/zitadel-protected.ts
+ */
 export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -209,6 +215,9 @@ export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string;
   return userService.listIDPLinks({ userId }, {});
 }
 
+/**
+ * @security Requires authenticated session. Use protectedAddOTPEmail from lib/server/zitadel-protected.ts
+ */
 export async function addOTPEmail({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -218,6 +227,9 @@ export async function addOTPEmail({ serviceUrl, userId }: { serviceUrl: string; 
   return userService.addOTPEmail({ userId }, {});
 }
 
+/**
+ * @security Requires authenticated session. Use protectedAddOTPSMS from lib/server/zitadel-protected.ts
+ */
 export async function addOTPSMS({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -227,6 +239,9 @@ export async function addOTPSMS({ serviceUrl, userId }: { serviceUrl: string; us
   return userService.addOTPSMS({ userId }, {});
 }
 
+/**
+ * @security Requires authenticated session. Returns cryptographic secret material. Use protectedRegisterTOTP from lib/server/zitadel-protected.ts
+ */
 export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -287,6 +302,9 @@ export async function getPasswordComplexitySettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+/**
+ * @security Creates authenticated session after auth checks pass. Internal use in auth flow.
+ */
 export async function createSessionFromChecks({
   serviceUrl,
   checks,
@@ -306,6 +324,9 @@ export async function createSessionFromChecks({
   return sessionService.createSession({ checks, lifetime, userAgent }, {});
 }
 
+/**
+ * @security Creates session after IDP login. Internal use in auth flow.
+ */
 export async function createSessionForUserIdAndIdpIntent({
   serviceUrl,
   userId,
@@ -343,6 +364,9 @@ export async function createSessionForUserIdAndIdpIntent({
   });
 }
 
+/**
+ * @security Updates session state during auth flow. Internal use only.
+ */
 export async function setSession({
   serviceUrl,
   sessionId,
@@ -376,6 +400,9 @@ export async function setSession({
   );
 }
 
+/**
+ * @security Requires authenticated session tokens. Internal use only.
+ */
 export async function getSession({
   serviceUrl,
   sessionId,
@@ -393,6 +420,9 @@ export async function getSession({
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
+/**
+ * @security Requires authenticated session tokens. Logout operation.
+ */
 export async function deleteSession({
   serviceUrl,
   sessionId,
@@ -415,6 +445,9 @@ type ListSessionsCommand = {
   ids: string[];
 };
 
+/**
+ * @security Internal use only. Lists sessions by their IDs.
+ */
 export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
   const sessionService: Client<typeof SessionService> = await createServiceForHost(
     SessionService,
@@ -500,6 +533,9 @@ export async function addHuman({
   return userService.addHumanUser(request);
 }
 
+/**
+ * @security Requires authenticated session. Use protected wrapper from lib/server/zitadel-protected.ts
+ */
 export async function updateHuman({
   serviceUrl,
   request,
@@ -515,6 +551,9 @@ export async function updateHuman({
   return userService.updateHumanUser(request);
 }
 
+/**
+ * @security Requires authenticated session. Use protectedVerifyTOTPRegistration from lib/server/zitadel-protected.ts
+ */
 export async function verifyTOTPRegistration({
   serviceUrl,
   code,
@@ -532,6 +571,9 @@ export async function verifyTOTPRegistration({
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
+/**
+ * @security Requires authenticated session. Use protectedGetUserByID from lib/server/zitadel-protected.ts
+ */
 export async function getUserByID({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -541,6 +583,9 @@ export async function getUserByID({ serviceUrl, userId }: { serviceUrl: string; 
   return userService.getUserByID({ userId }, {});
 }
 
+/**
+ * @security Requires authenticated session. Use protectedHumanMFAInitSkipped from lib/server/zitadel-protected.ts
+ */
 export async function humanMFAInitSkipped({
   serviceUrl,
   userId,
@@ -774,6 +819,9 @@ export type SearchUsersCommand = {
   organizationId?: string;
   suffix?: string;
 };
+
+// Re-export types used by protected server actions
+export type { VerifyU2FRegistrationRequest };
 
 const PhoneQuery = (searchValue: string) =>
   create(SearchQuerySchema, {
@@ -1248,6 +1296,9 @@ export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: s
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
 
+/**
+ * @security Requires authenticated session. Use protectedAddIDPLink from lib/server/zitadel-protected.ts
+ */
 export async function addIDPLink({
   serviceUrl,
   idp,
@@ -1399,11 +1450,7 @@ export async function setPassword({
 }
 
 /**
- *
- * @param host
- * @param userId the id of the user where the email should be set
- * @param domain the domain on which the factor is registered
- * @returns the newly set email
+ * @security Requires authenticated session. Returns cryptographic challenge data. Use protectedRegisterU2F from lib/server/zitadel-protected.ts
  */
 export async function registerU2F({
   serviceUrl,
@@ -1426,10 +1473,7 @@ export async function registerU2F({
 }
 
 /**
- *
- * @param host
- * @param request the request object for verifying U2F registration
- * @returns the result of the verification
+ * @security Requires authenticated session. Use protectedVerifyU2FRegistration from lib/server/zitadel-protected.ts
  */
 export async function verifyU2FRegistration({
   serviceUrl,
@@ -1475,10 +1519,7 @@ export async function getActiveIdentityProviders({
 }
 
 /**
- *
- * @param host
- * @param userId the id of the user where the email should be set
- * @returns the list of authentication method types
+ * @security Requires authenticated session. Use protectedListAuthenticationMethodTypes from lib/server/zitadel-protected.ts
  */
 export async function listAuthenticationMethodTypes({
   serviceUrl,
@@ -1520,9 +1561,13 @@ export function createServerTransport(token: string, baseUrl: string) {
   });
 }
 
-// Check whether a user has an authentication method (TOTP) attached to their account.
-// The current Zitadel API does not include the TOTP name so we can only show whether
-// TOTP is added/enabled or not.
+/**
+ * Check whether a user has an authentication method (TOTP) attached to their account.
+ * The current Zitadel API does not include the TOTP name so we can only show whether
+ * TOTP is added/enabled or not.
+ *
+ * @security Requires authenticated session. Use protectedGetTOTPStatus from lib/server/zitadel-protected.ts
+ */
 export async function getTOTPStatus({
   serviceUrl,
   userId,
@@ -1541,6 +1586,9 @@ export async function getTOTPStatus({
   return authMethodTypes.includes(4); // 4 = AuthenticationMethodType.TOTP
 }
 
+/**
+ * @security Requires authenticated session. Use protectedGetU2FList from lib/server/zitadel-protected.ts
+ */
 export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -1559,6 +1607,9 @@ export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; u
     .filter((token): token is NonNullable<typeof token> => token !== undefined);
 }
 
+/**
+ * @security Requires authenticated session. Removing MFA devices is sensitive. Use protectedRemoveU2F from lib/server/zitadel-protected.ts
+ */
 export async function removeU2F({
   serviceUrl,
   userId,
@@ -1579,6 +1630,9 @@ export async function removeU2F({
   });
 }
 
+/**
+ * @security Requires authenticated session. Removing MFA methods is sensitive. Use protectedRemoveTOTP from lib/server/zitadel-protected.ts
+ */
 export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
