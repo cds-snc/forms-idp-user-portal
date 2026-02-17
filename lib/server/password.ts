@@ -30,7 +30,9 @@ import {
   checkPasswordChangeRequired,
   checkUserVerification,
 } from "../verify-helper";
+import { sendPasswordChangedEmail } from "./verify";
 import { createServerTransport } from "../../lib/zitadel";
+import { logMessage } from "../../lib/logger";
 
 import { serverTranslation } from "@i18n/server";
 
@@ -419,6 +421,15 @@ export async function changePassword(command: { code?: string; userId: string; p
     userId,
     password: command.password,
     code: command.code,
+  }).then(async (result) => {
+    // Send password changed email notification
+    if (!("error" in result)) {
+      await sendPasswordChangedEmail({ userId }).catch((error) => {
+        logMessage.error({ error }, "Failed to send password changed email");
+        // Don't fail the password change if email fails
+      });
+    }
+    return result;
   });
 }
 
@@ -501,13 +512,22 @@ export async function checkSessionAndSetPassword({
     console.log(
       "Set password using service account due to enforced MFA without existing MFA methods"
     );
-    return setPassword({ serviceUrl, payload }).catch((error) => {
-      // throw error if failed precondition (ex. User is not yet initialized)
-      if (error.code === 9 && error.message) {
-        return { error: t("errors.failedPrecondition") };
-      }
-      return { error: "Could not set password" };
-    });
+    return setPassword({ serviceUrl, payload })
+      .then(async (result) => {
+        // Send password changed email notification
+        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+          logMessage.error({ error }, "Failed to send password changed email");
+          // Don't fail the password change if email fails
+        });
+        return result;
+      })
+      .catch((error) => {
+        // throw error if failed precondition (ex. User is not yet initialized)
+        if (error.code === 9 && error.message) {
+          return { error: t("errors.failedPrecondition") };
+        }
+        return { error: "Could not set password" };
+      });
   } else {
     const transport = async (serviceUrl: string, token: string) => {
       return createServerTransport(token, serviceUrl);
@@ -528,6 +548,14 @@ export async function checkSessionAndSetPassword({
         },
         {}
       )
+      .then(async (result) => {
+        // Send password changed email notification
+        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+          logMessage.error({ error }, "Failed to send password changed email");
+          // Don't fail the password change if email fails
+        });
+        return result;
+      })
       .catch((error: ConnectError) => {
         console.log(error);
         if (error.code === 7) {

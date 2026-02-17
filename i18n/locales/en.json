@@ -118,7 +118,11 @@
       "errors": {
         "couldNotSetPassword": "Could not set password",
         "couldNotResetPassword": "Could not reset password.",
-        "couldNotVerifyPassword": "Could not verify password."
+        "couldNotVerifyPassword": "Could not verify password.",
+        "couldNotLoadUser": "Could not load user.",
+        "couldNotLoadUserEmail": "Could not load user email address.",
+        "emailConfigurationError": "Email configuration error.",
+        "emailSendFailed": "Failed to send email."
       }
     },
     "change": {
