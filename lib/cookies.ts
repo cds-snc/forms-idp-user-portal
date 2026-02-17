@@ -12,6 +12,7 @@ export type Cookie = {
   id: string;
   token: string;
   loginName: string;
+  userId: string; // Zitadel user ID for authorization checks
   organization?: string;
   creationTs: string;
   expirationTs: string;
@@ -356,6 +357,7 @@ export async function getSessionCredentials(organizationOverride?: string) {
     return {
       sessionId: sessionCookie.id,
       loginName: sessionCookie.loginName,
+      userId: sessionCookie.userId,
       organization: organizationOverride || sessionCookie.organization,
       requestId: sessionCookie.requestId, // Include requestId for OIDC/SAML flows
     };

@@ -18,20 +18,20 @@ export const Authentication = ({
 }) => {
   const handleRemoveU2F = async (u2fId: string) => {
     const result = await removeU2FAction(userId, u2fId);
-    if (result.success) {
-      toast.success("Security key removed successfully", "account");
+    if ("error" in result) {
+      toast.error(result.error);
       return;
     }
-    toast.error(result.error || "Failed to remove security key", "account");
+    toast.success("Security key removed successfully");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
-    if (result.success) {
-      toast.success("Authenticator app removed successfully", "account");
+    if ("error" in result) {
+      toast.error(result.error);
       return;
     }
-    toast.error(result.error || "Failed to remove authenticator", "account");
+    toast.success("Authenticator app removed successfully");
   };
 
   return (
