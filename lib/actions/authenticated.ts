@@ -1,5 +1,3 @@
-"use server";
-
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 
