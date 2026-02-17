@@ -35,7 +35,6 @@ import {
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
-  SetUserMetadataRequestSchema,
   UpdateHumanUserRequest,
   UserService,
   VerifyU2FRegistrationRequest,
@@ -1519,48 +1518,6 @@ export function createServerTransport(token: string, baseUrl: string) {
           },
         ],
   });
-}
-
-/**
- * Store U2F token custom name in user metadata. This seems to be needed because
- * the API will overwrite the token name with the device name on each update. Probably
- * why the metadata bit was created.
- * @param serviceUrl - Zitadel service URL
- * @param userId - User ID
- * @param tokenId - U2F token ID
- * @param customName - Custom name for the token
- */
-export async function setU2FTokenName({
-  serviceUrl,
-  userId,
-  tokenId,
-  customName,
-}: {
-  serviceUrl: string;
-  userId: string;
-  tokenId: string;
-  customName: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  const metadataKey = `u2f_name_${tokenId}`;
-  // metadata values must be bytes
-  const valueBytes = Buffer.from(customName, "utf-8");
-
-  const request = create(SetUserMetadataRequestSchema, {
-    userId,
-    metadata: [
-      {
-        key: metadataKey,
-        value: valueBytes,
-      },
-    ],
-  });
-
-  return userService.setUserMetadata(request, {});
 }
 
 // Check whether a user has an authentication method (TOTP) attached to their account.
