@@ -1541,6 +1541,17 @@ export async function getTOTPStatus({
   return authMethodTypes.includes(4); // 4 = AuthenticationMethodType.TOTP
 }
 
+export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.removeTOTP({
+    userId,
+  });
+}
+
 export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
@@ -1576,16 +1587,5 @@ export async function removeU2F({
   return userService.removeU2F({
     userId,
     u2fId,
-  });
-}
-
-export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.removeTOTP({
-    userId,
   });
 }

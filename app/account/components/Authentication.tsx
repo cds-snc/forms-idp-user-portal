@@ -1,10 +1,9 @@
 "use client";
-import { Button } from "@components/clientComponents/globals";
+import { Button, toast } from "@components/clientComponents/globals";
 import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
 import Link from "next/link";
 import { removeTOTPAction, removeU2FAction } from "../actions";
-import { toast } from "react-toastify/unstyled";
 
 // TODO add translation strings
 
@@ -17,22 +16,22 @@ export const Authentication = ({
   userId: string;
   authenticatorStatus: boolean;
 }) => {
-  const handleRemove = async (u2fId: string) => {
+  const handleRemoveU2F = async (u2fId: string) => {
     const result = await removeU2FAction(userId, u2fId);
     if (result.success) {
-      toast.success("Security key removed successfully");
+      toast.success("Security key removed successfully", "account");
       return;
     }
-    toast.error(result.error);
+    toast.error(result.error || "Failed to remove security key", "account");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if (result.success) {
-      toast.success("Authenticator app removed successfully");
+      toast.success("Authenticator app removed successfully", "account");
       return;
     }
-    toast.error(result.error);
+    toast.error(result.error || "Failed to remove authenticator", "account");
   };
 
   return (
@@ -60,7 +59,7 @@ export const Authentication = ({
                     <span className="mr-2 font-semibold">Security key</span>
                     <span>({data.name || "Unkown device"})</span>
                     <span className="mx-2">&#8226;</span>
-                    <Button onClick={() => handleRemove(data.id)} theme="link">
+                    <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
                       Remove
                     </Button>
                   </li>
