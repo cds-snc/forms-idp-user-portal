@@ -27,7 +27,6 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import { SearchQuery, SearchQuerySchema } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
-export type { Passkey } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,

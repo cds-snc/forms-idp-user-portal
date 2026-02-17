@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
-import { getLoginSettings, getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
+import { getSession, getLoginSettings, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 import { create, Duration } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
