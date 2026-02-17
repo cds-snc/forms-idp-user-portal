@@ -4,7 +4,6 @@ import { Viewport } from "next";
 
 import { Noto_Sans, Lato } from "next/font/google";
 import { serverTranslation } from "@i18n/server";
-import { ToastContainer } from "@clientComponents/globals";
 
 export const dynamic = "force-dynamic";
 
@@ -43,10 +42,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         />
       </head>
 
-      <body>
-        {children}
-        <ToastContainer autoClose={false} containerId="default" />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

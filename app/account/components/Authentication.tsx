@@ -6,6 +6,7 @@ import { getImageUrl } from "@lib/imageUrl";
 import { removeTOTPAction, removeU2FAction } from "../actions";
 import { toast } from "@components/clientComponents/globals/Toast";
 import { Button } from "@components/clientComponents/globals";
+import { ToastContainer } from "@clientComponents/globals";
 
 // TODO add translation strings
 
@@ -21,19 +22,19 @@ export const Authentication = ({
   const handleRemoveU2F = async (u2fId: string) => {
     const result = await removeU2FAction(userId, u2fId);
     if ("error" in result) {
-      toast.error(result.error || "Failed to remove security key", "default");
+      toast.error(result.error || "Failed to remove security key", "account-authentication");
       return;
     }
-    toast.success("Security key removed successfully", "default");
+    toast.success("Security key removed successfully", "account-authentication");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if ("error" in result) {
-      toast.error(result.error || "Failed to remove authenticator", "default");
+      toast.error(result.error || "Failed to remove authenticator", "account-authentication");
       return;
     }
-    toast.success("Authenticator app removed successfully", "default");
+    toast.success("Authenticator app removed successfully", "account-authentication");
   };
 
   return (
@@ -98,6 +99,7 @@ export const Authentication = ({
           <Link href="/mfa/set">Add additional method</Link>
         </div>
       </div>
+      <ToastContainer autoClose={false} containerId="account-authentication" />
     </>
   );
 };
