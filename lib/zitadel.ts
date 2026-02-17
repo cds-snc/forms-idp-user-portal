@@ -1519,3 +1519,73 @@ export function createServerTransport(token: string, baseUrl: string) {
         ],
   });
 }
+
+// Check whether a user has an authentication method (TOTP) attached to their account.
+// The current Zitadel API does not include the TOTP name so we can only show whether
+// TOTP is added/enabled or not.
+export async function getTOTPStatus({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  const authMethodsResponse = await userService.listAuthenticationMethodTypes({ userId });
+  const authMethodTypes = authMethodsResponse.authMethodTypes ?? [];
+
+  return authMethodTypes.includes(4); // 4 = AuthenticationMethodType.TOTP
+}
+
+export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+  const authFactorsResponse = await userService.listAuthenticationFactors({ userId });
+
+  return authFactorsResponse.result
+    .filter((factor) => factor.type.case === "u2f")
+    .map((factor) => {
+      if (factor.type.case === "u2f") {
+        return factor.type.value;
+      }
+      return undefined;
+    })
+    .filter((token): token is NonNullable<typeof token> => token !== undefined);
+}
+
+export async function removeU2F({
+  serviceUrl,
+  userId,
+  u2fId,
+}: {
+  serviceUrl: string;
+  userId: string;
+  u2fId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.removeU2F({
+    userId,
+    u2fId,
+  });
+}
+
+export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.removeTOTP({
+    userId,
+  });
+}

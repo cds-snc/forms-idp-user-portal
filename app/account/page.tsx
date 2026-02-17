@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 
-import { getUserByID } from "@lib/zitadel";
+import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
 import { loadSessionById } from "@lib/session";
@@ -35,11 +35,26 @@ export default async function Page() {
     throw new Error("User information could not be retrieved from session.");
   }
 
+  const [u2fList, authenticatorStatus] = await Promise.all([
+    getU2FList({
+      serviceUrl,
+      userId: userId!,
+    }),
+    getTOTPStatus({
+      serviceUrl,
+      userId: userId!,
+    }),
+  ]);
+
   return (
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
-      <Authentication />
+      <Authentication
+        u2fList={u2fList}
+        authenticatorStatus={authenticatorStatus}
+        userId={userId!}
+      />
     </>
   );
 }
