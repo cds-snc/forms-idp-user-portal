@@ -115,7 +115,11 @@
       "errors": {
         "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
         "couldNotResetPassword": "Le mot de passe n'a pas pu être réinitialisé.",
-        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié."
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié.",
+        "couldNotLoadUser": "Impossible de charger l'utilisateur.",
+        "couldNotLoadUserEmail": "Impossible de charger l'adresse courriel de l'utilisateur.",
+        "emailConfigurationError": "Erreur de configuration du courriel.",
+        "emailSendFailed": "Échec de l'envoi du courriel."
       }
     },
     "change": {
