@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import { cn } from "@lib/utils";
+
 interface AvatarProps {
   name: string | null | undefined;
   loginName: string;
@@ -40,28 +43,27 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
 
   return (
     <div
-      className={`pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center bg-gcds-blue-500 text-white transition-colors duration-200 rounded-full ${
-        shadow ? "shadow" : ""
-      } ${
-        size === "large"
-          ? "h-20 w-20 font-normal"
-          : size === "base"
-            ? "h-[38px] w-[38px] font-bold"
-            : size === "small"
-              ? "!h-[32px] !w-[32px] text-[13px] font-bold"
-              : "h-12 w-12"
-      }`}
+      className={cn(
+        "pointer-events-none flex size-full flex-shrink-0 cursor-default items-center justify-center rounded-full bg-gcds-blue-500 text-white transition-colors duration-200",
+        shadow && "shadow",
+        {
+          "h-20 w-20 font-normal": size === "large",
+          "size-[38px] font-bold": size === "base",
+          "!h-[32px] !w-[32px] text-[13px] font-bold": size === "small",
+          "size-12": size !== "large" && size !== "base" && size !== "small",
+        }
+      )}
     >
       {imageUrl ? (
-        <img
+        <Image
           height={48}
           width={48}
           alt="avatar"
-          className={`h-full w-full border border-divider-light dark:border-divider-dark rounded-lg`}
+          className="size-full rounded-lg border"
           src={imageUrl}
         />
       ) : (
-        <span className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}>
+        <span className={cn("uppercase", size === "large" ? "text-xl" : "text-13px")}>
           {credentials}
         </span>
       )}

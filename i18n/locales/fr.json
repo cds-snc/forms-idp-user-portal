@@ -308,7 +308,10 @@
     },
     "password": {
       "title": "Password creation",
-      "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider."
+      "description": "We're asking for your information again because we're transferring all GC Forms accounts to a new authentication provider.",
+      "errors": {
+        "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
+      }
     }
   },
   "u2f": {

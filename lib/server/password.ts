@@ -34,6 +34,53 @@ import { createServerTransport } from "../../lib/zitadel";
 
 import { serverTranslation } from "@i18n/server";
 
+/**
+ * Type guard to check if an error has failedAttempts property
+ */
+function hasFailedAttempts(error: unknown): error is { failedAttempts: bigint } {
+  return (
+    error !== null &&
+    typeof error === "object" &&
+    "failedAttempts" in error &&
+    typeof error.failedAttempts === "bigint"
+  );
+}
+
+/**
+ * Helper function to handle authentication failure errors with lockout settings
+ */
+async function handleAuthenticationFailure(
+  error: unknown,
+  serviceUrl: string,
+  organization: string | undefined,
+  t: (key: string, options?: Record<string, string>) => string
+): Promise<{ error: string } | null> {
+  if (!hasFailedAttempts(error)) {
+    return null;
+  }
+
+  const lockoutSettings = await getLockoutSettings({
+    serviceUrl,
+    orgId: organization,
+  });
+
+  const hasLimit =
+    lockoutSettings?.maxPasswordAttempts !== undefined &&
+    lockoutSettings?.maxPasswordAttempts > BigInt(0);
+  const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+  const messageKey = hasLimit
+    ? "errors.failedToAuthenticate"
+    : "errors.failedToAuthenticateNoLimit";
+
+  return {
+    error: t(messageKey, {
+      failedAttempts: error.failedAttempts.toString(),
+      maxPasswordAttempts: hasLimit ? lockoutSettings?.maxPasswordAttempts.toString() : "?",
+      lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+    }),
+  };
+}
+
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
@@ -122,30 +169,15 @@ export async function sendPassword(
           requestId: command.requestId,
           lifetime: loginSettings?.passwordCheckLifetime,
         });
-      } catch (error: any) {
-        if ("failedAttempts" in error && error.failedAttempts) {
-          const lockoutSettings = await getLockoutSettings({
-            serviceUrl,
-            orgId: command.organization,
-          });
-
-          const hasLimit =
-            lockoutSettings?.maxPasswordAttempts !== undefined &&
-            lockoutSettings?.maxPasswordAttempts > BigInt(0);
-          const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-          const messageKey = hasLimit
-            ? "errors.failedToAuthenticate"
-            : "errors.failedToAuthenticateNoLimit";
-
-          return {
-            error: t(messageKey, {
-              failedAttempts: error.failedAttempts,
-              maxPasswordAttempts: hasLimit
-                ? (lockoutSettings?.maxPasswordAttempts).toString()
-                : "?",
-              lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-            }),
-          };
+      } catch (error: unknown) {
+        const authFailure = await handleAuthenticationFailure(
+          error,
+          serviceUrl,
+          command.organization,
+          t
+        );
+        if (authFailure) {
+          return authFailure;
         }
         return { error: t("errors.couldNotCreateSessionForUser") };
       }
@@ -183,28 +215,15 @@ export async function sendPassword(
         requestId: command.requestId,
         lifetime,
       });
-    } catch (error: any) {
-      if ("failedAttempts" in error && error.failedAttempts) {
-        const lockoutSettings = await getLockoutSettings({
-          serviceUrl,
-          orgId: command.organization,
-        });
-
-        const hasLimit =
-          lockoutSettings?.maxPasswordAttempts !== undefined &&
-          lockoutSettings?.maxPasswordAttempts > BigInt(0);
-        const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-        const messageKey = hasLimit
-          ? "errors.failedToAuthenticate"
-          : "errors.failedToAuthenticateNoLimit";
-
-        return {
-          error: t(messageKey, {
-            failedAttempts: error.failedAttempts,
-            maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
-            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-          }),
-        };
+    } catch (error: unknown) {
+      const authFailure = await handleAuthenticationFailure(
+        error,
+        serviceUrl,
+        command.organization,
+        t
+      );
+      if (authFailure) {
+        return authFailure;
       }
       throw error;
     }

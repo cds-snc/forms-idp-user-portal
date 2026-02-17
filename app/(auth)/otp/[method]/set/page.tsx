@@ -107,7 +107,7 @@ export default async function Page(props: {
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
-            showDropdown
+            showDropdown={false}
           ></UserAvatar>
         )}
       </AuthPanel>

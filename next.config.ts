@@ -33,6 +33,14 @@ const nextConfig: NextConfig = {
     includePaths: ["styles"],
   },
   reactCompiler: true,
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error"],
+          }
+        : false,
+  },
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
   async headers() {
     return [

@@ -34,7 +34,6 @@ export default async function Page() {
       },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.warn(error);
   }
 
