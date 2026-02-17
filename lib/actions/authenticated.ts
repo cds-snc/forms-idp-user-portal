@@ -8,6 +8,7 @@ import { logMessage } from "@lib/logger";
 export type SessionCredentials = {
   sessionId: string;
   loginName: string;
+  userId: string;
   organization?: string;
   requestId?: string;
 };

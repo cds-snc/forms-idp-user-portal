@@ -28,5 +28,7 @@ export function validateUserCanAccessUserId(
  * @returns true if all required fields present, false otherwise
  */
 export function validateSessionCredentials(credentials: SessionCredentials): boolean {
-  return !!credentials && !!credentials.sessionId && !!credentials.loginName;
+  return (
+    !!credentials && !!credentials.sessionId && !!credentials.loginName && !!credentials.userId
+  );
 }

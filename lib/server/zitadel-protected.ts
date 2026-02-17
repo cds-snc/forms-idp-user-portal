@@ -22,7 +22,7 @@ export const protectedGetUserByID = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to access userId ${userId} by user ${credentials.loginName}`
       );
@@ -54,7 +54,7 @@ export const protectedListIDPLinks = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to list IDP links for userId ${userId} by user ${credentials.loginName}`
       );
@@ -86,7 +86,7 @@ export const protectedRegisterTOTP = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to register TOTP for userId ${userId} by user ${credentials.loginName}`
       );
@@ -118,7 +118,7 @@ export const protectedVerifyTOTPRegistration = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to verify TOTP for userId ${userId} by user ${credentials.loginName}`
       );
@@ -150,7 +150,7 @@ export const protectedAddOTPEmail = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to add OTP email for userId ${userId} by user ${credentials.loginName}`
       );
@@ -182,7 +182,7 @@ export const protectedAddOTPSMS = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to add OTP SMS for userId ${userId} by user ${credentials.loginName}`
       );
@@ -214,7 +214,7 @@ export const protectedRegisterU2F = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to register U2F for userId ${userId} by user ${credentials.loginName}`
       );
@@ -250,7 +250,7 @@ export const protectedVerifyU2FRegistration = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to verify U2F for userId ${userId} by user ${credentials.loginName}`
       );
@@ -290,7 +290,7 @@ export const protectedRemoveU2F = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to remove U2F for userId ${userId} by user ${credentials.loginName}`
       );
@@ -322,7 +322,7 @@ export const protectedRemoveTOTP = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to remove TOTP for userId ${userId} by user ${credentials.loginName}`
       );
@@ -354,7 +354,7 @@ export const protectedGetTOTPStatus = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to check TOTP status for userId ${userId} by user ${credentials.loginName}`
       );
@@ -386,7 +386,7 @@ export const protectedGetU2FList = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to list U2F devices for userId ${userId} by user ${credentials.loginName}`
       );
@@ -418,7 +418,7 @@ export const protectedListAuthenticationMethodTypes = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to list auth methods for userId ${userId} by user ${credentials.loginName}`
       );
@@ -450,7 +450,7 @@ export const protectedHumanMFAInitSkipped = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to mark MFA init skipped for userId ${userId} by user ${credentials.loginName}`
       );
@@ -486,7 +486,7 @@ export const protectedAddIDPLink = AuthenticatedAction(
       return { error: "Invalid session credentials" };
     }
 
-    if (!validateUserCanAccessUserId(credentials.loginName, userId)) {
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
       logMessage.warn(
         `Unauthorized attempt to add IDP link to userId ${userId} by user ${credentials.loginName}`
       );
