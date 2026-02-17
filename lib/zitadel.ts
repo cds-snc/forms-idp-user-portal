@@ -1587,20 +1587,6 @@ export async function getTOTPStatus({
 }
 
 /**
- * @security Requires authenticated session. Removing MFA methods is sensitive. Use protectedRemoveTOTP from lib/server/zitadel-protected.ts
- */
-export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.removeTOTP({
-    userId,
-  });
-}
-
-/**
  * @security Requires authenticated session. Use protectedGetU2FList from lib/server/zitadel-protected.ts
  */
 export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
@@ -1641,5 +1627,19 @@ export async function removeU2F({
   return userService.removeU2F({
     userId,
     u2fId,
+  });
+}
+
+/**
+ * @security Requires authenticated session. Removing MFA methods is sensitive. Use protectedRemoveTOTP from lib/server/zitadel-protected.ts
+ */
+export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.removeTOTP({
+    userId,
   });
 }

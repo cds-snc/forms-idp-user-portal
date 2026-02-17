@@ -45,7 +45,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
       <body>
         {children}
-        <ToastContainer autoClose={false} containerId="account" />
+        <ToastContainer autoClose={false} containerId="default" />
       </body>
     </html>
   );
