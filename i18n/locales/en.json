@@ -382,5 +382,10 @@
       "couldNotVerifyEmail": "Could not verify email",
       "failedToAddOTPEmail": "Could not set up email verification. Please try again."
     }
+  },
+  "allSet": {
+    "title": "You're all set!",
+    "description": "Your account is now secured with two-factor authentication.",
+    "continueButton": "Continue"
   }
 }
