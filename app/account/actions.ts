@@ -11,9 +11,12 @@ import { logMessage } from "@lib/logger";
 
 export async function removeU2FAction(userId: string, u2fId: string) {
   try {
-    const hasMFA = await _hasMFAConfigured(userId);
-    if (!hasMFA) {
-      return { error: "At least one two-factor authentication method must be configured" };
+    const hasMultipleMFA = await _hasMultipleMFAMethods(userId);
+    if (!hasMultipleMFA) {
+      return {
+        error:
+          "Cannot remove security key. At least two authentication methods must be configured to remove one.",
+      };
     }
 
     const result = await protectedRemoveU2F(userId, u2fId);
@@ -32,9 +35,12 @@ export async function removeU2FAction(userId: string, u2fId: string) {
 
 export async function removeTOTPAction(userId: string) {
   try {
-    const hasMFA = await _hasMFAConfigured(userId);
-    if (!hasMFA) {
-      return { error: "At least one two-factor authentication method must be configured" };
+    const hasMultipleMFA = await _hasMultipleMFAMethods(userId);
+    if (!hasMultipleMFA) {
+      return {
+        error:
+          "Cannot remove authenticator. At least two authentication methods must be configured to remove one.",
+      };
     }
 
     const result = await protectedRemoveTOTP(userId);
@@ -51,7 +57,14 @@ export async function removeTOTPAction(userId: string) {
   }
 }
 
-async function _hasMFAConfigured(userId: string): Promise<boolean> {
+/**
+ * Check if user has at least 2 MFA methods configured.
+ * Ensures at least one MFA method remains after removal to prevent lockout.
+ *
+ * @param userId - The user ID to check
+ * @returns true if user has 2+ MFA methods, false otherwise
+ */
+async function _hasMultipleMFAMethods(userId: string): Promise<boolean> {
   const [totpResult, u2fResult] = await Promise.all([
     protectedGetTOTPStatus(userId),
     protectedGetU2FList(userId),
@@ -65,5 +78,10 @@ async function _hasMFAConfigured(userId: string): Promise<boolean> {
     return false;
   }
 
-  return totpResult || u2fResult.length > 0;
+  // Count total MFA methods: TOTP (0 or 1) + U2F devices count
+  const totpCount = totpResult ? 1 : 0;
+  const u2fCount = u2fResult.length;
+  const totalMethods = totpCount + u2fCount;
+
+  return totalMethods >= 2;
 }
