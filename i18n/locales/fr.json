@@ -369,5 +369,10 @@
       "couldNotVerifyEmail": "Problème de vérification du courriel",
       "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer."
     }
+  },
+  "allSet": {
+    "title": "Vous êtes prêt !",
+    "description": "Votre compte est maintenant sécurisé avec l'authentification à deux facteurs.",
+    "continueButton": "Continuer"
   }
 }
