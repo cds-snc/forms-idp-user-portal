@@ -10,14 +10,19 @@ import Link from "next/link";
 export const Authentication = ({
   u2fInfo,
   authenticatorStatus,
+  onRemoveU2F,
 }: {
   u2fInfo: Array<{ id: string; name: string; state?: string }>;
   authenticatorStatus: boolean;
+  onRemoveU2F: (u2fId: string) => Promise<void>;
 }) => {
-  const handleRemove = () => {
-    // TODO implement remove functionality
-    // Maybe link instead to a new "/mfa/remove" or existing"/mfa/set"?
-    alert("TODO");
+  const handleRemove = async (u2fId: string) => {
+    await onRemoveU2F(u2fId);
+  };
+
+  const handleRemoveAuthenticator = () => {
+    // TODO: implement TOTP removal
+    console.log("Remove authenticator app - not yet implemented");
   };
 
   if (!authenticatorStatus && u2fInfo.length === 0) {
@@ -49,7 +54,7 @@ export const Authentication = ({
                     <span className="mr-2 font-semibold">Security key</span>
                     <span>({data.name || "Unkown device"})</span>
                     <span className="mx-2">&#8226;</span>
-                    <Button onClick={handleRemove} theme="link">
+                    <Button onClick={() => handleRemove(data.id)} theme="link">
                       Remove
                     </Button>
                   </li>
@@ -67,7 +72,7 @@ export const Authentication = ({
                 />
                 <span className="mr-2 font-semibold">Authenticator app</span>
                 <span className="mx-2">&#8226;</span>
-                <Button onClick={handleRemove} theme="link">
+                <Button onClick={handleRemoveAuthenticator} theme="link">
                   Remove
                 </Button>
               </li>

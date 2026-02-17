@@ -1601,3 +1601,32 @@ export async function getU2FInfo({ serviceUrl, userId }: { serviceUrl: string; u
     })
     .filter((token): token is NonNullable<typeof token> => token !== undefined);
 }
+
+/**
+ * Remove a U2F authentication factor from a user.
+ *
+ * @param {Object} params - The parameters object
+ * @param {string} params.serviceUrl - The Zitadel service URL
+ * @param {string} params.userId - The user ID who owns the U2F token
+ * @param {string} params.u2fId - The ID of the U2F token to remove
+ * @returns {Promise<object>} The response from removing the U2F factor
+ */
+export async function removeU2F({
+  serviceUrl,
+  userId,
+  u2fId,
+}: {
+  serviceUrl: string;
+  userId: string;
+  u2fId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.removeU2F({
+    userId,
+    u2fId,
+  });
+}

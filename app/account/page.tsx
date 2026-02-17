@@ -9,6 +9,7 @@ import { loadSessionById } from "@lib/session";
 import { Authentication } from "./components/Authentication";
 import { AccountInformation } from "./components/AccountInformation";
 import { getTOTPStatus, getUserByID, getU2FInfo } from "@lib/zitadel";
+import { removeU2FAction } from "./actions";
 
 // TODO add translation strings
 
@@ -46,11 +47,20 @@ export default async function Page() {
     }),
   ]);
 
+  const handleRemoveU2F = async (u2fId: string) => {
+    "use server";
+    await removeU2FAction(userId!, u2fId);
+  };
+
   return (
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
-      <Authentication u2fInfo={u2fInfo} authenticatorStatus={authenticatorStatus} />
+      <Authentication
+        u2fInfo={u2fInfo}
+        authenticatorStatus={authenticatorStatus}
+        onRemoveU2F={handleRemoveU2F}
+      />
     </>
   );
 }
