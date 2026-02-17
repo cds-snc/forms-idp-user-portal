@@ -2,6 +2,7 @@
 import { Button } from "@components/clientComponents/globals";
 import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
+import Link from "next/link";
 
 // TODO may not need to be a client component if Link can be used instead of button
 // TODO add translation strings
@@ -72,6 +73,16 @@ export const Authentication = ({
               </li>
             )}
           </ul>
+        </div>
+        <div className="mt-6 flex align-middle">
+          <Image
+            src={getImageUrl("/img/plus.svg")}
+            alt=""
+            width={24}
+            height={24}
+            className="mr-1"
+          />{" "}
+          <Link href="/mfa/set">Add additional method</Link>
         </div>
       </div>
     </>
