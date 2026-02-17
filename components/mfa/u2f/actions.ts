@@ -3,7 +3,13 @@
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
-import { getSession, getLoginSettings, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
+import {
+  getLoginSettings,
+  getSession,
+  registerU2F,
+  setU2FTokenName,
+  verifyU2FRegistration,
+} from "@lib/zitadel";
 import { create, Duration } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -14,6 +20,7 @@ import { setSessionAndUpdateCookie } from "@lib/server/cookie";
 import { getSessionCookieById, getSessionCookieByLoginName } from "@lib/cookies";
 import { continueWithSession } from "@lib/server/session";
 import { U2F_ERRORS } from "./u2f-errors";
+import { logMessage } from "@lib/logger";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -155,6 +162,24 @@ export async function verifyU2F(command: VerifyU2FCommand) {
       errorMessage.includes("exists")
     ) {
       return { error: U2F_ERRORS.CREDENTIAL_ALREADY_REGISTERED };
+    }
+    // Return other errors
+    return result;
+  }
+
+  // Verification was successful - store the custom name in metadata to later show it in the UI
+  if (passkeyName && command.u2fId) {
+    try {
+      await setU2FTokenName({
+        serviceUrl,
+        userId,
+        tokenId: command.u2fId,
+        customName: passkeyName,
+      });
+    } catch (error) {
+      // Log error but don't fail the registration
+      // The token is registered, just the custom name wasn't saved
+      logMessage.warn(`Failed to store U2F custom name in metadata: ${JSON.stringify(error)}`);
     }
   }
 

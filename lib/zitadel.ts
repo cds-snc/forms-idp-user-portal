@@ -23,6 +23,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import { SearchQuery, SearchQuerySchema } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
+export type { Passkey } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -31,6 +32,7 @@ import {
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
+  SetUserMetadataRequestSchema,
   UpdateHumanUserRequest,
   UserService,
   VerifyU2FRegistrationRequest,
@@ -38,6 +40,7 @@ import {
 // import { unstable_cacheLife as cacheLife } from "next/cache";
 import { serverTranslation } from "@i18n/server";
 import { getUserAgent } from "./fingerprint";
+import { logMessage } from "./logger";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
@@ -1516,9 +1519,58 @@ export function createServerTransport(token: string, baseUrl: string) {
   });
 }
 
-// Check if TOTP (Time-based One-Time Password) authenticator is enabled for a user
-// Note: This only indicates if TOTP is enabled, NOT which authenticator app is used
-// The server only stores the TOTP secret, not the app name.
+/**
+ * Store U2F token custom name in user metadata. This seems to be needed because
+ * the API will overwrite the token name with the device name on each update. Probably
+ * why the metadata bit was created.
+ * @param serviceUrl - Zitadel service URL
+ * @param userId - User ID
+ * @param tokenId - U2F token ID
+ * @param customName - Custom name for the token
+ */
+export async function setU2FTokenName({
+  serviceUrl,
+  userId,
+  tokenId,
+  customName,
+}: {
+  serviceUrl: string;
+  userId: string;
+  tokenId: string;
+  customName: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  const metadataKey = `u2f_name_${tokenId}`;
+  // metadata values must be bytes
+  const valueBytes = Buffer.from(customName, "utf-8");
+
+  const request = create(SetUserMetadataRequestSchema, {
+    userId,
+    metadata: [
+      {
+        key: metadataKey,
+        value: valueBytes,
+      },
+    ],
+  });
+
+  return userService.setUserMetadata(request, {});
+}
+
+/**
+ * Check if TOTP (Time-based One-Time Password) authenticator is enabled for a user.
+ * Note: This only indicates if TOTP is enabled, NOT which authenticator app is used.
+ * The server only stores the TOTP secret, not the app name.
+ *
+ * @param {Object} params - The parameters object
+ * @param {string} params.serviceUrl - The Zitadel service URL
+ * @param {string} params.userId - The user ID to check TOTP status for
+ * @returns {Promise<boolean>} True if TOTP is enabled for the user, false otherwise
+ */
 export async function getTOTPStatus({
   serviceUrl,
   userId,
@@ -1530,8 +1582,10 @@ export async function getTOTPStatus({
     UserService,
     serviceUrl
   );
+
   const authMethodsResponse = await userService.listAuthenticationMethodTypes({ userId });
   const authMethodTypes = authMethodsResponse.authMethodTypes ?? [];
+
   // AuthenticationMethodType.TOTP has value 4
   return authMethodTypes.includes(4);
 }
@@ -1543,6 +1597,7 @@ export async function getU2FInfo({ serviceUrl, userId }: { serviceUrl: string; u
     serviceUrl
   );
   const authFactorsResponse = await userService.listAuthenticationFactors({ userId });
+
   return authFactorsResponse.result
     .filter((factor) => factor.type.case === "u2f")
     .map((factor) => {
@@ -1552,4 +1607,117 @@ export async function getU2FInfo({ serviceUrl, userId }: { serviceUrl: string; u
       return undefined;
     })
     .filter((token): token is NonNullable<typeof token> => token !== undefined);
+}
+
+/**
+ * Get all user metadata
+ * @param serviceUrl - Zitadel service URL
+ * @param userId - User ID
+ */
+export async function listUserMetadata({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  return userService.listUserMetadata({ userId }, {});
+}
+
+/**
+ * Get U2F token custom names from metadata
+ * @param serviceUrl - Zitadel service URL
+ * @param userId - User ID
+ * @returns Map of tokenId -> customName
+ */
+export async function getU2FTokenNames({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}): Promise<Record<string, string>> {
+  const metadataResponse = await listUserMetadata({ serviceUrl, userId });
+  const tokenNames: Record<string, string> = {};
+
+  for (const metadata of metadataResponse.metadata) {
+    if (metadata.key.startsWith("u2f_name_")) {
+      const tokenId = metadata.key.replace("u2f_name_", "");
+      try {
+        // Decode base64 value to string
+        const decodedValue = Buffer.from(metadata.value).toString("utf-8");
+        tokenNames[tokenId] = decodedValue;
+      } catch (error) {
+        logMessage.warn({ msg: "Failed to decode metadata value", key: metadata.key, error });
+      }
+    }
+  }
+
+  return tokenNames;
+}
+
+/**
+ * Get all security keys (U2F and Passkeys) registered for a user with their custom names.
+ * This combines both U2F factors and passkeys to support both registration methods.
+ * Custom names for U2F tokens are retrieved from user metadata.
+ *
+ * @param {Object} params - The parameters object
+ * @param {string} params.serviceUrl - The Zitadel service URL
+ * @param {string} params.userId - The user ID to fetch security keys for
+ * @returns {Promise<Array<{ id: string; name: string; state?: string }>>} Array of security keys with id, name, and optional state
+ */
+export async function getSecurityKeys({
+  serviceUrl,
+  userId,
+}: {
+  serviceUrl: string;
+  userId: string;
+}): Promise<Array<{ id: string; name: string; state?: string }>> {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl
+  );
+
+  const [authFactorsResponse, passkeysResponse, customNames] = await Promise.all([
+    userService.listAuthenticationFactors({ userId }),
+    userService.listPasskeys({ userId }),
+    getU2FTokenNames({ serviceUrl, userId }),
+  ]);
+
+  // Get U2F tokens (older registration method)
+  const u2fTokens = authFactorsResponse.result
+    .filter((factor) => factor.type.case === "u2f")
+    .map((factor) => {
+      if (factor.type.case === "u2f") {
+        const tokenId = factor.type.value.id;
+        // Use custom name from metadata if available, otherwise fall back to device Id
+        const customName = customNames[tokenId];
+        return {
+          id: tokenId,
+          name: customName || factor.type.value.name,
+          source: "u2f" as const,
+        };
+      }
+      return null;
+    })
+    .filter((token): token is NonNullable<typeof token> => token !== null);
+
+  // Get passkeys (newer registration method)
+  const passkeys = passkeysResponse.result.map((passkey) => ({
+    id: passkey.id,
+    name: passkey.name,
+    state: passkey.state.toString(),
+    source: "passkey" as const,
+  }));
+
+  // Combine and deduplicate by ID (in case same token appears in both)
+  const allKeys = [...u2fTokens, ...passkeys];
+  const uniqueKeys = Array.from(new Map(allKeys.map((key) => [key.id, key])).values());
+
+  return uniqueKeys;
 }

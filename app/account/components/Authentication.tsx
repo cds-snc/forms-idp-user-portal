@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@components/clientComponents/globals";
 import Image from "next/image";
-import { AuthFactorU2F } from "@zitadel/proto/zitadel/user/v2/user_pb";
 
 // TODO may not need to be a client component if Link can be used instead of button
 // TODO add translation strings
@@ -10,7 +9,7 @@ export const Authentication = ({
   yubikeyInfo,
   authenticatorStatus,
 }: {
-  yubikeyInfo: AuthFactorU2F[];
+  yubikeyInfo: Array<{ id: string; name: string; state?: string }>;
   authenticatorStatus: boolean;
 }) => {
   const handleRemove = () => {
@@ -46,7 +45,7 @@ export const Authentication = ({
                       className="mr-2 inline-block"
                     />
                     <span className="mr-2 font-semibold">Security key</span>
-                    <span>{data.name}</span>
+                    <span>({data.name || "Unkown device"})</span>
                     <span className="mx-2">&#8226;</span>
                     <Button onClick={handleRemove} theme="link">
                       Remove
