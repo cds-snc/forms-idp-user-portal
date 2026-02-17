@@ -35,7 +35,7 @@ export default async function Page() {
     throw new Error("User information could not be retrieved from session.");
   }
 
-  const [yubikeyInfo, authenticatorStatus] = await Promise.all([
+  const [u2fInfo, authenticatorStatus] = await Promise.all([
     getSecurityKeys({
       serviceUrl,
       userId: userId!,
@@ -50,7 +50,7 @@ export default async function Page() {
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
-      <Authentication yubikeyInfo={yubikeyInfo} authenticatorStatus={authenticatorStatus} />
+      <Authentication u2fInfo={u2fInfo} authenticatorStatus={authenticatorStatus} />
     </>
   );
 }

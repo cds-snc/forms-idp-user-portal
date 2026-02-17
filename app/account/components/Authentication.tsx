@@ -7,10 +7,10 @@ import Image from "next/image";
 // TODO add translation strings
 
 export const Authentication = ({
-  yubikeyInfo,
+  u2fInfo,
   authenticatorStatus,
 }: {
-  yubikeyInfo: Array<{ id: string; name: string; state?: string }>;
+  u2fInfo: Array<{ id: string; name: string; state?: string }>;
   authenticatorStatus: boolean;
 }) => {
   const handleRemove = () => {
@@ -19,7 +19,7 @@ export const Authentication = ({
     alert("TODO");
   };
 
-  if (!authenticatorStatus && yubikeyInfo.length === 0) {
+  if (!authenticatorStatus && u2fInfo.length === 0) {
     return (
       <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
         <h3 className="mb-6">Authentication</h3>
@@ -34,8 +34,8 @@ export const Authentication = ({
         <h3 className="mb-6">Authentication</h3>
         <div>
           <ul className="list-none p-0">
-            {yubikeyInfo.length > 0 &&
-              yubikeyInfo.map((data) => {
+            {u2fInfo.length > 0 &&
+              u2fInfo.map((data) => {
                 return (
                   <li key={data.id} className="mb-4">
                     <Image
