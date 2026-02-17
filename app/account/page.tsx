@@ -2,14 +2,13 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 
+import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
 import { loadSessionById } from "@lib/session";
 
 import { Authentication } from "./components/Authentication";
 import { AccountInformation } from "./components/AccountInformation";
-import { getTOTPStatus, getUserByID, getU2FInfo } from "@lib/zitadel";
-import { removeU2FAction } from "./actions";
 
 // TODO add translation strings
 
@@ -36,8 +35,8 @@ export default async function Page() {
     throw new Error("User information could not be retrieved from session.");
   }
 
-  const [u2fInfo, authenticatorStatus] = await Promise.all([
-    getU2FInfo({
+  const [u2fList, authenticatorStatus] = await Promise.all([
+    getU2FList({
       serviceUrl,
       userId: userId!,
     }),
@@ -47,19 +46,14 @@ export default async function Page() {
     }),
   ]);
 
-  const handleRemoveU2F = async (u2fId: string) => {
-    "use server";
-    await removeU2FAction(userId!, u2fId);
-  };
-
   return (
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
       <Authentication
-        u2fInfo={u2fInfo}
+        u2fList={u2fList}
         authenticatorStatus={authenticatorStatus}
-        onRemoveU2F={handleRemoveU2F}
+        userId={userId!}
       />
     </>
   );

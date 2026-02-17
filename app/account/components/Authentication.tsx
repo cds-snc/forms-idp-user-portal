@@ -3,45 +3,51 @@ import { Button } from "@components/clientComponents/globals";
 import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
 import Link from "next/link";
+import { removeTOTPAction, removeU2FAction } from "../actions";
+import { toast } from "react-toastify/unstyled";
 
-// TODO may not need to be a client component if Link can be used instead of button
 // TODO add translation strings
 
 export const Authentication = ({
-  u2fInfo,
+  u2fList,
+  userId,
   authenticatorStatus,
-  onRemoveU2F,
 }: {
-  u2fInfo: Array<{ id: string; name: string; state?: string }>;
+  u2fList: Array<{ id: string; name: string; state?: string }>;
+  userId: string;
   authenticatorStatus: boolean;
-  onRemoveU2F: (u2fId: string) => Promise<void>;
 }) => {
   const handleRemove = async (u2fId: string) => {
-    await onRemoveU2F(u2fId);
+    const result = await removeU2FAction(userId, u2fId);
+    if (result.success) {
+      toast.success("Security key removed successfully");
+      return;
+    }
+    toast.error(result.error);
   };
 
-  const handleRemoveAuthenticator = () => {
-    // TODO: implement TOTP removal
-    console.log("Remove authenticator app - not yet implemented");
+  const handleRemoveAuthenticator = async () => {
+    const result = await removeTOTPAction(userId);
+    if (result.success) {
+      toast.success("Authenticator app removed successfully");
+      return;
+    }
+    toast.error(result.error);
   };
-
-  if (!authenticatorStatus && u2fInfo.length === 0) {
-    return (
-      <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
-        <h3 className="mb-6">Authentication</h3>
-        <p>No two-factor authentication methods configured.</p>
-      </div>
-    );
-  }
 
   return (
     <>
       <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
         <h3 className="mb-6">Authentication</h3>
+
+        {u2fList.length === 0 && !authenticatorStatus && (
+          <p>No two-factor authentication methods configured.</p>
+        )}
+
         <div>
           <ul className="list-none p-0">
-            {u2fInfo.length > 0 &&
-              u2fInfo.map((data) => {
+            {u2fList.length > 0 &&
+              u2fList.map((data) => {
                 return (
                   <li key={data.id} className="mb-4">
                     <Image
@@ -79,6 +85,7 @@ export const Authentication = ({
             )}
           </ul>
         </div>
+
         <div className="mt-6 flex align-middle">
           <Image
             src={getImageUrl("/img/plus.svg")}
