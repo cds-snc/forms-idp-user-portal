@@ -29,7 +29,7 @@ const eslintConfig = defineConfig([
   ]),
   {
     rules: {
-      "no-console": "error",
+      "no-console": "off",
       "no-await-in-loop": "error",
       "no-return-await": "error",
       "react/no-jsx-in-try-catch": "off",

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { headers } from "next/headers";
 import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { LinkButton } from "@serverComponents/globals/Buttons/LinkButton";
@@ -9,7 +8,6 @@ import { getImageUrl } from "@lib/imageUrl";
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
-  const _headers = await headers();
   const { requestId } = searchParams;
 
   return (

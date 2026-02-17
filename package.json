@@ -50,6 +50,7 @@
     "@types/node": "^20.19.27",
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "baseline-browser-mapping": "^2.9.11",
     "clsx": "^2.1.1",
     "cssnano": "^7.1.2",

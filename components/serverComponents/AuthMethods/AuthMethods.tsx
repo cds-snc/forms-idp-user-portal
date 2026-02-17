@@ -6,8 +6,8 @@ import { BadgeState, StateBadge } from "./state-badge";
 
 const cardClasses = (alreadyAdded: boolean) =>
   clsx(
-    "relative bg-background-light-400 group block space-y-1.5 rounded-md px-5 py-3  border border-divider-light transition-all ",
-    alreadyAdded ? "opacity-50 cursor-default" : "hover:shadow-lg hover:dark:bg-white/10"
+    "group relative block space-y-1.5 rounded-md border  px-5 py-3 transition-all ",
+    alreadyAdded ? "cursor-default opacity-50" : "hover:shadow-lg hover:dark:bg-white/10"
   );
 
 const LinkWrapper = ({
@@ -33,7 +33,7 @@ export const TOTP = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div className={clsx("flex items-center font-medium", alreadyAdded ? "opacity-50" : "")}>
         <svg
-          className="mr-4 h-8 w-8 -translate-x-[2px] transform fill-current text-black"
+          className="mr-4 size-8 fill-current text-black"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
         >
@@ -61,7 +61,7 @@ export const U2F = (alreadyAdded: boolean, link: string) => {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="mr-4 h-8 w-8"
+          className="mr-4 size-8"
         >
           <path
             strokeLinecap="round"
@@ -85,7 +85,7 @@ export const EMAIL = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div className={clsx("flex items-center font-medium", alreadyAdded ? "" : "")}>
         <svg
-          className="mr-4 h-8 w-8"
+          className="mr-4 size-8"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -115,7 +115,7 @@ export const SMS = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div className={clsx("flex items-center font-medium", alreadyAdded ? "" : "")}>
         <svg
-          className="mr-4 h-8 w-8"
+          className="mr-4 size-8"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -149,7 +149,7 @@ export const PASSKEYS = (alreadyAdded: boolean, link: string) => {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="mr-4 h-8 w-8"
+          className="mr-4 size-8"
         >
           <path
             strokeLinecap="round"
@@ -193,9 +193,9 @@ export const PASSWORD = (alreadyAdded: boolean, link: string) => {
 
 function Setup() {
   return (
-    <div className="absolute right-2 top-0 transform">
+    <div className="absolute right-2 top-0">
       <StateBadge evenPadding={true} state={BadgeState.Success}>
-        <CheckIcon className="h-4 w-4" />
+        <CheckIcon className="size-4" />
       </StateBadge>
     </div>
   );
