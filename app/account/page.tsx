@@ -8,7 +8,7 @@ import { loadSessionById } from "@lib/session";
 
 import { Authentication } from "./components/Authentication";
 import { AccountInformation } from "./components/AccountInformation";
-import { getTOTPStatus, getSecurityKeys, getUserByID } from "@lib/zitadel";
+import { getTOTPStatus, getUserByID, getU2FInfo } from "@lib/zitadel";
 
 // TODO add translation strings
 
@@ -36,7 +36,7 @@ export default async function Page() {
   }
 
   const [u2fInfo, authenticatorStatus] = await Promise.all([
-    getSecurityKeys({
+    getU2FInfo({
       serviceUrl,
       userId: userId!,
     }),
