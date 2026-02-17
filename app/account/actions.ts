@@ -57,13 +57,8 @@ export async function removeTOTPAction(userId: string) {
   }
 }
 
-/**
- * Check if user has at least 2 MFA methods configured.
- * Ensures at least one MFA method remains after removal to prevent lockout.
- *
- * @param userId - The user ID to check
- * @returns true if user has 2+ MFA methods, false otherwise
- */
+// Check if user has at least 2 MFA methods configured.
+// Ensures at least one MFA method remains after removal to prevent lockout.
 async function _hasMultipleMFAMethods(userId: string): Promise<boolean> {
   const [totpResult, u2fResult] = await Promise.all([
     protectedGetTOTPStatus(userId),
