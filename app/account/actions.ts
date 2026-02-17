@@ -18,7 +18,7 @@ export async function removeU2FAction(userId: string, u2fId: string) {
     if (!hasMultipleMFA) {
       return {
         error:
-          "Cannot remove security key. At least two authentication methods must be configured to remove one.",
+          "Cannot remove security key. At least one strong authentication method must be configured to remove one.",
       };
     }
 
@@ -43,7 +43,7 @@ export async function removeTOTPAction(userId: string) {
     if (!hasMultipleMFA) {
       return {
         error:
-          "Cannot remove authenticator. At least two authentication methods must be configured to remove one.",
+          "Cannot remove authenticator. At least one strong authentication methods must be configured to remove one.",
       };
     }
 
