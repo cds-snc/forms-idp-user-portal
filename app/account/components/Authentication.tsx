@@ -1,10 +1,11 @@
 "use client";
-import { Button } from "@components/clientComponents/globals";
-import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
 import Link from "next/link";
+import { getImageUrl } from "@lib/imageUrl";
+
 import { removeTOTPAction, removeU2FAction } from "../actions";
-import { toast } from "react-toastify/unstyled";
+import { toast } from "@components/clientComponents/globals/Toast";
+import { Button } from "@components/clientComponents/globals";
 
 // TODO add translation strings
 
@@ -20,19 +21,19 @@ export const Authentication = ({
   const handleRemove = async (u2fId: string) => {
     const result = await removeU2FAction(userId, u2fId);
     if ("error" in result) {
-      toast.error(result.error);
+      toast.error(result.error || "Failed to remove security key", "account");
       return;
     }
-    toast.success("Security key removed successfully");
+    toast.success("Security key removed successfully", "account");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if ("error" in result) {
-      toast.error(result.error);
+      toast.error(result.error || "Failed to remove authenticator", "account");
       return;
     }
-    toast.success("Authenticator app removed successfully");
+    toast.success("Authenticator app removed successfully", "account");
   };
 
   return (
