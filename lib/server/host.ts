@@ -20,7 +20,8 @@ export async function getOriginalHost(): Promise<string> {
   // 1. x-forwarded-host - Set by proxies/CDNs with the original host
   // 2. x-original-host - Alternative header sometimes used
   // 3. host - Fallback to the current host header
-  const host = _headers.get("x-forwarded-host") || _headers.get("x-original-host") || _headers.get("host");
+  const host =
+    _headers.get("x-forwarded-host") || _headers.get("x-original-host") || _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found in headers");

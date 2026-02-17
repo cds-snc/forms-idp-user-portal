@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@components/clientComponents/globals";
+import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
 
 // TODO may not need to be a client component if Link can be used instead of button
@@ -38,7 +39,7 @@ export const Authentication = ({
                 return (
                   <li key={data.id} className="mb-4">
                     <Image
-                      src="/img/fingerprint_24px.png"
+                      src={getImageUrl("/img/fingerprint_24px.png")}
                       alt=""
                       width={32}
                       height={32}
@@ -57,7 +58,7 @@ export const Authentication = ({
             {authenticatorStatus && (
               <li className="mb-4">
                 <Image
-                  src="/img/verified_user_24px.png"
+                  src={getImageUrl("/img/verified_user_24px.png")}
                   alt=""
                   width={32}
                   height={32}

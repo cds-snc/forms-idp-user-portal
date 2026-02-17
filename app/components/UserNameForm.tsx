@@ -52,7 +52,6 @@ export const UserNameForm = ({ organization, requestId }: Props) => {
       organization,
       requestId,
     }).catch((error) => {
-      // eslint-disable-next-line no-console
       console.error(error);
       return {
         error: "Internal Error",

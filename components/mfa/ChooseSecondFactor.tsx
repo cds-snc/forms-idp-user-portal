@@ -7,6 +7,7 @@ import { useTranslation } from "@i18n/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Button } from "@clientComponents/globals/Buttons";
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
+import { buildUrlWithRequestId } from "@lib/utils";
 
 import { MethodOptionCard } from "./MethodOptionCard";
 
@@ -20,7 +21,7 @@ type Props = {
   userMethods: AuthenticationMethodType[];
 };
 
-export function ChooseSecondFactor({ userMethods }: Props) {
+export function ChooseSecondFactor({ userMethods, requestId }: Props) {
   const router = useRouter();
   const { t } = useTranslation("mfa");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export function ChooseSecondFactor({ userMethods }: Props) {
                   title={t("set.authenticator.title")}
                   icon="/img/verified_user_24px.png"
                   description={t("set.authenticator.description")}
-                  url="/otp/time-based"
+                  url={buildUrlWithRequestId("/otp/time-based", requestId)}
                   isSelected={selectedMethod === "authenticator"}
                   onSelect={handleMethodSelect}
                 />
@@ -71,7 +72,7 @@ export function ChooseSecondFactor({ userMethods }: Props) {
                   title={t("set.securityKey.title")}
                   icon="/img/fingerprint_24px.png"
                   description={t("set.securityKey.description")}
-                  url="/u2f"
+                  url={buildUrlWithRequestId("/u2f", requestId)}
                   isSelected={selectedMethod === "securityKey"}
                   onSelect={handleMethodSelect}
                 />
@@ -82,7 +83,7 @@ export function ChooseSecondFactor({ userMethods }: Props) {
                   title={t("set.email.title")}
                   icon="/img/email_24px.png"
                   description={t("set.email.description")}
-                  url="/otp/email"
+                  url={buildUrlWithRequestId("/otp/email", requestId)}
                   isSelected={selectedMethod === "email"}
                   onSelect={handleMethodSelect}
                 />

@@ -17,17 +17,12 @@ export function CopyToClipboard({ value }: Props) {
       const to = setTimeout(setCopied, 1000, false);
       return () => clearTimeout(to);
     }
-  }, [copied]);
+  }, [copied, value]);
 
   return (
     <div className="flex flex-row items-center px-2">
-      <button
-        id="tooltip-ctc"
-        type="button"
-        className="text-primary-light-500 dark:text-primary-dark-500"
-        onClick={() => setCopied(true)}
-      >
-        {!copied ? <CopyIcon className="h-5 w-5" /> : <CheckIcon className="h-5 w-5" />}
+      <button id="tooltip-ctc" type="button" onClick={() => setCopied(true)}>
+        {!copied ? <CopyIcon className="size-5" /> : <CheckIcon className="size-5" />}
       </button>
     </div>
   );

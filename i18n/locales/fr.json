@@ -169,6 +169,14 @@
       "success": "Succès",
       "requiredPasswordSuccess": "Mot de passe valide."
     },
+    "reset": {
+      "title": "Réinitialiser votre mot de passe",
+      "description": "Réinitialisez votre mot de passe pour continuer à utiliser Formulaires GC.",
+      "submit": "Continuer",
+      "labels": {
+        "confirmationCode": "Code de confirmation"
+      }
+    },
     "errors": {
       "noHostFound": "Aucun hôte trouvé",
       "couldNotSendResetLink": "Problème d'envoi du lien de réinitialisation du mot de passe",
@@ -300,7 +308,10 @@
     },
     "password": {
       "title": "Password creation",
-      "description": "We’re asking for your information again because we’re transferring all GC Forms accounts to a new authentication provider."
+      "description": "We're asking for your information again because we're transferring all GC Forms accounts to a new authentication provider.",
+      "errors": {
+        "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur"
+      }
     }
   },
   "u2f": {

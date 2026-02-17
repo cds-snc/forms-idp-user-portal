@@ -1,4 +1,16 @@
-export function coerceToBase64Url(thing: any, name: string) {
+/**
+ * Type representing values that can be coerced to/from Base64 or ArrayBuffer
+ */
+type CoercibleValue =
+  | string
+  | ArrayBuffer
+  | ArrayBufferView
+  | Uint8Array
+  | number[]
+  | ArrayLike<number>
+  | ArrayBufferLike;
+
+export function coerceToBase64Url(thing: CoercibleValue, name: string) {
   // Array or ArrayBuffer to Uint8Array
   if (Array.isArray(thing)) {
     thing = Uint8Array.from(thing);
@@ -10,10 +22,10 @@ export function coerceToBase64Url(thing: any, name: string) {
 
   // Uint8Array to base64
   if (thing instanceof Uint8Array) {
-    var str = "";
-    var len = thing.byteLength;
+    let str = "";
+    const len = thing.byteLength;
 
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       str += String.fromCharCode(thing[i]);
     }
     thing = window.btoa(str);
@@ -30,15 +42,15 @@ export function coerceToBase64Url(thing: any, name: string) {
   return thing;
 }
 
-export function coerceToArrayBuffer(thing: any, name: string) {
+export function coerceToArrayBuffer(thing: CoercibleValue, name: string) {
   if (typeof thing === "string") {
     // base64url to base64
     thing = thing.replace(/-/g, "+").replace(/_/g, "/");
 
     // base64 to Uint8Array
-    var str = window.atob(thing);
-    var bytes = new Uint8Array(str.length);
-    for (var i = 0; i < str.length; i++) {
+    const str = window.atob(thing);
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
       bytes[i] = str.charCodeAt(i);
     }
     thing = bytes;

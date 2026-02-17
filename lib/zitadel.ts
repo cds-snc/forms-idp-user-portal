@@ -2,7 +2,11 @@ import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
-import { OrganizationSchema, TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import {
+  OrganizationSchema,
+  RequestContext,
+  TextQueryMethod,
+} from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
@@ -1461,7 +1465,7 @@ export async function getActiveIdentityProviders({
   orgId?: string;
   linking_allowed?: boolean;
 }) {
-  const props: any = { ctx: makeReqCtx(orgId) };
+  const props: { ctx: RequestContext; linkingAllowed?: boolean } = { ctx: makeReqCtx(orgId) };
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }

@@ -72,7 +72,6 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
     requestId,
     lifetime: lifetime as Duration,
   }).catch((error) => {
-    // eslint-disable-next-line no-console
     console.error("Could not set session for OTP challenge", error);
     return null;
   });
@@ -85,7 +84,6 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
   const otpCode = session.challenges?.otpEmail;
 
   if (!otpCode) {
-    // eslint-disable-next-line no-console
     console.error("No OTP code returned from Zitadel");
     return { error: t("errors.couldNotGenerateOtp") };
   }
@@ -103,7 +101,6 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
   const templateId = process.env.TEMPLATE_ID;
 
   if (!apiKey || !templateId) {
-    // eslint-disable-next-line no-console
     console.error("Missing NOTIFY_API_KEY or TEMPLATE_ID environment variables");
     return { error: t("errors.emailConfigurationError") };
   }
@@ -126,7 +123,6 @@ ${otpCode}`,
       factors: session.factors,
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Failed to send OTP email via GC Notify", error);
     return { error: t("errors.emailSendFailed") };
   }

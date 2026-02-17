@@ -1,5 +1,6 @@
 import { constructUrl } from "@lib/service-url";
 import { findValidSession } from "@lib/session";
+import { Cookie } from "@lib/cookies";
 import {
   createCallback,
   createResponse,
@@ -53,7 +54,7 @@ export interface FlowInitiationParams {
   serviceUrl: string;
   requestId: string;
   sessions: Session[];
-  sessionCookies: any[];
+  sessionCookies: Cookie[];
   request: NextRequest;
 }
 

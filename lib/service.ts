@@ -18,11 +18,9 @@ type ServiceClass =
   | typeof SAMLService;
 
 export async function createServiceForHost<T extends ServiceClass>(service: T, serviceUrl: string) {
-  let token;
-
   // if we are running in a multitenancy context, use the system user token
 
-  token = process.env.ZITADEL_SERVICE_USER_TOKEN;
+  const token = process.env.ZITADEL_SERVICE_USER_TOKEN;
 
   if (!serviceUrl) {
     throw new Error("No instance url found");
