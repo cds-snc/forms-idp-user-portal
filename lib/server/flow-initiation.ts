@@ -8,7 +8,6 @@ import {
   getAuthRequest,
   getOrgsByDomain,
   getSAMLRequest,
-  getSecuritySettings,
   startIdentityProviderFlow,
 } from "@lib/zitadel";
 import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
@@ -23,7 +22,6 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "../../constants/csp";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
@@ -221,10 +219,6 @@ export async function handleOIDCFlowInitiation(
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
-      const securitySettings = await getSecuritySettings({
-        serviceUrl,
-      });
-
       const selectedSession = await findValidSession({
         serviceUrl,
         sessions,
@@ -235,15 +229,6 @@ export async function handleOIDCFlowInitiation(
         { error: "No active session found" },
         { status: 400 }
       );
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        noSessionResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`
-        );
-        noSessionResponse.headers.delete("X-Frame-Options");
-      }
 
       if (!selectedSession || !selectedSession.id) {
         return noSessionResponse;
@@ -272,15 +257,6 @@ export async function handleOIDCFlowInitiation(
       });
 
       const callbackResponse = NextResponse.redirect(callbackUrl);
-
-      if (securitySettings?.embeddedIframe?.enabled) {
-        securitySettings.embeddedIframe.allowedOrigins;
-        callbackResponse.headers.set(
-          "Content-Security-Policy",
-          `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`
-        );
-        callbackResponse.headers.delete("X-Frame-Options");
-      }
 
       return callbackResponse;
     } else {
