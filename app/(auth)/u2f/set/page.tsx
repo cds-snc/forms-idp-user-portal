@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 /*--------------------------------------------*
  * Methods
  *--------------------------------------------*/
-import { getSerializableLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
@@ -33,10 +32,6 @@ export default async function Page(props: {
 
   const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
-  const loginSettings = await getSerializableLoginSettings({
-    serviceUrl,
-    organizationId: sessionFactors.factors?.user?.organizationId,
-  });
 
   if (!sessionFactors) {
     throw new Error("No session factors found");
@@ -62,12 +57,9 @@ export default async function Page(props: {
       </div>
 
       <RegisterU2f
-        loginName={loginName}
         sessionId={sessionFactors.id}
-        organization={organization}
         requestId={requestId}
         checkAfter={checkAfter === "true"}
-        loginSettings={loginSettings}
       />
     </AuthPanel>
   );

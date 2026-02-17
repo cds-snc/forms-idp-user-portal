@@ -27,7 +27,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       <div id="page-container" className="gc-authpages">
         <div className="account-wrapper mt-10 flex items-center justify-center">
           <div
-            className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[658px] has-[#auth-panel]:tablet:w-[658px] laptop:w-[850px]`}
+            className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[658px] has-[#auth-panel-wide]:tablet:w-[950px] laptop:w-[850px] has-[#auth-panel-wide]:laptop:w-[1200px]`}
           >
             <main id="content">
               <Link className="mb-6 mr-10 inline-flex no-underline focus:bg-white" href={`/about`}>

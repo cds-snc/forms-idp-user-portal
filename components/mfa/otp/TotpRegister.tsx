@@ -1,8 +1,6 @@
 "use client";
 
-import { completeFlowOrGetUrl } from "@lib/client";
 import { verifyTOTP } from "@lib/server/verify";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
@@ -22,21 +20,11 @@ type Props = {
   uri: string;
   secret: string;
   loginName?: string;
-  sessionId?: string;
   requestId?: string;
   organization?: string;
   checkAfter?: boolean;
-  loginSettings?: LoginSettings;
 };
-export function TotpRegister({
-  uri,
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  checkAfter,
-  loginSettings,
-}: Props) {
+export function TotpRegister({ uri, loginName, requestId, organization, checkAfter }: Props) {
   const router = useRouter();
 
   const { t } = useTranslation("otp");
@@ -52,61 +40,22 @@ export function TotpRegister({
 
     return verifyTOTP(code, loginName, organization)
       .then(async () => {
-        // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
+        // Redirect to all-set page after successful setup
+        const params = new URLSearchParams({});
+        if (requestId) {
+          params.append("requestId", requestId);
+        }
         if (checkAfter) {
-          const params = new URLSearchParams({});
-
+          params.append("checkAfter", "true");
+          params.append("method", "time-based");
           if (loginName) {
             params.append("loginName", loginName);
-          }
-          if (requestId) {
-            params.append("requestId", requestId);
           }
           if (organization) {
             params.append("organization", organization);
           }
-
-          return router.push(`/otp/time-based?` + params);
-        } else {
-          if (requestId && sessionId) {
-            const callbackResponse = await completeFlowOrGetUrl(
-              {
-                sessionId: sessionId,
-                requestId: requestId,
-                organization: organization,
-              },
-              loginSettings?.defaultRedirectUri
-            );
-
-            if ("error" in callbackResponse) {
-              return {
-                error: callbackResponse.error,
-              };
-            }
-
-            if ("redirect" in callbackResponse) {
-              return router.push(callbackResponse.redirect);
-            }
-          } else if (loginName) {
-            const callbackResponse = await completeFlowOrGetUrl(
-              {
-                loginName: loginName,
-                organization: organization,
-              },
-              loginSettings?.defaultRedirectUri
-            );
-
-            if ("error" in callbackResponse) {
-              return {
-                error: callbackResponse.error,
-              };
-            }
-
-            if ("redirect" in callbackResponse) {
-              return router.push(callbackResponse.redirect);
-            }
-          }
         }
+        return router.push(`/all-set?` + params);
       })
       .then(() => {
         return previousState;
