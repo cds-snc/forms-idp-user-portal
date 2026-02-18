@@ -571,7 +571,8 @@ export const protectedUpdateAccount = AuthenticatedAction(
         email: {
           email: account.email,
         },
-        username: account.email,
+        // Note: leaving here for reference encase we want to update the username as well
+        // username: account.email,
       });
       return await z.updateHuman({ serviceUrl, request });
     } catch (error) {
