@@ -115,21 +115,13 @@ export async function checkMFAFactors(
   const hasSingleStrongFactor = availableMultiFactors?.length === 1;
 
   if (hasSingleStrongFactor) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-    });
-
-    if (requestId) {
-      params.append("requestId", requestId);
-    }
-
     const factor = availableMultiFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
       logMessage.info("Redirecting user to TOTP verification");
-      return { redirect: `/otp/time-based?` + params };
+      return { redirect: buildUrlWithRequestId(`/otp/time-based`, requestId) };
     } else if (factor === AuthenticationMethodType.U2F) {
       logMessage.info("Redirecting user to U2F verification");
-      return { redirect: `/u2f?` + params };
+      return { redirect: buildUrlWithRequestId(`/u2f`, requestId) };
     }
   } else if (availableMultiFactors?.length > 1) {
     // Show MFA selection page
