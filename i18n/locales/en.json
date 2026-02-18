@@ -50,15 +50,34 @@
     },
     "ariaLabel": "Footer"
   },
-  "accounts": {
-    "title": "Accounts",
-    "description": "Select the account you want to use.",
-    "addAnother": "Add another account",
-    "setUpMFA": "Change two-factor authentication",
-    "verifyEmail": "Verify your email address",
-    "noResults": "No accounts found",
-    "verified": "verified",
-    "expired": "expired"
+  "account": {
+    "title": "GC Platform Accounts",
+    "accountDetails": {
+      "title":  "Account Details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "change": "change"
+    },
+    "authentication": {
+      "title": "Authentication",
+      "securityKey": "Security key",
+      "noTwoFactor": "No two-factor authentication methods configured.",
+      "authenticatorApp": "Authentication app",
+      "addlMethods": "Add additional methods",
+      "remove": "Remove",
+      "unknownDevice": "Unknown device",
+      "success": {
+        "keyRemoved": "Security key removed successfully",
+        "authAppRemoved": "Authenticator app removed successfully"
+      },
+      "errors": {
+        "cannotRemoveSecurityKey": "Cannot remove security key. At least one strong authentication method must be configured to remove one.",
+        "failedToRemoveSecurityKey": "Failed to remove security key",
+        "failedToRemoveAuthApp": "Failed to remove authenticator"
+       }
+    }
   },
   "start": {
     "title": "Sign in",

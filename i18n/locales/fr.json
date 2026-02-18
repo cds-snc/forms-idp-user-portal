@@ -50,15 +50,33 @@
     },
     "ariaLabel": "Pied de page"
   },
-  "accounts": {
-    "title": "Comptes",
-    "description": "Sélectionnez le compte que vous souhaitez utiliser.",
-    "addAnother": "Ajouter un autre compte",
-    "setUpMFA": "Modifier l'authentification à deux facteurs",
-    "verifyEmail": "Vérifiez votre adresse courriel",
-    "noResults": "Aucun compte trouvé",
-    "verified": "verifié",
-    "expired": "expiré"
+  "account": {
+    "title": "[FR]GC Platform Accounts",
+    "accountDetails": {
+      "title":  "[FR]Account Details",
+      "firstName": "[FR]First name",
+      "lastName": "[FR]Last name",
+      "email": "[FR]Email address",
+      "password": "[FR]Password",
+      "change": "[FR]change"
+    },
+    "authentication": {
+      "title": "[FR]Authentication",
+      "securityKey": "[FR]Security key",
+      "authenticatorApp": "[FR]Authentication app",
+      "addlMethods": "[FR]Add additional methods",
+      "remove": "[FR]Remove",
+      "unknownDevice": "[FR]Unknown device",
+      "success": {
+        "keyRemoved": "[FR]Security key removed successfully",
+        "authAppRemoved": "[FR]Authenticator app removed successfully"
+      },
+      "errors": {
+        "cannotRemoveSecurityKey": "[FR]Cannot remove security key. At least one strong authentication method must be configured to remove one.",
+        "failedToRemoveSecurityKey": "[FR]Failed to remove security key",
+        "failedToRemoveAuthApp": "[FR]Failed to remove authenticator"
+       }
+    }
   },
   "start": {
     "title": "Se connecter",
