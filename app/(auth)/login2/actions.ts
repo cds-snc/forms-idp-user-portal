@@ -1,0 +1,196 @@
+"use server";
+
+import { serverTranslation } from "@i18n/server";
+import { logMessage } from "@lib/logger";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import {
+  getLoginSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+  getOrgsByDomain,
+  getLockoutSettings,
+} from "@lib/zitadel";
+import { headers } from "next/headers";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
+import { buildUrlWithRequestId } from "@lib/utils";
+
+const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+
+export type SubmitLoginCommand = {
+  loginName: string;
+  password: string;
+  requestId?: string;
+};
+
+/**
+ * Handles combined username + password login in a single step
+ * Returns generic error messages to prevent username enumeration
+ */
+export const submitLoginForm = async (
+  command: SubmitLoginCommand
+): Promise<{ error: string } | { redirect: string }> => {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { t } = await serverTranslation("start");
+
+  // Perform organization discovery from email domain
+  let organization: string | undefined;
+
+  if (command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
+    const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
+    const suffix = matched?.[1] ?? "";
+
+    const orgs = await getOrgsByDomain({
+      serviceUrl,
+      domain: suffix,
+    });
+
+    const orgToCheckForDiscovery =
+      orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+    if (orgToCheckForDiscovery) {
+      const orgLoginSettings = await getLoginSettings({
+        serviceUrl,
+        organization: orgToCheckForDiscovery,
+      });
+
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        logMessage.info(`org discovery successful, using org: ${orgToCheckForDiscovery}`);
+        organization = orgToCheckForDiscovery;
+      }
+    }
+  }
+
+  // Get login settings for organization context
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    organization,
+  });
+
+  if (!loginSettings) {
+    logMessage.error("Could not load login settings");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  // Create session with combined username + password check
+  const checks = create(ChecksSchema, {
+    user: { search: { case: "loginName", value: command.loginName } },
+    password: { password: command.password },
+  });
+
+  let session;
+
+  try {
+    session = await createSessionAndUpdateCookie({
+      checks,
+      requestId: command.requestId,
+    });
+  } catch (error: unknown) {
+    // Handle authentication failures with generic error message
+    // This prevents username enumeration attacks
+    const errorDetail = error as CreateSessionFailedError;
+
+    // Log failed attempt count if available (for monitoring)
+    if ("failedAttempts" in errorDetail && errorDetail.failedAttempts) {
+      const lockoutSettings = await getLockoutSettings({
+        serviceUrl,
+        orgId: organization,
+      });
+
+      logMessage.warn(
+        `Login failed - Attempt ${errorDetail.failedAttempts}${lockoutSettings?.maxPasswordAttempts ? ` of ${lockoutSettings.maxPasswordAttempts}` : ""}`
+      );
+
+      // Check if account is locked
+      const hasLimit =
+        lockoutSettings?.maxPasswordAttempts !== undefined &&
+        lockoutSettings?.maxPasswordAttempts > BigInt(0);
+      const locked = hasLimit && errorDetail.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+
+      if (locked) {
+        logMessage.error("Account locked due to too many failed attempts");
+      }
+    }
+
+    // Always return generic error (don't reveal if user exists or password is wrong)
+    logMessage.info("Authentication failed, returning generic error");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  if (!session?.factors?.user?.id) {
+    logMessage.error("Session created but no user ID found");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  // Fetch user details
+  const userResponse = await getUserByID({
+    serviceUrl,
+    userId: session.factors.user.id,
+  });
+
+  if (!userResponse.user) {
+    logMessage.error("User not found after successful authentication");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  const user = userResponse.user;
+  const humanUser = user.type.case === "human" ? user.type.value : undefined;
+
+  // Check if user is in initial state (not supported)
+  if (user.state === UserState.INITIAL) {
+    logMessage.error("User in INITIAL state - not supported");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  // Check email verification status
+  const emailVerificationCheck = checkEmailVerification(
+    session,
+    humanUser,
+    organization,
+    command.requestId
+  );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
+
+  // Get authentication methods for MFA check
+  const response = await listAuthenticationMethodTypes({
+    serviceUrl,
+    userId: session.factors.user.id,
+  });
+
+  const authMethods = response.authMethodTypes ?? [];
+
+  if (authMethods.length === 0) {
+    logMessage.error("No authentication methods found for user");
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  // Check MFA requirements and redirect appropriately
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
+    session,
+    loginSettings,
+    authMethods,
+    command.requestId
+  );
+
+  if ("error" in mfaFactorCheck) {
+    logMessage.error(`MFA factor check failed: ${mfaFactorCheck.error}`);
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  if ("redirect" in mfaFactorCheck) {
+    return mfaFactorCheck;
+  }
+
+  // If no MFA redirect, authentication is complete
+  logMessage.info("Login successful, redirecting to account page");
+  return { redirect: buildUrlWithRequestId("/account", command.requestId) };
+};
