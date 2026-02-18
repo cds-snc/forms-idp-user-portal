@@ -5,7 +5,7 @@ This is a **Next.js 16 App Router** identity portal for GC Forms, integrating wi
 
 ## MCP Tools
 - `ask_question`: Use for clarifications or when uncertain about user intent.
-- `get_user_approval`: Must be used to obtain user acceptance before finalizing any work or returning control to the user. Provide context and testing steps if applicable. Iterate until approval is obtained
+- `get_user_approval`: Must be used to obtain user acceptance before finalizing any work or returning control to the user. Provide context and testing steps if applicable. Iterate until approval is obtained.
 
 After a prompt to continue working ensure you still ask for user approval before finalizing any work.
 
