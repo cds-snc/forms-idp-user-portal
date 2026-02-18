@@ -10,14 +10,13 @@ import { loadSessionById } from "@lib/session";
 import { Authentication } from "./components/Authentication";
 import { AccountInformation } from "./components/AccountInformation";
 
-// TODO add translation strings
-
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
   return { title: t("title") };
 }
 
 export default async function Page() {
+  const { t } = await serverTranslation("account");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -32,7 +31,7 @@ export default async function Page() {
   const email = user?.email?.email;
 
   if (!firstName || !lastName || !email) {
-    throw new Error("User information could not be retrieved from session.");
+    throw new Error(t("errors.noSession"));
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([
