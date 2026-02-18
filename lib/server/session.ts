@@ -5,7 +5,6 @@ import {
   deleteSession,
   getLoginSettings,
   getSecuritySettings,
-  humanMFAInitSkipped,
   listAuthenticationMethodTypes,
   listSessions,
 } from "@lib/zitadel";
@@ -99,51 +98,6 @@ export async function loadSessionsWithCookies({
   const sessions = await loadSessionsByIds({ serviceUrl, ids });
 
   return { sessions, sessionCookies };
-}
-
-export async function skipMFAAndContinueWithNextUrl({
-  userId,
-  requestId,
-  loginName,
-  sessionId,
-  organization,
-}: {
-  userId: string;
-  loginName?: string;
-  sessionId?: string;
-  requestId?: string;
-  organization?: string;
-}): Promise<{ redirect: string } | { error: string }> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization,
-  });
-
-  await humanMFAInitSkipped({ serviceUrl, userId });
-
-  if (requestId && sessionId) {
-    return completeFlowOrGetUrl(
-      {
-        sessionId: sessionId,
-        requestId: requestId,
-        organization: organization,
-      },
-      loginSettings?.defaultRedirectUri
-    );
-  } else if (loginName) {
-    return completeFlowOrGetUrl(
-      {
-        loginName: loginName,
-        organization: organization,
-      },
-      loginSettings?.defaultRedirectUri
-    );
-  }
-
-  return { error: "Could not skip MFA and continue" };
 }
 
 export type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
