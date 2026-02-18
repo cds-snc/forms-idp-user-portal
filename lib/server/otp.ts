@@ -9,6 +9,7 @@ import {
   getSessionCookieByLoginName,
 } from "../cookies";
 import { getLoginSettings } from "@lib/zitadel";
+import { getSecurityCodeTemplate } from "@lib/emailTemplates";
 import { serverTranslation } from "@i18n/server";
 import { create, Duration } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -107,15 +108,7 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(userEmail, templateId, {
-      subject: "Your security code | Votre code de sécurité",
-      formResponse: `
-**Your security code | Votre code de sécurité**
-
-
-
-${otpCode}`,
-    });
+    await gcNotify.sendEmail(userEmail, templateId, getSecurityCodeTemplate(otpCode));
 
     return {
       success: true,
