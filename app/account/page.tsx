@@ -48,7 +48,7 @@ export default async function Page() {
 
   return (
     <>
-      <AccountInformation firstName={firstName} lastName={lastName} email={email} />
+      <AccountInformation userId={userId} firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-8"></div>
       <PasswordAuthentication />
       <div className="mb-8"></div>
