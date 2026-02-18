@@ -1,12 +1,13 @@
 "use client";
-import { Button } from "@components/clientComponents/globals";
-import { getImageUrl } from "@lib/imageUrl";
 import Image from "next/image";
 import Link from "next/link";
-import { removeTOTPAction, removeU2FAction } from "../actions";
-import { toast } from "react-toastify/unstyled";
+import { useTranslation } from "react-i18next";
+import { getImageUrl } from "@lib/imageUrl";
 
-// TODO add translation strings
+import { ToastContainer } from "@clientComponents/globals";
+import { toast } from "@components/clientComponents/globals/Toast";
+import { Button } from "@components/clientComponents/globals";
+import { removeTOTPAction, removeU2FAction } from "../actions";
 
 export const Authentication = ({
   u2fList,
@@ -17,55 +18,63 @@ export const Authentication = ({
   userId: string;
   authenticatorStatus: boolean;
 }) => {
-  const handleRemove = async (u2fId: string) => {
+  const { t } = useTranslation("account");
+
+  const handleRemoveU2F = async (u2fId: string) => {
     const result = await removeU2FAction(userId, u2fId);
     if ("error" in result) {
-      toast.error(result.error);
+      toast.error(
+        result.error || t("authentication.errors.failedToRemoveSecurityKey"),
+        "account-authentication"
+      );
       return;
     }
-    toast.success("Security key removed successfully");
+    toast.success(t("authentication.success.keyRemoved"), "account-authentication");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if ("error" in result) {
-      toast.error(result.error);
+      toast.error(
+        result.error || t("authentication.errors.failedToRemoveAuthApp"),
+        "account-authentication"
+      );
       return;
     }
-    toast.success("Authenticator app removed successfully");
+    toast.success(t("authentication.success.authAppRemoved"), "account-authentication");
   };
 
   return (
     <>
       <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
-        <h3 className="mb-6">Authentication</h3>
+        <h3 className="mb-6">{t("authentication.title")}</h3>
 
-        {u2fList.length === 0 && !authenticatorStatus && (
-          <p>No two-factor authentication methods configured.</p>
-        )}
+        {u2fList.length === 0 && !authenticatorStatus && <p>{t("authentication.noTwoFactor")}</p>}
 
         <div>
           <ul className="list-none p-0">
             {u2fList.length > 0 &&
-              u2fList.map((data) => {
-                return (
-                  <li key={data.id} className="mb-4">
-                    <Image
-                      src={getImageUrl("/img/fingerprint_24px.png")}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="mr-2 inline-block"
-                    />
-                    <span className="mr-2 font-semibold">Security key</span>
-                    <span>({data.name || "Unkown device"})</span>
-                    <span className="mx-2">&#8226;</span>
-                    <Button onClick={() => handleRemove(data.id)} theme="link">
-                      Remove
-                    </Button>
-                  </li>
-                );
-              })}
+              u2fList
+                .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                .map((data) => {
+                  return (
+                    <li key={data.id} className="mb-4">
+                      <Image
+                        src={getImageUrl("/img/fingerprint_24px.png")}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="mr-2 inline-block"
+                      />
+                      <span className="mr-2 font-semibold">{t("authentication.securityKey")}</span>
+                      <span>({data.name || t("authentication.unknownDevice")})</span>
+                      <span className="mx-2">&#8226;</span>
+                      <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
+                        {t("authentication.remove")}
+                      </Button>
+                    </li>
+                  );
+                })}
 
             {authenticatorStatus && (
               <li className="mb-4">
@@ -76,10 +85,10 @@ export const Authentication = ({
                   height={32}
                   className="mr-2 inline-block"
                 />
-                <span className="mr-2 font-semibold">Authenticator app</span>
+                <span className="mr-2 font-semibold">{t("authentication.authenticatorApp")}</span>
                 <span className="mx-2">&#8226;</span>
                 <Button onClick={handleRemoveAuthenticator} theme="link">
-                  Remove
+                  {t("authentication.remove")}
                 </Button>
               </li>
             )}
@@ -94,9 +103,10 @@ export const Authentication = ({
             height={24}
             className="mr-1"
           />{" "}
-          <Link href="/mfa/set">Add additional method</Link>
+          <Link href="/mfa/set">{t("authentication.addlMethods")}</Link>
         </div>
       </div>
+      <ToastContainer autoClose={false} containerId="account-authentication" />
     </>
   );
 };
