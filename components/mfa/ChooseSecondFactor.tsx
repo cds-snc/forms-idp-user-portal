@@ -6,7 +6,6 @@ import { useTranslation } from "@i18n/client";
 
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Button } from "@clientComponents/globals/Buttons";
-import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 import { buildUrlWithRequestId } from "@lib/utils";
 
 import { MethodOptionCard } from "./MethodOptionCard";
@@ -27,12 +26,17 @@ export function ChooseSecondFactor({ userMethods, requestId }: Props) {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [nextUrl, setNextUrl] = useState<string>("");
 
+  // Check if user has at least one strong MFA method (TOTP or U2F)
+  const hasStrongFactor = userMethods.some(
+    (m) => m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
+  );
+
   const authMehods = userMethods.filter((method) => {
-    if (!ENABLE_EMAIL_OTP && method === AuthenticationMethodType.OTP_EMAIL) {
+    if (method === AuthenticationMethodType.PASSWORD) {
       return false;
     }
-
-    if (method === AuthenticationMethodType.PASSWORD) {
+    // Only allow email OTP if user already has a strong factor (TOTP or U2F)
+    if (method === AuthenticationMethodType.OTP_EMAIL && !hasStrongFactor) {
       return false;
     }
     return true;

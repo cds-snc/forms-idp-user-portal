@@ -1,0 +1,73 @@
+---
+description: 'Next.js + Tailwind development standards and instructions'
+applyTo: '**/*.tsx, **/*.css, **/*.scss'
+---
+
+## Tailwind CSS Class Ordering
+
+This project enforces Tailwind CSS class ordering via `eslint-plugin-tailwindcss` with recommended rules enabled (see eslint.config.mjs).
+
+### ESLint Rules Enforced
+The `tailwind/classnames-order` rule automatically orders your Tailwind classes according to the official recommended order. ESLint will flag incorrect ordering and can auto-fix it.
+
+### Recommended Workflow
+1. **Auto-fix on save**: Configure your editor to run ESLint fix on save
+2. **Pre-commit checks**: Run `pnpm lint` before committing
+3. **Let ESLint handle ordering**: Don't manually sort - let the plugin do it
+
+### Example
+```tsx
+// ❌ WRONG ORDER (ESLint will flag this)
+<div className="text-white p-4 bg-blue-500 hover:bg-blue-600 rounded-lg">
+
+// ✅ CORRECT ORDER (ESLint auto-fixes to this)
+<div className="rounded-lg bg-blue-500 p-4 text-white hover:bg-blue-600">
+```
+
+### Custom Classes (gc-* prefix)
+This project uses custom `gc-*` class prefixes for GC Design System components. These are whitelisted in the ESLint config and won't trigger errors:
+```tsx
+// ✅ GOOD - Custom gc- classes are allowed
+<div className="gc-button gc-button--primary">
+```
+
+## GC Design System (GCDS) Tokens
+
+This project uses design tokens from [@gcds-core/tokens](https://github.com/cds-snc/gcds-tokens) integrated into the Tailwind configuration. These tokens ensure consistency with the Government of Canada Design System.
+
+GCDS tokens are imported and configured in [tailwind.config.ts](tailwind.config.ts):
+```typescript
+import tokens from "@gcds-core/tokens/build/figma/figma.tokens.json";
+``
+
+### Available Token Namespaces
+
+The GCDS tokens are available under the `gcds` namespace in Tailwind:
+
+#### Colors
+- `gcds-grayscale-{50-900}` - Grayscale colors (50, 100, 150...900 in steps of 50)
+- `gcds-blue-{50-900}` - Blue colors including `gcds-blue-muted` and `gcds-blue-vivid`
+- `gcds-green-{50-900}` - Green colors
+- `gcds-red-{50-900}` - Red colors
+- `gcds-purple-{50-900}` - Purple colors
+- `gcds-yellow-{50-900}` - Yellow colors
+
+#### Spacing
+GCDS spacing tokens are integrated into Tailwind's spacing scale and can be used with margin, padding, gap, etc.
+
+### Usage Examples
+
+```tsx
+// ✅ GOOD - Using GCDS color tokens
+<div className="bg-gcds-blue-900 text-gcds-grayscale-50">
+  <p className="text-gcds-grayscale-700">Content with GCDS colors</p>
+</div>
+
+// ✅ GOOD - GCDS spacing in utility classes
+<div className="p-400 m-200"> {/* Using GCDS spacing tokens */}
+  Content
+</div>
+```
+
+### Design System Reference
+For more information about GCDS colors and design guidelines, see: [https://design-system.alpha.canada.ca/en/styles/colour/](https://design-system.alpha.canada.ca/en/styles/colour/)
