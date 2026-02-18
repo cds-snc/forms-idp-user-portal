@@ -60,11 +60,15 @@
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "email": "[FR]Email address",
-      "password": "[FR]Password",
       "change": "[FR]change"
     },
     "authentication": {
       "title": "[FR]Authentication",
+      "password": "[FR]Password",
+      "change": "[FR]change"
+    },
+    "mfaAuthentication": {
+      "title": "[FR]2 Factor Authentication",
       "securityKey": "[FR]Security key",
       "authenticatorApp": "[FR]Authentication app",
       "addlMethods": "[FR]Add additional methods",

@@ -7,8 +7,9 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
 import { loadSessionById } from "@lib/session";
 
-import { Authentication } from "./components/Authentication";
+import { MFAAuthentication } from "./components/MFAAuthentication";
 import { AccountInformation } from "./components/AccountInformation";
+import { PasswordAuthentication } from "./components/PasswordAuthentication";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
@@ -48,8 +49,14 @@ export default async function Page() {
   return (
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
-      <div className="mb-10"></div>
-      <Authentication u2fList={u2fList} authenticatorStatus={authenticatorStatus} userId={userId} />
+      <div className="mb-8"></div>
+      <PasswordAuthentication />
+      <div className="mb-8"></div>
+      <MFAAuthentication
+        u2fList={u2fList}
+        authenticatorStatus={authenticatorStatus}
+        userId={userId}
+      />
     </>
   );
 }

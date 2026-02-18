@@ -9,7 +9,7 @@ import { toast } from "@components/clientComponents/globals/Toast";
 import { Button } from "@components/clientComponents/globals";
 import { removeTOTPAction, removeU2FAction } from "../actions";
 
-export const Authentication = ({
+export const MFAAuthentication = ({
   u2fList,
   userId,
   authenticatorStatus,
@@ -25,32 +25,32 @@ export const Authentication = ({
     const result = await removeU2FAction(userId, u2fId);
     if ("error" in result) {
       toast.error(
-        result.error || t("authentication.errors.failedToRemoveSecurityKey"),
+        result.error || t("mfaAuthentication.errors.failedToRemoveSecurityKey"),
         "account-authentication"
       );
       return;
     }
-    toast.success(t("authentication.success.keyRemoved"), "account-authentication");
+    toast.success(t("mfaAuthentication.success.keyRemoved"), "account-authentication");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if ("error" in result) {
       toast.error(
-        result.error || t("authentication.errors.failedToRemoveAuthApp"),
+        result.error || t("mfaAuthentication.errors.failedToRemoveAuthApp"),
         "account-authentication"
       );
       return;
     }
-    toast.success(t("authentication.success.authAppRemoved"), "account-authentication");
+    toast.success(t("mfaAuthentication.success.authAppRemoved"), "account-authentication");
   };
 
   return (
     <>
       <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
-        <h3 className="mb-6">{t("authentication.title")}</h3>
+        <h3 className="mb-6">{t("mfaAuthentication.title")}</h3>
 
-        {!hasMFAMethods && <p>{t("authentication.noTwoFactor")}</p>}
+        {!hasMFAMethods && <p>{t("mfaAuthentication.noTwoFactor")}</p>}
 
         {hasMFAMethods && (
           <>
@@ -70,12 +70,12 @@ export const Authentication = ({
                             className="mr-2 inline-block"
                           />
                           <span className="mr-2 font-semibold">
-                            {t("authentication.securityKey")}
+                            {t("mfaAuthentication.securityKey")}
                           </span>
-                          <span>({data.name || t("authentication.unknownDevice")})</span>
+                          <span>({data.name || t("mfaAuthentication.unknownDevice")})</span>
                           <span className="mx-2">&#8226;</span>
                           <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
-                            {t("authentication.remove")}
+                            {t("mfaAuthentication.remove")}
                           </Button>
                         </li>
                       );
@@ -91,11 +91,11 @@ export const Authentication = ({
                       className="mr-2 inline-block"
                     />
                     <span className="mr-2 font-semibold">
-                      {t("authentication.authenticatorApp")}
+                      {t("mfaAuthentication.authenticatorApp")}
                     </span>
                     <span className="mx-2">&#8226;</span>
                     <Button onClick={handleRemoveAuthenticator} theme="link">
-                      {t("authentication.remove")}
+                      {t("mfaAuthentication.remove")}
                     </Button>
                   </li>
                 )}
@@ -109,7 +109,7 @@ export const Authentication = ({
                 height={24}
                 className="mr-1"
               />{" "}
-              <Link href="/mfa/set">{t("authentication.addlMethods")}</Link>
+              <Link href="/mfa/set">{t("mfaAuthentication.addlMethods")}</Link>
             </div>
           </>
         )}
