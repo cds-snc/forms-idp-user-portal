@@ -30,7 +30,7 @@ export default async function Page() {
   const lastName = user?.profile?.familyName;
   const email = user?.email?.email;
 
-  if (!firstName || !lastName || !email) {
+  if (!firstName || !lastName || !email || !userId) {
     throw new Error(t("errors.noSession"));
   }
 
@@ -49,11 +49,7 @@ export default async function Page() {
     <>
       <AccountInformation firstName={firstName} lastName={lastName} email={email} />
       <div className="mb-10"></div>
-      <Authentication
-        u2fList={u2fList}
-        authenticatorStatus={authenticatorStatus}
-        userId={userId!}
-      />
+      <Authentication u2fList={u2fList} authenticatorStatus={authenticatorStatus} userId={userId} />
     </>
   );
 }
