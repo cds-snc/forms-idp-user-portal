@@ -26,8 +26,17 @@ export function ChooseSecondFactor({ userMethods, requestId }: Props) {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [nextUrl, setNextUrl] = useState<string>("");
 
+  // Check if user has at least one strong MFA method (TOTP or U2F)
+  const hasStrongFactor = userMethods.some(
+    (m) => m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
+  );
+
   const authMehods = userMethods.filter((method) => {
     if (method === AuthenticationMethodType.PASSWORD) {
+      return false;
+    }
+    // Only allow email OTP if user already has a strong factor (TOTP or U2F)
+    if (method === AuthenticationMethodType.OTP_EMAIL && !hasStrongFactor) {
       return false;
     }
     return true;

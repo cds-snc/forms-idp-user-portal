@@ -8,7 +8,6 @@ import crypto from "crypto";
 import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
-import { getUserByID } from "../lib/zitadel";
 import { logMessage } from "./logger";
 import { buildUrlWithRequestId } from "./utils";
 
@@ -106,16 +105,29 @@ export async function checkMFAFactors(
   authMethods: AuthenticationMethodType[],
   requestId?: string
 ): Promise<{ error: string } | { redirect: string }> {
-  const availableMultiFactors = authMethods?.filter(
+  // Strong MFA methods (TOTP/U2F) - at least one must exist
+  const strongFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
-  // if user has only one mfa factor that is not OTP_EMAIL, redirect to that
-  const hasSingleStrongFactor = availableMultiFactors?.length === 1;
+  // All available MFA methods including OTP_EMAIL
+  const allMfaFactors = authMethods?.filter(
+    (m: AuthenticationMethodType) =>
+      m === AuthenticationMethodType.TOTP ||
+      m === AuthenticationMethodType.U2F ||
+      m === AuthenticationMethodType.OTP_EMAIL
+  );
 
-  if (hasSingleStrongFactor) {
-    const factor = availableMultiFactors[0];
+  // If no strong factor exists, redirect to setup
+  if (!strongFactors.length) {
+    logMessage.info("Redirecting user to MFA setup - strong MFA required");
+    return { redirect: buildUrlWithRequestId(`/mfa/set`, requestId) };
+  }
+
+  // If user has only one MFA method total, redirect directly to that
+  if (allMfaFactors.length === 1) {
+    const factor = allMfaFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
       logMessage.info("Redirecting user to TOTP verification");
       return { redirect: buildUrlWithRequestId(`/otp/time-based`, requestId) };
@@ -123,56 +135,12 @@ export async function checkMFAFactors(
       logMessage.info("Redirecting user to U2F verification");
       return { redirect: buildUrlWithRequestId(`/u2f`, requestId) };
     }
-  } else if (availableMultiFactors?.length > 1) {
-    // Show MFA selection page
+  }
+
+  // Multiple MFA methods available - show selection page
+  if (allMfaFactors.length > 1) {
     logMessage.info("Redirecting user to MFA selection page");
     return { redirect: buildUrlWithRequestId(`/mfa`, requestId) };
-  } else if (shouldEnforceMFA(session, loginSettings) && !availableMultiFactors.length) {
-    logMessage.info("Redirecting user to MFA setup - MFA enforced");
-    return { redirect: buildUrlWithRequestId(`/mfa/set`, requestId) };
-  } else if (
-    loginSettings?.mfaInitSkipLifetime &&
-    (loginSettings.mfaInitSkipLifetime.nanos > 0 ||
-      loginSettings.mfaInitSkipLifetime.seconds > 0) &&
-    !availableMultiFactors.length &&
-    session?.factors?.user?.id &&
-    shouldEnforceMFA(session, loginSettings)
-  ) {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session.factors?.user?.id,
-    });
-
-    const humanUser =
-      userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
-
-    if (humanUser?.mfaInitSkipped) {
-      const mfaInitSkippedTimestamp = timestampDate(humanUser.mfaInitSkipped);
-
-      const mfaInitSkipLifetimeMillis =
-        Number(loginSettings.mfaInitSkipLifetime.seconds) * 1000 +
-        loginSettings.mfaInitSkipLifetime.nanos / 1000000;
-      const currentTime = Date.now();
-      const mfaInitSkippedTime = mfaInitSkippedTimestamp.getTime();
-      const timeDifference = currentTime - mfaInitSkippedTime;
-
-      if (!(timeDifference > mfaInitSkipLifetimeMillis)) {
-        // if the time difference is smaller than the lifetime, skip the mfa setup
-        logMessage.info(
-          { userId: session.factors?.user?.id },
-          "Skipping MFA setup - user skipped recently"
-        );
-        return {
-          error: "MFA Skipped",
-        };
-      }
-    }
-
-    logMessage.info(
-      { userId: session.factors?.user?.id },
-      "Redirecting user to MFA setup - skip lifetime expired"
-    );
-    return { redirect: buildUrlWithRequestId(`/mfa/set`, requestId) };
   }
 
   return { error: "No MFA factors available" };
