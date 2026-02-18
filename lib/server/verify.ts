@@ -10,6 +10,7 @@ import {
   verifyTOTPRegistration,
   addOTPEmail,
 } from "@lib/zitadel";
+import { getPasswordChangedTemplate, getSecurityCodeTemplate } from "@lib/emailTemplates";
 import crypto from "crypto";
 import { GCNotifyConnector } from "@gcforms/connectors";
 
@@ -292,15 +293,7 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(email, templateId, {
-      subject: "Your security code | Votre code de sécurité",
-      formResponse: `
-**Your security code | Votre code de sécurité**
-
-
-
-${codeResponse.verificationCode}`,
-    });
+    await gcNotify.sendEmail(email, templateId, getSecurityCodeTemplate(codeResponse.verificationCode));
 
     return { success: true };
   } catch (error) {
@@ -349,17 +342,7 @@ export async function sendPasswordChangedEmail(command: SendPasswordChangedEmail
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(email, templateId, {
-      subject: "Password changed | Mot de passe modifié",
-      formResponse: `
-**Password changed | Mot de passe modifié**
-
-Your password has been successfully changed. If you did not make this change, please contact support immediately.
-
----
-
-Votre mot de passe a été modifié avec succès. Si vous n'avez pas effectué ce changement, veuillez contacter le support immédiatement.`,
-    });
+    await gcNotify.sendEmail(email, templateId, getPasswordChangedTemplate());
 
     return { success: true };
   } catch (error) {
