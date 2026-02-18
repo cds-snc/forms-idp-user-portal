@@ -20,9 +20,8 @@ export const AccountInformation = ({
         <div className="flex items-center justify-between">
           <h3 className="mb-6">{t("accountDetails.title")}</h3>
           <div>
-            <LinkButton.Primary href="/password/change">
-              {t("accountDetails.change")}
-            </LinkButton.Primary>
+            {/* TODO link to update page or change to form entry mode once decided */}
+            <LinkButton.Primary href="/account">{t("accountDetails.change")}</LinkButton.Primary>
           </div>
         </div>
         <div>
@@ -43,13 +42,6 @@ export const AccountInformation = ({
               <div className="mb-1 font-semibold">{t("accountDetails.email")}</div>
               <div>
                 <em>{email}</em>
-              </div>
-            </li>
-            <li className="">
-              <div className="mb-1 font-semibold">{t("accountDetails.password")}</div>
-              {/* Placeholder password characters used instead of real password for security reasons */}
-              <div>
-                &#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;
               </div>
             </li>
           </ul>
