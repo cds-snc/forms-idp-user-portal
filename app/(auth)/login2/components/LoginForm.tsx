@@ -11,6 +11,7 @@ import Link from "next/link";
 
 type Props = {
   requestId?: string;
+  organization?: string;
 };
 
 type FormState = {

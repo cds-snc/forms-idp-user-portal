@@ -10,6 +10,7 @@ import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
 import { LoginForm } from "./components/LoginForm";
 import { redirect } from "next/navigation";
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
@@ -22,10 +23,11 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const organization = ZITADEL_ORGANIZATION;
 
   // Check if user is already authenticated
   try {
-    const { loginName, organization } = await getSessionCredentials();
+    const { loginName } = await getSessionCredentials();
 
     const session = await loadMostRecentSession({
       serviceUrl,
@@ -46,7 +48,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="form.description" namespace="start">
-      <LoginForm requestId={requestId} />
+      <LoginForm requestId={requestId} organization={organization} />
 
       <p className="mt-10">
         <I18n i18nKey="register" namespace="start" />

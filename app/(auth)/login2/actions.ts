@@ -7,7 +7,7 @@ import {
   getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
-  getOrgsByDomain,
+  // getOrgsByDomain,
   getLockoutSettings,
 } from "@lib/zitadel";
 import { headers } from "next/headers";
@@ -17,13 +17,15 @@ import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/ser
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import { buildUrlWithRequestId } from "@lib/utils";
+// import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
-const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+// const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
 export type SubmitLoginCommand = {
   loginName: string;
   password: string;
   requestId?: string;
+  organization?: string;
 };
 
 /**
@@ -38,38 +40,10 @@ export const submitLoginForm = async (
 
   const { t } = await serverTranslation("start");
 
-  // Perform organization discovery from email domain
-  let organization: string | undefined;
-
-  if (command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
-    const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
-    const suffix = matched?.[1] ?? "";
-
-    const orgs = await getOrgsByDomain({
-      serviceUrl,
-      domain: suffix,
-    });
-
-    const orgToCheckForDiscovery =
-      orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
-
-    if (orgToCheckForDiscovery) {
-      const orgLoginSettings = await getLoginSettings({
-        serviceUrl,
-        organization: orgToCheckForDiscovery,
-      });
-
-      if (orgLoginSettings?.allowDomainDiscovery) {
-        logMessage.info(`org discovery successful, using org: ${orgToCheckForDiscovery}`);
-        organization = orgToCheckForDiscovery;
-      }
-    }
-  }
-
   // Get login settings for organization context
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization,
+    organization: command.organization,
   });
 
   if (!loginSettings) {
@@ -99,7 +73,7 @@ export const submitLoginForm = async (
     if ("failedAttempts" in errorDetail && errorDetail.failedAttempts) {
       const lockoutSettings = await getLockoutSettings({
         serviceUrl,
-        orgId: organization,
+        orgId: command.organization,
       });
 
       logMessage.warn(
@@ -151,7 +125,7 @@ export const submitLoginForm = async (
   const emailVerificationCheck = checkEmailVerification(
     session,
     humanUser,
-    organization,
+    command.organization,
     command.requestId
   );
 
