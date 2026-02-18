@@ -54,25 +54,27 @@ export const Authentication = ({
         <div>
           <ul className="list-none p-0">
             {u2fList.length > 0 &&
-              u2fList.map((data) => {
-                return (
-                  <li key={data.id} className="mb-4">
-                    <Image
-                      src={getImageUrl("/img/fingerprint_24px.png")}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="mr-2 inline-block"
-                    />
-                    <span className="mr-2 font-semibold">{t("authentication.securityKey")}</span>
-                    <span>({data.name || t("authentication.unknownDevice")})</span>
-                    <span className="mx-2">&#8226;</span>
-                    <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
-                      {t("authentication.remove")}
-                    </Button>
-                  </li>
-                );
-              })}
+              u2fList
+                .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+                .map((data) => {
+                  return (
+                    <li key={data.id} className="mb-4">
+                      <Image
+                        src={getImageUrl("/img/fingerprint_24px.png")}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="mr-2 inline-block"
+                      />
+                      <span className="mr-2 font-semibold">{t("authentication.securityKey")}</span>
+                      <span>({data.name || t("authentication.unknownDevice")})</span>
+                      <span className="mx-2">&#8226;</span>
+                      <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
+                        {t("authentication.remove")}
+                      </Button>
+                    </li>
+                  );
+                })}
 
             {authenticatorStatus && (
               <li className="mb-4">
