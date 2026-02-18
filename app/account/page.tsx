@@ -31,7 +31,7 @@ export default async function Page() {
   const lastName = user?.profile?.familyName;
   const email = user?.email?.email;
 
-  if (!firstName || !lastName || !email || !userId) {
+  if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
     throw new Error(t("errors.noSession"));
   }
 
