@@ -8,6 +8,7 @@ import { Label, TextInput } from "@components/clientComponents/forms";
 import { SubmitButtonAction } from "@components/clientComponents/globals/Buttons";
 
 // TODO form validation
+// TODO add toasts for error+success
 // TODO is Display Name (in Zitadel) different than firstName+lastName (currently an update does not seem to change the Display Name)
 
 type FormState = {
@@ -33,6 +34,7 @@ export const AccountInformation = ({
   const { t } = useTranslation("account");
   const [editMode, setEditMode] = useState(false);
 
+  // TODO: move to actions.ts when more complete
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const formEntries = {
       firstname: (formData.get("firstname") as string) || "",
