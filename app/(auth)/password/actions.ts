@@ -2,6 +2,7 @@
 
 import { serverTranslation } from "@i18n/server";
 import { getSessionCookieByLoginName } from "@lib/cookies";
+import { getPasswordResetTemplate } from "@lib/emailTemplates";
 import { logMessage } from "@lib/logger";
 import { CreateSessionFailedError, setSessionAndUpdateCookie } from "@lib/server/cookie";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
@@ -220,15 +221,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(email, templateId, {
-      subject: "Reset your password | Réinitialiser votre mot de passe",
-      formResponse: `
-**Reset your password | Réinitialiser votre mot de passe**
-
-Use the following code to reset your password. | Utilisez le code suivant pour réinitialiser votre mot de passe.
-
-${resetCode}`,
-    });
+    await gcNotify.sendEmail(email, templateId, getPasswordResetTemplate(resetCode));
   } catch (error) {
     logMessage.error({ error }, "Failed to send password reset email via GC Notify");
     return { error: t("errors.couldNotSendResetLink") };
