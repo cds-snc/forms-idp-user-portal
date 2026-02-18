@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import { getImageUrl } from "@lib/imageUrl";
 
 import { ToastContainer } from "@clientComponents/globals";
-import { removeTOTPAction, removeU2FAction } from "../actions";
 import { toast } from "@components/clientComponents/globals/Toast";
 import { Button } from "@components/clientComponents/globals";
+import { removeTOTPAction, removeU2FAction } from "../actions";
 
 export const Authentication = ({
   u2fList,

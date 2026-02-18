@@ -52,6 +52,9 @@
   },
   "account": {
     "title": "[FR]GC Platform Accounts",
+    "errors": {
+      "noSession": "[FR]User information could not be retrieved from session."
+    },
     "accountDetails": {
       "title":  "[FR]Account Details",
       "firstName": "[FR]First name",

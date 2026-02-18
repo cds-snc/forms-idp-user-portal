@@ -9,9 +9,6 @@ import {
 } from "@lib/server/zitadel-protected";
 import { logMessage } from "@lib/logger";
 
-// TODO language strings
-
-// TODO check user is authenticated and has the right to remove the u2f device
 export async function removeU2FAction(userId: string, u2fId: string) {
   try {
     const hasMultipleMFA = await _hasMultipleMFAMethods(userId);
@@ -36,7 +33,6 @@ export async function removeU2FAction(userId: string, u2fId: string) {
   }
 }
 
-// TODO check user is authenticated and has the right to remove the u2f device
 export async function removeTOTPAction(userId: string) {
   try {
     const hasMultipleMFA = await _hasMultipleMFAMethods(userId);
