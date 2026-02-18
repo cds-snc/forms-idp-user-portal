@@ -70,6 +70,8 @@ export async function updateAccountAction({
   email: string;
 }) {
   try {
+    // TODO: validate firstName, lastName, email
+
     await protectedUpdateAccount(userId, { firstName, lastName, email });
     logMessage.info(
       `Updating account with firstName: ${firstName}, lastName: ${lastName}, email: ${email}`
