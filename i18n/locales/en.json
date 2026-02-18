@@ -60,12 +60,12 @@
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email address",
-      "change": "change"
+      "change": "Change"
     },
     "authentication": {
       "title": "Authentication",
       "password": "Password",
-      "change": "change"
+      "change": "Change"
     },
     "mfaAuthentication": {
       "title": "2 Factor Authentication",

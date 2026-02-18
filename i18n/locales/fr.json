@@ -60,12 +60,12 @@
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "email": "[FR]Email address",
-      "change": "[FR]change"
+      "change": "[FR]Change"
     },
     "authentication": {
       "title": "[FR]Authentication",
       "password": "[FR]Password",
-      "change": "[FR]change"
+      "change": "[FR]Change"
     },
     "mfaAuthentication": {
       "title": "[FR]2 Factor Authentication",

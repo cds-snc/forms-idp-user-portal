@@ -546,7 +546,7 @@ export const protectedUpdateAccount = AuthenticatedAction(
   async (
     credentials: SessionCredentials,
     userId: string,
-    update: { firstName: string; lastName: string; email: string }
+    account: { firstName: string; lastName: string; email: string }
   ) => {
     if (!validateSessionCredentials(credentials)) {
       return { error: "Invalid session credentials" };
@@ -565,13 +565,13 @@ export const protectedUpdateAccount = AuthenticatedAction(
       const request = create(UpdateHumanUserRequestSchema, {
         userId,
         profile: {
-          givenName: update.firstName,
-          familyName: update.lastName,
+          givenName: account.firstName,
+          familyName: account.lastName,
         },
         email: {
-          email: update.email,
+          email: account.email,
         },
-        username: update.email,
+        username: account.email,
       });
       return await z.updateHuman({ serviceUrl, request });
     } catch (error) {
