@@ -6,6 +6,7 @@ import {
   protectedRemoveTOTP,
   protectedGetTOTPStatus,
   protectedGetU2FList,
+  protectedUpdateAccount,
 } from "@lib/server/zitadel-protected";
 import { logMessage } from "@lib/logger";
 
@@ -54,6 +55,32 @@ export async function removeTOTPAction(userId: string) {
       `Failed to remove TOTP: ${error instanceof Error ? error.message : String(error)}`
     );
     return { error: "Failed to remove Authentication method" };
+  }
+}
+
+export async function updateAccountAction({
+  userId,
+  firstName,
+  lastName,
+  email,
+}: {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}) {
+  try {
+    await protectedUpdateAccount(userId, { firstName, lastName, email });
+    logMessage.info(
+      `Updating account with firstName: ${firstName}, lastName: ${lastName}, email: ${email}`
+    );
+    revalidatePath("/account");
+    return { success: true };
+  } catch (error) {
+    logMessage.error(
+      `Failed to update account: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return { error: "Failed to update account" };
   }
 }
 
