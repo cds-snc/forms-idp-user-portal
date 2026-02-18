@@ -24,24 +24,24 @@ export const Authentication = ({
     const result = await removeU2FAction(userId, u2fId);
     if ("error" in result) {
       toast.error(
-        result.error || t("authentication.failedToRemoveSecurityKey"),
+        result.error || t("authentication.errors.failedToRemoveSecurityKey"),
         "account-authentication"
       );
       return;
     }
-    toast.success(t("authentication.keyRemoved"), "account-authentication");
+    toast.success(t("authentication.success.keyRemoved"), "account-authentication");
   };
 
   const handleRemoveAuthenticator = async () => {
     const result = await removeTOTPAction(userId);
     if ("error" in result) {
       toast.error(
-        result.error || t("authentication.failedToRemoveAuthApp"),
+        result.error || t("authentication.errors.failedToRemoveAuthApp"),
         "account-authentication"
       );
       return;
     }
-    toast.success(t("authentication.authAppRemoved"), "account-authentication");
+    toast.success(t("authentication.success.authAppRemoved"), "account-authentication");
   };
 
   return (
