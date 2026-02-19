@@ -29,7 +29,7 @@ export const VerifiedAccount = ({ email }: { email: string }) => {
           </p>
         </div>
 
-        <div className="mb-1 font-semibold">{t("accountDetails.email")}</div>
+        <div className="mb-1 font-semibold">{t("verifiedAccount.email")}</div>
         <div>
           <em>{email}</em>
         </div>

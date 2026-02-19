@@ -66,11 +66,11 @@ export default async function Page() {
   return (
     <>
       <PersonalDetails userId={userId} firstName={firstName} lastName={lastName} />
-      <div className="mb-8"></div>
+      <div className="mb-4"></div>
       <VerifiedAccount email={email} />
-      <div className="mb-8"></div>
+      <div className="mb-4"></div>
       <PasswordAuthentication />
-      <div className="mb-8"></div>
+      <div className="mb-4"></div>
       <MFAAuthentication
         u2fList={u2fList}
         authenticatorStatus={authenticatorStatus}
