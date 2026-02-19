@@ -16,6 +16,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
 
 /*--------------------------------------------*
  * Components
@@ -39,6 +40,18 @@ export default async function Page() {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  // Page-level authentication check - defense in depth
+  const authCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.PASSWORD_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!authCheck.satisfied) {
+    redirect(authCheck.redirect || "/password");
+  }
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)

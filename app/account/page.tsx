@@ -1,11 +1,13 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { serverTranslation } from "@i18n/server";
 
 import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
 import { loadSessionById } from "@lib/session";
+import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
 
 import { MFAAuthentication } from "./components/MFAAuthentication";
 import { AccountInformation } from "./components/AccountInformation";
@@ -22,7 +24,20 @@ export default async function Page() {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // Load account information from the session cookie
-  const { sessionId, organization } = await getSessionCredentials();
+  const { sessionId, organization, loginName } = await getSessionCredentials();
+
+  // Page-level authentication check - defense in depth
+  const authCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.ANY_MFA_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!authCheck.satisfied) {
+    redirect(authCheck.redirect || "/");
+  }
+
   const session = await loadSessionById(serviceUrl, sessionId, organization);
   const userId = session.factors?.user?.id;
   const userResponse = await getUserByID({ serviceUrl, userId: userId! });
