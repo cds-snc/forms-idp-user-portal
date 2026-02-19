@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import { Alert, Label, TextInput, ErrorStatus } from "@clientComponents/forms";
 import { useTranslation } from "@i18n/client";
-import { useRouter } from "next/navigation";
 import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
 import { validateUsername } from "@lib/validationSchemas";
 import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
@@ -13,6 +12,7 @@ import { submitUserNameForm } from "../actions";
 type Props = {
   organization?: string;
   requestId?: string;
+  onSuccess: (data: { userId: string; loginName: string }) => void;
 };
 
 type FormState = {
@@ -23,10 +23,8 @@ type FormState = {
   validationErrors?: { fieldKey: string; fieldValue: string }[];
 };
 
-export const UserNameForm = ({ organization, requestId }: Props) => {
+export const UserNameForm = ({ organization, requestId, onSuccess }: Props) => {
   const { t } = useTranslation(["start", "common"]);
-
-  const router = useRouter();
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const username = (formData?.get("username") as string) || "";
@@ -55,7 +53,6 @@ export const UserNameForm = ({ organization, requestId }: Props) => {
       console.error(error);
       return {
         error: "Internal Error",
-        redirect: undefined,
       };
     });
 
@@ -69,11 +66,10 @@ export const UserNameForm = ({ organization, requestId }: Props) => {
       };
     }
 
-    if (result && "redirect" in result && result.redirect) {
-      router.push(result.redirect);
+    if (result && "userId" in result) {
+      onSuccess(result);
     }
 
-    // Fallback if there is no error and no redirect
     return previousState;
   };
 

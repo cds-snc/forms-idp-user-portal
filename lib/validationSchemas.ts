@@ -113,6 +113,18 @@ export const validateUsername = async (formEntries: { [k: string]: FormDataEntry
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
 
+export const validateUsernameAndPassword = async (formEntries: {
+  [k: string]: FormDataEntryValue;
+}) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...usernameSchema(),
+      password: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredPassword")),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
+};
+
 export const validateCode = async (
   formEntries: { [k: string]: FormDataEntryValue },
   min = 1,

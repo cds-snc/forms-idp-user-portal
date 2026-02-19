@@ -100,7 +100,7 @@
         "cannotRemoveSecurityKey": "Cannot remove security key. At least one strong authentication method must be configured to remove one.",
         "failedToRemoveSecurityKey": "Failed to remove security key",
         "failedToRemoveAuthApp": "Failed to remove authenticator"
-       }
+      }
     }
   },
   "start": {
@@ -112,11 +112,17 @@
     "registerLinkText": "create one now",
     "form": {
       "label": "Email address",
-      "description": "Enter your own individual government email address."
+      "description": "Enter your own individual government email address.",
+      "passwordLabel": "Password",
+      "forgotPasswordLink": "Forgot password?",
+      "signingIn": "Signing in...",
+      "submit": "Sign in"
     },
     "validation": {
       "requiredUsername": "Email address is required.",
-      "validGovEmail": "Enter a valid individual Government of Canada email address."
+      "validGovEmail": "Enter a valid individual Government of Canada email address.",
+      "requiredPassword": "Password is required.",
+      "invalidCredentials": "Invalid email address or password. Please try again."
     }
   },
   "logout": {
