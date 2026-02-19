@@ -55,17 +55,35 @@
     "errors": {
       "noSession": "[FR]User information could not be retrieved from session."
     },
-    "accountDetails": {
+    "personalDetails": {
       "title":  "[FR]Account Details",
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "email": "[FR]Email address",
-      "change": "[FR]change"
+      "change": "[FR]Change",
+      "cancel": "[FR]Cancel",
+      "updateAccount": "[FR]Update Account",
+      "success": {
+        "updateSuccess": "[FR]Account details updated successfully"
+      },
+      "errors": {
+        "updateFailed": "[FR]Failed to update account details"
+      },
+      "validation": {
+        "required": "[FR]Complete the required fields to continue.",
+        "requiredFirstname": "Y[FR]our first name is required.",
+        "requiredLastname": "[FR]Your last name is required."
+      }
+    },
+    "verifiedAccount": {
+      "title": "Verified Account",
+      "email": "Email address",
+      "changeMessage": "<0>Cannot be changed</0> <1>create new account</1> or <2>contact support</2>"
     },
     "authentication": {
       "title": "[FR]Authentication",
       "password": "[FR]Password",
-      "change": "[FR]change"
+      "change": "[FR]Change"
     },
     "mfaAuthentication": {
       "title": "[FR]2 Factor Authentication",

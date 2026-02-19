@@ -6,8 +6,10 @@ import {
   protectedRemoveTOTP,
   protectedGetTOTPStatus,
   protectedGetU2FList,
+  protectedUpdateAccount,
 } from "@lib/server/zitadel-protected";
 import { logMessage } from "@lib/logger";
+import { validatePersonalDetails } from "@lib/validationSchemas";
 
 export async function removeU2FAction(userId: string, u2fId: string) {
   try {
@@ -54,6 +56,38 @@ export async function removeTOTPAction(userId: string) {
       `Failed to remove TOTP: ${error instanceof Error ? error.message : String(error)}`
     );
     return { error: "Failed to remove Authentication method" };
+  }
+}
+
+export async function updateAccountAction({
+  userId,
+  firstName,
+  lastName,
+}: {
+  userId: string;
+  firstName: string;
+  lastName: string;
+}) {
+  try {
+    // Validate form entries just encase
+    const formData: { [k: string]: FormDataEntryValue } = {
+      firstname: firstName,
+      lastname: lastName,
+    };
+    const validationResult = await validatePersonalDetails(formData);
+    if (!validationResult.success) {
+      return { error: "Failed to update account. Invalid fields." };
+    }
+
+    await protectedUpdateAccount(userId, { firstName, lastName });
+    logMessage.info(`Updating account with firstName: ${firstName}, lastName: ${lastName}`);
+    revalidatePath("/account");
+    return { success: true };
+  } catch (error) {
+    logMessage.error(
+      `Failed to update account: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return { error: "Failed to update account" };
   }
 }
 
