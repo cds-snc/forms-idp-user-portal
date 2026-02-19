@@ -95,7 +95,7 @@ export const AccountInformation = ({
           <h3 className="mb-6">{t("accountDetails.title")}</h3>
           <div>
             <Button theme="primary" onClick={() => setEditMode(!editMode)}>
-              {editMode ? "Cancel (Todo)" : t("accountDetails.change")}
+              {editMode ? t("accountDetails.cancel") : t("accountDetails.change")}
             </Button>
           </div>
         </div>
@@ -180,7 +180,7 @@ export const AccountInformation = ({
             </div>
 
             <div>
-              <SubmitButtonAction>{t("button.continue", { ns: "common" })}</SubmitButtonAction>
+              <SubmitButtonAction>{t("accountDetails.updateAccount")}</SubmitButtonAction>
             </div>
           </form>
         )}

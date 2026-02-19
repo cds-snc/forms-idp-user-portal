@@ -61,6 +61,8 @@
       "lastName": "[FR]Last name",
       "email": "[FR]Email address",
       "change": "[FR]Change",
+      "cancel": "[FR]Cancel",
+      "updateAccount": "[FR]Update Account",
       "success": {
         "updateSuccess": "[FR]Account details updated successfully"
       },

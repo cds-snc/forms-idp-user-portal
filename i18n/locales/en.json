@@ -61,6 +61,8 @@
       "lastName": "Last name",
       "email": "Email address",
       "change": "Change",
+      "cancel": "Cancel",
+      "updateAccount": "Update Account",
       "success": {
         "updateSuccess": "Account details updated successfully"
       },
