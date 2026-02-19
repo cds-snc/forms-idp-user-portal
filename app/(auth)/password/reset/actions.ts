@@ -72,7 +72,7 @@ export const submitUserNameForm = async (
     const gcNotify = GCNotifyConnector.default(apiKey);
     await gcNotify.sendEmail(email, templateId, getPasswordResetTemplate(resetCode));
   } catch (error) {
-    logMessage.error({ error }, "Failed to send password reset email via GC Notify");
+    logMessage.error("Failed to send password reset email via GC Notify");
     return { error: t("errors.couldNotSendResetLink") };
   }
 
