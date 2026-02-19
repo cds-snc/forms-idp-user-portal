@@ -9,6 +9,7 @@ import {
   protectedUpdateAccount,
 } from "@lib/server/zitadel-protected";
 import { logMessage } from "@lib/logger";
+import { validateAccount } from "@lib/validationSchemas";
 
 export async function removeU2FAction(userId: string, u2fId: string) {
   try {
@@ -70,7 +71,16 @@ export async function updateAccountAction({
   email: string;
 }) {
   try {
-    // TODO: validate firstName, lastName, email
+    // Validate form entries just encase
+    const formData: { [k: string]: FormDataEntryValue } = {
+      firstname: firstName,
+      lastname: lastName,
+      email,
+    };
+    const validationResult = await validateAccount(formData);
+    if (!validationResult.success) {
+      return { error: "Failed to update account. Invalid fields." };
+    }
 
     await protectedUpdateAccount(userId, { firstName, lastName, email });
     logMessage.info(
