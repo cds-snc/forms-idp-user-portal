@@ -3,7 +3,7 @@ import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, toast, ToastContainer } from "@components/clientComponents/globals";
-import { updateAccountAction } from "../actions";
+import { updatePersonalDetailsAction } from "../actions";
 import { Label, TextInput } from "@components/clientComponents/forms";
 import { SubmitButtonAction } from "@components/clientComponents/globals/Buttons";
 import { validatePersonalDetails } from "@lib/validationSchemas";
@@ -49,7 +49,7 @@ export const PersonalDetails = ({
       };
     }
 
-    const result = await updateAccountAction({
+    const result = await updatePersonalDetailsAction({
       userId,
       firstName: formEntries.firstname,
       lastName: formEntries.lastname,
