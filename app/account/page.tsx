@@ -6,13 +6,12 @@ import { serverTranslation } from "@i18n/server";
 import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
-import { loadSessionById } from "@lib/session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
 import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
 
 import { MFAAuthentication } from "./components/MFAAuthentication";
 import { PersonalDetails } from "./components/PersonalDetails";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
-import { redirect } from "next/navigation";
 import { VerifiedAccount } from "./components/VerifiedAccount";
 
 export async function generateMetadata(): Promise<Metadata> {
