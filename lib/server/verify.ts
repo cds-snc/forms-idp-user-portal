@@ -70,7 +70,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     userId: command.userId,
     verificationCode: command.code,
   }).catch((error) => {
-    logMessage.error({ error }, "Failed to verify email");
+    logMessage.debug({ error, message: "Failed to verify email" });
     return { error: t("errors.couldNotVerifyEmail") };
   });
 
@@ -89,7 +89,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       userId: command.userId,
     });
   } catch (error) {
-    logMessage.error({ error }, "Failed to add OTPEmail");
+    logMessage.debug({ error, message: "Failed to add OTPEmail" });
     return { error: t("errors.failedToAddOTPEmail") };
   }
 
@@ -160,7 +160,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     if (!session) {
-      logMessage.error({ userId: command.userId }, "Failed to create session for MFA setup");
+      logMessage.debug({
+        userId: command.userId,
+        message: "Failed to create session for MFA setup",
+      });
       return { error: t("errors.couldNotCreateSession") };
     }
 
@@ -250,7 +253,7 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
     serviceUrl,
     userId: command.userId,
   }).catch((error) => {
-    logMessage.error({ error }, "Failed to get verification code");
+    logMessage.debug({ error, message: "Failed to get verification code" });
     return { error: t("errors.couldNotGenerateCode") };
   });
 
@@ -293,11 +296,15 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(email, templateId, getSecurityCodeTemplate(codeResponse.verificationCode));
+    await gcNotify.sendEmail(
+      email,
+      templateId,
+      getSecurityCodeTemplate(codeResponse.verificationCode)
+    );
 
     return { success: true };
   } catch (error) {
-    logMessage.error({ error }, "Failed to send verification email");
+    logMessage.debug({ error, message: "Failed to send verification email" });
     return { error: t("errors.emailSendFailed") };
   }
 }
@@ -346,7 +353,7 @@ export async function sendPasswordChangedEmail(command: SendPasswordChangedEmail
 
     return { success: true };
   } catch (error) {
-    logMessage.error({ error }, "Failed to send password changed email");
+    logMessage.debug({ error, message: "Failed to send password changed email" });
     return { error: t("errors.emailSendFailed") };
   }
 }

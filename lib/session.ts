@@ -159,14 +159,10 @@ export async function isSessionValid({
     : true;
 
   if (!stillValid) {
-    logMessage.info(
-      {
-        expirationDate: session.expirationDate
-          ? timestampDate(session.expirationDate).toDateString()
-          : "no expiration date",
-      },
-      "Session is expired"
-    );
+    const expirationInfo = session.expirationDate
+      ? timestampDate(session.expirationDate).toDateString()
+      : "no expiration date";
+    logMessage.info(`Session is expired: ${expirationInfo}`);
     return false;
   }
 
@@ -185,15 +181,7 @@ export async function isSessionValid({
   const mfaValid = totpValid || u2fValid || optEmail;
 
   if (!mfaValid) {
-    logMessage.info(
-      {
-        sessionFactors: {
-          totp: session.factors.totp?.verifiedAt,
-          webAuthN: session.factors.webAuthN?.verifiedAt,
-        },
-      },
-      "Session has no valid MFA factor (TOTP or U2F required)"
-    );
+    logMessage.info("Session has no valid MFA factor (TOTP or U2F required)");
     return false;
   }
 
@@ -209,8 +197,7 @@ export async function isSessionValid({
 
     if (humanUser && !humanUser.email?.isVerified) {
       logMessage.info(
-        { userId: session.factors.user.id },
-        "Session invalid: Email not verified and EMAIL_VERIFICATION is enabled"
+        `Session invalid: Email not verified and EMAIL_VERIFICATION is enabled for user: ${session.factors.user.id}`
       );
       return false;
     }
