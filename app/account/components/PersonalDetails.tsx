@@ -37,7 +37,6 @@ export const PersonalDetails = ({
       lastname: (formData.get("lastname") as string) || "",
     };
 
-    // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = Object.fromEntries(formData.entries());
     const validationResult = await validatePersonalDetails(formEntriesData);
     if (!validationResult.success) {
@@ -50,8 +49,6 @@ export const PersonalDetails = ({
       };
     }
 
-    // updating will only change the email and not the username but will trigger
-    // email validation on the newly added email
     const result = await updateAccountAction({
       userId,
       firstName: formEntries.firstname,
