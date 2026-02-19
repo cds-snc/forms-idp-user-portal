@@ -567,6 +567,7 @@ export const protectedUpdateAccount = AuthenticatedAction(
         profile: {
           givenName: account.firstName,
           familyName: account.lastName,
+          displayName: `${account.firstName} ${account.lastName}`,
         },
         // Note: leaving here for reference encase we want to update the username as well
         // email: {
