@@ -2,17 +2,16 @@
 import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@components/clientComponents/globals";
+import { Button, toast, ToastContainer } from "@components/clientComponents/globals";
 import { updateAccountAction } from "../actions";
 import { Label, TextInput } from "@components/clientComponents/forms";
 import { SubmitButtonAction } from "@components/clientComponents/globals/Buttons";
-
-// TODO form validation
-// TODO add toasts for error+success
-// TODO is Display Name (in Zitadel) different than firstName+lastName (currently an update does not seem to change the Display Name)
+import { validateAccount } from "@lib/validationSchemas";
+import { ErrorMessage } from "@components/clientComponents/forms/ErrorMessage";
 
 type FormState = {
   error?: string;
+  validationErrors?: { fieldKey: string; fieldValue: string }[];
   formData?: {
     firstname?: string;
     lastname?: string;
@@ -34,13 +33,25 @@ export const AccountInformation = ({
   const { t } = useTranslation("account");
   const [editMode, setEditMode] = useState(false);
 
-  // TODO: move to actions.ts when more complete
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const formEntries = {
       firstname: (formData.get("firstname") as string) || "",
       lastname: (formData.get("lastname") as string) || "",
       email: (formData.get("email") as string) || "",
     };
+
+    // Validate form entries and map any errors to form state with translated messages
+    const formEntriesData = Object.fromEntries(formData.entries());
+    const validationResult = await validateAccount(formEntriesData);
+    if (!validationResult.success) {
+      return {
+        validationErrors: validationResult.issues.map((issue) => ({
+          fieldKey: issue.path?.[0].key as string,
+          fieldValue: t(`accountDetails.validation.${issue.message}`),
+        })),
+        formData: formEntries,
+      };
+    }
 
     // updating will only change the email and not the username but will trigger
     // email validation on the newly added email
@@ -52,26 +63,30 @@ export const AccountInformation = ({
     });
 
     if ("error" in result) {
-      console.error("Failed to update account:", result.error);
+      toast.error(result.error || t("accountDetails.errors.updateFailed"), "account-details");
       return {
         formData: formEntries,
       };
     }
 
     setEditMode(false);
-    console.log("Account updated successfully");
+    toast.success(t("accountDetails.success.updateSuccess"), "account-details");
 
     return previousState;
   };
 
   const [state, formAction] = useActionState(localFormAction, {
-    // validationErrors: undefined,
+    validationErrors: undefined,
     formData: {
       firstname: firstName || "",
       lastname: lastName || "",
       email: email || "",
     },
   });
+
+  const getError = (fieldKey: string) => {
+    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
+  };
 
   return (
     <>
@@ -115,9 +130,9 @@ export const AccountInformation = ({
                 <Label className="required" htmlFor="firstname" required>
                   {t("accountDetails.firstName")}
                 </Label>
-                {/* {getError("firstname") && (
-                <ErrorMessage id={"errorMessageFirstname"}>{getError("firstname")}</ErrorMessage>
-              )} */}
+                {getError("firstname") && (
+                  <ErrorMessage id={"errorMessageFirstname"}>{getError("firstname")}</ErrorMessage>
+                )}
                 <TextInput
                   className="w-full"
                   type="text"
@@ -125,16 +140,16 @@ export const AccountInformation = ({
                   autoComplete="given-name"
                   required
                   defaultValue={state.formData?.firstname ?? ""}
-                  // ariaDescribedbyIds={getError("firstname") ? ["errorMessageFirstname"] : undefined}
+                  ariaDescribedbyIds={getError("firstname") ? ["errorMessageFirstname"] : undefined}
                 />
               </div>
               <div className="gcds-input-wrapper">
                 <Label htmlFor="lastname" required>
                   {t("accountDetails.lastName")}
                 </Label>
-                {/* {getError("lastname") && (
-                <ErrorMessage id={"errorMessageLastname"}>{getError("lastname")}</ErrorMessage>
-              )} */}
+                {getError("lastname") && (
+                  <ErrorMessage id={"errorMessageLastname"}>{getError("lastname")}</ErrorMessage>
+                )}
                 <TextInput
                   className="w-full"
                   type="text"
@@ -142,16 +157,16 @@ export const AccountInformation = ({
                   required
                   id="lastname"
                   defaultValue={state.formData?.lastname ?? ""}
-                  // ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
+                  ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
                 />
               </div>
               <div className="gcds-input-wrapper col-span-2">
                 <Label htmlFor="email" required>
                   {t("accountDetails.email")}
                 </Label>
-                {/* {getError("email") && (
-                <ErrorMessage id={"errorMessageEmail"}>{getError("email")}</ErrorMessage>
-              )} */}
+                {getError("email") && (
+                  <ErrorMessage id={"errorMessageEmail"}>{getError("email")}</ErrorMessage>
+                )}
                 <TextInput
                   className="w-full"
                   type="email"
@@ -159,7 +174,7 @@ export const AccountInformation = ({
                   required
                   id="email"
                   defaultValue={state.formData?.email ?? ""}
-                  // ariaDescribedbyIds={getError("email") ? ["errorMessageEmail"] : undefined}
+                  ariaDescribedbyIds={getError("email") ? ["errorMessageEmail"] : undefined}
                 />
               </div>
             </div>
@@ -170,6 +185,7 @@ export const AccountInformation = ({
           </form>
         )}
       </div>
+      <ToastContainer autoClose={false} containerId="account-details" />
     </>
   );
 };

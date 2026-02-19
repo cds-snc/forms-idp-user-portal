@@ -60,7 +60,20 @@
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "email": "[FR]Email address",
-      "change": "[FR]Change"
+      "change": "[FR]Change",
+      "success": {
+        "updateSuccess": "[FR]Account details updated successfully"
+      },
+      "errors": {
+        "updateFailed": "[FR]Failed to update account details"
+      },
+      "validation": {
+        "required": "[FR]Complete the required fields to continue.",
+        "requiredFirstname": "Y[FR]our first name is required.",
+        "requiredLastname": "[FR]Your last name is required.",
+        "requiredEmail": "[FR]Your email address is required.",
+        "validGovEmail": "[FR]Enter a valid individual Government of Canada email address."
+      }
     },
     "authentication": {
       "title": "[FR]Authentication",

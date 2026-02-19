@@ -60,7 +60,20 @@
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email address",
-      "change": "Change"
+      "change": "Change",
+      "success": {
+        "updateSuccess": "Account details updated successfully"
+      },
+      "errors": {
+        "updateFailed": "Failed to update account details"
+      },
+      "validation": {
+        "required": "Complete the required fields to continue.",
+        "requiredFirstname": "Your first name is required.",
+        "requiredLastname": "Your last name is required.",
+        "requiredEmail": "Your email address is required.",
+        "validGovEmail": "Enter a valid individual Government of Canada email address."
+      }
     },
     "authentication": {
       "title": "Authentication",
