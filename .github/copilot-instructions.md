@@ -51,6 +51,10 @@ v.minLength(1, "requiredFirstname") // maps to validation.requiredFirstname
 ```
 
 ### Logging
+
+Use `logMessage` from `@lib/logger` for consistent logging. Look at eslint config for restrictions on logMessage usage. For info and warn, only string literals or template literals are allowed to ensure structured logging. For example:
+
+
 ```typescript
 import { logMessage } from "@lib/logger";
 logMessage.info("message");  // .warn(), .error(), .debug()

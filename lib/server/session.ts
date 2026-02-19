@@ -287,7 +287,7 @@ export async function logoutCurrentSession(
     const redirectUrl = `/`;
     return { redirect: redirectUrl };
   } catch (error) {
-    logMessage.error({ error }, "Error during logout");
+    logMessage.info("Error during logout");
     return { error: "Failed to logout" };
   }
 }
