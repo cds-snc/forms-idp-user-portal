@@ -1,9 +1,8 @@
-import { getSession } from "@lib/zitadel";
-import { getMostRecentCookieWithLoginname } from "@lib/cookies";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { timestampDate } from "@zitadel/client";
-import { logMessage } from "@lib/logger";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { loadMostRecentSession } from "@lib/session";
+import { logMessage } from "@lib/logger";
 
 /**
  * Authentication levels for route protection
@@ -27,31 +26,19 @@ export type AuthCheckResult = {
 };
 
 /**
- * Extract session from cookies without throwing errors
- * Returns null if session doesn't exist or is invalid
+ * Safe wrapper around loadMostRecentSession that returns null instead of throwing
  */
-export async function getSessionFromCookies(
+async function getSessionFromCookies(
   serviceUrl: string,
   loginName?: string,
   organization?: string
 ): Promise<Session | null> {
   try {
-    const sessionCookie = await getMostRecentCookieWithLoginname({
-      loginName,
-      organization,
-    });
-
-    if (!sessionCookie?.id || !sessionCookie?.token) {
-      return null;
-    }
-
-    const response = await getSession({
+    const session = await loadMostRecentSession({
       serviceUrl,
-      sessionId: sessionCookie.id,
-      sessionToken: sessionCookie.token,
+      sessionParams: { loginName, organization },
     });
-
-    return response?.session || null;
+    return session || null;
   } catch (error) {
     logMessage.debug({
       error,
@@ -135,7 +122,7 @@ export async function checkAuthenticationLevel(
     return { satisfied: true };
   }
 
-  // Get session from cookies
+  // Get session from cookies (non-throwing)
   const session = await getSessionFromCookies(serviceUrl, loginName, organization);
 
   // Basic session check - just verify cookie exists
