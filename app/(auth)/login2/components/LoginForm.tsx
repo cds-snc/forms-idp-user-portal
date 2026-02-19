@@ -8,6 +8,9 @@ import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButt
 import { submitLoginForm } from "../actions";
 import { buildUrlWithRequestId } from "@lib/utils";
 import Link from "next/link";
+import { validateUsername } from "@lib/validationSchemas";
+import { ErrorSummary } from "@components/clientComponents/forms/ErrorSummary";
+import { ErrorMessage } from "@components/clientComponents/forms/ErrorMessage";
 
 type Props = {
   requestId?: string;
@@ -17,8 +20,10 @@ type Props = {
 type FormState = {
   formData: {
     username: string;
+    password: string;
   };
   error?: string;
+  validationErrors?: { fieldKey: string; fieldValue: string }[];
 };
 
 export function LoginForm({ requestId }: Props) {
@@ -32,13 +37,21 @@ export function LoginForm({ requestId }: Props) {
     const username = (formData?.get("username") as string) || "";
     const password = formData?.get("password") as string;
 
-    // Basic client-side validation
-    if (!username || !password) {
+    // Validate form entries and map any errors to form state with translated messages
+    const formEntriesData = formData ? Object.fromEntries(formData.entries()) : {};
+    const validationResult = await validateUsername(formEntriesData);
+    if (!validationResult.success) {
       setLoading(false);
       return {
         ...previousState,
-        error: !username ? t("validation.requiredUsername") : t("validation.requiredPassword"),
-        formData: { username },
+        validationErrors: validationResult.issues.map((issue) => ({
+          fieldKey: issue.path?.[0].key as string,
+          fieldValue: t(`validation.${issue.message}`, { ns: "start" }),
+        })),
+        formData: {
+          username: username,
+          password: password,
+        },
       };
     }
 
@@ -60,7 +73,7 @@ export function LoginForm({ requestId }: Props) {
       return {
         ...previousState,
         error: response.error,
-        formData: { username },
+        formData: { username, password: "" },
       };
     }
 
@@ -74,11 +87,19 @@ export function LoginForm({ requestId }: Props) {
   const [state, formAction] = useActionState(localFormAction, {
     formData: {
       username: "",
+      password: "",
     },
   });
 
+  // Helper to get field error
+  const getError = (fieldKey: string) => {
+    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
+  };
+
   return (
     <div>
+      <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
+
       {state.error && (
         <div className="py-4" data-testid="error">
           <Alert type={ErrorStatus.ERROR} focussable={true} id="loginError">
@@ -97,12 +118,16 @@ export function LoginForm({ requestId }: Props) {
             <div className="mb-4 text-sm text-black" id="login-description">
               {t("form.description")}
             </div>
+            {getError("username") && (
+              <ErrorMessage id={"errorMessageUsername"}>{getError("username")}</ErrorMessage>
+            )}
             <TextInput
               type={"email"}
               id={"username"}
               required
               autoComplete={"email"}
               defaultValue={state.formData?.username || ""}
+              ariaDescribedbyIds={getError("username") ? ["errorMessageUsername"] : undefined}
             />
           </div>
         </div>
@@ -113,11 +138,15 @@ export function LoginForm({ requestId }: Props) {
             <Label id={"label-password"} htmlFor={"password"} className="required" required>
               {t("form.passwordLabel")}
             </Label>
+            {getError("password") && (
+              <ErrorMessage id={"errorMessagePassword"}>{getError("password")}</ErrorMessage>
+            )}
             <TextInput
               type={"password"}
               id={"password"}
               required
               autoComplete={"current-password"}
+              ariaDescribedbyIds={getError("password") ? ["errorMessagePassword"] : undefined}
             />
 
             {/* Forgot password link */}
