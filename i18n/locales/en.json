@@ -63,10 +63,10 @@
       "cancel": "Cancel",
       "updateAccount": "Update Account",
       "success": {
-        "updateSuccess": "Account details updated successfully"
+        "updateSuccess": "Personal details updated successfully"
       },
       "errors": {
-        "updateFailed": "Failed to update account details"
+        "updateFailed": "Failed to update personal details"
       },
       "validation": {
         "required": "Complete the required fields to continue.",
