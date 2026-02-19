@@ -6,7 +6,7 @@ import { Button, toast, ToastContainer } from "@components/clientComponents/glob
 import { updateAccountAction } from "../actions";
 import { Label, TextInput } from "@components/clientComponents/forms";
 import { SubmitButtonAction } from "@components/clientComponents/globals/Buttons";
-import { validateAccount } from "@lib/validationSchemas";
+import { validatePersonalDetails } from "@lib/validationSchemas";
 import { ErrorMessage } from "@components/clientComponents/forms/ErrorMessage";
 
 type FormState = {
@@ -19,16 +19,14 @@ type FormState = {
   };
 };
 
-export const AccountInformation = ({
+export const PersonalDetails = ({
   userId,
   firstName,
   lastName,
-  email,
 }: {
   userId: string;
   firstName: string;
   lastName: string;
-  email: string;
 }) => {
   const { t } = useTranslation("account");
   const [editMode, setEditMode] = useState(false);
@@ -37,17 +35,16 @@ export const AccountInformation = ({
     const formEntries = {
       firstname: (formData.get("firstname") as string) || "",
       lastname: (formData.get("lastname") as string) || "",
-      email: (formData.get("email") as string) || "",
     };
 
     // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = Object.fromEntries(formData.entries());
-    const validationResult = await validateAccount(formEntriesData);
+    const validationResult = await validatePersonalDetails(formEntriesData);
     if (!validationResult.success) {
       return {
         validationErrors: validationResult.issues.map((issue) => ({
           fieldKey: issue.path?.[0].key as string,
-          fieldValue: t(`accountDetails.validation.${issue.message}`),
+          fieldValue: t(`personalDetails.validation.${issue.message}`),
         })),
         formData: formEntries,
       };
@@ -59,18 +56,17 @@ export const AccountInformation = ({
       userId,
       firstName: formEntries.firstname,
       lastName: formEntries.lastname,
-      email: formEntries.email,
     });
 
     if ("error" in result) {
-      toast.error(result.error || t("accountDetails.errors.updateFailed"), "account-details");
+      toast.error(result.error || t("personalDetails.errors.updateFailed"), "account-details");
       return {
         formData: formEntries,
       };
     }
 
     setEditMode(false);
-    toast.success(t("accountDetails.success.updateSuccess"), "account-details");
+    toast.success(t("personalDetails.success.updateSuccess"), "account-details");
 
     return previousState;
   };
@@ -80,7 +76,6 @@ export const AccountInformation = ({
     formData: {
       firstname: firstName || "",
       lastname: lastName || "",
-      email: email || "",
     },
   });
 
@@ -92,10 +87,10 @@ export const AccountInformation = ({
     <>
       <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
         <div className="flex items-center justify-between">
-          <h3 className="mb-6">{t("accountDetails.title")}</h3>
+          <h3 className="mb-6">{t("personalDetails.title")}</h3>
           <div>
             <Button theme="primary" onClick={() => setEditMode(!editMode)}>
-              {editMode ? t("accountDetails.cancel") : t("accountDetails.change")}
+              {editMode ? t("personalDetails.cancel") : t("personalDetails.change")}
             </Button>
           </div>
         </div>
@@ -103,21 +98,15 @@ export const AccountInformation = ({
           <div>
             <ul className="list-none p-0">
               <li className="mb-4">
-                <div className="mb-1 font-semibold">{t("accountDetails.firstName")}</div>
+                <div className="mb-1 font-semibold">{t("personalDetails.firstName")}</div>
                 <div>
                   <em>{firstName}</em>
                 </div>
               </li>
               <li className="mb-4">
-                <div className="mb-1 font-semibold">{t("accountDetails.lastName")}</div>
+                <div className="mb-1 font-semibold">{t("personalDetails.lastName")}</div>
                 <div>
                   <em>{lastName}</em>
-                </div>
-              </li>
-              <li className="mb-4">
-                <div className="mb-1 font-semibold">{t("accountDetails.email")}</div>
-                <div>
-                  <em>{email}</em>
                 </div>
               </li>
             </ul>
@@ -128,7 +117,7 @@ export const AccountInformation = ({
             <div className="mb-4 flex flex-col gap-4">
               <div className="gcds-input-wrapper">
                 <Label className="required" htmlFor="firstname" required>
-                  {t("accountDetails.firstName")}
+                  {t("personalDetails.firstName")}
                 </Label>
                 {getError("firstname") && (
                   <ErrorMessage id={"errorMessageFirstname"}>{getError("firstname")}</ErrorMessage>
@@ -145,7 +134,7 @@ export const AccountInformation = ({
               </div>
               <div className="gcds-input-wrapper">
                 <Label htmlFor="lastname" required>
-                  {t("accountDetails.lastName")}
+                  {t("personalDetails.lastName")}
                 </Label>
                 {getError("lastname") && (
                   <ErrorMessage id={"errorMessageLastname"}>{getError("lastname")}</ErrorMessage>
@@ -160,27 +149,10 @@ export const AccountInformation = ({
                   ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
                 />
               </div>
-              <div className="gcds-input-wrapper col-span-2">
-                <Label htmlFor="email" required>
-                  {t("accountDetails.email")}
-                </Label>
-                {getError("email") && (
-                  <ErrorMessage id={"errorMessageEmail"}>{getError("email")}</ErrorMessage>
-                )}
-                <TextInput
-                  className="w-full"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  id="email"
-                  defaultValue={state.formData?.email ?? ""}
-                  ariaDescribedbyIds={getError("email") ? ["errorMessageEmail"] : undefined}
-                />
-              </div>
             </div>
 
             <div>
-              <SubmitButtonAction>{t("accountDetails.updateAccount")}</SubmitButtonAction>
+              <SubmitButtonAction>{t("personalDetails.updateAccount")}</SubmitButtonAction>
             </div>
           </form>
         )}

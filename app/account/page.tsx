@@ -8,9 +8,10 @@ import { getSessionCredentials } from "@lib/cookies";
 import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
 
 import { MFAAuthentication } from "./components/MFAAuthentication";
-import { AccountInformation } from "./components/AccountInformation";
+import { PersonalDetails } from "./components/PersonalDetails";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
 import { redirect } from "next/navigation";
+import { VerifiedAccount } from "./components/VerifiedAccount";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
@@ -18,7 +19,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { t } = await serverTranslation("account");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -65,7 +65,9 @@ export default async function Page() {
 
   return (
     <>
-      <AccountInformation userId={userId} firstName={firstName} lastName={lastName} email={email} />
+      <PersonalDetails userId={userId} firstName={firstName} lastName={lastName} />
+      <div className="mb-8"></div>
+      <VerifiedAccount email={email} />
       <div className="mb-8"></div>
       <PasswordAuthentication />
       <div className="mb-8"></div>

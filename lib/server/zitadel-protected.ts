@@ -546,7 +546,7 @@ export const protectedUpdateAccount = AuthenticatedAction(
   async (
     credentials: SessionCredentials,
     userId: string,
-    account: { firstName: string; lastName: string; email: string }
+    account: { firstName: string; lastName: string }
   ) => {
     if (!validateSessionCredentials(credentials)) {
       return { error: "Invalid session credentials" };
@@ -568,10 +568,10 @@ export const protectedUpdateAccount = AuthenticatedAction(
           givenName: account.firstName,
           familyName: account.lastName,
         },
-        email: {
-          email: account.email,
-        },
         // Note: leaving here for reference encase we want to update the username as well
+        // email: {
+        //   email: account.email,
+        // },
         // username: account.email,
       });
       return await z.updateHuman({ serviceUrl, request });

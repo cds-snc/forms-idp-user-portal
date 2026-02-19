@@ -55,11 +55,10 @@
     "errors": {
       "noSession": "User information could not be retrieved from session."
     },
-    "accountDetails": {
-      "title":  "Account Details",
+    "personalDetails": {
+      "title":  "Personal Details",
       "firstName": "First name",
       "lastName": "Last name",
-      "email": "Email address",
       "change": "Change",
       "cancel": "Cancel",
       "updateAccount": "Update Account",
@@ -72,10 +71,13 @@
       "validation": {
         "required": "Complete the required fields to continue.",
         "requiredFirstname": "Your first name is required.",
-        "requiredLastname": "Your last name is required.",
-        "requiredEmail": "Your email address is required.",
-        "validGovEmail": "Enter a valid individual Government of Canada email address."
+        "requiredLastname": "Your last name is required."
       }
+    },
+    "verifiedAccount": {
+      "title": "Verified Account",
+      "email": "Email address",
+      "changeMessage": "<0>Cannot be changed</0> <1>create new account</1> or <2>contact support</2>"
     },
     "authentication": {
       "title": "Authentication",
