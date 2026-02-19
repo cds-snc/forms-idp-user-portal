@@ -5,11 +5,12 @@ import { serverTranslation } from "@i18n/server";
 import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
-import { loadSessionById } from "@lib/session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
 
 import { MFAAuthentication } from "./components/MFAAuthentication";
 import { AccountInformation } from "./components/AccountInformation";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
@@ -22,7 +23,7 @@ export default async function Page() {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // Load account information from the session cookie
-  const { sessionId, organization } = await getSessionCredentials();
+  const { loginName, sessionId, organization } = await getSessionCredentials();
   const session = await loadSessionById(serviceUrl, sessionId, organization);
   const userId = session.factors?.user?.id;
   const userResponse = await getUserByID({ serviceUrl, userId: userId! });
@@ -32,7 +33,23 @@ export default async function Page() {
   const email = user?.email?.email;
 
   if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
-    throw new Error(t("errors.noSession"));
+    redirect("/login");
+  }
+
+  try {
+    const authSession = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: { loginName, organization },
+    });
+    if (!authSession) {
+      redirect("/login");
+    }
+    const result = await isSessionValid({ serviceUrl, session: authSession });
+    if (!result) {
+      redirect("/login");
+    }
+  } catch (error) {
+    redirect("/login");
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([

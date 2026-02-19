@@ -181,7 +181,8 @@ export async function isSessionValid({
   // At least one MFA (TOTP or U2F) must be verified
   const totpValid = !!session.factors.totp?.verifiedAt;
   const u2fValid = !!session.factors.webAuthN?.verifiedAt;
-  const mfaValid = totpValid || u2fValid;
+  const optEmail = !!session.factors.otpEmail?.verifiedAt;
+  const mfaValid = totpValid || u2fValid || optEmail;
 
   if (!mfaValid) {
     logMessage.info(
