@@ -425,7 +425,10 @@ export async function changePassword(command: { code?: string; userId: string; p
     // Send password changed email notification
     if (!("error" in result)) {
       await sendPasswordChangedEmail({ userId }).catch((error) => {
-        logMessage.error({ error }, "Failed to send password changed email");
+        logMessage.debug({
+          error: error instanceof Error ? error.message : error,
+          message: "Failed to send password changed email",
+        });
         // Don't fail the password change if email fails
       });
     }
@@ -516,7 +519,10 @@ export async function checkSessionAndSetPassword({
       .then(async (result) => {
         // Send password changed email notification
         await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-          logMessage.error({ error }, "Failed to send password changed email");
+          logMessage.debug({
+            error: error instanceof Error ? error.message : error,
+            message: "Failed to send password changed email",
+          });
           // Don't fail the password change if email fails
         });
         return result;
@@ -551,7 +557,10 @@ export async function checkSessionAndSetPassword({
       .then(async (result) => {
         // Send password changed email notification
         await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-          logMessage.error({ error }, "Failed to send password changed email");
+          logMessage.debug({
+            error: error instanceof Error ? error.message : error,
+            message: "Failed to send password changed email",
+          });
           // Don't fail the password change if email fails
         });
         return result;

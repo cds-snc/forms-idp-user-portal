@@ -39,7 +39,7 @@ export const submitPasswordForm = async (
     loginName: command.loginName,
     organization: command.organization,
   }).catch((error) => {
-    logMessage.warn("Ignored error:", error); // TODO: how to handle this error?
+    logMessage.warn(`Ignored error: ${error?.message}`); // TODO: how to handle this error?
   });
 
   let session;
@@ -197,7 +197,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     serviceUrl,
     userId,
   }).catch((error) => {
-    logMessage.error({ error }, "Failed to get password reset code");
+    logMessage.debug({ message: (error as Error)?.message });
     return { error: t("errors.couldNotSendResetLink") };
   });
 
@@ -223,7 +223,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     const gcNotify = GCNotifyConnector.default(apiKey);
     await gcNotify.sendEmail(email, templateId, getPasswordResetTemplate(resetCode));
   } catch (error) {
-    logMessage.error({ error }, "Failed to send password reset email via GC Notify");
+    logMessage.debug({ message: (error as Error)?.message });
     return { error: t("errors.couldNotSendResetLink") };
   }
 }
