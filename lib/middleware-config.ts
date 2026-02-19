@@ -27,6 +27,9 @@ export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
 
   // MFA setup - requires basic session
   "/mfa/set": AuthLevel.BASIC_SESSION,
+
+  // Completion page - requires basic session (uses getSessionCredentials)
+  "/all-set": AuthLevel.BASIC_SESSION,
 };
 
 /**
@@ -35,9 +38,8 @@ export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
 export const PUBLIC_ROUTES = [
   "/", // Login/username entry
   "/login", // OIDC/SAML initiation
-  "/register", // User registration
-  "/register/password", // Registration password setup
-  "/password/reset", // Password reset request
+  "/register", // User registratio (accessed via email link with userId)
+  "/verify/success", // Email verification successsword reset request
   "/verify", // Email verification
   "/verify/success", // Email verification success
   "/all-set", // Completion page
