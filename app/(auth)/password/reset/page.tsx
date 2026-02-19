@@ -1,14 +1,12 @@
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadMostRecentSession } from "@lib/session";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { getSessionCredentials } from "@lib/cookies";
 
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { PasswordReset } from "./components/PasswordReset";
+import { PasswordResetFlow } from "./components/PasswordResetFlow";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
@@ -16,30 +14,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, organization } = await getSessionCredentials();
+  const { organization } = await getSessionCredentials();
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  // also allow no session to be found (ignoreUnkownUsername)
-  let session: Session | undefined;
-  if (loginName) {
-    session = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    });
-  }
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
     organization,
   });
-
-  if (!loginName || !session || !organization) {
-    throw new Error("No session.");
-  }
 
   return (
     <AuthPanel
@@ -47,11 +29,9 @@ export default async function Page() {
       descriptionI18nKey="reset.description"
       namespace="password"
     >
-      <PasswordReset
-        userId={session.factors?.user?.id}
+      <PasswordResetFlow
         passwordComplexitySettings={passwordComplexitySettings}
         organization={organization}
-        loginName={loginName}
       />
     </AuthPanel>
   );

@@ -8,7 +8,7 @@ import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButt
 import { submitLoginForm } from "../actions";
 import { buildUrlWithRequestId } from "@lib/utils";
 import Link from "next/link";
-import { validateUsername } from "@lib/validationSchemas";
+import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { ErrorSummary } from "@components/clientComponents/forms/ErrorSummary";
 import { ErrorMessage } from "@components/clientComponents/forms/ErrorMessage";
 
@@ -39,7 +39,7 @@ export function LoginForm({ requestId }: Props) {
 
     // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = formData ? Object.fromEntries(formData.entries()) : {};
-    const validationResult = await validateUsername(formEntriesData);
+    const validationResult = await validateUsernameAndPassword(formEntriesData);
     if (!validationResult.success) {
       setLoading(false);
       return {
@@ -152,7 +152,7 @@ export function LoginForm({ requestId }: Props) {
             {/* Forgot password link */}
             <div className="mt-2">
               <Link
-                href={buildUrlWithRequestId("/password/set", requestId)}
+                href={buildUrlWithRequestId("/password/reset", requestId)}
                 className="text-sm underline"
               >
                 {t("form.forgotPasswordLink")}
