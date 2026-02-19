@@ -40,6 +40,7 @@ export function LoginForm({ requestId }: Props) {
     // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = formData ? Object.fromEntries(formData.entries()) : {};
     const validationResult = await validateUsernameAndPassword(formEntriesData);
+
     if (!validationResult.success) {
       setLoading(false);
       return {
@@ -72,6 +73,7 @@ export function LoginForm({ requestId }: Props) {
     if (response && "error" in response && response.error) {
       return {
         ...previousState,
+        validationErrors: undefined,
         error: response.error,
         formData: { username, password: "" },
       };
