@@ -46,8 +46,8 @@ export const submitUserNameForm = async (
   const codeResponse = await passwordResetWithReturn({
     serviceUrl,
     userId,
-  }).catch((error) => {
-    logMessage.error({ error }, "Failed to get password reset code");
+  }).catch((_error) => {
+    logMessage.error("Failed to get password reset code");
     return { error: t("errors.couldNotSendResetLink") };
   });
 
@@ -71,7 +71,7 @@ export const submitUserNameForm = async (
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
     await gcNotify.sendEmail(email, templateId, getPasswordResetTemplate(resetCode));
-  } catch (error) {
+  } catch (_error) {
     logMessage.error("Failed to send password reset email via GC Notify");
     return { error: t("errors.couldNotSendResetLink") };
   }
