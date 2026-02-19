@@ -137,3 +137,13 @@ export const validateCode = async (
   );
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
 };
+
+export const validatePersonalDetails = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...firstnameSchema(),
+      ...lastnameSchema(),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
+};
