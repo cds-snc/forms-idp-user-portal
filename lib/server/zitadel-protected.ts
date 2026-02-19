@@ -9,6 +9,8 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { headers } from "next/headers";
 
 import * as z from "@lib/zitadel";
+import { create } from "@zitadel/client";
+import { UpdateHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /**
  * Protected wrapper for getUserByID.
@@ -530,6 +532,55 @@ export const protectedGetPasswordExpirySettings = AuthenticatedAction(
         `Failed to get password expiry settings: ${error instanceof Error ? error.message : String(error)}`
       );
       return { error: "Failed to get password expiry settings" };
+    }
+  }
+);
+
+/**
+ * Protected wrapper for protectedUpdateAccount.
+ * Ensures user can only update their own profile data.
+ *
+ * @security Requires authenticated session. Verifies userId matches authenticated user.
+ */
+export const protectedUpdateAccount = AuthenticatedAction(
+  async (
+    credentials: SessionCredentials,
+    userId: string,
+    account: { firstName: string; lastName: string }
+  ) => {
+    if (!validateSessionCredentials(credentials)) {
+      return { error: "Invalid session credentials" };
+    }
+
+    if (!validateUserCanAccessUserId(credentials.userId, userId)) {
+      logMessage.warn(
+        `Unauthorized attempt to update userId ${userId} by user ${credentials.loginName}`
+      );
+      return { error: "Unauthorized" };
+    }
+
+    try {
+      const _headers = await headers();
+      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const request = create(UpdateHumanUserRequestSchema, {
+        userId,
+        profile: {
+          givenName: account.firstName,
+          familyName: account.lastName,
+          displayName: `${account.firstName} ${account.lastName}`,
+        },
+        // Note: leaving here for reference encase we want to update the username as well
+        // email: {
+        //   email: account.email,
+        // },
+        // username: account.email,
+      });
+      return await z.updateHuman({ serviceUrl, request });
+    } catch (error) {
+      logMessage.error(
+        `Failed to update user ${userId}: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return { error: "Failed to update user" };
     }
   }
 );

@@ -6,12 +6,13 @@ import { serverTranslation } from "@i18n/server";
 import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSessionCredentials } from "@lib/cookies";
-import { loadSessionById } from "@lib/session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
 import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
 
 import { MFAAuthentication } from "./components/MFAAuthentication";
-import { AccountInformation } from "./components/AccountInformation";
+import { PersonalDetails } from "./components/PersonalDetails";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
+import { VerifiedAccount } from "./components/VerifiedAccount";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
@@ -19,7 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { t } = await serverTranslation("account");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -47,7 +47,23 @@ export default async function Page() {
   const email = user?.email?.email;
 
   if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
-    throw new Error(t("errors.noSession"));
+    redirect("/login");
+  }
+
+  try {
+    const authSession = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: { loginName, organization },
+    });
+    if (!authSession) {
+      redirect("/login");
+    }
+    const result = await isSessionValid({ serviceUrl, session: authSession });
+    if (!result) {
+      redirect("/login");
+    }
+  } catch (error) {
+    redirect("/login");
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([
@@ -63,10 +79,12 @@ export default async function Page() {
 
   return (
     <>
-      <AccountInformation firstName={firstName} lastName={lastName} email={email} />
-      <div className="mb-8"></div>
+      <PersonalDetails userId={userId} firstName={firstName} lastName={lastName} />
+      <div className="mb-4"></div>
+      <VerifiedAccount email={email} />
+      <div className="mb-4"></div>
       <PasswordAuthentication />
-      <div className="mb-8"></div>
+      <div className="mb-4"></div>
       <MFAAuthentication
         u2fList={u2fList}
         authenticatorStatus={authenticatorStatus}
