@@ -16,8 +16,7 @@ export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
   // Password entry - requires basic session
   "/password": AuthLevel.BASIC_SESSION,
 
-  // Password set (new users) - requires basic session
-  "/password/set": AuthLevel.BASIC_SESSION,
+  "/password/reset": AuthLevel.OPEN,
 
   // OTP verification pages - require basic session
   "/otp": AuthLevel.BASIC_SESSION,
@@ -55,7 +54,7 @@ export const PUBLIC_ROUTES = [
  */
 export const AUTH_FLOW_ROUTES = [
   "/password",
-  "/password/set",
+  "/password/reset",
   "/mfa",
   "/mfa/set",
   "/otp/time-based",
