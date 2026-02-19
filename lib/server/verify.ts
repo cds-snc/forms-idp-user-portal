@@ -293,7 +293,11 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
 
   try {
     const gcNotify = GCNotifyConnector.default(apiKey);
-    await gcNotify.sendEmail(email, templateId, getSecurityCodeTemplate(codeResponse.verificationCode));
+    await gcNotify.sendEmail(
+      email,
+      templateId,
+      getSecurityCodeTemplate(codeResponse.verificationCode)
+    );
 
     return { success: true };
   } catch (error) {
