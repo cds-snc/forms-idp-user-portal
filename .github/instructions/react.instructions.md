@@ -17,8 +17,10 @@ Instructions for building high-quality ReactJS applications with modern patterns
 ## Development Standards
 
 ### Component Structure
-- Shared components in `@components` -- to be used across multiple pages
-- Page-specific components in the same folder as the page (e.g. `app/(auth)/verify/components`) -- only used by that page
+Placement decision for a new component:
+- Route-only usage: colocate under that route’s `components` folder.
+- Reused across routes: place under `@components/*` in the closest matching domain folder.
+- If no domain fits, default to `@components/ui/*` only when it is a true primitive.
 
 ### Architecture
 - Use functional components with hooks as the primary pattern
@@ -78,7 +80,7 @@ Required group order:
 Notes:
 - Keep one blank line between groups.
 - Let ESLint auto-fix ordering; avoid manual re-sorting.
-- In files with section comments (`Types`, `Methods`, `Components`), keep imports grouped under those headings while still lint-compliant.
+- In files with section comments, use standardized headings (`Framework and Third-Party`, `Internal Aliases`, `Parent Relative`, `Local Relative`, `Styles`) while remaining lint-compliant.
 
 Workflow:
 - Run `pnpm lint` to validate.
