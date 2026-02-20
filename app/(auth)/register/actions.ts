@@ -12,6 +12,8 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getOrSetFingerprintId } from "@lib/fingerprint";
 import { checkEmailVerification } from "@lib/verify-helper";
 import { completeFlowOrGetUrl } from "@lib/client";
+import { validateAccountWithPassword } from "@lib/validationSchemas";
+import { logMessage } from "@lib/logger";
 
 type RegisterUserCommand = {
   email: string;
@@ -31,6 +33,20 @@ export async function registerUser(command: RegisterUserCommand) {
   const { t } = await serverTranslation("register");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const validationResult = await validateAccountWithPassword({
+    email: command.email,
+    firstname: command.firstName,
+    lastname: command.lastName,
+    password: command.password,
+  } as { [k: string]: FormDataEntryValue });
+
+  if (!validationResult.success) {
+    logMessage.warn("Server side validation failed for registration");
+    return {
+      error: t("errors.couldNotCreateUser"),
+    };
+  }
 
   const addResponse = await addHumanUser({
     serviceUrl,
