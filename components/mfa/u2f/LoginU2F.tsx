@@ -16,7 +16,7 @@ import { updateSession } from "@lib/server/session";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 import { useTranslation } from "@i18n";
 /*--------------------------------------------*
- * Components
+ * Internal Aliases
  *--------------------------------------------*/
 import { Alert, ErrorStatus } from "@components/ui/form";
 
