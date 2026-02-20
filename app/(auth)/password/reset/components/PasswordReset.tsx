@@ -16,7 +16,7 @@ export function PasswordReset({
   organization,
   loginName,
 }: {
-  userId?: string;
+  userId: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;
   loginName?: string;
@@ -26,8 +26,6 @@ export function PasswordReset({
   const [error, setError] = useState("");
 
   const submitPasswordForm = async ({ password, code }: { password: string; code?: string }) => {
-    if (!userId) return;
-
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password,
@@ -66,7 +64,7 @@ export function PasswordReset({
     }
   };
 
-  if (!userId || !passwordComplexitySettings) {
+  if (!passwordComplexitySettings) {
     return <Alert type={ErrorStatus.ERROR}>{t("reset.errors.missingRequiredInformation")}</Alert>;
   }
 

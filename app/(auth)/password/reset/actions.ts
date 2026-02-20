@@ -28,7 +28,10 @@ export const submitUserNameForm = async (
   });
 
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
-    return { error: t("errors.couldNotSendResetLink") };
+    return {
+      userId: "",
+      loginName: command.loginName,
+    };
   }
 
   const user = users.result[0];
