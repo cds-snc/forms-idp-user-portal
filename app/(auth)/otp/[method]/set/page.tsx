@@ -24,7 +24,7 @@ import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
  * Components
  *--------------------------------------------*/
 import { TotpRegister } from "@components/mfa/otp/TotpRegister";
-import * as Alert from "@components/Alert/Alert";
+import * as Alert from "@components/Alert";
 import { BackButton } from "@components/Buttons/BackButton";
 import { Button } from "@components/Buttons/Button";
 import { UserAvatar } from "@components/UserAvatar";

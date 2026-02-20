@@ -1,4 +1,4 @@
-import * as Alert from "@components/Alert/Alert";
+import * as Alert from "@components/Alert";
 
 import { I18n } from "@i18n";
 import { UserAvatar } from "@components/UserAvatar";

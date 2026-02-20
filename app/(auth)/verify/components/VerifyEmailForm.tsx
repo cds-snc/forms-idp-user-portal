@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ErrorSummary } from "@components/forms/ErrorSummary";
 import { CodeEntry } from "@components/forms/CodeEntry";
 import { Alert, ErrorStatus } from "@components/forms";
-import * as AlertNotification from "@components/Alert/Alert";
+import * as AlertNotification from "@components/Alert";
 import { Button } from "@components/Buttons/Button";
 import { validateCode } from "@lib/validationSchemas";
 
