@@ -1,5 +1,5 @@
 import { Avatar } from "./Avatar";
-import { ChevronDown } from "@serverComponents/icons";
+import { ChevronDown } from "@components/icons/ChevronDown";
 import Link from "next/link";
 
 type Props = {

@@ -1,6 +1,7 @@
 "use client";
 
-import { CopyIcon, CheckIcon } from "@serverComponents/icons";
+import { CheckIcon } from "@components/icons/CheckIcon";
+import { CopyIcon } from "@components/icons/CopyIcon";
 import copy from "copy-to-clipboard";
 import { useEffect, useState } from "react";
 

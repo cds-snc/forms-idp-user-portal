@@ -1,6 +1,8 @@
 "use client";
 import React, { ReactNode, useEffect, useRef, useState, type JSX } from "react";
-import { CircleCheckIcon, InfoIcon, WarningIcon } from "@serverComponents/icons";
+import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
+import { InfoIcon } from "@components/icons/InfoIcon";
+import { WarningIcon } from "@components/icons/WarningIcon";
 import { cn } from "@lib/utils";
 import { useTranslation } from "@i18n/client";
 

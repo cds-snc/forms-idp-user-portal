@@ -2,7 +2,7 @@
 import React, { ReactElement, type JSX } from "react";
 import { themes, Theme } from "./themes";
 import { cn } from "@lib/utils";
-import { SpinnerIcon } from "@serverComponents/icons/SpinnerIcon";
+import { SpinnerIcon } from "@components/icons/SpinnerIcon";
 import { useTranslation } from "@i18n/client";
 
 interface ButtonProps {

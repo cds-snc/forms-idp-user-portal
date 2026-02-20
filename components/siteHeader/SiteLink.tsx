@@ -1,7 +1,7 @@
 import { I18n } from "@i18n";
 import Link from "next/link";
 
-import { SiteLogo } from "@serverComponents/icons";
+import { SiteLogo } from "@components/icons/SiteLogo";
 
 export const SiteLink = ({ href }: { href: string }) => {
   return (

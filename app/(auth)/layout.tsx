@@ -8,7 +8,7 @@ import { Logout } from "@serverComponents/globals/Logout";
 import { GcdsHeader } from "@serverComponents/globals/GcdsHeader/GcdsHeader";
 import { Footer } from "@serverComponents/globals/Footer";
 import { FooterLinks } from "@clientComponents/globals/FooterLinks";
-import { SiteLogo } from "@serverComponents/icons";
+import { SiteLogo } from "@components/icons/SiteLogo";
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
