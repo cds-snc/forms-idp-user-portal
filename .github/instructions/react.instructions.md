@@ -16,6 +16,10 @@ Instructions for building high-quality ReactJS applications with modern patterns
 
 ## Development Standards
 
+### Component Structure
+- Shared components in `@components` -- to be used across multiple pages
+- Page-specific components in the same folder as the page (e.g. `app/(auth)/verify/components`) -- only used by that page
+
 ### Architecture
 - Use functional components with hooks as the primary pattern
 - Implement component composition over inheritance
@@ -66,7 +70,7 @@ This project enforces import ordering with `eslint-plugin-simple-import-sort`.
 
 Required group order:
 1. React / Next / third-party packages
-2. Project aliases (`@root`, `@lib`, `@i18n`, `@components`, `@clientComponents`, `@serverComponents`)
+2. Project aliases (`@root`, `@lib`, `@i18n`, `@components`)
 3. Parent relative imports (`../...`)
 4. Same-folder relative imports (`./...`)
 5. Style imports (`.css`, `.scss`)

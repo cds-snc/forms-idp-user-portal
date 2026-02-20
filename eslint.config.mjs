@@ -22,14 +22,7 @@ const eslintConfig = defineConfig([
         {
           groups: [
             ["^react$", "^next", "^@?\\w"],
-            [
-              "^@root",
-              "^@lib",
-              "^@i18n",
-              "^@components",
-              "^@clientComponents",
-              "^@serverComponents",
-            ],
+            ["^@root", "^@lib", "^@i18n", "^@components"],
             ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
             ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
             ["^.+\\.(css|scss)$"],
