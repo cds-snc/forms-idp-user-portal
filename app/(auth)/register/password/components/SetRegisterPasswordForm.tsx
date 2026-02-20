@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { useTranslation } from "@i18n";
 import { validateAccount } from "@lib/validationSchemas";
-import { registerUser } from "@lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 
 import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
 import { Alert, ErrorStatus } from "@clientComponents/forms";
 import { useRegistration } from "../../context/RegistrationContext";
+import { registerUser } from "../../actions";
 
 export function SetRegisterPasswordForm({
   passwordComplexitySettings,
