@@ -1,12 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
-import { Alert, Label, TextInput, ErrorStatus } from "@components/forms";
+import { Alert, Label, TextInput, ErrorStatus } from "@components/ui/form";
 import { useTranslation } from "@i18n/client";
-import { SubmitButtonAction } from "@components/Buttons/SubmitButton";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { validateUsername } from "@lib/validationSchemas";
-import { ErrorMessage } from "@components/forms/ErrorMessage";
-import { ErrorSummary } from "@components/forms/ErrorSummary";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 import { submitUserNameForm } from "../actions";
 
 type Props = {

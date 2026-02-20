@@ -1,7 +1,7 @@
-import LanguageToggle from "@components/LanguageToggle";
+import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
 import { BrandContainer } from "./BrandContainer";
 import { Fip } from "./Fip";
-import { SkipLink } from "@components/SkipLink";
+import { SkipLink } from "@components/ui/skip-link/SkipLink";
 
 export const GcdsHeader = ({
   language,

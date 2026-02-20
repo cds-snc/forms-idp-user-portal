@@ -4,7 +4,7 @@ import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { AuthPanel } from "@components/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { SearchParams } from "@lib/utils";
 

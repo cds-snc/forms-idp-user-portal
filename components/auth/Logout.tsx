@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 import { loadSessionsFromCookies } from "@lib/server/session";
-import { LogoutButton } from "@components/LogoutButton";
+import { LogoutButton } from "@components/auth/LogoutButton";
 import { isSessionValid } from "@lib/session";
 
 export const Logout = async ({ className }: { className?: string }) => {

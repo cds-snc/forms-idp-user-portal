@@ -3,11 +3,11 @@ import { serverTranslation } from "@i18n/server";
 
 import * as Tooltip from "@radix-ui/react-tooltip";
 
-import { ToastContainer } from "@components/Toast";
-import { Logout } from "@components/Logout";
-import { GcdsHeader } from "@components/GcdsHeader/GcdsHeader";
-import { Footer } from "@components/Footer";
-import { FooterLinks } from "@components/FooterLinks";
+import { ToastContainer } from "@components/ui/toast/Toast";
+import { Logout } from "@components/auth/Logout";
+import { GcdsHeader } from "@components/layout/gcds-header/GcdsHeader";
+import { Footer } from "@components/layout/footer/Footer";
+import { FooterLinks } from "@components/layout/footer/FooterLinks";
 import { SiteLogo } from "@components/icons/SiteLogo";
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";

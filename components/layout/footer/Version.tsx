@@ -1,5 +1,5 @@
 import { serverTranslation } from "@i18n/server";
-import packageJson from "../package.json";
+import packageJson from "../../../package.json";
 
 const deploymentId = process.env.NEXT_DEPLOYMENT_ID || "local";
 

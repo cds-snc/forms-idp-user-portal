@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@lib/utils";
-import { Alert, ErrorListItem, ErrorStatus } from "@components/forms";
+import { Alert, ErrorListItem, ErrorStatus } from "@components/ui/form";
 import { useTranslation } from "@i18n";
 
 export const ErrorSummary = ({

@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import Image from "next/image";
 
-import { AuthPanel } from "@components/AuthPanel";
-import { LinkButton } from "@components/Buttons/LinkButton";
+import { AuthPanel } from "@components/auth/AuthPanel";
+import { LinkButton } from "@components/ui/button/LinkButton";
 import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
-import { UserAvatar } from "@components/UserAvatar/UserAvatar";
+import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 
 import { I18n } from "@i18n";
 

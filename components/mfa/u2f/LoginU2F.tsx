@@ -17,7 +17,7 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 /*--------------------------------------------*
  * Components
  *--------------------------------------------*/
-import { Alert, ErrorStatus } from "@components/forms";
+import { Alert, ErrorStatus } from "@components/ui/form";
 
 type PublicKeyCredentialRequestOptionsData = {
   challenge: BufferSource | string;

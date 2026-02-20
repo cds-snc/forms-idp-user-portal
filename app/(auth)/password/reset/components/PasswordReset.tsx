@@ -6,8 +6,8 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
-import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
-import { Alert, ErrorStatus } from "@components/forms";
+import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@components/ui/form";
 import { changePassword, sendPassword } from "@lib/server/password";
 
 export function PasswordReset({

@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 
-import { AuthPanel } from "@components/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { PasswordPageClient } from "./PasswordPageClient";
 import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";

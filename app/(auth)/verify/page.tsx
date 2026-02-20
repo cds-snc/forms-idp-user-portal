@@ -1,12 +1,12 @@
-import * as Alert from "@components/Alert";
+import * as Alert from "@components/ui/alert/Alert";
 
 import { I18n } from "@i18n";
-import { UserAvatar } from "@components/UserAvatar";
+import { UserAvatar } from "@components/account/user-avatar";
 import { VerifyEmailForm } from "./components/VerifyEmailForm";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getUserByID } from "@lib/zitadel";
-import { AuthPanel } from "@components/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";

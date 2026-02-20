@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { AuthPanel } from "@components/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import Link from "next/link";
 import { getSessionCredentials } from "@lib/cookies";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";

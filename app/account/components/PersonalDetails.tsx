@@ -2,13 +2,13 @@
 import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@components/Buttons/Button";
-import { toast, ToastContainer } from "@components/Toast";
+import { Button } from "@components/ui/button/Button";
+import { toast, ToastContainer } from "@components/ui/toast/Toast";
 import { updateAccountAction } from "../actions";
-import { Label, TextInput } from "@components/forms";
-import { SubmitButtonAction } from "@components/Buttons/SubmitButton";
+import { Label, TextInput } from "@components/ui/form";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { validatePersonalDetails } from "@lib/validationSchemas";
-import { ErrorMessage } from "@components/forms/ErrorMessage";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
 
 type FormState = {
   error?: string;

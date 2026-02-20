@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
-import { AuthPanel } from "@components/AuthPanel";
-import { LinkButton } from "@components/Buttons/LinkButton";
+import { AuthPanel } from "@components/auth/AuthPanel";
+import { LinkButton } from "@components/ui/button/LinkButton";
 import { I18n } from "@i18n";
 import { getImageUrl } from "@lib/imageUrl";
 

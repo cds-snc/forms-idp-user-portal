@@ -24,11 +24,11 @@ import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
  * Components
  *--------------------------------------------*/
 import { TotpRegister } from "@components/mfa/otp/TotpRegister";
-import * as Alert from "@components/Alert";
-import { BackButton } from "@components/Buttons/BackButton";
-import { Button } from "@components/Buttons/Button";
-import { UserAvatar } from "@components/UserAvatar";
-import { AuthPanel } from "@components/AuthPanel";
+import * as Alert from "@components/ui/alert/Alert";
+import { BackButton } from "@components/ui/button/BackButton";
+import { Button } from "@components/ui/button/Button";
+import { UserAvatar } from "@components/account/user-avatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
 
 export default async function Page(props: {

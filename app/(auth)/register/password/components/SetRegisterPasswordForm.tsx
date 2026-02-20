@@ -5,8 +5,8 @@ import { validateAccount } from "@lib/validationSchemas";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 
-import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
-import { Alert, ErrorStatus } from "@components/forms";
+import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@components/ui/form";
 import { useRegistration } from "../../context/RegistrationContext";
 import { registerUser } from "../../actions";
 

@@ -1,6 +1,6 @@
-import { SiteHeader } from "@components/siteHeader/SiteHeader";
-import { Logout } from "@components/Logout";
-import LanguageToggle from "@components/LanguageToggle";
+import { SiteHeader } from "@components/layout/site-header/SiteHeader";
+import { Logout } from "@components/auth/Logout";
+import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
 
 // Note: This is a single column layout as we don't need the left nav yet.
 

@@ -1,7 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 
-import { LinkButton } from "@components/Buttons/LinkButton";
+import { LinkButton } from "@components/ui/button/LinkButton";
 
 export const PasswordAuthentication = () => {
   const { t } = useTranslation("account");
