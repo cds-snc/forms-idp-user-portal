@@ -17,12 +17,13 @@ import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/ser
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import { buildUrlWithRequestId } from "@lib/utils";
+import { validateUsernameAndPassword } from "@lib/validationSchemas";
 // import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
 // const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
 export type SubmitLoginCommand = {
-  loginName: string;
+  username: string;
   password: string;
   requestId?: string;
   organization?: string;
@@ -40,6 +41,15 @@ export const submitLoginForm = async (
 
   const { t } = await serverTranslation("start");
 
+  const validationResult = await validateUsernameAndPassword(command);
+
+  if (!validationResult.success) {
+    logMessage.warn("Server side validation failed for username and password");
+    return {
+      error: t("validation.invalidCredentials"),
+    };
+  }
+
   // Get login settings for organization context
   const loginSettings = await getLoginSettings({
     serviceUrl,
@@ -53,7 +63,7 @@ export const submitLoginForm = async (
 
   // Create session with combined username + password check
   const checks = create(ChecksSchema, {
-    user: { search: { case: "loginName", value: command.loginName } },
+    user: { search: { case: "loginName", value: command.username } },
     password: { password: command.password },
   });
 
