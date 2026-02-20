@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
  * Methods
@@ -9,6 +10,8 @@ import { serverTranslation } from "@i18n/server";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, checkSessionFactorValidity } from "@lib/session";
 import { getSessionCredentials } from "@lib/cookies";
+import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { logMessage } from "@lib/logger";
 
 /*--------------------------------------------*
  * Components
@@ -24,8 +27,35 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const { sessionId, organization, requestId } = await getSessionCredentials();
+  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
+
+  const authCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.PASSWORD_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!authCheck.satisfied) {
+    logMessage.debug({
+      message: "MFA set page auth check failed",
+      reason: authCheck.reason,
+      redirect: authCheck.redirect,
+    });
+    redirect(authCheck.redirect || "/password");
+  }
+
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
+
+  if (!sessionFactors) {
+    logMessage.debug({
+      message: "MFA set page missing session factors",
+      hasSessionId: !!sessionId,
+      hasOrganization: !!organization,
+    });
+    redirect("/");
+  }
+
   const loginSettings = await getSerializableLoginSettings({
     serviceUrl,
     organizationId: sessionFactors.factors?.user?.organizationId,
@@ -34,7 +64,12 @@ export default async function Page() {
   const { valid } = checkSessionFactorValidity(sessionFactors);
 
   if (!valid || !sessionFactors.factors?.user?.id) {
-    throw new Error("Session is not valid anymore");
+    logMessage.debug({
+      message: "MFA set page invalid session factors",
+      valid,
+      hasUserId: !!sessionFactors.factors?.user?.id,
+    });
+    redirect("/mfa");
   }
 
   return (

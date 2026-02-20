@@ -17,6 +17,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { logMessage } from "@lib/logger";
 
 /*--------------------------------------------*
  * Components
@@ -58,7 +59,13 @@ export default async function Page() {
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   if (!sessionFactors) {
-    throw new Error("No session factors found");
+    logMessage.debug({
+      message: "MFA page missing session factors",
+      hasSessionId: !!sessionId,
+      hasLoginName: !!loginName,
+      hasOrganization: !!organization,
+    });
+    redirect(authCheck.redirect || "/password");
   }
 
   // Check if user has at least one strong MFA method (TOTP or U2F)

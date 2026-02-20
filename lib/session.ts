@@ -181,7 +181,7 @@ export async function isSessionValid({
   const mfaValid = totpValid || u2fValid || optEmail;
 
   if (!mfaValid) {
-    logMessage.info("Session has no valid MFA factor (TOTP or U2F required)");
+    logMessage.debug("Session has no valid MFA factor (TOTP, U2F, or OTP Email required)");
     return false;
   }
 
