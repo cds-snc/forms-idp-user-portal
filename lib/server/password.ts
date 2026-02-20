@@ -253,7 +253,7 @@ export async function sendPassword(
     });
   }
 
-  if (!session?.factors?.user?.id || !sessionCookie) {
+  if (!session?.factors?.user?.id) {
     return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
@@ -378,6 +378,7 @@ export async function changePassword(command: { code?: string; userId: string; p
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
+  const normalizedCode = command.code?.replace(/\s+/g, "").trim();
 
   // check for init state
   const { user } = await getUserByID({
@@ -395,7 +396,7 @@ export async function changePassword(command: { code?: string; userId: string; p
   }
 
   // check if the user has no password set in order to set a password
-  if (!command.code) {
+  if (!normalizedCode) {
     const authmethods = await listAuthenticationMethodTypes({
       serviceUrl,
       userId,
@@ -416,12 +417,14 @@ export async function changePassword(command: { code?: string; userId: string; p
     }
   }
 
-  return setUserPassword({
-    serviceUrl,
-    userId,
-    password: command.password,
-    code: command.code,
-  }).then(async (result) => {
+  try {
+    const result = await setUserPassword({
+      serviceUrl,
+      userId,
+      password: command.password,
+      code: normalizedCode,
+    });
+
     // Send password changed email notification
     if (!("error" in result)) {
       await sendPasswordChangedEmail({ userId }).catch((error) => {
@@ -432,8 +435,16 @@ export async function changePassword(command: { code?: string; userId: string; p
         // Don't fail the password change if email fails
       });
     }
+
     return result;
-  });
+  } catch (error) {
+    logMessage.debug({
+      message: "Failed to change password",
+      userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return { error: t("errors.couldNotResetPassword") };
+  }
 }
 
 type CheckSessionAndSetPasswordCommand = {

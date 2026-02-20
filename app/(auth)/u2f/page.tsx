@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
  * Methods
@@ -10,6 +11,8 @@ import { SearchParams } from "@lib/utils";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
+import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { logMessage } from "@lib/logger";
 
 /*--------------------------------------------*
  * Components
@@ -32,14 +35,41 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const authCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.PASSWORD_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!authCheck.satisfied) {
+    logMessage.debug({
+      message: "U2F verify page auth check failed",
+      reason: authCheck.reason,
+      redirect: authCheck.redirect,
+    });
+    redirect(authCheck.redirect || "/password");
+  }
+
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
 
   if (!sessionFactors) {
-    throw new Error("No session factors found");
+    logMessage.debug({
+      message: "U2F verify page missing session factors",
+      hasSessionId: !!sessionId,
+      hasOrganization: !!organization,
+    });
+    redirect("/mfa");
   }
 
   if (!loginName || !sessionFactors.factors?.user?.id) {
-    throw new Error("No loginName or sessionId provided");
+    logMessage.debug({
+      message: "U2F verify page missing required user context",
+      hasLoginName: !!loginName,
+      hasUserId: !!sessionFactors.factors?.user?.id,
+    });
+    redirect("/mfa");
   }
 
   return (

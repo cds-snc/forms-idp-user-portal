@@ -7,6 +7,7 @@ import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { getSessionCredentials } from "@lib/cookies";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { logMessage } from "@lib/logger";
 
 import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { ChangePasswordForm } from "./components/ChangePasswordForm";
@@ -39,7 +40,14 @@ export default async function Page() {
   });
 
   if (!loginName || !sessionId || !organization || !passwordComplexitySettings) {
-    throw new Error("No session.");
+    logMessage.debug({
+      message: "Password change page missing required session context",
+      hasLoginName: !!loginName,
+      hasSessionId: !!sessionId,
+      hasOrganization: !!organization,
+      hasPasswordComplexitySettings: !!passwordComplexitySettings,
+    });
+    redirect(authCheck.redirect || "/password");
   }
 
   return (
