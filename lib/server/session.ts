@@ -1,5 +1,19 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
+import { Duration } from "@zitadel/client";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { completeFlowOrGetUrl } from "@lib/client";
+import { logMessage } from "@lib/logger";
 import { setSessionAndUpdateCookie } from "@lib/server/cookie";
 import {
   deleteSession,
@@ -8,25 +22,20 @@ import {
   listAuthenticationMethodTypes,
   listSessions,
 } from "@lib/zitadel";
-import { Duration } from "@zitadel/client";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
 import { serverTranslation } from "@i18n/server";
-import { completeFlowOrGetUrl } from "@lib/client";
+
+import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import {
   Cookie,
+  getAllSessionCookieIds,
   getAllSessions,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
-  getAllSessionCookieIds,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
+
 import { getOriginalHost } from "./host";
-import { logMessage } from "@lib/logger";
 
 /**
  * Load sessions by their IDs

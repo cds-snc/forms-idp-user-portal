@@ -1,8 +1,14 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import Image from "next/image";
-import { cn } from "@lib/utils";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
 interface AvatarProps {
   name: string | null | undefined;
   loginName: string;

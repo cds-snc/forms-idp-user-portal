@@ -1,17 +1,27 @@
-import { getServiceUrlFromHeaders } from "@lib/service-url";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { getSessionCredentials } from "@lib/cookies";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { isSessionValid, loadMostRecentSession } from "@lib/session";
+import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import Link from "next/link";
-import { getSessionCredentials } from "@lib/cookies";
-import { isSessionValid, loadMostRecentSession } from "@lib/session";
-import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
-import { LoginForm } from "./components/LoginForm";
-import { redirect } from "next/navigation";
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { LoginForm } from "./components/LoginForm";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
   return { title: t("title") };

@@ -1,12 +1,18 @@
-import { completeFlowOrGetUrl } from "@lib/client";
-import { updateSession } from "@lib/server/session";
-import { sendOtpEmail } from "@lib/server/otp";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { validateCode } from "@lib/validationSchemas";
-import { logMessage } from "@lib/logger";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { completeFlowOrGetUrl } from "@lib/client";
+import { logMessage } from "@lib/logger";
+import { sendOtpEmail } from "@lib/server/otp";
+import { updateSession } from "@lib/server/session";
+import { validateCode } from "@lib/validationSchemas";
 export type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];

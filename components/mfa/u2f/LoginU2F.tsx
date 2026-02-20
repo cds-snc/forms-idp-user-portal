@@ -1,23 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "@i18n";
-
-import { verifyU2FLogin } from "./actions";
-import { updateSession } from "@lib/server/session";
+import { useRouter } from "next/navigation";
 import { create, JsonObject } from "@zitadel/client";
 import {
   RequestChallengesSchema,
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 
+import { updateSession } from "@lib/server/session";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { useTranslation } from "@i18n";
 /*--------------------------------------------*
  * Components
  *--------------------------------------------*/
 import { Alert, ErrorStatus } from "@components/ui/form";
+
+import { verifyU2FLogin } from "./actions";
 
 type PublicKeyCredentialRequestOptionsData = {
   challenge: BufferSource | string;

@@ -1,9 +1,15 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { I18n } from "@i18n";
-import { Label } from "./Label";
-import { Hint } from "./Hint";
-import { ErrorMessage } from "./ErrorMessage";
-import { TextInput } from "./TextInput";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { ErrorMessage } from "./ErrorMessage";
+import { Hint } from "./Hint";
+import { Label } from "./Label";
+import { TextInput } from "./TextInput";
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];

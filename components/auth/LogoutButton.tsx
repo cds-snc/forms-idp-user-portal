@@ -1,9 +1,15 @@
 "use client";
 
-import { logoutCurrentSession } from "@lib/server/session";
-import { useRouter } from "next/navigation";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { logoutCurrentSession } from "@lib/server/session";
 type LogoutButtonProps = {
   className?: string;
   label: string;

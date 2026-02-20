@@ -1,6 +1,8 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
-
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { createContext, ReactNode, useContext, useState } from "react";
 const STORAGE_KEY = "registration-data";
 
 export type RegistrationData = {

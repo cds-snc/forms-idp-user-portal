@@ -1,11 +1,20 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
 import { useRegistration } from "../context/RegistrationContext";
-import { SetRegisterPasswordForm } from "./components/SetRegisterPasswordForm";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { SetRegisterPasswordForm } from "./components/SetRegisterPasswordForm";
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
 };

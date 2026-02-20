@@ -1,16 +1,26 @@
 "use client";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState, useState } from "react";
-import { I18n, useTranslation } from "@i18n";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import * as v from "valibot";
-import { Label, TextInput } from "@components/ui/form";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
-import { Hint } from "@components/ui/form/Hint";
-import { confirmPasswordSchema, passwordSchema, codeSchema } from "@lib/validationSchemas";
-import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { ErrorMessage } from "@components/ui/form/ErrorMessage";
-import { PasswordComplexity } from "./PasswordComplexity";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { codeSchema, confirmPasswordSchema, passwordSchema } from "@lib/validationSchemas";
+import { I18n, useTranslation } from "@i18n";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Label, TextInput } from "@components/ui/form";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
+import { Hint } from "@components/ui/form/Hint";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { PasswordComplexity } from "./PasswordComplexity";
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];

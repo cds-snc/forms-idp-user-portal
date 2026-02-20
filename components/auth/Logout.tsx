@@ -1,10 +1,16 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { serverTranslation } from "@i18n/server";
-import { loadSessionsFromCookies } from "@lib/server/session";
-import { LogoutButton } from "@components/auth/LogoutButton";
-import { isSessionValid } from "@lib/session";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { loadSessionsFromCookies } from "@lib/server/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { isSessionValid } from "@lib/session";
+import { serverTranslation } from "@i18n/server";
+import { LogoutButton } from "@components/auth/LogoutButton";
 export const Logout = async ({ className }: { className?: string }) => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);

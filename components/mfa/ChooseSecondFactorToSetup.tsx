@@ -1,15 +1,23 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@i18n/client";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { ENABLE_EMAIL_OTP } from "@root/constants/config";
-import { MethodOptionCard } from "./MethodOptionCard";
 import { buildUrlWithRequestId } from "@lib/utils";
-
+import { useTranslation } from "@i18n/client";
 import { Button } from "@components/ui/button/Button";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { MethodOptionCard } from "./MethodOptionCard";
 type Props = {
   checkAfter: boolean;
   requestId?: string;

@@ -1,33 +1,26 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Metadata } from "next";
-import { I18n } from "@i18n";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { serverTranslation } from "i18n/server";
 
 /*--------------------------------------------*
- * Types and Constants
+ * Internal Aliases
  *--------------------------------------------*/
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-
-/*--------------------------------------------*
- * Methods
- *--------------------------------------------*/
-
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
-import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { buildUrlWithRequestId } from "@lib/utils";
+import { I18n } from "@i18n";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { getSessionCredentials } from "@lib/cookies";
-import { buildUrlWithRequestId } from "@lib/utils";
-
+import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
 

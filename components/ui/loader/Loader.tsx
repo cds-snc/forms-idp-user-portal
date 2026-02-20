@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import React from "react";
-
 interface LoaderProps {
   message?: string;
   className?: string;

@@ -1,7 +1,13 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import React from "react";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { cn } from "@lib/utils";
 import { I18n } from "@i18n";
-
 interface LabelProps {
   children: React.ReactNode;
   htmlFor?: string;

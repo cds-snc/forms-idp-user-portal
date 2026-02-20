@@ -1,14 +1,9 @@
 "use server";
 
-import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
-import { logMessage } from "@lib/logger";
-import {
-  createSessionForUserIdAndIdpIntent,
-  createSessionFromChecks,
-  getSecuritySettings,
-  getSession,
-  setSession,
-} from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
 import { ConnectError, Duration, timestampMs } from "@zitadel/client";
 import {
   CredentialsCheckError,
@@ -18,7 +13,17 @@ import {
 import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
+
+import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import {
+  createSessionForUserIdAndIdpIntent,
+  createSessionFromChecks,
+  getSecuritySettings,
+  getSession,
+  setSession,
+} from "@lib/zitadel";
+
 import { getServiceUrlFromHeaders } from "../service-url";
 
 type CustomCookieData = {

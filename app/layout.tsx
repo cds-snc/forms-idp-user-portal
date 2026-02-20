@@ -1,10 +1,19 @@
-import { dir } from "i18next";
-import "@root/styles/app.scss";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Viewport } from "next";
+import { Lato, Noto_Sans } from "next/font/google";
+import { dir } from "i18next";
 
-import { Noto_Sans, Lato } from "next/font/google";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { serverTranslation } from "@i18n/server";
 
+/*--------------------------------------------*
+ * Styles
+ *--------------------------------------------*/
+import "@root/styles/app.scss";
 export const dynamic = "force-dynamic";
 
 const notoSans = Noto_Sans({

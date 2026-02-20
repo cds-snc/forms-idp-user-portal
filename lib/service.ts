@@ -1,3 +1,6 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { createClientFor } from "@zitadel/client";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -6,8 +9,11 @@ import { SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { createServerTransport } from "../lib/zitadel";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { createServerTransport } from "../lib/zitadel";
 type ServiceClass =
   | typeof IdentityProviderService
   | typeof UserService

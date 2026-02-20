@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { I18n } from "@i18n";
-
 export const AuthPanelTitle = ({
   i18nKey,
   namespace,

@@ -1,7 +1,13 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@i18n";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { useTranslation } from "@i18n";
 const toggledLang = (language: string) => {
   return language === "en" ? "fr" : "en";
 };

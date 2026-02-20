@@ -1,19 +1,28 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState } from "react";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { I18n, useTranslation } from "@i18n";
-
-import { BackButton } from "@components/ui/button/BackButton";
-import { Alert, ErrorStatus } from "@components/ui/form";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
-import { CodeEntry } from "@components/ui/form/CodeEntry";
 import Link from "next/link";
-import { Button } from "@components/ui/button/Button";
-import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { handleOTPFormSubmit, FormState, updateSessionForOTPChallenge } from "./action";
+import { useRouter } from "next/navigation";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { I18n, useTranslation } from "@i18n";
+import { BackButton } from "@components/ui/button/BackButton";
+import { Button } from "@components/ui/button/Button";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Alert, ErrorStatus } from "@components/ui/form";
+import { CodeEntry } from "@components/ui/form/CodeEntry";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { FormState, handleOTPFormSubmit, updateSessionForOTPChallenge } from "./action";
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export function LoginOTP({

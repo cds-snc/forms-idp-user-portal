@@ -1,11 +1,21 @@
 "use client";
-import React, { ReactElement, type JSX } from "react";
-import { themes, Theme } from "./themes";
-import { cn } from "@lib/utils";
-import { SpinnerIcon } from "@components/icons/SpinnerIcon";
-import { useTranslation } from "@i18n/client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import React, { type JSX, ReactElement } from "react";
 import { useFormStatus } from "react-dom";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
+import { useTranslation } from "@i18n/client";
+import { SpinnerIcon } from "@components/icons/SpinnerIcon";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { Theme, themes } from "./themes";
 // Convenience for server actions
 export const SubmitButtonAction = (props: ButtonProps) => {
   const { pending } = useFormStatus();

@@ -1,21 +1,24 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
 import Image from "next/image";
 
-import { AuthPanel } from "@components/auth/AuthPanel";
-import { LinkButton } from "@components/ui/button/LinkButton";
-import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
-import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
-
-import { I18n } from "@i18n";
-
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { completeFlowOrGetUrl } from "@lib/client";
 import { getSessionCredentials } from "@lib/cookies";
 import { getImageUrl } from "@lib/imageUrl";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
-import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
+import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { getSerializableLoginSettings } from "@lib/zitadel";
-
+import { I18n } from "@i18n";
+import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
+import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
+import { LinkButton } from "@components/ui/button/LinkButton";
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { requestId, checkAfter, method } = searchParams;

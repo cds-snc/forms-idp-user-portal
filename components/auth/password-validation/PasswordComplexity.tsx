@@ -1,13 +1,19 @@
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { I18n } from "@i18n";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useEffect, useReducer } from "react";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import {
   lowerCaseValidator,
   numberValidator,
   symbolValidator,
   upperCaseValidator,
 } from "@lib/validators";
+import { I18n } from "@i18n";
 
 function CheckIcon() {
   return (

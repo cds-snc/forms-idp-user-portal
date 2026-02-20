@@ -1,10 +1,16 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { UserNameForm } from "./UserNameForm";
-import { PasswordReset } from "./PasswordReset";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { PasswordReset } from "./PasswordReset";
+import { UserNameForm } from "./UserNameForm";
 type Props = {
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;

@@ -1,8 +1,10 @@
 "use client";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { I18n } from "@i18n";
 import { useTranslation } from "@i18n/client";
-
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 const BulletPoint = () => {

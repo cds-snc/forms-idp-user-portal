@@ -1,14 +1,24 @@
-import { Cookie } from "@lib/cookies";
-import { buildUrlWithRequestId } from "@lib/utils";
-import { sendLoginname, SendLoginnameCommand } from "./server/username";
-import { createResponse, getLoginSettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { cookies } from "next/headers";
 import { create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
-import { isSessionValid } from "./session";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { Cookie } from "@lib/cookies";
+import { buildUrlWithRequestId } from "@lib/utils";
+import { createResponse, getLoginSettings } from "@lib/zitadel";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { sendLoginname, SendLoginnameCommand } from "./server/username";
+import { isSessionValid } from "./session";
 type LoginWithSAMLAndSession = {
   serviceUrl: string;
   samlRequest: string;

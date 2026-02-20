@@ -1,20 +1,25 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState } from "react";
-import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-
-import { I18n, useTranslation } from "@i18n";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { CodeEntry } from "@components/ui/form/CodeEntry";
-import { Alert, ErrorStatus } from "@components/ui/form";
+import { useRouter } from "next/navigation";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
+import { validateCode } from "@lib/validationSchemas";
+import { I18n, useTranslation } from "@i18n";
 import * as AlertNotification from "@components/ui/alert/Alert";
 import { Button } from "@components/ui/button/Button";
-import { validateCode } from "@lib/validationSchemas";
-
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Alert, ErrorStatus } from "@components/ui/form";
+import { CodeEntry } from "@components/ui/form/CodeEntry";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 type FormState = {

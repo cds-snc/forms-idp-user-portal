@@ -61,6 +61,25 @@ Instructions for building high-quality ReactJS applications with modern patterns
 ## Additional Guidelines
 - Use ESLint and Prettier for consistent code formatting
 
+### Import Sort Order
+This project enforces import ordering with `eslint-plugin-simple-import-sort`.
+
+Required group order:
+1. React / Next / third-party packages
+2. Project aliases (`@root`, `@lib`, `@i18n`, `@components`, `@clientComponents`, `@serverComponents`)
+3. Parent relative imports (`../...`)
+4. Same-folder relative imports (`./...`)
+5. Style imports (`.css`, `.scss`)
+
+Notes:
+- Keep one blank line between groups.
+- Let ESLint auto-fix ordering; avoid manual re-sorting.
+- In files with section comments (`Types`, `Methods`, `Components`), keep imports grouped under those headings while still lint-compliant.
+
+Workflow:
+- Run `pnpm lint` to validate.
+- Run `pnpm eslint . --fix` to auto-apply ordering.
+
 ### Form Handling (React 19)
 Client components use `useActionState` with local validation before server action:
 ```tsx

@@ -1,12 +1,22 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { Metadata } from "next";
+import { headers } from "next/headers";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
-import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { PasswordResetFlow } from "./components/PasswordResetFlow";
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { PasswordResetFlow } from "./components/PasswordResetFlow";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("reset.title") };

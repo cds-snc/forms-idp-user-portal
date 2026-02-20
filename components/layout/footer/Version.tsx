@@ -1,6 +1,12 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { serverTranslation } from "@i18n/server";
-import packageJson from "../../../package.json";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import packageJson from "../../../package.json";
 const deploymentId = process.env.NEXT_DEPLOYMENT_ID || "local";
 
 export const Version = async () => {

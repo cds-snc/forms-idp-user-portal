@@ -1,17 +1,27 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState, useState } from "react";
-import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
-import { useTranslation } from "@i18n";
-import { useRouter } from "next/navigation";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
-import { submitLoginForm } from "../actions";
-import { buildUrlWithRequestId } from "@lib/utils";
 import Link from "next/link";
-import { validateUsernameAndPassword } from "@lib/validationSchemas";
-import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { useRouter } from "next/navigation";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { buildUrlWithRequestId } from "@lib/utils";
+import { validateUsernameAndPassword } from "@lib/validationSchemas";
+import { useTranslation } from "@i18n";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { submitLoginForm } from "../actions";
 type Props = {
   requestId?: string;
   organization?: string;

@@ -1,21 +1,22 @@
-import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
-
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { DEFAULT_CSP } from "./constants/csp";
+import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
+
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import { getServiceUrlFromHeaders } from "./lib/service-url";
+
+import { DEFAULT_CSP } from "./constants/csp";
 import {
-  getRequiredAuthLevel,
-  matchesPattern,
   API_ROUTES,
   AUTH_FLOW_ROUTES,
+  getRequiredAuthLevel,
+  matchesPattern,
 } from "./lib/middleware-config";
 import {
   AuthLevel,
   checkAuthenticationLevel,
   getSmartRedirect,
 } from "./lib/server/route-protection";
+import { getServiceUrlFromHeaders } from "./lib/service-url";
 
 export const config = {
   matcher: [

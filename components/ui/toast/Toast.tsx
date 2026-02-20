@@ -1,15 +1,18 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import React, { type JSX } from "react";
+import {
+  Bounce,
+  toast as originalToast,
+  ToastContainer as OriginalContainer,
+  type ToastPosition,
+} from "react-toastify/unstyled";
+
 import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
 import { InfoIcon } from "@components/icons/InfoIcon";
 import { WarningIcon } from "@components/icons/WarningIcon";
-import React, { type JSX } from "react";
-
-import {
-  ToastContainer as OriginalContainer,
-  toast as originalToast,
-  type ToastPosition,
-  Bounce,
-} from "react-toastify/unstyled";
 
 const contextClass = {
   success: {

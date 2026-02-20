@@ -1,8 +1,14 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import React from "react";
-import { cn } from "@lib/utils";
-import { Alert, ErrorListItem, ErrorStatus } from "@components/ui/form";
-import { useTranslation } from "@i18n";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
+import { useTranslation } from "@i18n";
+import { Alert, ErrorListItem, ErrorStatus } from "@components/ui/form";
 export const ErrorSummary = ({
   id,
   validationErrors,

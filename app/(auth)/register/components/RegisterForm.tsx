@@ -1,18 +1,27 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslation } from "@i18n";
-import { useRegistration } from "../context/RegistrationContext";
-
-import { Label, TextInput } from "@components/ui/form";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
-import { validateAccount } from "@lib/validationSchemas";
-import { ErrorMessage } from "@components/ui/form/ErrorMessage";
 import Link from "next/link";
-import { Hint } from "@components/ui/form/Hint";
-import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { buildUrlWithRequestId } from "@lib/utils";
+import { useRouter } from "next/navigation";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { buildUrlWithRequestId } from "@lib/utils";
+import { validateAccount } from "@lib/validationSchemas";
+import { useTranslation } from "@i18n";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Label, TextInput } from "@components/ui/form";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
+import { Hint } from "@components/ui/form/Hint";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { useRegistration } from "../context/RegistrationContext";
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];

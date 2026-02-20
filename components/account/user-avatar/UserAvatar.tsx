@@ -1,7 +1,17 @@
-import { Avatar } from "./Avatar";
-import { ChevronDown } from "@components/icons/ChevronDown";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import Link from "next/link";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ChevronDown } from "@components/icons/ChevronDown";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { Avatar } from "./Avatar";
 type Props = {
   loginName?: string;
   displayName?: string;

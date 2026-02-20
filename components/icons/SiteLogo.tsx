@@ -1,4 +1,7 @@
 "use client";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { useTranslation } from "@i18n";
 export const SiteLogo = ({ className }: { className?: string }) => {
   const { t } = useTranslation("header");

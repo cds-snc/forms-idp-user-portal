@@ -1,4 +1,11 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import * as v from "valibot";
+
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import {
   containsLowerCaseCharacter,
   containsNumber,
