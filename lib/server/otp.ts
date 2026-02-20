@@ -1,19 +1,30 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
 import { GCNotifyConnector } from "@gcforms/connectors";
+import { create, Duration } from "@zitadel/client";
+import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getSecurityCodeTemplate } from "@lib/emailTemplates";
 import { setSessionAndUpdateCookie } from "@lib/server/cookie";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getLoginSettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
+
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getLoginSettings } from "@lib/zitadel";
-import { getSecurityCodeTemplate } from "@lib/emailTemplates";
-import { serverTranslation } from "@i18n/server";
-import { create, Duration } from "@zitadel/client";
-import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { headers } from "next/headers";
 
 type SendOtpEmailCommand = {
   loginName?: string;

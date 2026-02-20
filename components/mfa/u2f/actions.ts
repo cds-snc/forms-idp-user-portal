@@ -1,20 +1,28 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-
-import { getSession, getLoginSettings, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 import { create, Duration } from "@zitadel/client";
-import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getOriginalHost } from "@lib/server/host";
-import { setSessionAndUpdateCookie } from "@lib/server/cookie";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { getSessionCookieById, getSessionCookieByLoginName } from "@lib/cookies";
+import { setSessionAndUpdateCookie } from "@lib/server/cookie";
+import { getOriginalHost } from "@lib/server/host";
 import { continueWithSession } from "@lib/server/session";
-import { U2F_ERRORS } from "./u2f-errors";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getLoginSettings, getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { U2F_ERRORS } from "./u2f-errors";
 type RegisterU2FCommand = {
   sessionId: string;
 };

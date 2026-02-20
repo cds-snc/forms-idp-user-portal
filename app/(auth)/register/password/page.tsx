@@ -1,13 +1,22 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
-import { serverTranslation } from "@i18n/server";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 
-import { AuthPanel } from "@components/auth/AuthPanel";
-import { PasswordPageClient } from "./PasswordPageClient";
-import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
+import { AuthPanel } from "@components/auth/AuthPanel";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { PasswordPageClient } from "./PasswordPageClient";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("create.title") };

@@ -1,36 +1,30 @@
-import { I18n } from "@i18n";
-import Link from "next/link";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 /*--------------------------------------------*
- * Types and Constants
+ * Framework and Third-Party
  *--------------------------------------------*/
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
- * Methods
+ * Internal Aliases
  *--------------------------------------------*/
-import { registerTOTP } from "@lib/zitadel";
+import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
+import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getSessionCredentials } from "@lib/cookies";
 import { buildUrlWithRequestId } from "@lib/utils";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
-import { logMessage } from "@lib/logger";
-import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
+import { registerTOTP } from "@lib/zitadel";
+import { I18n } from "@i18n";
+import { UserAvatar } from "@components/account/user-avatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { TotpRegister } from "@components/mfa/otp/TotpRegister";
 import * as Alert from "@components/ui/alert/Alert";
 import { BackButton } from "@components/ui/button/BackButton";
 import { Button } from "@components/ui/button/Button";
-import { UserAvatar } from "@components/account/user-avatar";
-import { AuthPanel } from "@components/auth/AuthPanel";
-import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
-
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<Record<string | number | symbol, string | undefined>>;

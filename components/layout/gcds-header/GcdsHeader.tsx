@@ -1,8 +1,14 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
-import { BrandContainer } from "./BrandContainer";
-import { Fip } from "./Fip";
 import { SkipLink } from "@components/ui/skip-link/SkipLink";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { BrandContainer } from "./BrandContainer";
+import { Fip } from "./Fip";
 export const GcdsHeader = ({
   language,
   showLanguageToggle = true,

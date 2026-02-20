@@ -1,6 +1,5 @@
-import type { Config } from "tailwindcss";
 import tokens from "@gcds-core/tokens/build/figma/figma.tokens.json";
-
+import type { Config } from "tailwindcss";
 import colors from "tailwindcss/colors";
 
 const {

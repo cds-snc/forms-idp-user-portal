@@ -1,8 +1,13 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useTranslation } from "react-i18next";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { LinkButton } from "@components/ui/button/LinkButton";
-
 export const PasswordAuthentication = () => {
   const { t } = useTranslation("account");
 

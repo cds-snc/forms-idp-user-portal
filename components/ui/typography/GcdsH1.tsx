@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { cn } from "@lib/utils";
-
 export const GcdsH1 = ({
   children,
   tabIndex,

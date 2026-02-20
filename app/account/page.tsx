@@ -1,19 +1,27 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getSessionCredentials } from "@lib/cookies";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
+import { getTOTPStatus, getU2FList, getUserByID } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 
-import { getTOTPStatus, getUserByID, getU2FList } from "@lib/zitadel";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getSessionCredentials } from "@lib/cookies";
-import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
-
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { MFAAuthentication } from "./components/MFAAuthentication";
-import { PersonalDetails } from "./components/PersonalDetails";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
+import { PersonalDetails } from "./components/PersonalDetails";
 import { VerifiedAccount } from "./components/VerifiedAccount";
-
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
   return { title: t("title") };

@@ -1,15 +1,20 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
-import { useTranslation } from "@i18n";
+import { useRouter } from "next/navigation";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { useRouter } from "next/navigation";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { checkSessionAndSetPassword, sendPassword } from "@lib/server/password";
-import { Alert, ErrorStatus } from "@components/ui/form";
+import { useTranslation } from "@i18n";
 import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
-
+import { Alert, ErrorStatus } from "@components/ui/form";
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
   sessionId: string;

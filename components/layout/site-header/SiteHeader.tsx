@@ -1,8 +1,14 @@
 "use client";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { cn } from "@lib/utils";
-import { SiteLink } from "./SiteLink";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { SiteLink } from "./SiteLink";
 export const SiteHeader = ({ children }: { children?: React.ReactNode }) => {
   return (
     <>

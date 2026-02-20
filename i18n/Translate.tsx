@@ -1,6 +1,8 @@
 "use client";
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { useTranslation } from "./client";
-
 export function I18n({
   i18nKey,
   namespace,

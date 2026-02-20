@@ -1,23 +1,30 @@
 "use server";
 
-import { serverTranslation } from "@i18n/server";
-import { logMessage } from "@lib/logger";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import {
-  getLoginSettings,
-  getUserByID,
-  listAuthenticationMethodTypes,
-  // getOrgsByDomain,
-  getLockoutSettings,
-} from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { logMessage } from "@lib/logger";
+import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
+import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
+import {
+  // getOrgsByDomain,
+  getLockoutSettings,
+  getLoginSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+} from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
 // import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
 // const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;

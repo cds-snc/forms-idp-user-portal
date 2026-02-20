@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { randomUUID } from "crypto";
-
 /**
  * Generates a Content Security Policy header with a nonce for inline scripts and styles.
  * This prevents XSS attacks by requiring all inline scripts/styles to have a matching nonce.

@@ -1,8 +1,13 @@
-import { I18n } from "@i18n";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import Link from "next/link";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { I18n } from "@i18n";
 import { SiteLogo } from "@components/icons/SiteLogo";
-
 export const SiteLink = ({ href }: { href: string }) => {
   return (
     <Link

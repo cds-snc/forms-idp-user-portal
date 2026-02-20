@@ -1,10 +1,16 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { cache } from "react";
 import { createInstance } from "i18next";
 import resourcesToBackend from "i18next-resources-to-backend";
 import { initReactI18next } from "react-i18next/initReactI18next";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { getOptions } from "./settings";
 import { getCurrentLanguage } from "./utils";
-import { cache } from "react";
-
 export const serverTranslation = cache(
   async (ns?: string | string[], options?: { keyPrefix?: string; lang?: string }) => {
     const i18nLang = options?.lang ?? (await getCurrentLanguage());

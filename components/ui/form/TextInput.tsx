@@ -1,6 +1,12 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import React from "react";
-import { cn } from "@lib/utils";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
 export const TextInput = ({
   id,
   type,

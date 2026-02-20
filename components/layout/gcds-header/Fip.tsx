@@ -1,7 +1,13 @@
-import { SignatureEn } from "./assets/SignatureEn";
-import { SignatureFr } from "./assets/SignatureFr";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { serverTranslation } from "@i18n/server";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { SignatureEn } from "./assets/SignatureEn";
+import { SignatureFr } from "./assets/SignatureFr";
 export const Fip = async ({ language }: { language: string }) => {
   const { t } = await serverTranslation(["fip"]);
 

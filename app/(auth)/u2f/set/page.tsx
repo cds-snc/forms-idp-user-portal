@@ -1,24 +1,22 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
- * Methods
+ * Internal Aliases
  *--------------------------------------------*/
-import { serverTranslation } from "@i18n/server";
+import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
-import { getSessionCredentials } from "@lib/cookies";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
-import { logMessage } from "@lib/logger";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
-import { RegisterU2f } from "@components/mfa/u2f/RegisterU2f";
+import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-
+import { RegisterU2f } from "@components/mfa/u2f/RegisterU2f";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
   return { title: t("set.title") };

@@ -1,14 +1,24 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState } from "react";
-import { Alert, Label, TextInput, ErrorStatus } from "@components/ui/form";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { validateUsername } from "@lib/validationSchemas";
 import { useTranslation } from "@i18n/client";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
-import { validateUsername } from "@lib/validationSchemas";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
 import { ErrorMessage } from "@components/ui/form/ErrorMessage";
 import { ErrorSummary } from "@components/ui/form/ErrorSummary";
-import { submitUserNameForm } from "../actions";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { submitUserNameForm } from "../actions";
 type Props = {
   organization?: string;
   requestId?: string;

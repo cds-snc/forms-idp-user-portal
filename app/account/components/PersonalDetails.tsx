@@ -1,15 +1,24 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@components/ui/button/Button";
-import { toast, ToastContainer } from "@components/ui/toast/Toast";
-import { updateAccountAction } from "../actions";
-import { Label, TextInput } from "@components/ui/form";
-import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { validatePersonalDetails } from "@lib/validationSchemas";
+import { Button } from "@components/ui/button/Button";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Label, TextInput } from "@components/ui/form";
 import { ErrorMessage } from "@components/ui/form/ErrorMessage";
+import { toast, ToastContainer } from "@components/ui/toast/Toast";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { updateAccountAction } from "../actions";
 type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];

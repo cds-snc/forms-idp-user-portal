@@ -1,20 +1,26 @@
 "use server";
 
-import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { addHumanUser, getLoginSettings, getUserByID } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { cookies, headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { cookies, headers } from "next/headers";
-import { serverTranslation } from "@i18n/server";
 import crypto from "crypto";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getOrSetFingerprintId } from "@lib/fingerprint";
-import { checkEmailVerification } from "@lib/verify-helper";
-import { completeFlowOrGetUrl } from "@lib/client";
-import { validateAccountWithPassword } from "@lib/validationSchemas";
-import { logMessage } from "@lib/logger";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { completeFlowOrGetUrl } from "@lib/client";
+import { getOrSetFingerprintId } from "@lib/fingerprint";
+import { logMessage } from "@lib/logger";
+import { createSessionAndUpdateCookie } from "@lib/server/cookie";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { validateAccountWithPassword } from "@lib/validationSchemas";
+import { checkEmailVerification } from "@lib/verify-helper";
+import { addHumanUser, getLoginSettings, getUserByID } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
 type RegisterUserCommand = {
   email: string;
   firstName: string;

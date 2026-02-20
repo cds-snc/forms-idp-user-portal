@@ -1,5 +1,19 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
+import { ConnectError, create, Duration } from "@zitadel/client";
+import { createUserServiceClient } from "@zitadel/client/v2";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@lib/server/cookie";
 import {
   getLockoutSettings,
@@ -13,28 +27,22 @@ import {
   setPassword,
   setUserPassword,
 } from "@lib/zitadel";
-import { ConnectError, create, Duration } from "@zitadel/client";
-import { createUserServiceClient } from "@zitadel/client/v2";
-import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { headers } from "next/headers";
+import { serverTranslation } from "@i18n/server";
+
+import { logMessage } from "../../lib/logger";
+import { getServiceUrlFromHeaders } from "../../lib/service-url";
+import { createServerTransport } from "../../lib/zitadel";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
-import { getOriginalHostWithProtocol } from "./host";
 import {
   checkEmailVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
   checkUserVerification,
 } from "../verify-helper";
-import { sendPasswordChangedEmail } from "./verify";
-import { createServerTransport } from "../../lib/zitadel";
-import { logMessage } from "../../lib/logger";
 
-import { serverTranslation } from "@i18n/server";
+import { getOriginalHostWithProtocol } from "./host";
+import { sendPasswordChangedEmail } from "./verify";
 
 /**
  * Type guard to check if an error has failedAttempts property

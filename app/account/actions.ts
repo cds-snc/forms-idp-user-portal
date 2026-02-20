@@ -1,14 +1,20 @@
 "use server";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { revalidatePath } from "next/cache";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { logMessage } from "@lib/logger";
 import {
-  protectedRemoveU2F,
-  protectedRemoveTOTP,
   protectedGetTOTPStatus,
   protectedGetU2FList,
+  protectedRemoveTOTP,
+  protectedRemoveU2F,
   protectedUpdateAccount,
 } from "@lib/server/zitadel-protected";
-import { logMessage } from "@lib/logger";
 import { validatePersonalDetails } from "@lib/validationSchemas";
 
 export async function removeU2FAction(userId: string, u2fId: string) {

@@ -1,6 +1,8 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { IDPType } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-
 // This maps the IdentityProviderType to a slug which is used in the /success and /failure routes
 export function idpTypeToSlug(idpType: IdentityProviderType) {
   switch (idpType) {

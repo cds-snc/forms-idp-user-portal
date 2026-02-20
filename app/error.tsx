@@ -1,10 +1,16 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useEffect } from "react";
 import Image from "next/image";
-import { I18n } from "@i18n";
-import { getImageUrl } from "@lib/imageUrl";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getImageUrl } from "@lib/imageUrl";
+import { I18n } from "@i18n";
 export default function Error({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
     console.error(error);

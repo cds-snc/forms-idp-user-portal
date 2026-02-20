@@ -1,9 +1,19 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { ReactNode } from "react";
-import { AuthPanelTitle } from "./AuthPanelTitle";
-import { I18n } from "@i18n";
 import Image from "next/image";
-import { getImageUrl } from "@lib/imageUrl";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getImageUrl } from "@lib/imageUrl";
+import { I18n } from "@i18n";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { AuthPanelTitle } from "./AuthPanelTitle";
 interface AuthPanelProps {
   titleI18nKey: string;
   descriptionI18nKey: string;

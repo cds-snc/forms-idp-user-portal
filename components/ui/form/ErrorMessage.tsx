@@ -1,7 +1,13 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import React from "react";
-import { cn } from "@lib/utils";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
 export interface ErrorMessageProps {
   children: React.ReactNode;
   id?: string;

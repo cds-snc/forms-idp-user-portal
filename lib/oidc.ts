@@ -1,12 +1,17 @@
-import { Cookie } from "@lib/cookies";
-import { sendLoginname, SendLoginnameCommand } from "@lib/server/username";
-import { createCallback, getLoginSettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { create } from "@zitadel/client";
 import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+
+import { Cookie } from "@lib/cookies";
+import { sendLoginname, SendLoginnameCommand } from "@lib/server/username";
+import { createCallback, getLoginSettings } from "@lib/zitadel";
+
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCAndSession = {

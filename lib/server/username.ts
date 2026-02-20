@@ -1,21 +1,29 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { serverTranslation } from "@i18n/server";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { logMessage } from "@lib/logger";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { buildUrlWithRequestId } from "@lib/utils";
 import {
   getLoginSettings,
   listAuthenticationMethodTypes,
   searchUsers,
   SearchUsersCommand,
 } from "@lib/zitadel";
-import { headers } from "next/headers";
+import { serverTranslation } from "@i18n/server";
+
 import { createSessionAndUpdateCookie } from "./cookie";
-import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { logMessage } from "@lib/logger";
-import { buildUrlWithRequestId } from "@lib/utils";
 
 export type SendLoginnameCommand = {
   loginName: string;

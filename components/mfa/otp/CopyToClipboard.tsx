@@ -1,10 +1,16 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { useEffect, useState } from "react";
+import copy from "copy-to-clipboard";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { CheckIcon } from "@components/icons/CheckIcon";
 import { CopyIcon } from "@components/icons/CopyIcon";
-import copy from "copy-to-clipboard";
-import { useEffect, useState } from "react";
-
 type Props = {
   value: string;
 };

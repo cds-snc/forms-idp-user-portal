@@ -1,8 +1,9 @@
 "use client";
-import { Trans, useTranslation } from "react-i18next";
-
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import Link from "next/link";
-
+import { Trans, useTranslation } from "react-i18next";
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export const VerifiedAccount = ({ email }: { email: string }) => {

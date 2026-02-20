@@ -1,7 +1,13 @@
-import { logoutCurrentSession } from "@lib/server/session";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { logoutCurrentSession } from "@lib/server/session";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const returnUrl = searchParams.get("returnUrl") || "/";

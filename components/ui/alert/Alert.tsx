@@ -1,11 +1,17 @@
 "use client";
-import React, { ReactNode, useEffect, useRef, useState, type JSX } from "react";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import React, { type JSX, ReactNode, useEffect, useRef, useState } from "react";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { cn } from "@lib/utils";
+import { useTranslation } from "@i18n/client";
 import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
 import { InfoIcon } from "@components/icons/InfoIcon";
 import { WarningIcon } from "@components/icons/WarningIcon";
-import { cn } from "@lib/utils";
-import { useTranslation } from "@i18n/client";
-
 export enum ErrorStatus {
   SUCCESS = "SUCCESS",
   WARNING = "WARNING",

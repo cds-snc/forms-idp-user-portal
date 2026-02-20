@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { AuthLevel } from "./server/route-protection";
-
 /**
  * Route patterns mapped to their required authentication levels
  */
