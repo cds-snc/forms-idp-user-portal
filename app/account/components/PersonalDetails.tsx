@@ -3,7 +3,7 @@ import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, toast, ToastContainer } from "@components/clientComponents/globals";
-import { updateAccountAction } from "../actions";
+import { updatePersonalDetailsAction } from "../actions";
 import { Label, TextInput } from "@components/clientComponents/forms";
 import { SubmitButtonAction } from "@components/clientComponents/globals/Buttons";
 import { validatePersonalDetails } from "@lib/validationSchemas";
@@ -37,7 +37,6 @@ export const PersonalDetails = ({
       lastname: (formData.get("lastname") as string) || "",
     };
 
-    // Validate form entries and map any errors to form state with translated messages
     const formEntriesData = Object.fromEntries(formData.entries());
     const validationResult = await validatePersonalDetails(formEntriesData);
     if (!validationResult.success) {
@@ -50,9 +49,7 @@ export const PersonalDetails = ({
       };
     }
 
-    // updating will only change the email and not the username but will trigger
-    // email validation on the newly added email
-    const result = await updateAccountAction({
+    const result = await updatePersonalDetailsAction({
       userId,
       firstName: formEntries.firstname,
       lastName: formEntries.lastname,
