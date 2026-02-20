@@ -57,7 +57,7 @@ export function LoginForm({ requestId }: Props) {
     }
 
     const response = await submitLoginForm({
-      loginName: username,
+      username: username,
       password: password,
       requestId,
     })
