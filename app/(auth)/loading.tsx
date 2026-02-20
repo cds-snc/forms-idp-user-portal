@@ -1,4 +1,4 @@
-import Loader from "@clientComponents/globals/Loader";
+import Loader from "@components/ui/loader/Loader";
 
 export default function Loading() {
   return <Loader />;

@@ -9,8 +9,8 @@ import { useActionState } from "react";
 
 import { CopyToClipboard } from "./CopyToClipboard";
 
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 
 type FormState = {
   error?: string;

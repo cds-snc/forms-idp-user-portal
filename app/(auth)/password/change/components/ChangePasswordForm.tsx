@@ -7,8 +7,8 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { useRouter } from "next/navigation";
 
 import { checkSessionAndSetPassword, sendPassword } from "@lib/server/password";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@components/ui/form";
+import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;

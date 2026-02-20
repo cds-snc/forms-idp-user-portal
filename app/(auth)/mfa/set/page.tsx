@@ -17,7 +17,7 @@ import { logMessage } from "@lib/logger";
  * Components
  *--------------------------------------------*/
 import { ChooseSecondFactorToSetup } from "@components/mfa/ChooseSecondFactorToSetup";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");

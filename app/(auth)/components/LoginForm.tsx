@@ -1,16 +1,16 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
 import { useTranslation } from "@i18n";
 import { useRouter } from "next/navigation";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { submitLoginForm } from "../actions";
 import { buildUrlWithRequestId } from "@lib/utils";
 import Link from "next/link";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
-import { ErrorSummary } from "@components/clientComponents/forms/ErrorSummary";
-import { ErrorMessage } from "@components/clientComponents/forms/ErrorMessage";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
 
 type Props = {
   requestId?: string;

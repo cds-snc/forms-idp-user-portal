@@ -3,7 +3,7 @@ import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { Metadata } from "next";
 import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { PasswordResetFlow } from "./components/PasswordResetFlow";
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 

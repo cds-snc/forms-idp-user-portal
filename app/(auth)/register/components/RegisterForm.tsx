@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "@i18n";
 import { useRegistration } from "../context/RegistrationContext";
 
-import { Label, TextInput } from "@clientComponents/forms";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import { Label, TextInput } from "@components/ui/form";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { validateAccount } from "@lib/validationSchemas";
-import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
+import { ErrorMessage } from "@components/ui/form/ErrorMessage";
 import Link from "next/link";
-import { Hint } from "@clientComponents/forms/Hint";
-import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { Hint } from "@components/ui/form/Hint";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 import { buildUrlWithRequestId } from "@lib/utils";
 
 type FormState = {

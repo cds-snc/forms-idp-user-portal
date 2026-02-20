@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { I18n, useTranslation } from "@i18n";
 
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { CodeEntry } from "@clientComponents/forms/CodeEntry";
+import { BackButton } from "@components/ui/button/BackButton";
+import { Alert, ErrorStatus } from "@components/ui/form";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { CodeEntry } from "@components/ui/form/CodeEntry";
 import Link from "next/link";
-import { Button } from "@clientComponents/globals";
-import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
+import { Button } from "@components/ui/button/Button";
+import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 import { handleOTPFormSubmit, FormState, updateSessionForOTPChallenge } from "./action";
 
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
