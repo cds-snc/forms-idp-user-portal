@@ -119,7 +119,7 @@ export const validateUsernameAndPassword = async (formEntries: {
   const formValidationSchema = v.pipe(
     v.object({
       ...usernameSchema(),
-      password: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredPassword")),
+      password: v.pipe(v.string(), v.nonEmpty("requiredPassword")),
     })
   );
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
