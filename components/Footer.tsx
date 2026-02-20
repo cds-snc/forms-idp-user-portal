@@ -1,6 +1,6 @@
 import { cn } from "@lib/utils";
 import { getImageUrl } from "@lib/imageUrl";
-import { Version } from "@serverComponents/globals/Version";
+import { Version } from "@components/Version";
 export const Footer = async ({ children }: { children?: React.ReactNode }) => {
   return (
     <footer

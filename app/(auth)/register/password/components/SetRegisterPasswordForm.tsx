@@ -6,7 +6,7 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { useRouter } from "next/navigation";
 
 import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
+import { Alert, ErrorStatus } from "@components/forms";
 import { useRegistration } from "../../context/RegistrationContext";
 import { registerUser } from "../../actions";
 

@@ -1,4 +1,4 @@
-import { Avatar } from "@serverComponents/UserAvatar/Avatar";
+import { Avatar } from "@components/UserAvatar/Avatar";
 import Link from "next/link";
 
 export type AvatarListItem = {

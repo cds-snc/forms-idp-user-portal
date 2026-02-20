@@ -23,8 +23,8 @@ import { logMessage } from "@lib/logger";
  * Components
  *--------------------------------------------*/
 import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
-import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { UserAvatar } from "@components/UserAvatar/UserAvatar";
+import { AuthPanel } from "@components/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
 import { buildUrlWithRequestId } from "@lib/utils";
 

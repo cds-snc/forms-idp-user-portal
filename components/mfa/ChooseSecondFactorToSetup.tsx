@@ -8,7 +8,7 @@ import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 import { MethodOptionCard } from "./MethodOptionCard";
 import { buildUrlWithRequestId } from "@lib/utils";
 
-import { Button } from "@clientComponents/globals/Buttons";
+import { Button } from "@components/Buttons/Button";
 
 type Props = {
   checkAfter: boolean;

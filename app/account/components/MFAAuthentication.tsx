@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { getImageUrl } from "@lib/imageUrl";
 
-import { ToastContainer } from "@clientComponents/globals";
-import { toast } from "@components/clientComponents/globals/Toast";
-import { Button } from "@components/clientComponents/globals";
+import { ToastContainer } from "@components/Toast";
+import { toast } from "@components/Toast";
+import { Button } from "@components/Buttons/Button";
 import { removeTOTPAction, removeU2FAction } from "../actions";
 
 export const MFAAuthentication = ({

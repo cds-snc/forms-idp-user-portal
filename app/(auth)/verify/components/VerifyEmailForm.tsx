@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
 import { I18n, useTranslation } from "@i18n";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
+import { SubmitButtonAction } from "@components/Buttons/SubmitButton";
 import Link from "next/link";
-import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-import { CodeEntry } from "@clientComponents/forms/CodeEntry";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { Alert as AlertNotification, Button } from "@clientComponents/globals";
+import { ErrorSummary } from "@components/forms/ErrorSummary";
+import { CodeEntry } from "@components/forms/CodeEntry";
+import { Alert, ErrorStatus } from "@components/forms";
+import * as AlertNotification from "@components/Alert/Alert";
+import { Button } from "@components/Buttons/Button";
 import { validateCode } from "@lib/validationSchemas";
 
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";

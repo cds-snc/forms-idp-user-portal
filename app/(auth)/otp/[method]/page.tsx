@@ -16,8 +16,8 @@ import { getSafeRedirectUrl } from "@lib/redirect-validator";
  * Components
  *--------------------------------------------*/
 import { LoginOTP } from "@components/mfa/otp/LoginOTP";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { UserAvatar } from "@components/UserAvatar";
+import { AuthPanel } from "@components/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
 
 export async function generateMetadata(): Promise<Metadata> {

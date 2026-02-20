@@ -18,8 +18,8 @@ import { logMessage } from "@lib/logger";
  * Components
  *--------------------------------------------*/
 import { LoginU2F } from "@components/mfa/u2f/LoginU2F";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { UserAvatar } from "@components/UserAvatar";
+import { AuthPanel } from "@components/AuthPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");

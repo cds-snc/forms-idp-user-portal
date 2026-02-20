@@ -3,12 +3,12 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { useActionState, useState } from "react";
 import { I18n, useTranslation } from "@i18n";
 import * as v from "valibot";
-import { Label, TextInput } from "@clientComponents/forms";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-import { Hint } from "@clientComponents/forms/Hint";
+import { Label, TextInput } from "@components/forms";
+import { SubmitButtonAction } from "@components/Buttons/SubmitButton";
+import { Hint } from "@components/forms/Hint";
 import { confirmPasswordSchema, passwordSchema, codeSchema } from "@lib/validationSchemas";
-import { ErrorSummary } from "@clientComponents/forms/ErrorSummary";
-import { ErrorMessage } from "@clientComponents/forms/ErrorMessage";
+import { ErrorSummary } from "@components/forms/ErrorSummary";
+import { ErrorMessage } from "@components/forms/ErrorMessage";
 import { PasswordComplexity } from "./PasswordComplexity";
 
 type FormState = {

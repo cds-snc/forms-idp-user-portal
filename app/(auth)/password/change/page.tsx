@@ -9,7 +9,7 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
 import { logMessage } from "@lib/logger";
 
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+import { AuthPanel } from "@components/AuthPanel";
 import { ChangePasswordForm } from "./components/ChangePasswordForm";
 
 export async function generateMetadata(): Promise<Metadata> {

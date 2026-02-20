@@ -13,9 +13,9 @@ import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service
 /*--------------------------------------------*
  * Components
  *--------------------------------------------*/
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
-import { SubmitButton } from "@clientComponents/globals/Buttons";
+import { BackButton } from "@components/Buttons/BackButton";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/forms";
+import { SubmitButton } from "@components/Buttons/SubmitButton";
 
 type PublicKeyCredentialJSON = {
   id: string;
