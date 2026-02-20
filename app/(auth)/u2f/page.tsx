@@ -29,9 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
 // Hardware key login page
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
-  const { redirect } = searchParams;
+  const { redirect: redirectParam } = searchParams;
   const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
-  const safeRedirect = getSafeRedirectUrl(redirect);
+  const safeRedirect = getSafeRedirectUrl(redirectParam);
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
