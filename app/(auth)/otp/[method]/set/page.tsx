@@ -140,7 +140,7 @@ export default async function Page(props: {
           <div className="py-4">
             <Alert.Warning>
               {mappedUiError ? (
-                <I18n i18nKey={mappedUiError.i18nKey} namespace={mappedUiError.namespace} />
+                <I18n i18nKey={mappedUiError.i18nKey} namespace="otp" />
               ) : (
                 <I18n i18nKey="title" namespace="error" />
               )}

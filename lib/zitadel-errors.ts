@@ -1,15 +1,50 @@
-import { ConnectError } from "@connectrpc/connect";
 import { ErrorDetailSchema } from "@zitadel/proto/zitadel/message_pb";
 
-export type ZitadelErrorContext = "otp.set";
+export type ZitadelErrorContext = string;
 
 export type ZitadelUiError = {
-  namespace: string;
   i18nKey: string;
   blockContinue?: boolean;
 };
 
-function getFirstErrorDetail(err: ConnectError) {
+type ZitadelParsedError = {
+  code?: number;
+  text: string;
+};
+
+type ZitadelUiErrorRule = {
+  match: (error: ZitadelParsedError) => boolean;
+  i18nKey: string;
+  blockContinue?: boolean;
+};
+
+type ZitadelErrorRulesByContext = Record<ZitadelErrorContext, ZitadelUiErrorRule[]>;
+
+const defaultRulesByContext: ZitadelErrorRulesByContext = {
+  "otp.set": [
+    {
+      match: (error) => error.code === 6 || error.text.includes("already set up"),
+      i18nKey: "set.alreadySetUp",
+      blockContinue: true,
+    },
+  ],
+};
+
+function isConnectErrorLike(err: unknown): err is {
+  code?: number;
+  message?: string;
+  rawMessage?: string;
+  findDetails: (schema: unknown) => unknown[];
+} {
+  if (!err || typeof err !== "object") {
+    return false;
+  }
+
+  const candidate = err as { findDetails?: unknown };
+  return typeof candidate.findDetails === "function";
+}
+
+function getFirstErrorDetail(err: { findDetails: (schema: unknown) => unknown[] }) {
   return err.findDetails(ErrorDetailSchema)[0];
 }
 
@@ -25,28 +60,40 @@ function getErrorDetailFields(detail: unknown): { id?: string; message?: string 
   };
 }
 
-function isOtpAlreadyReadyError(err: ConnectError): boolean {
+function parseZitadelError(err: {
+  code?: number;
+  message?: string;
+  rawMessage?: string;
+  findDetails: (schema: unknown) => unknown[];
+}): ZitadelParsedError {
   const detail = getErrorDetailFields(getFirstErrorDetail(err));
-  const normalizedMessage =
-    `${detail.message ?? ""} ${err.rawMessage ?? ""} ${err.message ?? ""}`.toLowerCase();
+  const text = `${detail.message ?? ""} ${err.rawMessage ?? ""} ${err.message ?? ""}`.toLowerCase();
 
-  return err.code === 6 || normalizedMessage.includes("already set up");
+  return {
+    code: err.code,
+    text,
+  };
 }
 
 export function getZitadelUiError(
   context: ZitadelErrorContext,
-  err: unknown
+  err: unknown,
+  rulesByContext: ZitadelErrorRulesByContext = defaultRulesByContext
 ): ZitadelUiError | undefined {
-  if (!(err instanceof ConnectError)) {
+  if (!isConnectErrorLike(err)) {
     return undefined;
   }
 
-  if (context === "otp.set" && isOtpAlreadyReadyError(err)) {
-    return {
-      namespace: "otp",
-      i18nKey: "set.alreadySetUp",
-      blockContinue: true,
-    };
+  const rules = rulesByContext[context] ?? [];
+  const parsedError = parseZitadelError(err);
+
+  for (const rule of rules) {
+    if (rule.match(parsedError)) {
+      return {
+        i18nKey: rule.i18nKey,
+        blockContinue: rule.blockContinue,
+      };
+    }
   }
 
   return undefined;
