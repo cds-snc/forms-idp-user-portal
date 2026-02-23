@@ -78,7 +78,7 @@ export default async function Page() {
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
+            showDropdown={false}
           ></UserAvatar>
         </div>
         <ChooseSecondFactor

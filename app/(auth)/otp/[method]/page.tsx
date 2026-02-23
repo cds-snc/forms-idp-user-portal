@@ -82,7 +82,7 @@ export default async function Page(props: {
             <UserAvatar
               loginName={loginName ?? sessionFactors.factors?.user?.loginName}
               displayName={sessionFactors.factors?.user?.displayName}
-              showDropdown
+              showDropdown={false}
             />
           )}
         </LoginOTP>
