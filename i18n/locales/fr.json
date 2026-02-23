@@ -207,6 +207,7 @@
       }
     },
     "complexity": {
+      "required": "Ce champ est obligatoire.",
       "requiredPassword": "Le mot de passe est obligatoire.",
       "requiredConfirmPassword": "La confirmation du mot de passe est obligatoire.",
       "minLength": "Au moins 8 caractères",
@@ -228,6 +229,11 @@
       "submit": "Continuer",
       "labels": {
         "confirmationCode": "Code de confirmation"
+      },
+      "errors": {
+        "missingRequiredInformation": "Information requise manquante",
+        "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié."
       }
     },
     "errors": {
@@ -235,6 +241,8 @@
       "couldNotSendResetLink": "Problème d'envoi du lien de réinitialisation du mot de passe",
       "couldNotCreateSessionForUser": "Problème de création de session pour cet utilisateur",
       "couldNotVerifyPassword": "Problème de vérification du mot de passe",
+      "couldNotResetPassword": "Le mot de passe n'a pas pu être réinitialisé",
+      "couldNotRegisterUser": "Le compte utilisateur n'a pas pu être créé",
       "failedToAuthenticate": "Échec de l'authentification. Vous avez essayé {failedAttempts} des {maxPasswordAttempts} tentatives de mot de passe. {lockoutMessage}",
       "failedToAuthenticateNoLimit": "Échec de l'authentification.",
       "accountLockedContactAdmin": " Contactez votre administrateur pour déverrouiller votre compte",
