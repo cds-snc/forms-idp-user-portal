@@ -21,14 +21,33 @@ type ZitadelUiErrorRule = {
 type ZitadelErrorRulesByContext = Record<ZitadelErrorContext, ZitadelUiErrorRule[]>;
 
 const defaultRulesByContext: ZitadelErrorRulesByContext = {
+  "otp.verify": [
+    {
+      match: (error) =>
+        error.code === 3 ||
+        error.text.includes("invalid code") ||
+        error.text.includes("invalid argument"),
+      i18nKey: "set.invalidCode",
+    },
+  ],
   "otp.set": [
     {
-      match: (error) => error.code === 3 || error.text.includes("invalid code"),
+      match: (error) =>
+        error.code === 3 ||
+        error.text.includes("invalid code") ||
+        error.text.includes("invalid argument") ||
+        error.text.includes("otpinvalidcode"),
       i18nKey: "set.invalidCode",
       blockContinue: true,
     },
     {
-      match: (error) => error.code === 6 || error.text.includes("already set up"),
+      match: (error) =>
+        error.code === 6 ||
+        error.text.includes("already set up") ||
+        error.text.includes("already configured") ||
+        error.text.includes("already ready") ||
+        error.text.includes("otpalreadyready") ||
+        error.text.includes("multifactor otp"),
       i18nKey: "set.alreadySetUp",
       blockContinue: true,
     },
@@ -69,17 +88,41 @@ function parseZitadelError(err: {
   code?: unknown;
   message?: unknown;
   rawMessage?: unknown;
+  metadata?: unknown;
 }): ZitadelParsedError {
-  const code = typeof err.code === "number" ? err.code : undefined;
+  const getHeader = (name: string): string | undefined => {
+    if (!err.metadata || typeof err.metadata !== "object") {
+      return undefined;
+    }
+
+    const metadata = err.metadata as { get?: (key: string) => string | null };
+    if (typeof metadata.get !== "function") {
+      return undefined;
+    }
+
+    return metadata.get(name) ?? undefined;
+  };
+
+  const headerStatus = getHeader("grpc-status");
+  const parsedHeaderStatus =
+    typeof headerStatus === "string" && /^\d+$/.test(headerStatus)
+      ? Number(headerStatus)
+      : undefined;
+
+  const code = typeof err.code === "number" ? err.code : parsedHeaderStatus;
   const message = typeof err.message === "string" ? err.message : "";
   const rawMessage = typeof err.rawMessage === "string" ? err.rawMessage : "";
+  const grpcMessage = getHeader("grpc-message") ?? "";
 
-  const detailMessage =
+  const detail = isConnectErrorLike(err) ? getFirstErrorDetail(err) : undefined;
+  const detailFields = getErrorDetailFields(detail);
+
+  const detailText =
     isConnectErrorLike(err) && getFirstErrorDetail(err)
-      ? (getErrorDetailFields(getFirstErrorDetail(err)).message ?? "")
+      ? `${detailFields.id ?? ""} ${detailFields.message ?? ""}`
       : "";
 
-  const text = `${detailMessage} ${rawMessage} ${message}`.toLowerCase();
+  const text = `${detailText} ${grpcMessage} ${rawMessage} ${message}`.toLowerCase();
 
   return {
     code,
