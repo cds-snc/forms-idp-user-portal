@@ -211,6 +211,7 @@
       }
     },
     "complexity": {
+      "required": "Ce champ est obligatoire.",
       "requiredPassword": "Le mot de passe est obligatoire.",
       "requiredConfirmPassword": "La confirmation du mot de passe est obligatoire.",
       "minLength": "Au moins 8 caractères",
@@ -232,6 +233,11 @@
       "submit": "Continuer",
       "labels": {
         "confirmationCode": "Code de confirmation"
+      },
+      "errors": {
+        "missingRequiredInformation": "Information requise manquante",
+        "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié."
       }
     },
     "errors": {
