@@ -21,6 +21,22 @@ export const ErrorSummary = ({
   const { t } = useTranslation(["common"]);
   const classes = cn("w-full", className);
 
+  const getSafeSummaryMessage = (fieldValue?: string): string => {
+    const trimmedValue = fieldValue?.trim();
+
+    if (!trimmedValue) {
+      return t("errorSummary.itemFallback");
+    }
+
+    const looksLikeTranslationKey = /^[a-z][a-zA-Z0-9]*(?:[._-][a-zA-Z0-9]+)+$/.test(trimmedValue);
+
+    if (looksLikeTranslationKey) {
+      return t("errorSummary.itemFallback");
+    }
+
+    return trimmedValue;
+  };
+
   return (
     <>
       {Array.isArray(validationErrors) && validationErrors.length > 0 && (
@@ -39,7 +55,7 @@ export const ErrorSummary = ({
                 <ErrorListItem
                   key={`error-${fieldKey}-${index}`}
                   errorKey={fieldKey}
-                  value={fieldValue}
+                  value={getSafeSummaryMessage(fieldValue)}
                 />
               );
             })}

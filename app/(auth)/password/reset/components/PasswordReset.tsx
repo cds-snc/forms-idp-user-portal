@@ -29,6 +29,12 @@ export function PasswordReset({
   const { t } = useTranslation(["password"]);
   const router = useRouter();
   const [error, setError] = useState("");
+  const [formResetKey, setFormResetKey] = useState(0);
+
+  const setErrorAndResetForm = (message: string) => {
+    setError(message);
+    setFormResetKey((previous) => previous + 1);
+  };
 
   const submitPasswordForm = async ({ password, code }: { password: string; code?: string }) => {
     const payload: { userId: string; password: string; code?: string } = {
@@ -37,17 +43,17 @@ export function PasswordReset({
       ...(code ? { code } : {}),
     };
 
-    const changeResponse = await changePassword(payload).catch(() =>
-      setError("rest.errors.couldNotSetPassword")
-    );
+    const changeResponse = await changePassword(payload).catch(() => {
+      setErrorAndResetForm(t("reset.errors.couldNotSetPassword"));
+    });
 
     if (changeResponse && "error" in changeResponse) {
-      setError(changeResponse.error);
+      setErrorAndResetForm(changeResponse.error);
       return;
     }
 
     if (!changeResponse) {
-      setError(t("reset.errors.couldNotSetPassword"));
+      setErrorAndResetForm(t("reset.errors.couldNotSetPassword"));
       return;
     }
 
@@ -57,10 +63,12 @@ export function PasswordReset({
       checks: create(ChecksSchema, {
         password: { password },
       }),
-    }).catch(() => setError(t("reset.errors.couldNotVerifyPassword")));
+    }).catch(() => {
+      setErrorAndResetForm(t("reset.errors.couldNotVerifyPassword"));
+    });
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
-      setError(passwordResponse.error);
+      setErrorAndResetForm(passwordResponse.error);
       return;
     }
 
@@ -77,6 +85,7 @@ export function PasswordReset({
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
       <PasswordValidationForm
+        key={formResetKey}
         passwordComplexitySettings={passwordComplexitySettings}
         successCallback={submitPasswordForm}
         requireConfirmationCode={true}

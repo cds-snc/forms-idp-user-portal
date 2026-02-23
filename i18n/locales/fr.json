@@ -8,7 +8,8 @@
     "title": "Formulaires GC",
     "required": "obligatoire",
     "errorSummary": {
-      "title": "Veuillez corriger les erreurs sur la page."
+      "title": "Veuillez corriger les erreurs sur la page.",
+      "itemFallback": "Veuillez vérifier ce champ."
     }
   },
   "error": {
@@ -56,10 +57,9 @@
       "noSession": "[FR]User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title":  "[FR]Account Details",
+      "title": "[FR]Account Details",
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
-      "email": "[FR]Email address",
       "change": "[FR]Change",
       "cancel": "[FR]Cancel",
       "updateAccount": "[FR]Update Account",
@@ -88,6 +88,7 @@
     "mfaAuthentication": {
       "title": "[FR]2 Factor Authentication",
       "securityKey": "[FR]Security key",
+      "noTwoFactor": "[FR]No two-factor authentication methods configured.",
       "authenticatorApp": "[FR]Authentication app",
       "addlMethods": "[FR]Add additional methods",
       "remove": "[FR]Remove",
@@ -109,6 +110,7 @@
     "signUpLink": "en créer un maintenant.",
     "userName": "Nom",
     "register": "Créer un compte maintenant",
+    "registerLinkText": "en créer un maintenant",
     "form": {
       "label": "Adresse courriel",
       "description": "Entrez votre propre adresse courriel individuelledu gouvernement.",
@@ -119,6 +121,7 @@
     },
     "validation": {
       "requiredUsername": "L'adresse courriel est obligatoire.",
+      "validGovEmail": "Veuillez entrer une adresse courriel individuelle valide du gouvernement du Canada.",
       "requiredPassword": "Le mot de passe est obligatoire.",
       "invalidCredentials": "Adresse courriel ou mot de passe invalide. Veuillez réessayer."
     }
@@ -136,6 +139,7 @@
   },
   "password": {
     "title": "Enter your password [FR]",
+    "forgot": "Mot de passe oublié?",
     "verify": {
       "title": "Mot de passe",
       "description": "Veuillez entrer votre mot de passe ou sélectionner un autre compte ci-dessous.",
@@ -207,6 +211,7 @@
       }
     },
     "complexity": {
+      "required": "Ce champ est obligatoire.",
       "requiredPassword": "Le mot de passe est obligatoire.",
       "requiredConfirmPassword": "La confirmation du mot de passe est obligatoire.",
       "minLength": "Au moins 8 caractères",
@@ -228,6 +233,11 @@
       "submit": "Continuer",
       "labels": {
         "confirmationCode": "Code de confirmation"
+      },
+      "errors": {
+        "missingRequiredInformation": "Information requise manquante",
+        "couldNotSetPassword": "Le mot de passe n'a pas pu être défini.",
+        "couldNotVerifyPassword": "Le mot de passe n'a pas pu être vérifié."
       }
     },
     "errors": {
@@ -235,6 +245,8 @@
       "couldNotSendResetLink": "Problème d'envoi du lien de réinitialisation du mot de passe",
       "couldNotCreateSessionForUser": "Problème de création de session pour cet utilisateur",
       "couldNotVerifyPassword": "Problème de vérification du mot de passe",
+      "couldNotResetPassword": "Problème de réinitialisation du mot de passe",
+      "couldNotRegisterUser": "Impossible d'enregistrer le compte utilisateur",
       "failedToAuthenticate": "Échec de l'authentification. Vous avez essayé {failedAttempts} des {maxPasswordAttempts} tentatives de mot de passe. {lockoutMessage}",
       "failedToAuthenticateNoLimit": "Échec de l'authentification.",
       "accountLockedContactAdmin": " Contactez votre administrateur pour déverrouiller votre compte",
@@ -250,6 +262,7 @@
     }
   },
   "mfa": {
+    "title": "Sélectionnez une méthode de vérification",
     "verify": {
       "title": "Vérifiez votre identité",
       "description": "Choisissez l'un des facteurs d'authentification suivants.",
@@ -282,18 +295,20 @@
       "title": "Code à usage unique",
       "authAppTitle": "Use authentication app [FR]",
       "otpDescription": "Entrez le code de votre application d'authentification",
-      "smsDescription": "Entrez le code reçu par message texte",
       "emailDescription": "Entrez le code reçu par courriel",
       "form": {
         "label": "Code de sécurité",
         "noCodeReceived": "Vous n'avez pas reçu de code?",
         "resendCode": "Renvoyer le code"
+      },
+      "validation": {
+        "required": "Ce champ ne peut pas être vide",
+        "maxLength": "Moins de 10 caractères"
       }
     },
     "set": {
       "title": "Configurer l'authentification à deux facteurs",
       "totpDescription": "Scannez le code QR avec votre application d'authentification.",
-      "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par message texte.",
       "emailDescription": "Entrez votre adresse courriel pour recevoir un code par courriel.",
       "totpRegisterDescription": "Scannez le code QR ou accédez au lien URL.",
       "submit": "Continuer",

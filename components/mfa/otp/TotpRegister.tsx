@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -110,6 +111,11 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
               <div className="py-4">
                 <Alert type={ErrorStatus.ERROR}>
                   {state.error === alreadySetUpMessage ? alreadySetUpMessage : genericErrorMessage}
+                  {getSafeErrorMessage({
+                    error: state.error,
+                    fallback: genericErrorMessage,
+                    allowedMessages: [genericErrorMessage],
+                  })}
                 </Alert>
               </div>
             )}

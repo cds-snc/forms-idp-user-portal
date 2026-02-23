@@ -8,7 +8,8 @@
     "title": "GC Forms",
     "required": "required",
     "errorSummary": {
-      "title": "Please correct the errors on the page."
+      "title": "Please correct the errors on the page.",
+      "itemFallback": "Please check this field."
     }
   },
   "error": {
@@ -56,7 +57,7 @@
       "noSession": "User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title":  "Personal Details",
+      "title": "Personal Details",
       "firstName": "First name",
       "lastName": "Last name",
       "change": "Change",
@@ -210,6 +211,7 @@
       }
     },
     "complexity": {
+      "required": "This field is required.",
       "requiredPassword": "Password is required.",
       "requiredConfirmPassword": "Confirm password is required.",
       "minLength": "At least 8 characters",
@@ -231,6 +233,11 @@
       "submit": "Continue",
       "labels": {
         "confirmationCode": "Confirmation code"
+      },
+      "errors": {
+        "missingRequiredInformation": "Missing required information",
+        "couldNotSetPassword": "Could not set password",
+        "couldNotVerifyPassword": "Could not verify password"
       }
     },
     "errors": {
@@ -287,7 +294,7 @@
     "verify": {
       "title": "One-time code",
       "authAppTitle": "Use authentication app",
-      "smsDescription": "Enter the code received by text message",
+      "otpDescription": "Enter the code from your authentication app",
       "emailDescription": "Enter the code received by email",
       "form": {
         "label": "Security code",
@@ -302,7 +309,6 @@
     "set": {
       "title": "Set up two-factor authentication",
       "totpDescription": "Scan the QR code with your authenticator app.",
-      "smsDescription": "Enter your phone number to receive a code via SMS text message.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL link.",
       "submit": "Continue",
