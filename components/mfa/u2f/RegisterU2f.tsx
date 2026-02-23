@@ -1,22 +1,27 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
-import { I18n } from "@i18n";
-import { useTranslation } from "@i18n/client";
-
-import { addU2F, verifyU2F } from "./actions";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
-import { buildUrlWithRequestId } from "@lib/utils";
+import { useRouter } from "next/navigation";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
- * Components
+ * Internal Aliases
  *--------------------------------------------*/
-import { BackButton } from "@clientComponents/globals/Buttons/BackButton";
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
-import { SubmitButton } from "@clientComponents/globals/Buttons";
+import { buildUrlWithRequestId } from "@lib/utils";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { I18n } from "@i18n";
+import { useTranslation } from "@i18n/client";
+import { BackButton } from "@components/ui/button/BackButton";
+import { SubmitButton } from "@components/ui/button/SubmitButton";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { addU2F, verifyU2F } from "./actions";
 type PublicKeyCredentialJSON = {
   id: string;
   rawId: string;

@@ -1,15 +1,19 @@
-import { I18n } from "@i18n";
-import { serverTranslation } from "@i18n/server";
-
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import * as Tooltip from "@radix-ui/react-tooltip";
 
-import { ToastContainer } from "@clientComponents/globals";
-import { Logout } from "@serverComponents/globals/Logout";
-import { GcdsHeader } from "@serverComponents/globals/GcdsHeader/GcdsHeader";
-import { Footer } from "@serverComponents/globals/Footer";
-import { FooterLinks } from "@clientComponents/globals/FooterLinks";
-import { SiteLogo } from "@serverComponents/icons";
-
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { I18n } from "@i18n";
+import { serverTranslation } from "@i18n/server";
+import { Logout } from "@components/auth/Logout";
+import { SiteLogo } from "@components/icons/SiteLogo";
+import { Footer } from "@components/layout/footer/Footer";
+import { FooterLinks } from "@components/layout/footer/FooterLinks";
+import { GcdsHeader } from "@components/layout/gcds-header/GcdsHeader";
+import { ToastContainer } from "@components/ui/toast/Toast";
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {

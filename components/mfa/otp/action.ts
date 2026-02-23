@@ -1,11 +1,18 @@
-import { completeFlowOrGetUrl } from "@lib/client";
-import { updateSession } from "@lib/server/session";
-import { sendOtpEmail } from "@lib/server/otp";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { validateCode } from "@lib/validationSchemas";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { completeFlowOrGetUrl } from "@lib/client";
+import { logMessage } from "@lib/logger";
+import { sendOtpEmail } from "@lib/server/otp";
+import { updateSession } from "@lib/server/session";
+import { validateCode } from "@lib/validationSchemas";
 export type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];
@@ -51,6 +58,15 @@ export async function updateSessionForOTPChallenge(
 ): Promise<{ error?: string; response?: SessionResponse }> {
   const { loginName, sessionId, organization, requestId, method } = params;
 
+  logMessage.debug({
+    message: "Requesting OTP challenge",
+    method,
+    hasLoginName: !!loginName,
+    hasSessionId: !!sessionId,
+    hasOrganization: !!organization,
+    hasRequestId: !!requestId,
+  });
+
   // For email OTP, use GC Notify to send the code
   if (method === "email") {
     const result = await sendOtpEmail({
@@ -61,10 +77,18 @@ export async function updateSessionForOTPChallenge(
     });
 
     if (result.error) {
+      logMessage.debug({
+        message: "OTP email challenge request failed",
+        error: result.error,
+      });
       return { error: result.error };
     }
 
     if (result.success) {
+      logMessage.debug({
+        message: "OTP email challenge request succeeded",
+        hasSessionId: !!result.sessionId,
+      });
       return {
         response: {
           sessionId: result.sessionId,
@@ -91,6 +115,10 @@ export async function updateSessionForOTPChallenge(
 
     return { response };
   } catch {
+    logMessage.debug({
+      message: "OTP challenge request failed during session update",
+      method,
+    });
     return { error: "Could not request OTP challenge" };
   }
 }
@@ -128,6 +156,11 @@ export async function handleOTPFormSubmit(
   }
 
   if (response.error) {
+    logMessage.debug({
+      message: "OTP code submission returned error",
+      method: submitParams.method,
+      error: response.error,
+    });
     return {
       validationErrors: undefined,
       error: response.error,
@@ -158,6 +191,11 @@ export async function handleOTPFormSubmit(
     );
 
     if ("error" in callbackResponse) {
+      logMessage.debug({
+        message: "OTP callback flow returned error",
+        method: submitParams.method,
+        error: callbackResponse.error,
+      });
       return {
         validationErrors: undefined,
         formData: { code },
@@ -166,6 +204,11 @@ export async function handleOTPFormSubmit(
     }
 
     if ("redirect" in callbackResponse) {
+      logMessage.debug({
+        message: "OTP callback flow returned redirect",
+        method: submitParams.method,
+        redirect: callbackResponse.redirect,
+      });
       return {
         validationErrors: undefined,
         error: undefined,
@@ -211,11 +254,20 @@ async function _submitOTPCode(
     });
 
     if (response && "error" in response && response.error) {
+      logMessage.debug({
+        message: "OTP code verification failed during session update",
+        method,
+        error: response.error,
+      });
       return { error: response.error };
     }
 
     return response;
   } catch {
+    logMessage.debug({
+      message: "OTP code verification failed with unexpected error",
+      method,
+    });
     return { error: "Could not verify OTP code" };
   }
 }

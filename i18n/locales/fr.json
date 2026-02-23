@@ -99,7 +99,7 @@
         "cannotRemoveSecurityKey": "[FR]Cannot remove security key. At least one strong authentication method must be configured to remove one.",
         "failedToRemoveSecurityKey": "[FR]Failed to remove security key",
         "failedToRemoveAuthApp": "[FR]Failed to remove authenticator"
-       }
+      }
     }
   },
   "start": {
@@ -110,10 +110,16 @@
     "register": "Créer un compte maintenant",
     "form": {
       "label": "Adresse courriel",
-      "description": "Entrez votre propre adresse courriel individuelledu gouvernement."
+      "description": "Entrez votre propre adresse courriel individuelledu gouvernement.",
+      "passwordLabel": "Mot de passe",
+      "forgotPasswordLink": "Mot de passe oublié?",
+      "signingIn": "Connexion en cours...",
+      "submit": "Se connecter"
     },
     "validation": {
-      "requiredUsername": "L'adresse courriel est obligatoire."
+      "requiredUsername": "L'adresse courriel est obligatoire.",
+      "requiredPassword": "Le mot de passe est obligatoire.",
+      "invalidCredentials": "Adresse courriel ou mot de passe invalide. Veuillez réessayer."
     }
   },
   "logout": {

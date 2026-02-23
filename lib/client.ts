@@ -1,6 +1,8 @@
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { completeAuthFlow } from "./server/auth-flow";
 import { buildUrlWithRequestId } from "./utils";
-
 type FinishFlowCommand =
   | {
       sessionId: string;

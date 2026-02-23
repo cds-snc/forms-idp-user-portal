@@ -23,8 +23,6 @@
       "@lib/*": ["lib/*"],
       "@api/*": ["app/api/*"],
       "@components/*": ["components/*"],
-      "@serverComponents/*": ["components/serverComponents/*"],
-      "@clientComponents/*": ["components/clientComponents/*"],
       "@i18n": ["i18n"],
       "@i18n/*": ["i18n/*"],
       "@public/*": ["public/*"],

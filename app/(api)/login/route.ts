@@ -1,13 +1,20 @@
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { validateAuthRequest, isRSCRequest } from "@lib/auth-utils";
-import {
-  handleOIDCFlowInitiation,
-  handleSAMLFlowInitiation,
-  FlowInitiationParams,
-} from "@lib/server/flow-initiation";
-import { loadSessionsWithCookies } from "@lib/server/session";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { isRSCRequest, validateAuthRequest } from "@lib/auth-utils";
+import {
+  FlowInitiationParams,
+  handleOIDCFlowInitiation,
+  handleSAMLFlowInitiation,
+} from "@lib/server/flow-initiation";
+import { loadSessionsWithCookies } from "@lib/server/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;

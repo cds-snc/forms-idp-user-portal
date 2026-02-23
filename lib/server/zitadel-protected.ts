@@ -1,17 +1,25 @@
 "use server";
 
-import "server-only";
-
-import { AuthenticatedAction, type SessionCredentials } from "@lib/actions/authenticated";
-import { validateUserCanAccessUserId, validateSessionCredentials } from "@lib/server/session-utils";
-import { logMessage } from "@lib/logger";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
-
-import * as z from "@lib/zitadel";
 import { create } from "@zitadel/client";
 import { UpdateHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { AuthenticatedAction, type SessionCredentials } from "@lib/actions/authenticated";
+import { logMessage } from "@lib/logger";
+import { validateSessionCredentials, validateUserCanAccessUserId } from "@lib/server/session-utils";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import * as z from "@lib/zitadel";
+
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import "server-only";
 /**
  * Protected wrapper for getUserByID.
  * Ensures user can only access their own profile data.

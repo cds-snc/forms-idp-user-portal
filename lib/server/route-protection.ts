@@ -1,9 +1,15 @@
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { timestampDate } from "@zitadel/client";
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import { loadMostRecentSession } from "@lib/session";
-import { logMessage } from "@lib/logger";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { logMessage } from "@lib/logger";
+import { loadMostRecentSession } from "@lib/session";
 /**
  * Authentication levels for route protection
  */

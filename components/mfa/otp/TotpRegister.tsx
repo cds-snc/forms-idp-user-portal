@@ -1,17 +1,25 @@
 "use client";
 
-import { verifyTOTP } from "@lib/server/verify";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { useActionState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
-import { useTranslation, I18n } from "@i18n";
-import { useActionState } from "react";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { verifyTOTP } from "@lib/server/verify";
+import { I18n, useTranslation } from "@i18n";
+import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
+import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { CopyToClipboard } from "./CopyToClipboard";
-
-import { Alert, ErrorStatus, Label, TextInput } from "@clientComponents/forms";
-import { SubmitButtonAction } from "@clientComponents/globals/Buttons/SubmitButton";
-
 type FormState = {
   error?: string;
 };

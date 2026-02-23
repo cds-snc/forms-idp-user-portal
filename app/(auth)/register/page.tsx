@@ -1,13 +1,23 @@
-import { RegisterForm } from "./components/RegisterForm";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
-import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import { SearchParams } from "@lib/utils";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { SearchParams } from "@lib/utils";
+import { getLegalAndSupportSettings, getPasswordComplexitySettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
+import { AuthPanel } from "@components/auth/AuthPanel";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { RegisterForm } from "./components/RegisterForm";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("register");
   return { title: t("title") };

@@ -1,118 +1,73 @@
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getLoginSettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { getSessionCredentials } from "@lib/cookies";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { isSessionValid, loadMostRecentSession } from "@lib/session";
+import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
-import { UserNameForm } from "../components/UserNameForm";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import Link from "next/dist/client/link";
-import { getMostRecentSessionCookie, getSessionCredentials } from "@lib/cookies";
-import { AvatarList, AvatarListItem } from "@serverComponents/globals/AvatarList";
-import { isSessionValid, loadMostRecentSession } from "@lib/session";
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import { SearchParams, buildUrlWithRequestId } from "@lib/utils";
+import { AuthPanel } from "@components/auth/AuthPanel";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { LoginForm } from "./components/LoginForm";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("start");
   return { title: t("title") };
 }
 
-export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+export default async function LoginPage(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
-  const searchParamsRequestId = searchParams.requestId;
+  const requestId = searchParams.requestId;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const organization = ZITADEL_ORGANIZATION;
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization,
-  });
-
-  let currentSession;
-  let cookieRequestId;
-  try {
-    currentSession = await getMostRecentSessionCookie();
-    cookieRequestId = currentSession.requestId;
-  } catch {
-    currentSession = null;
-  }
-
-  // Prefer search params requestId (from /login redirect), fallback to cookie requestId
-  const requestId = searchParamsRequestId || cookieRequestId;
-
-  const registerLink = buildUrlWithRequestId("/register", requestId);
-
-  let isAuthenticated = false;
-  let session;
-
+  // Check if user is already authenticated
   try {
     const { loginName } = await getSessionCredentials();
 
-    session = await loadMostRecentSession({
+    const session = await loadMostRecentSession({
       serviceUrl,
       sessionParams: { loginName, organization },
     });
 
-    isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
+    const isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
+
+    if (isAuthenticated) {
+      // User is already logged in, redirect to account page
+      redirect(buildUrlWithRequestId("/account", requestId));
+    }
   } catch (error) {
-    session = null;
+    // No valid session, continue to login form
   }
 
-  const accounts: AvatarListItem[] = [
-    {
-      loginName: currentSession?.loginName || "",
-      organization: organization || currentSession?.organization || "",
-      requestId: "",
-      suffix: "",
-      link: isAuthenticated
-        ? buildUrlWithRequestId("/account", requestId)
-        : buildUrlWithRequestId("/password", requestId),
-      showDropdown: false,
-    },
-    {
-      loginName: "Other account",
-      organization: "",
-      requestId: "outer-account-id",
-      suffix: "",
-      link: `/logout-session?returnUrl=/`,
-      showDropdown: false,
-    },
-  ];
-
-  if (currentSession) {
-    return (
-      <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
-        <AvatarList avatars={accounts} />
-
-        <p className="mt-10">
-          <I18n i18nKey="register" namespace="start" />
-          &nbsp;
-          <Link href={registerLink}>
-            <I18n i18nKey="registerLinkText" namespace="start" />
-          </Link>
-          .
-        </p>
-      </AuthPanel>
-    );
-  }
+  const registerLink = buildUrlWithRequestId("/register", requestId);
 
   return (
-    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
-      {!!loginSettings?.allowRegister && (
-        <div className="mb-6">
-          <I18n i18nKey="signUpText" namespace="start" />
-          &nbsp;
-          <Link href={registerLink}>
-            <I18n i18nKey="signUpLink" namespace="start" />
-          </Link>
-        </div>
-      )}
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="form.description" namespace="start">
+      <LoginForm requestId={requestId} organization={organization} />
 
-      <UserNameForm organization={organization} requestId={requestId} />
+      <p className="mt-10">
+        <I18n i18nKey="register" namespace="start" />
+        &nbsp;
+        <Link href={registerLink}>
+          <I18n i18nKey="registerLinkText" namespace="start" />
+        </Link>
+        .
+      </p>
     </AuthPanel>
   );
 }

@@ -1,13 +1,25 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { serverTranslation } from "@i18n/server";
-import { headers } from "next/headers";
-import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { serverTranslation } from "@i18n/server";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { getServiceUrlFromHeaders } from "../service-url";
 import {
   getActiveIdentityProviders,
@@ -20,9 +32,9 @@ import {
   SearchUsersCommand,
   startIdentityProviderFlow,
 } from "../zitadel";
+
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
-import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 export type SendLoginnameCommand = {
   loginName: string;

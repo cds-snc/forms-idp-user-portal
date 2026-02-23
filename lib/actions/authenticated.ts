@@ -1,6 +1,8 @@
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-
 /**
  * Session credentials extracted from HTTP-only cookies.
  * Available after user authentication.

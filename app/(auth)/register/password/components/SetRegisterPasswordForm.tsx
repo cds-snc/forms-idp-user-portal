@@ -1,15 +1,24 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
-import { useTranslation } from "@i18n";
-import { validateAccount } from "@lib/validationSchemas";
-import { registerUser } from "@lib/server/register";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
-import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
-import { Alert, ErrorStatus } from "@clientComponents/forms";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { validateAccount } from "@lib/validationSchemas";
+import { useTranslation } from "@i18n";
+import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@components/ui/form";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { registerUser } from "../../actions";
 import { useRegistration } from "../../context/RegistrationContext";
-
 export function SetRegisterPasswordForm({
   passwordComplexitySettings,
   email,

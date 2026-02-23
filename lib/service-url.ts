@@ -1,6 +1,8 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { NextRequest } from "next/server";
-
 /**
  * Extracts the service url and region from the headers if used in a multitenant context (host, x-zitadel-forward-host header)
  * or falls back to the ZITADEL_API_URL for a self hosting deployment

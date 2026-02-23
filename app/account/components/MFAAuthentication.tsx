@@ -1,14 +1,23 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { getImageUrl } from "@lib/imageUrl";
+import { Button } from "@components/ui/button/Button";
+import { ToastContainer } from "@components/ui/toast/Toast";
+import { toast } from "@components/ui/toast/Toast";
 
-import { ToastContainer } from "@clientComponents/globals";
-import { toast } from "@components/clientComponents/globals/Toast";
-import { Button } from "@components/clientComponents/globals";
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
 import { removeTOTPAction, removeU2FAction } from "../actions";
-
 export const MFAAuthentication = ({
   u2fList,
   userId,

@@ -1,16 +1,25 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
-import { serverTranslation } from "@i18n/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { getPasswordComplexitySettings } from "@lib/zitadel";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
+import { getPasswordComplexitySettings } from "@lib/zitadel";
+import { serverTranslation } from "@i18n/server";
+import { AuthPanel } from "@components/auth/AuthPanel";
 
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { ChangePasswordForm } from "./components/ChangePasswordForm";
-
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("password");
   return { title: t("change.title") };
@@ -39,7 +48,14 @@ export default async function Page() {
   });
 
   if (!loginName || !sessionId || !organization || !passwordComplexitySettings) {
-    throw new Error("No session.");
+    logMessage.debug({
+      message: "Password change page missing required session context",
+      hasLoginName: !!loginName,
+      hasSessionId: !!sessionId,
+      hasOrganization: !!organization,
+      hasPasswordComplexitySettings: !!passwordComplexitySettings,
+    });
+    redirect(authCheck.redirect || "/password");
   }
 
   return (

@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import pino from "pino";
-
 const pinoLogger = pino({
   level: process.env.NODE_ENV === "development" ? "debug" : "info",
   browser: {

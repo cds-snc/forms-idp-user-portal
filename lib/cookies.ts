@@ -1,10 +1,20 @@
 "use server";
 
-import { timestampDate, timestampFromMs } from "@zitadel/client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { cookies } from "next/headers";
-import { LANGUAGE_COOKIE_NAME } from "@i18n";
-import { logMessage } from "./logger";
+import { timestampDate, timestampFromMs } from "@zitadel/client";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { LANGUAGE_COOKIE_NAME } from "@i18n";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { logMessage } from "./logger";
 // TODO: improve this to handle overflow
 const MAX_COOKIE_SIZE = 2048;
 

@@ -1,17 +1,7 @@
-import { constructUrl } from "@lib/service-url";
-import { findValidSession } from "@lib/session";
-import { Cookie } from "@lib/cookies";
-import {
-  createCallback,
-  createResponse,
-  getActiveIdentityProviders,
-  getAuthRequest,
-  getOrgsByDomain,
-  getSAMLRequest,
-  startIdentityProviderFlow,
-} from "@lib/zitadel";
-import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
-import { idpTypeToSlug } from "@lib/idp";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { NextRequest, NextResponse } from "next/server";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import {
@@ -21,7 +11,21 @@ import {
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { NextRequest, NextResponse } from "next/server";
+
+import { Cookie } from "@lib/cookies";
+import { idpTypeToSlug } from "@lib/idp";
+import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
+import { constructUrl } from "@lib/service-url";
+import { findValidSession } from "@lib/session";
+import {
+  createCallback,
+  createResponse,
+  getActiveIdentityProviders,
+  getAuthRequest,
+  getOrgsByDomain,
+  getSAMLRequest,
+  startIdentityProviderFlow,
+} from "@lib/zitadel";
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;

@@ -1,25 +1,23 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getSessionCredentials } from "@lib/cookies";
+import { getSafeRedirectUrl } from "@lib/redirect-validator";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { getSerializableObject, SearchParams } from "@lib/utils";
+import { getLoginSettings } from "@lib/zitadel";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
-
-/*--------------------------------------------*
- * Methods
- *--------------------------------------------*/
-import { getLoginSettings } from "@lib/zitadel";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getSerializableObject, SearchParams } from "@lib/utils";
-import { getSafeRedirectUrl } from "@lib/redirect-validator";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
+import { UserAvatar } from "@components/account/user-avatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { LoginOTP } from "@components/mfa/otp/LoginOTP";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { getSessionCredentials } from "@lib/cookies";
-
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };

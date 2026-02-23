@@ -16,7 +16,7 @@ After a prompt to continue working ensure you still ask for user approval before
 ### Component Organization
 - **Server Components**: Default in `app/` and `components/serverComponents/` - use `serverTranslation()` for i18n
 - **Client Components**: Require `"use client"` directive, placed in `components/clientComponents/` - use `useTranslation()` hook
-- **Path aliases** (see [tsconfig.json](../tsconfig.json)): `@lib/*`, `@clientComponents/*`, `@serverComponents/*`, `@i18n`, `@root/*`
+- **Path aliases** (see [tsconfig.json](../tsconfig.json)): `@lib/*`, `@components/*`, `@i18n`, `@root/*`
 
 ### Authentication Flow
 1. `/login` route handles OIDC/SAML request initiation ([app/(api)/login/route.ts](../app/(api)/login/route.ts))
