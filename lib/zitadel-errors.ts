@@ -23,6 +23,11 @@ type ZitadelErrorRulesByContext = Record<ZitadelErrorContext, ZitadelUiErrorRule
 const defaultRulesByContext: ZitadelErrorRulesByContext = {
   "otp.set": [
     {
+      match: (error) => error.code === 3 || error.text.includes("invalid code"),
+      i18nKey: "set.invalidCode",
+      blockContinue: true,
+    },
+    {
       match: (error) => error.code === 6 || error.text.includes("already set up"),
       i18nKey: "set.alreadySetUp",
       blockContinue: true,
@@ -61,16 +66,23 @@ function getErrorDetailFields(detail: unknown): { id?: string; message?: string 
 }
 
 function parseZitadelError(err: {
-  code?: number;
-  message?: string;
-  rawMessage?: string;
-  findDetails: (schema: unknown) => unknown[];
+  code?: unknown;
+  message?: unknown;
+  rawMessage?: unknown;
 }): ZitadelParsedError {
-  const detail = getErrorDetailFields(getFirstErrorDetail(err));
-  const text = `${detail.message ?? ""} ${err.rawMessage ?? ""} ${err.message ?? ""}`.toLowerCase();
+  const code = typeof err.code === "number" ? err.code : undefined;
+  const message = typeof err.message === "string" ? err.message : "";
+  const rawMessage = typeof err.rawMessage === "string" ? err.rawMessage : "";
+
+  const detailMessage =
+    isConnectErrorLike(err) && getFirstErrorDetail(err)
+      ? (getErrorDetailFields(getFirstErrorDetail(err)).message ?? "")
+      : "";
+
+  const text = `${detailMessage} ${rawMessage} ${message}`.toLowerCase();
 
   return {
-    code: err.code,
+    code,
     text,
   };
 }
@@ -80,12 +92,18 @@ export function getZitadelUiError(
   err: unknown,
   rulesByContext: ZitadelErrorRulesByContext = defaultRulesByContext
 ): ZitadelUiError | undefined {
-  if (!isConnectErrorLike(err)) {
+  if (!err || typeof err !== "object") {
     return undefined;
   }
 
   const rules = rulesByContext[context] ?? [];
-  const parsedError = parseZitadelError(err);
+  const parsedError = parseZitadelError(
+    err as {
+      code?: unknown;
+      message?: unknown;
+      rawMessage?: unknown;
+    }
+  );
 
   for (const rule of rules) {
     if (rule.match(parsedError)) {

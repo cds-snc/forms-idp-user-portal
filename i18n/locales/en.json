@@ -313,6 +313,7 @@
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL link.",
       "submit": "Continue",
       "genericError": "We couldn’t set up your authenticator app right now. Please try again.",
+      "invalidCode": "The code is invalid. Please try again.",
       "alreadySetUp": "Your authenticator app is already configured on your account.",
       "labels": {
         "code": "Code"
