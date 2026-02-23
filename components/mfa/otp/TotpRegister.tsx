@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -36,6 +37,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
   const router = useRouter();
 
   const { t } = useTranslation("otp");
+  const genericErrorMessage = t("title", { ns: "error" });
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const code = formData?.get("code");
@@ -101,7 +103,13 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
 
             {state.error && (
               <div className="py-4">
-                <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>
+                <Alert type={ErrorStatus.ERROR}>
+                  {getSafeErrorMessage({
+                    error: state.error,
+                    fallback: genericErrorMessage,
+                    allowedMessages: [genericErrorMessage],
+                  })}
+                </Alert>
               </div>
             )}
 

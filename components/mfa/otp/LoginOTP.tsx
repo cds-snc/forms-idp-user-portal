@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -50,6 +51,7 @@ export function LoginOTP({
     t,
     i18n: { language },
   } = useTranslation("otp");
+  const genericErrorMessage = t("title", { ns: "error" });
   const [, setError] = useState<string>("");
   const [codeSent, setCodeSent] = useState<boolean>(false);
   const [codeLoading, setCodeLoading] = useState<boolean>(false);
@@ -126,7 +128,13 @@ export function LoginOTP({
     <>
       {state.error && (
         <div className="py-4" data-testid="error">
-          <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>
+          <Alert type={ErrorStatus.ERROR}>
+            {getSafeErrorMessage({
+              error: state.error,
+              fallback: genericErrorMessage,
+              allowedMessages: [genericErrorMessage],
+            })}
+          </Alert>
         </div>
       )}
 

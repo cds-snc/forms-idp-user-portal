@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -40,6 +41,7 @@ export function LoginForm({ requestId }: Props) {
   const { t } = useTranslation(["start", "common"]);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const genericLoginError = t("validation.invalidCredentials", { ns: "start" });
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     setLoading(true);
@@ -115,7 +117,11 @@ export function LoginForm({ requestId }: Props) {
       {state.error && (
         <div className="py-4" data-testid="error">
           <Alert type={ErrorStatus.ERROR} focussable={true} id="loginError">
-            {state.error}
+            {getSafeErrorMessage({
+              error: state.error,
+              fallback: genericLoginError,
+              allowedMessages: [genericLoginError],
+            })}
           </Alert>
         </div>
       )}
