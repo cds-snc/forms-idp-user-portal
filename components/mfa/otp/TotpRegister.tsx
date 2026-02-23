@@ -73,7 +73,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
       .catch((e) => {
         if (e instanceof Error) {
           return {
-            error: genericErrorMessage,
+            error: e.message,
           };
         } else {
           throw e;

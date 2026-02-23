@@ -71,10 +71,12 @@ export default async function Page(props: {
     error: Error | undefined,
     mappedUiError: ReturnType<typeof getZitadelUiError>;
   if (session && session.factors?.user?.id) {
+    const userId = session.factors.user.id;
+
     if (method === "time-based") {
       await registerTOTP({
         serviceUrl,
-        userId: session.factors.user.id,
+        userId,
       })
         .then((resp) => {
           if (resp) {
@@ -124,6 +126,8 @@ export default async function Page(props: {
     urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
   }
 
+  const shouldBlockContinue = Boolean(error) && (!mappedUiError || mappedUiError.blockContinue);
+
   return (
     <>
       <AuthPanel titleI18nKey="set.title" descriptionI18nKey="none" namespace="otp">
@@ -142,7 +146,7 @@ export default async function Page(props: {
               {mappedUiError ? (
                 <I18n i18nKey={mappedUiError.i18nKey} namespace="otp" />
               ) : (
-                <I18n i18nKey="title" namespace="error" />
+                <I18n i18nKey="set.genericError" namespace="otp" />
               )}
             </Alert.Warning>
           </div>
@@ -174,7 +178,7 @@ export default async function Page(props: {
             <BackButton />
             <span className="grow"></span>
 
-            {mappedUiError?.blockContinue ? (
+            {shouldBlockContinue ? (
               <Button disabled>
                 <I18n i18nKey="set.submit" namespace="otp" />
               </Button>
