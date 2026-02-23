@@ -12,11 +12,9 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { SearchParams } from "@lib/utils";
 import { getUserByID } from "@lib/zitadel";
-import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import * as Alert from "@components/ui/alert/Alert";
 
 /*--------------------------------------------*
  * Local Relative
@@ -80,7 +78,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             <UserAvatar
               loginName={loginName ?? sessionFactors.factors?.user?.loginName}
               displayName={sessionFactors.factors?.user?.displayName}
-              showDropdown
+              showDropdown={false}
             ></UserAvatar>
           ) : (
             user && (
@@ -92,14 +90,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
             )
           )}
         </div>
-
-        {!id && (
-          <div className="py-4">
-            <Alert.Danger>
-              <I18n i18nKey="unknownContext" namespace="error" />
-            </Alert.Danger>
-          </div>
-        )}
       </VerifyEmailForm>
     </AuthPanel>
   );

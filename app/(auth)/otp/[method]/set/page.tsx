@@ -18,13 +18,16 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { registerTOTP } from "@lib/zitadel";
+import { getZitadelUiError } from "@lib/zitadel-errors";
 import { I18n } from "@i18n";
+import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
 import { TotpRegister } from "@components/mfa/otp/TotpRegister";
 import * as Alert from "@components/ui/alert/Alert";
 import { BackButton } from "@components/ui/button/BackButton";
 import { Button } from "@components/ui/button/Button";
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<Record<string | number | symbol, string | undefined>>;
@@ -36,6 +39,7 @@ export default async function Page(props: {
   const checkAfter = searchParams.checkAfter === "true";
 
   const { method } = params;
+  const { t } = await serverTranslation("otp");
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -65,25 +69,32 @@ export default async function Page(props: {
     },
   });
 
-  let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
+  let totpResponse: RegisterTOTPResponse | undefined,
+    error: Error | undefined,
+    mappedUiError: ReturnType<typeof getZitadelUiError>;
   if (session && session.factors?.user?.id) {
+    const userId = session.factors.user.id;
+
     if (method === "time-based") {
-      await registerTOTP({
-        serviceUrl,
-        userId: session.factors.user.id,
-      })
-        .then((resp) => {
-          if (resp) {
-            totpResponse = resp;
-          }
-        })
-        .catch((err) => {
-          logMessage.debug({
-            message: "Failed to register TOTP during OTP setup",
-            error: err,
-          });
-          error = err;
+      try {
+        const resp = await registerTOTP({
+          serviceUrl,
+          userId,
         });
+
+        if (resp) {
+          totpResponse = resp;
+        }
+      } catch (err) {
+        logMessage.debug({
+          message: "Failed to register TOTP during OTP setup",
+          error: err,
+        });
+
+        mappedUiError = getZitadelUiError("otp.set", err);
+
+        error = err instanceof Error ? err : undefined;
+      }
     } else if (method === "email") {
       const addOtpEmailResponse = await protectedAddOTPEmail(session.factors.user.id);
       if ("error" in addOtpEmailResponse && addOtpEmailResponse.error) {
@@ -117,6 +128,8 @@ export default async function Page(props: {
     urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
   }
 
+  const shouldBlockContinue = Boolean(error) && (!mappedUiError || mappedUiError.blockContinue);
+
   return (
     <>
       <AuthPanel titleI18nKey="set.title" descriptionI18nKey="none" namespace="otp">
@@ -131,7 +144,9 @@ export default async function Page(props: {
 
         {error && (
           <div className="py-4">
-            <Alert.Warning>{error?.message}</Alert.Warning>
+            <Alert.Warning>
+              {mappedUiError ? t(mappedUiError.i18nKey) : t("set.genericError")}
+            </Alert.Warning>
           </div>
         )}
 
@@ -161,11 +176,17 @@ export default async function Page(props: {
             <BackButton />
             <span className="grow"></span>
 
-            <Link href={urlToContinue}>
-              <Button>
+            {shouldBlockContinue ? (
+              <Button disabled>
                 <I18n i18nKey="set.submit" namespace="otp" />
               </Button>
-            </Link>
+            ) : (
+              <Link href={urlToContinue}>
+                <Button>
+                  <I18n i18nKey="set.submit" namespace="otp" />
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </div>
