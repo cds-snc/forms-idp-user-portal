@@ -297,6 +297,7 @@
       "emailDescription": "Entrez votre adresse courriel pour recevoir un code par courriel.",
       "totpRegisterDescription": "Scannez le code QR ou accédez au lien URL.",
       "submit": "Continuer",
+      "alreadySetUp": "Votre application d'authentification est déjà configurée sur votre compte. Pour modifier votre méthode de vérification, supprimez la configuration existante de l'application d'authentification dans les paramètres de votre compte.",
       "labels": {
         "code": "Code"
       },

@@ -36,6 +36,8 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
   const router = useRouter();
 
   const { t } = useTranslation("otp");
+  const genericErrorMessage = t("title", { ns: "error" });
+  const alreadySetUpMessage = t("set.alreadySetUp");
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const code = formData?.get("code");
@@ -70,8 +72,13 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
       })
       .catch((e) => {
         if (e instanceof Error) {
+          // Detect "already set up" error from Zitadel and map to user-friendly message
+          let errorMessage = e.message;
+          if (e.message?.includes("already set up") || e.message?.includes("Multifactor OTP")) {
+            errorMessage = alreadySetUpMessage;
+          }
           return {
-            error: e.message,
+            error: errorMessage,
           };
         } else {
           throw e;
@@ -101,7 +108,9 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
 
             {state.error && (
               <div className="py-4">
-                <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>
+                <Alert type={ErrorStatus.ERROR}>
+                  {state.error === alreadySetUpMessage ? alreadySetUpMessage : genericErrorMessage}
+                </Alert>
               </div>
             )}
 
