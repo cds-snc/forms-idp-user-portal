@@ -8,11 +8,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 
-import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 import { verifyTOTP } from "@lib/server/verify";
+import { getZitadelUiError } from "@lib/zitadel-errors";
 import { I18n, useTranslation } from "@i18n";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
@@ -36,15 +37,16 @@ type Props = {
 export function TotpRegister({ uri, loginName, requestId, organization, checkAfter }: Props) {
   const router = useRouter();
 
-  const { t } = useTranslation("otp");
-  const genericErrorMessage = t("title", { ns: "error" });
+  const { t } = useTranslation(["otp", "error"]);
+  const genericErrorMessage = t("error:title");
+  const invalidCodeMessage = t("set.invalidCode");
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const code = formData?.get("code");
 
     if (typeof code !== "string") {
       return {
-        error: "Invalid Field",
+        error: genericErrorMessage,
       };
     }
 
@@ -71,9 +73,16 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
         return previousState;
       })
       .catch((e) => {
+        const mappedUiError = getZitadelUiError("otp.set", e);
+        if (mappedUiError) {
+          return {
+            error: t(mappedUiError.i18nKey),
+          };
+        }
+
         if (e instanceof Error) {
           return {
-            error: e.message,
+            error: genericErrorMessage,
           };
         } else {
           throw e;
@@ -94,24 +103,24 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
             <CopyToClipboard value={uri}></CopyToClipboard>
           </div>
           <form className="w-full" action={formAction}>
-            <div className="gcds-input-wrapper">
-              <Label id={"label-code"} htmlFor={"code"} className="required" required>
-                {t("set.labels.code")}
-              </Label>
-              <TextInput type={"text"} id={"code"} required defaultValue={""} />
-            </div>
-
             {state.error && (
               <div className="py-4">
                 <Alert type={ErrorStatus.ERROR}>
                   {getSafeErrorMessage({
                     error: state.error,
                     fallback: genericErrorMessage,
-                    allowedMessages: [genericErrorMessage],
+                    allowedMessages: [genericErrorMessage, invalidCodeMessage],
                   })}
                 </Alert>
               </div>
             )}
+
+            <div className="gcds-input-wrapper">
+              <Label id={"label-code"} htmlFor={"code"} className="required" required>
+                {t("set.labels.code")}
+              </Label>
+              <TextInput type={"text"} id={"code"} required defaultValue={""} />
+            </div>
 
             <SubmitButtonAction>
               <I18n i18nKey="set.submit" namespace="otp" />
