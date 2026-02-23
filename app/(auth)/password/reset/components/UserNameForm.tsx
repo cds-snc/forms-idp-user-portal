@@ -5,6 +5,7 @@
  *--------------------------------------------*/
 import { useActionState } from "react";
 
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -34,7 +35,8 @@ type FormState = {
 };
 
 export const UserNameForm = ({ organization, requestId, onSuccess }: Props) => {
-  const { t } = useTranslation(["start", "common"]);
+  const { t } = useTranslation(["start", "common", "error"]);
+  const genericErrorMessage = t("title", { ns: "error" });
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const username = (formData?.get("username") as string) || "";
@@ -99,8 +101,21 @@ export const UserNameForm = ({ organization, requestId, onSuccess }: Props) => {
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
 
       {state.error && (
-        <Alert type={ErrorStatus.ERROR} heading={state.error} focussable={true} id="cognitoErrors">
-          {state.error}
+        <Alert
+          type={ErrorStatus.ERROR}
+          heading={getSafeErrorMessage({
+            error: state.error,
+            fallback: genericErrorMessage,
+            allowedMessages: [genericErrorMessage],
+          })}
+          focussable={true}
+          id="cognitoErrors"
+        >
+          {getSafeErrorMessage({
+            error: state.error,
+            fallback: genericErrorMessage,
+            allowedMessages: [genericErrorMessage],
+          })}
         </Alert>
       )}
 
