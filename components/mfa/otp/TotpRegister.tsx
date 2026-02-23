@@ -73,7 +73,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
         return previousState;
       })
       .catch((e) => {
-        const mappedUiError = getZitadelUiError("otp.set", e);
+        const mappedUiError = getZitadelUiError("otp.verify", e);
         if (mappedUiError) {
           return {
             error: t(mappedUiError.i18nKey),
