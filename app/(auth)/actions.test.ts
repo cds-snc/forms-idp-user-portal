@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -129,6 +130,73 @@ describe("submitLoginForm", () => {
     expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
   });
 
+  it("returns generic error when login settings cannot be loaded", async () => {
+    vi.mocked(getLoginSettings).mockResolvedValue(undefined as never);
+
+    const response = await submitLoginForm({
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+    });
+
+    expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
+    expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  it("returns generic error when session has no user id", async () => {
+    vi.mocked(createSessionAndUpdateCookie).mockResolvedValue({} as never);
+
+    const response = await submitLoginForm({
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+    });
+
+    expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
+  });
+
+  it("returns generic error when authenticated user cannot be loaded", async () => {
+    vi.mocked(getUserByID).mockResolvedValue({ user: undefined } as never);
+
+    const response = await submitLoginForm({
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+    });
+
+    expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
+  });
+
+  it("returns generic error when user is in INITIAL state", async () => {
+    vi.mocked(getUserByID).mockResolvedValue({
+      user: {
+        state: UserState.INITIAL,
+        type: {
+          case: "human",
+          value: {},
+        },
+      },
+    } as never);
+
+    const response = await submitLoginForm({
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+    });
+
+    expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
+  });
+
+  it("returns email verification redirect when required", async () => {
+    vi.mocked(checkEmailVerification).mockReturnValue({
+      redirect: "/verify?requestId=req-123",
+    });
+
+    const response = await submitLoginForm({
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+      requestId: "req-123",
+    });
+
+    expect(response).toEqual({ redirect: "/verify?requestId=req-123" });
+  });
+
   it("returns generic error when no auth methods are available", async () => {
     vi.mocked(listAuthenticationMethodTypes).mockResolvedValue({ authMethodTypes: [] } as never);
 
@@ -152,13 +220,35 @@ describe("submitLoginForm", () => {
     expect(response).toEqual({ redirect: "/mfa?requestId=req-123" });
   });
 
-  it("redirects to account when login is successful", async () => {
+  it("returns generic error when MFA factor check fails", async () => {
+    vi.mocked(checkMFAFactors).mockResolvedValue({ error: "failed-precondition" } as never);
+
     const response = await submitLoginForm({
       username: "person@canada.ca",
       password: "P@ssw0rd",
       requestId: "req-123",
     });
 
+    expect(response).toEqual({ error: "translated:validation.invalidCredentials" });
+  });
+
+  it("redirects to account when login is successful", async () => {
+    const command = {
+      username: "person@canada.ca",
+      password: "P@ssw0rd",
+      requestId: "req-123",
+    };
+
+    const response = await submitLoginForm(command);
+
     expect(response).toEqual({ redirect: "/account?requestId=req-123" });
+    expect(create).toHaveBeenCalledWith(ChecksSchema, {
+      user: { search: { case: "loginName", value: command.username } },
+      password: { password: command.password },
+    });
+    expect(createSessionAndUpdateCookie).toHaveBeenCalledWith({
+      checks: { checks: "value" },
+      requestId: command.requestId,
+    });
   });
 });
