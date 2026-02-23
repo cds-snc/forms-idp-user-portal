@@ -210,6 +210,7 @@
       }
     },
     "complexity": {
+      "required": "This field is required.",
       "requiredPassword": "Password is required.",
       "requiredConfirmPassword": "Confirm password is required.",
       "minLength": "At least 8 characters",
@@ -231,6 +232,11 @@
       "submit": "Continue",
       "labels": {
         "confirmationCode": "Confirmation code"
+      },
+      "errors": {
+        "missingRequiredInformation": "Missing required information",
+        "couldNotSetPassword": "Could not set password",
+        "couldNotVerifyPassword": "Could not verify password"
       }
     },
     "errors": {

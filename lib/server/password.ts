@@ -56,6 +56,27 @@ function hasFailedAttempts(error: unknown): error is { failedAttempts: bigint } 
   );
 }
 
+function didPasswordChangeSucceed(result: unknown): boolean {
+  if (!result || typeof result !== "object") {
+    return false;
+  }
+
+  if ("error" in result) {
+    return false;
+  }
+
+  if (!("details" in result)) {
+    return false;
+  }
+
+  const details = result.details;
+  if (!details || typeof details !== "object") {
+    return false;
+  }
+
+  return "changeDate" in details;
+}
+
 /**
  * Helper function to handle authentication failure errors with lockout settings
  */
@@ -145,8 +166,8 @@ export async function sendPassword(
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
-  }).catch((error) => {
-    console.warn("Ignored error:", error);
+  }).catch(() => {
+    return undefined;
   });
 
   let session;
@@ -195,9 +216,6 @@ export async function sendPassword(
       // this is a fake error message to hide that the user does not even exist
       return { error: "Could not verify password" };
     }
-
-    // this is a fake error message to hide that the user does not even exist
-    return { error: t("errors.couldNotVerifyPassword") };
   } else {
     loginSettings = await getLoginSettings({
       serviceUrl,
@@ -388,14 +406,20 @@ export async function changePassword(command: { code?: string; userId: string; p
   const { t } = await serverTranslation("password");
   const normalizedCode = command.code?.replace(/\s+/g, "").trim();
 
+  if (!command.userId?.trim()) {
+    return { error: t("errors.couldNotResetPassword") };
+  }
+
   // check for init state
-  const { user } = await getUserByID({
+  const userResponse = await getUserByID({
     serviceUrl,
     userId: command.userId,
-  });
+  }).catch(() => undefined);
+
+  const user = userResponse?.user;
 
   if (!user || user.userId !== command.userId) {
-    return { error: t("errors.couldNotSendResetLink") };
+    return { error: t("errors.couldNotResetPassword") };
   }
   const userId = user.userId;
 
@@ -434,7 +458,7 @@ export async function changePassword(command: { code?: string; userId: string; p
     });
 
     // Send password changed email notification
-    if (!("error" in result)) {
+    if (didPasswordChangeSucceed(result)) {
       await sendPasswordChangedEmail({ userId }).catch((error) => {
         logMessage.debug({
           error: error instanceof Error ? error.message : error,
@@ -537,13 +561,15 @@ export async function checkSessionAndSetPassword({
     return setPassword({ serviceUrl, payload })
       .then(async (result) => {
         // Send password changed email notification
-        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-          logMessage.debug({
-            error: error instanceof Error ? error.message : error,
-            message: "Failed to send password changed email",
+        if (didPasswordChangeSucceed(result)) {
+          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+            logMessage.debug({
+              error: error instanceof Error ? error.message : error,
+              message: "Failed to send password changed email",
+            });
+            // Don't fail the password change if email fails
           });
-          // Don't fail the password change if email fails
-        });
+        }
         return result;
       })
       .catch((error) => {
@@ -575,13 +601,15 @@ export async function checkSessionAndSetPassword({
       )
       .then(async (result) => {
         // Send password changed email notification
-        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-          logMessage.debug({
-            error: error instanceof Error ? error.message : error,
-            message: "Failed to send password changed email",
+        if (didPasswordChangeSucceed(result)) {
+          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+            logMessage.debug({
+              error: error instanceof Error ? error.message : error,
+              message: "Failed to send password changed email",
+            });
+            // Don't fail the password change if email fails
           });
-          // Don't fail the password change if email fails
-        });
+        }
         return result;
       })
       .catch((error: ConnectError) => {
