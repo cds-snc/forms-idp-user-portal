@@ -85,6 +85,52 @@ describe("LoginForm", () => {
     });
   });
 
+  it("shows generic error when submitLoginForm rejects", async () => {
+    vi.mocked(submitLoginForm).mockRejectedValue(new Error("network error"));
+
+    render(<LoginForm requestId="abc123" />);
+
+    await userEvent.type(screen.getByLabelText(/form\.label/i), "person@canada.ca");
+    await userEvent.type(screen.getByLabelText(/form\.passwordLabel/i), "P@ssw0rd");
+    await userEvent.click(screen.getByRole("button", { name: "form.submit" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("validation.invalidCredentials")).toBeInTheDocument();
+    });
+
+    expect(submitLoginForm).toHaveBeenCalled();
+  });
+
+  it("shows loading state while submitting", async () => {
+    let resolveLogin!: (value: { redirect: string }) => void;
+    vi.mocked(submitLoginForm).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveLogin = resolve;
+        })
+    );
+
+    render(<LoginForm requestId="abc123" />);
+
+    const button = screen.getByRole("button", { name: "form.submit" });
+    expect(button).toHaveAttribute("aria-disabled", "false");
+
+    await userEvent.type(screen.getByLabelText(/form\.label/i), "person@canada.ca");
+    await userEvent.type(screen.getByLabelText(/form\.passwordLabel/i), "P@ssw0rd");
+    await userEvent.click(button);
+
+    // useFormStatus drives aria-disabled and the spinner during the transition
+    await waitFor(() => {
+      expect(button).toHaveAttribute("aria-disabled", "true");
+    });
+
+    resolveLogin({ redirect: "/account?requestId=abc123" });
+
+    await waitFor(() => {
+      expect(button).toHaveAttribute("aria-disabled", "false");
+    });
+  });
+
   it("redirects when login succeeds", async () => {
     vi.mocked(submitLoginForm).mockResolvedValue({ redirect: "/account?requestId=abc123" });
 
