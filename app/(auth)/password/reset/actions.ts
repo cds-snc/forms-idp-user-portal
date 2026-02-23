@@ -13,7 +13,6 @@ import { getPasswordResetTemplate } from "@lib/emailTemplates";
 import { logMessage } from "@lib/logger";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
-import { serverTranslation } from "@i18n/server";
 type SendResetCodeCommand = {
   loginName: string;
   organization?: string;
@@ -25,7 +24,6 @@ export const submitUserNameForm = async (
 ): Promise<{ error: string } | { userId: string; loginName: string }> => {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const { t } = await serverTranslation("password");
 
   const users = await listUsers({
     serviceUrl,
@@ -33,11 +31,13 @@ export const submitUserNameForm = async (
     organizationId: command.organization,
   });
 
+  const nonEnumeratingResponse = {
+    userId: "",
+    loginName: command.loginName,
+  };
+
   if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
-    return {
-      userId: "",
-      loginName: command.loginName,
-    };
+    return nonEnumeratingResponse;
   }
 
   const user = users.result[0];
@@ -49,7 +49,8 @@ export const submitUserNameForm = async (
   }
 
   if (!email) {
-    return { error: t("errors.couldNotSendResetLink") };
+    logMessage.info("Password reset requested for user without email address");
+    return nonEnumeratingResponse;
   }
 
   const codeResponse = await passwordResetWithReturn({
@@ -57,15 +58,12 @@ export const submitUserNameForm = async (
     userId,
   }).catch((_error) => {
     logMessage.error("Failed to get password reset code");
-    return { error: t("errors.couldNotSendResetLink") };
+    return undefined;
   });
 
-  if ("error" in codeResponse) {
-    return codeResponse;
-  }
-
-  if (!codeResponse.verificationCode) {
-    return { error: t("errors.couldNotSendResetLink") };
+  if (!codeResponse || !("verificationCode" in codeResponse) || !codeResponse.verificationCode) {
+    logMessage.error("Password reset code missing from response");
+    return nonEnumeratingResponse;
   }
 
   const apiKey = process.env.NOTIFY_API_KEY;
@@ -74,7 +72,7 @@ export const submitUserNameForm = async (
 
   if (!apiKey || !templateId) {
     logMessage.error("Missing NOTIFY_API_KEY or TEMPLATE_ID environment variables");
-    return { error: t("errors.couldNotSendResetLink") };
+    return nonEnumeratingResponse;
   }
 
   try {
@@ -82,7 +80,7 @@ export const submitUserNameForm = async (
     await gcNotify.sendEmail(email, templateId, getPasswordResetTemplate(resetCode));
   } catch (_error) {
     logMessage.error("Failed to send password reset email via GC Notify");
-    return { error: t("errors.couldNotSendResetLink") };
+    return nonEnumeratingResponse;
   }
 
   return { userId, loginName: command.loginName };
