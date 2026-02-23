@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 import { verifyTOTP } from "@lib/server/verify";
 import { I18n, useTranslation } from "@i18n";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
@@ -43,7 +44,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
 
     if (typeof code !== "string") {
       return {
-        error: "Invalid Field",
+        error: genericErrorMessage,
       };
     }
 
@@ -102,7 +103,13 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
 
             {state.error && (
               <div className="py-4">
-                <Alert type={ErrorStatus.ERROR}>{state.error}</Alert>
+                <Alert type={ErrorStatus.ERROR}>
+                  {getSafeErrorMessage({
+                    error: state.error,
+                    fallback: genericErrorMessage,
+                    allowedMessages: [genericErrorMessage],
+                  })}
+                </Alert>
               </div>
             )}
 
