@@ -57,7 +57,7 @@
       "noSession": "[FR]User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title":  "[FR]Account Details",
+      "title": "[FR]Account Details",
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "change": "[FR]Change",

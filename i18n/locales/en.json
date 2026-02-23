@@ -57,7 +57,7 @@
       "noSession": "User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title":  "Personal Details",
+      "title": "Personal Details",
       "firstName": "First name",
       "lastName": "Last name",
       "change": "Change",
