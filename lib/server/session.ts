@@ -203,6 +203,8 @@ export async function updateSession(options: UpdateSessionCommand) {
         ? await getSessionCookieByLoginName({ loginName, organization })
         : await getMostRecentSessionCookie();
 
+    console.error("Recent session found for update", recentSession);
+
     if (!recentSession) {
       return {
         error: "Could not find session",
@@ -223,10 +225,14 @@ export async function updateSession(options: UpdateSessionCommand) {
       challenges.webAuthN.domain = hostname;
     }
 
+    console.error("Updating session with options", { serviceUrl, organization });
+
     const loginSettings = await getLoginSettings({
       serviceUrl,
       organization,
     });
+
+    console.error({ loginSettings });
 
     let lifetime = checks?.webAuthN
       ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -241,7 +247,10 @@ export async function updateSession(options: UpdateSessionCommand) {
       } as Duration;
     }
 
+    console.error({ lifetime });
+
     let session;
+
     try {
       session = await setSessionAndUpdateCookie({
         recentCookie: recentSession,
@@ -250,7 +259,9 @@ export async function updateSession(options: UpdateSessionCommand) {
         requestId,
         lifetime,
       });
+      console.error({ session });
     } catch (error) {
+      console.error({ error });
       const serializedError = serializeActionError(error, "Could not update session");
 
       logMessage.debug({
@@ -269,6 +280,8 @@ export async function updateSession(options: UpdateSessionCommand) {
       return { error: "Could not update session" };
     }
 
+    console.error("HUzzah");
+
     // if password, check if user has MFA methods
     let authMethods;
     if (checks && checks.password && session.factors?.user?.id) {
@@ -280,6 +293,8 @@ export async function updateSession(options: UpdateSessionCommand) {
         authMethods = response.authMethodTypes;
       }
     }
+
+    console.error({ authMethods });
 
     return {
       sessionId: session.id,
@@ -301,6 +316,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       error: serializedError,
     };
   }
+  console.error("Somehow ended up here");
 }
 
 type ClearSessionOptions = {
