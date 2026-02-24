@@ -57,7 +57,7 @@
       "noSession": "[FR]User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title":  "[FR]Personal Details",
+      "title": "[FR]Personal Details",
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "change": "[FR]Change",
@@ -261,7 +261,6 @@
       "title": "Ajouter une méthode de vérification",
       "description": "Lors de la connexion, on vous demandera de confirmer votre identité d'une autre façon, comme couche de sécurité supplémentaire. Vous pourrez ajouter d'autres méthodes plus tard dans les paramètres de votre compte.",
       "skip": "Ignorer",
-      "addAnother": "Ajouter une autre méthode",
       "securityKey": {
         "title": "Clé de sécurité",
         "recommended": "Recommandé",

@@ -3,7 +3,6 @@
  *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { serverTranslation } from "i18n/server";
@@ -17,7 +16,6 @@ import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protectio
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
-import { I18n } from "@i18n";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
 import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
@@ -88,14 +86,6 @@ export default async function Page() {
           requestId={requestId}
           organization={organization}
         />
-        <div className="mt-6">
-          <Link
-            href={buildUrlWithRequestId("/mfa/set", requestId)}
-            className="text-gcds-blue-muted underline hover:text-gcds-blue-vivid"
-          >
-            <I18n i18nKey="set.addAnother" namespace="mfa" />
-          </Link>
-        </div>
       </AuthPanel>
     </>
   );
