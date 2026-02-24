@@ -18,6 +18,7 @@ LABEL maintainer="-"
 
 ENV NODE_ENV=production
 ENV EMAIL_VERIFICATION=true
+ENV XDG_CACHE_HOME=/tmp/.cache
 
 WORKDIR /src
 
@@ -25,8 +26,11 @@ COPY --from=base /src/public ./public
 COPY --from=base /src/package.json ./package.json
 COPY --from=base /src/.next/standalone ./
 COPY --from=base /src/.next/static ./.next/static
+COPY --from=base /src/.next/cache ./.next/cache
+
+RUN mkdir -p /src/.next/cache /tmp/.cache && chmod -R 777 /src/.next /tmp/.cache
 
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "mkdir -p /src/.next/cache /tmp/.cache && node server.js"]
