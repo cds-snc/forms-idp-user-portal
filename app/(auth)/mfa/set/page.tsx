@@ -4,6 +4,7 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
  * Internal Aliases
@@ -27,20 +28,20 @@ export default async function Page() {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
 
-  const authCheck = await checkAuthenticationLevel(
+  const passwordAuthCheck = await checkAuthenticationLevel(
     serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
   );
 
-  if (!authCheck.satisfied) {
+  if (!passwordAuthCheck.satisfied) {
     logMessage.debug({
       message: "MFA set page auth check failed",
-      reason: authCheck.reason,
-      redirect: authCheck.redirect,
+      reason: passwordAuthCheck.reason,
+      redirect: passwordAuthCheck.redirect,
     });
-    redirect(authCheck.redirect || "/password");
+    redirect(passwordAuthCheck.redirect || "/password");
   }
 
   const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
@@ -52,6 +53,21 @@ export default async function Page() {
       hasOrganization: !!organization,
     });
     redirect("/");
+  }
+
+  const hasConfiguredStrongMFA = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F].some(
+    (method) => sessionFactors.authMethods?.includes(method)
+  );
+
+  const fullyAuthenticatedCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.ANY_MFA_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!fullyAuthenticatedCheck.satisfied && hasConfiguredStrongMFA) {
+    redirect(fullyAuthenticatedCheck.redirect || "/mfa");
   }
 
   const loginSettings = await getSerializableLoginSettings({
