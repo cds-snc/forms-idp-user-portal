@@ -312,6 +312,9 @@
       "emailDescription": "Entrez votre adresse courriel pour recevoir un code par courriel.",
       "totpRegisterDescription": "Scannez le code QR ou accédez au lien URL.",
       "submit": "Continuer",
+      "genericError": "Nous n’avons pas pu configurer votre application d’authentification pour le moment. Veuillez réessayer.",
+      "invalidCode": "Le code est invalide. Veuillez réessayer.",
+      "alreadySetUp": "Votre application d'authentification est déjà configurée sur votre compte.",
       "labels": {
         "code": "Code"
       },

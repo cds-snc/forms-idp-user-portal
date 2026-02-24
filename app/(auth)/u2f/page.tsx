@@ -81,7 +81,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         <UserAvatar
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
-          showDropdown
+          showDropdown={false}
         ></UserAvatar>
       )}
       <div className="w-full">
