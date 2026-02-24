@@ -32,11 +32,11 @@ export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  // Attempt to get session credentials from cookies
   let sessionId, organization, loginName;
   try {
     ({ sessionId, organization, loginName } = await getSessionCredentials());
   } catch (error) {
-    logMessage.info("No session credentials found in cookies, redirecting to login");
     redirect("/");
   }
 
@@ -49,9 +49,6 @@ export default async function Page() {
   );
 
   if (!authCheck.satisfied) {
-    logMessage.info(
-      `Authentication level not satisfied, redirecting to login. Details: ${JSON.stringify(authCheck)}`
-    );
     redirect(authCheck.redirect || "/");
   }
 
@@ -74,17 +71,15 @@ export default async function Page() {
       sessionParams: { loginName, organization },
     });
     if (!authSession) {
-      logMessage.info("No valid session found, redirecting to login");
       redirect("/");
     }
     const result = await isSessionValid({ serviceUrl, session: authSession });
     if (!result) {
-      logMessage.info("Session is not valid, redirecting to login");
       redirect("/");
     }
   } catch (error) {
     logMessage.error(
-      `Error validating session, redirecting to login (4). Errors: ${JSON.stringify(error)}`
+      `Error validating session, redirecting to login. Errors: ${JSON.stringify(error)}`
     );
     redirect("/");
   }
