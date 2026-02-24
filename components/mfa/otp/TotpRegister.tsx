@@ -13,6 +13,7 @@ import { QRCodeSVG } from "qrcode.react";
  *--------------------------------------------*/
 import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 import { verifyTOTP } from "@lib/server/verify";
+import { validateTotpCode } from "@lib/validationSchemas";
 import { getZitadelUiError } from "@lib/zitadel-errors";
 import { I18n, useTranslation } from "@i18n";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
@@ -38,8 +39,9 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
   const router = useRouter();
 
   const { t } = useTranslation(["otp", "error"]);
-  const genericErrorMessage = t("error:title");
+  const genericErrorMessage = t("set.genericError");
   const invalidCodeMessage = t("set.invalidCode");
+  const invalidCodeLengthMessage = t("set.invalidCodeLength");
 
   const localFormAction = async (previousState: FormState, formData?: FormData) => {
     const code = formData?.get("code");
@@ -50,7 +52,16 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
       };
     }
 
-    return verifyTOTP(code, loginName, organization)
+    const normalizedCode = code.trim();
+
+    const totpValidationResult = await validateTotpCode({ code: normalizedCode });
+    if (!totpValidationResult.success) {
+      return {
+        error: invalidCodeLengthMessage,
+      };
+    }
+
+    return verifyTOTP(normalizedCode, loginName, organization)
       .then(async () => {
         // Redirect to all-set page after successful setup
         const params = new URLSearchParams({});
@@ -89,7 +100,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
         }
       });
   };
-  const [state, formAction] = useActionState(localFormAction, {});
+  const [state, formAction, isPending] = useActionState(localFormAction, {});
 
   return (
     <div className="flex flex-col items-center">
@@ -103,13 +114,17 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
             <CopyToClipboard value={uri}></CopyToClipboard>
           </div>
           <form className="w-full" action={formAction}>
-            {state.error && (
+            {!isPending && state.error && (
               <div className="py-4">
-                <Alert type={ErrorStatus.ERROR}>
+                <Alert type={ErrorStatus.ERROR} focussable>
                   {getSafeErrorMessage({
                     error: state.error,
                     fallback: genericErrorMessage,
-                    allowedMessages: [genericErrorMessage, invalidCodeMessage],
+                    allowedMessages: [
+                      genericErrorMessage,
+                      invalidCodeMessage,
+                      invalidCodeLengthMessage,
+                    ],
                   })}
                 </Alert>
               </div>
@@ -119,7 +134,13 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
               <Label id={"label-code"} htmlFor={"code"} className="required" required>
                 {t("set.labels.code")}
               </Label>
-              <TextInput type={"text"} id={"code"} required defaultValue={""} />
+              <TextInput
+                type={"text"}
+                id={"code"}
+                required
+                defaultValue={""}
+                autoComplete="one-time-code"
+              />
             </div>
 
             <SubmitButtonAction>

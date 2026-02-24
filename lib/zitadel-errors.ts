@@ -24,6 +24,11 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
   "otp.verify": [
     {
       match: (error) =>
+        error.text.includes("value length must be 6") || error.text.includes("6 runes"),
+      i18nKey: "set.invalidCodeLength",
+    },
+    {
+      match: (error) =>
         error.code === 3 ||
         error.text.includes("invalid code") ||
         error.text.includes("invalid argument"),
@@ -31,6 +36,12 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
     },
   ],
   "otp.set": [
+    {
+      match: (error) =>
+        error.text.includes("value length must be 6") || error.text.includes("6 runes"),
+      i18nKey: "set.invalidCodeLength",
+      blockContinue: true,
+    },
     {
       match: (error) =>
         error.code === 3 ||
@@ -49,7 +60,6 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
         error.text.includes("otpalreadyready") ||
         error.text.includes("multifactor otp"),
       i18nKey: "set.alreadySetUp",
-      blockContinue: true,
     },
   ],
 };
