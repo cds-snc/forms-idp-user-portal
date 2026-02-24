@@ -261,7 +261,6 @@
       "title": "Add a verification method",
       "description": "When you sign in, you will be asked to confirm your identity in another way, as an extra layer of security. You’ll be able to add additional methods later in your account settings.",
       "skip": "Skip",
-      "addAnother": "Add another method",
       "securityKey": {
         "title": "Security key",
         "recommended": "Recommended",
