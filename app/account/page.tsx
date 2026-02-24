@@ -86,7 +86,7 @@ export default async function Page() {
   ]);
 
   return (
-    <>
+    <div id="content">
       <PersonalDetails userId={userId} firstName={firstName} lastName={lastName} />
       <div className="mb-4"></div>
       <VerifiedAccount email={email} />
@@ -98,6 +98,6 @@ export default async function Page() {
         authenticatorStatus={authenticatorStatus}
         userId={userId}
       />
-    </>
+    </div>
   );
 }

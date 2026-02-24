@@ -126,17 +126,6 @@
       "invalidCredentials": "Invalid email address or password. Please try again."
     }
   },
-  "logout": {
-    "title": "Sign out",
-    "description": "Click an account to end the session.",
-    "noResults": "No accounts found",
-    "clear": "End session",
-    "verifiedAt": "Last active: {time}",
-    "success": {
-      "title": "Sign-out was successful",
-      "description": "You've signed out."
-    }
-  },
   "password": {
     "title": "Enter your password",
     "forgot": "Forgot password?",
@@ -325,22 +314,9 @@
       }
     }
   },
-  "signedin": {
-    "title": "Welcome {{user}}",
-    "description": "You are signed in.",
-    "continue": "Continue",
-    "error": {
-      "title": "Error",
-      "description": "An error occurred while trying to sign in."
-    }
-  },
   "register": {
     "methods": {
       "password": "Password"
-    },
-    "missingdata": {
-      "title": "Missing data",
-      "description": "Provide your email, first name, and last name to register."
     },
     "title": "Create your account",
     "emailInputHint": "Use a government address only you can access, not a shared inbox.",
@@ -440,7 +416,8 @@
     },
     "errors": {
       "couldNotVerifyEmail": "Could not verify email",
-      "failedToAddOTPEmail": "Could not set up email verification. Please try again."
+      "failedToAddOTPEmail": "Could not set up email verification. Please try again.",
+      "couldNotResentEmail": "Could not resend verification email. Please try again."
     }
   },
   "allSet": {
