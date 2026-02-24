@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
  * Internal Aliases
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
@@ -43,6 +44,9 @@ export default async function Page() {
   );
 
   if (!authCheck.satisfied) {
+    logMessage.info(
+      `Authentication level not satisfied, redirecting to login. Details: ${JSON.stringify(authCheck)}`
+    );
     redirect(authCheck.redirect || "/");
   }
 
@@ -55,6 +59,7 @@ export default async function Page() {
   const email = user?.email?.email;
 
   if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
+    logMessage.info("Missing required user information or password factor, redirecting to login");
     redirect("/login");
   }
 
@@ -64,13 +69,18 @@ export default async function Page() {
       sessionParams: { loginName, organization },
     });
     if (!authSession) {
+      logMessage.info("No valid session found, redirecting to login");
       redirect("/login");
     }
     const result = await isSessionValid({ serviceUrl, session: authSession });
     if (!result) {
+      logMessage.info("Session is not valid, redirecting to login");
       redirect("/login");
     }
   } catch (error) {
+    logMessage.error(
+      `Error validating session, redirecting to login (4). Errors: ${JSON.stringify(error)}`
+    );
     redirect("/login");
   }
 
