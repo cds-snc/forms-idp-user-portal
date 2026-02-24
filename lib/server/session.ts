@@ -259,9 +259,9 @@ export async function updateSession(options: UpdateSessionCommand) {
         requestId,
         lifetime,
       });
-      console.error({ session });
+      console.error("error in the try", { session });
     } catch (error) {
-      console.error({ error });
+      console.error("error in the catch", { error });
       const serializedError = serializeActionError(error, "Could not update session");
 
       logMessage.debug({
@@ -275,12 +275,13 @@ export async function updateSession(options: UpdateSessionCommand) {
         error: serializedError,
       };
     }
+    console.error("Huzzah");
 
     if (!session) {
       return { error: "Could not update session" };
     }
 
-    console.error("HUzzah");
+    console.error("HUzzah2");
 
     // if password, check if user has MFA methods
     let authMethods;
