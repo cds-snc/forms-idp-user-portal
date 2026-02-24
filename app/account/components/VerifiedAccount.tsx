@@ -3,14 +3,40 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Trans, useTranslation } from "react-i18next";
+
+import { logMessage } from "@lib/logger";
+import { logoutCurrentSession } from "@lib/server/session";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { Button } from "@components/ui/button/Button";
+
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export const VerifiedAccount = ({ email }: { email: string }) => {
+  const router = useRouter();
   const {
     t,
     i18n: { language },
   } = useTranslation("account");
+
+  const registerUser = async () => {
+    try {
+      const result = await logoutCurrentSession({
+        postLogoutRedirectUri: "/register",
+      });
+
+      if ("redirect" in result) {
+        router.push(result.redirect);
+      }
+    } catch (error) {
+      logMessage.info(
+        `Failed to log out user when redirecting to registration. Errors: ${JSON.stringify(error)}`
+      );
+    }
+  };
 
   return (
     <>
@@ -29,7 +55,7 @@ export const VerifiedAccount = ({ email }: { email: string }) => {
               ns="account"
               components={[
                 <strong key="0" />,
-                <Link key="1" href="/logout-session?returnUrl=/register" />,
+                <Button key="1" theme="link" onClick={registerUser} />,
                 <Link key="2" href={`${FORMS_PRODUCTION_URL}/${language}/support`} />,
               ]}
             />

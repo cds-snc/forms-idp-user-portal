@@ -32,8 +32,13 @@ export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  // Load account information from the session cookie
-  const { sessionId, organization, loginName } = await getSessionCredentials();
+  let sessionId, organization, loginName;
+  try {
+    ({ sessionId, organization, loginName } = await getSessionCredentials());
+  } catch (error) {
+    logMessage.info("No session credentials found in cookies, redirecting to login");
+    redirect("/");
+  }
 
   // Page-level authentication check - defense in depth
   const authCheck = await checkAuthenticationLevel(
@@ -60,7 +65,7 @@ export default async function Page() {
 
   if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
     logMessage.info("Missing required user information or password factor, redirecting to login");
-    redirect("/login");
+    redirect("/");
   }
 
   try {
@@ -70,18 +75,18 @@ export default async function Page() {
     });
     if (!authSession) {
       logMessage.info("No valid session found, redirecting to login");
-      redirect("/login");
+      redirect("/");
     }
     const result = await isSessionValid({ serviceUrl, session: authSession });
     if (!result) {
       logMessage.info("Session is not valid, redirecting to login");
-      redirect("/login");
+      redirect("/");
     }
   } catch (error) {
     logMessage.error(
       `Error validating session, redirecting to login (4). Errors: ${JSON.stringify(error)}`
     );
-    redirect("/login");
+    redirect("/");
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([
