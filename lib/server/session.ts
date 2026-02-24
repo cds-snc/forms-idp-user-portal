@@ -111,6 +111,36 @@ export async function loadSessionsWithCookies({
 
 export type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
 
+type SerializedActionError = {
+  message: string;
+  rawMessage?: string;
+  code?: number;
+};
+
+function serializeActionError(
+  error: unknown,
+  fallbackMessage: string = "Could not update session"
+): SerializedActionError {
+  if (!error || typeof error !== "object") {
+    return { message: fallbackMessage };
+  }
+
+  const serializedError: SerializedActionError = {
+    message:
+      "message" in error && typeof error.message === "string" ? error.message : fallbackMessage,
+  };
+
+  if ("rawMessage" in error && typeof error.rawMessage === "string") {
+    serializedError.rawMessage = error.rawMessage;
+  }
+
+  if ("code" in error && typeof error.code === "number") {
+    serializedError.code = error.code;
+  }
+
+  return serializedError;
+}
+
 export async function continueWithSession({
   requestId,
   redirect,
@@ -210,13 +240,29 @@ export async function updateSession(options: UpdateSessionCommand) {
     } as Duration;
   }
 
-  const session = await setSessionAndUpdateCookie({
-    recentCookie: recentSession,
-    checks,
-    challenges,
-    requestId,
-    lifetime,
-  });
+  let session;
+  try {
+    session = await setSessionAndUpdateCookie({
+      recentCookie: recentSession,
+      checks,
+      challenges,
+      requestId,
+      lifetime,
+    });
+  } catch (error) {
+    const serializedError = serializeActionError(error, "Could not update session");
+
+    logMessage.debug({
+      message: "Failed to update session with checks/challenges",
+      error: serializedError,
+      hasChecks: !!checks,
+      hasChallenges: !!challenges,
+    });
+
+    return {
+      error: serializedError,
+    };
+  }
 
   if (!session) {
     return { error: "Could not update session" };

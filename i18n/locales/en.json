@@ -303,7 +303,8 @@
       },
       "validation": {
         "required": "Cannot be empty",
-        "maxLength": "Less than 10 characters"
+        "maxLength": "Less than 10 characters",
+        "invalidCodeLength": "Enter the 6-digit code from your authenticator app."
       }
     },
     "set": {
@@ -314,6 +315,7 @@
       "submit": "Continue",
       "genericError": "We couldn’t set up your authenticator app right now. Please try again.",
       "invalidCode": "The code is invalid. Please try again.",
+      "invalidCodeLength": "The code must be exactly 6 digits.",
       "alreadySetUp": "Your authenticator app is already configured on your account.",
       "labels": {
         "code": "Code"

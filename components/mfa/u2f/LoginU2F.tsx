@@ -106,7 +106,16 @@ export function LoginU2F({
     });
 
     if (session && "error" in session && session.error) {
-      setError(session.error);
+      setError(
+        typeof session.error === "string"
+          ? session.error
+          : typeof session.error === "object" &&
+              session.error &&
+              "message" in session.error &&
+              typeof session.error.message === "string"
+            ? session.error.message
+            : t("verify.errors.couldNotRequestChallenge")
+      );
       return;
     }
 

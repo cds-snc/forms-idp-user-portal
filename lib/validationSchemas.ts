@@ -98,6 +98,12 @@ export const codeSchema = (min = 1, max = 10) => ({
   },
 });
 
+export const totpCodeSchema = () => ({
+  ...{
+    code: v.pipe(v.string(), v.trim(), v.regex(/^\d{6}$/, "invalidCodeLength")),
+  },
+});
+
 // Shared "composed" validation functions using the above schemas
 
 export const validateAccount = async (formEntries: { [k: string]: FormDataEntryValue }) => {
@@ -154,6 +160,15 @@ export const validateCode = async (
   const formValidationSchema = v.pipe(
     v.object({
       ...codeSchema(min, max),
+    })
+  );
+  return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
+};
+
+export const validateTotpCode = async (formEntries: { [k: string]: FormDataEntryValue }) => {
+  const formValidationSchema = v.pipe(
+    v.object({
+      ...totpCodeSchema(),
     })
   );
   return v.safeParse(formValidationSchema, formEntries, { abortPipeEarly: true });
