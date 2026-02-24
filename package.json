@@ -15,6 +15,9 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "upgrade": "next upgrade"
   },
@@ -46,9 +49,14 @@
     "@gcds-core/tokens": "^1.0.0",
     "@gcforms/types": "1.0.27",
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.19.27",
     "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/coverage-v8": "^4.0.18",
     "baseline-browser-mapping": "^2.9.11",
     "clsx": "^2.1.1",
     "cssnano": "^7.1.2",
@@ -59,12 +67,15 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tailwindcss": "^3.17.5",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "sass": "^1.97.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   },
   "pnpm": {
     "overrides": {
