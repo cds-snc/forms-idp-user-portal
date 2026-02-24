@@ -1,6 +1,12 @@
-import "server-only";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { type SessionCredentials } from "@lib/actions/authenticated";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import "server-only";
 /**
  * Validates that a user can access a specific userId.
  * Prevents lateral access to other users' data.

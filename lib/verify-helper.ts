@@ -1,3 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { cookies } from "next/headers";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -6,11 +10,13 @@ import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
 import moment from "moment";
-import { cookies } from "next/headers";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { getFingerprintIdCookie } from "./fingerprint";
 import { logMessage } from "./logger";
 import { buildUrlWithRequestId } from "./utils";
-
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
   session: Session,

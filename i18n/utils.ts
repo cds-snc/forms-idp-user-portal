@@ -1,7 +1,13 @@
-import { languages } from "./settings";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { cookies } from "next/headers";
-import { LANGUAGE_COOKIE_NAME } from "./client";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { LANGUAGE_COOKIE_NAME } from "./client";
+import { languages } from "./settings";
 export const languageParamSanitization = (locale: string | string[] | undefined) => {
   // If provided with an array, return the first the default locale
   if (Array.isArray(locale) || locale === undefined) {

@@ -1,9 +1,11 @@
-import { create } from "@zitadel/client";
-import { UserAgent, UserAgentSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
+import { create } from "@zitadel/client";
+import { UserAgent, UserAgentSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { v4 as uuidv4 } from "uuid";
-
 export async function getFingerprintId() {
   return uuidv4();
 }

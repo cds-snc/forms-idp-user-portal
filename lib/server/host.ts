@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
-
 /**
  * Gets the original host that the user sees in their browser URL.
  * When using rewrites this function prioritizes forwarded headers that preserve the original host.

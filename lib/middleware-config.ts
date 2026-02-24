@@ -1,11 +1,13 @@
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { AuthLevel } from "./server/route-protection";
-
 /**
  * Route patterns mapped to their required authentication levels
  */
 export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
-  // Account management - requires full authentication with strong MFA
-  "/account": AuthLevel.STRONG_MFA_REQUIRED,
+  // Account management - requires full authentication with any MFA factor
+  "/account": AuthLevel.ANY_MFA_REQUIRED,
 
   // Password change - requires password to be verified
   "/password/change": AuthLevel.PASSWORD_REQUIRED,
@@ -16,8 +18,7 @@ export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
   // Password entry - requires basic session
   "/password": AuthLevel.BASIC_SESSION,
 
-  // Password set (new users) - requires basic session
-  "/password/set": AuthLevel.BASIC_SESSION,
+  "/password/reset": AuthLevel.OPEN,
 
   // OTP verification pages - require basic session
   "/otp": AuthLevel.BASIC_SESSION,
@@ -39,7 +40,6 @@ export const PUBLIC_ROUTES = [
   "/", // Login/username entry
   "/login", // OIDC/SAML initiation
   "/register", // User registratio (accessed via email link with userId)
-  "/verify/success", // Email verification successsword reset request
   "/verify", // Email verification
   "/verify/success", // Email verification success
   "/all-set", // Completion page
@@ -55,14 +55,12 @@ export const PUBLIC_ROUTES = [
  */
 export const AUTH_FLOW_ROUTES = [
   "/password",
-  "/password/set",
+  "/password/reset",
   "/mfa",
   "/mfa/set",
   "/otp/time-based",
-  "/otp/sms",
-  "/otp/email",
   "/otp/time-based/set",
-  "/otp/sms/set",
+  "/otp/email",
   "/otp/email/set",
   "/u2f",
   "/u2f/set",

@@ -1,72 +1,61 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
-import { useTranslation } from "@i18n";
 import { useRouter } from "next/navigation";
-
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { changePassword, sendPassword } from "@lib/server/password";
-
-import { Alert, ErrorStatus } from "@clientComponents/forms";
-import { PasswordValidationForm } from "@components/PasswordValidation/PasswordValidationForm";
-
+import { useTranslation } from "@i18n";
+import { PasswordValidationForm } from "@components/auth/password-validation/PasswordValidationForm";
+import { Alert, ErrorStatus } from "@components/ui/form";
 export function PasswordReset({
   userId,
-  code,
   passwordComplexitySettings,
   organization,
-  requestId,
   loginName,
 }: {
-  userId?: string;
-  code?: string;
+  userId: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
   organization?: string;
-  requestId?: string;
   loginName?: string;
 }) {
   const { t } = useTranslation(["password"]);
   const router = useRouter();
   const [error, setError] = useState("");
+  const [formResetKey, setFormResetKey] = useState(0);
 
-  const successCallback = async ({ password }: { password: string }) => {
-    if (!userId) return;
+  const setErrorAndResetForm = (message: string) => {
+    setError(message);
+    setFormResetKey((previous) => previous + 1);
+  };
 
+  const submitPasswordForm = async ({ password, code }: { password: string; code?: string }) => {
     const payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password,
-      code,
+      ...(code ? { code } : {}),
     };
 
-    const changeResponse = await changePassword(payload).catch(() =>
-      setError("rest.errors.couldNotSetPassword")
-    );
+    const changeResponse = await changePassword(payload).catch(() => {
+      setErrorAndResetForm(t("reset.errors.couldNotSetPassword"));
+    });
 
     if (changeResponse && "error" in changeResponse) {
-      setError(changeResponse.error);
+      setErrorAndResetForm(changeResponse.error);
       return;
     }
 
     if (!changeResponse) {
-      setError(t("reset.errors.couldNotSetPassword"));
+      setErrorAndResetForm(t("reset.errors.couldNotSetPassword"));
       return;
     }
-
-    ContinueAuthenticationFlow({ password });
-  };
-
-  const ContinueAuthenticationFlow = async ({ password }: { password: string }) => {
-    const params = new URLSearchParams({});
-
-    if (loginName) {
-      params.append("loginName", loginName);
-    }
-    if (organization) {
-      params.append("organization", organization);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
 
     const passwordResponse = await sendPassword({
       loginName: loginName ?? "",
@@ -74,11 +63,12 @@ export function PasswordReset({
       checks: create(ChecksSchema, {
         password: { password },
       }),
-      requestId,
-    }).catch(() => setError(t("reset.errors.couldNotVerifyPassword")));
+    }).catch(() => {
+      setErrorAndResetForm(t("reset.errors.couldNotVerifyPassword"));
+    });
 
     if (passwordResponse && "error" in passwordResponse && passwordResponse.error) {
-      setError(passwordResponse.error);
+      setErrorAndResetForm(passwordResponse.error);
       return;
     }
 
@@ -87,7 +77,7 @@ export function PasswordReset({
     }
   };
 
-  if (!userId || !passwordComplexitySettings) {
+  if (!passwordComplexitySettings) {
     return <Alert type={ErrorStatus.ERROR}>{t("reset.errors.missingRequiredInformation")}</Alert>;
   }
 
@@ -95,8 +85,10 @@ export function PasswordReset({
     <>
       {error && <Alert type={ErrorStatus.ERROR}>{error}</Alert>}
       <PasswordValidationForm
+        key={formResetKey}
         passwordComplexitySettings={passwordComplexitySettings}
-        successCallback={successCallback}
+        successCallback={submitPasswordForm}
+        requireConfirmationCode={true}
       />
     </>
   );

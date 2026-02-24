@@ -1,13 +1,23 @@
-import { timestampDate, Timestamp } from "@zitadel/client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
-import { logMessage } from "./logger";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
 import { getSession, getUserByID, listAuthenticationMethodTypes } from "../lib/zitadel";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
+import { logMessage } from "./logger";
 export function checkSessionFactorValidity(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
@@ -181,7 +191,7 @@ export async function isSessionValid({
   const mfaValid = totpValid || u2fValid || optEmail;
 
   if (!mfaValid) {
-    logMessage.info("Session has no valid MFA factor (TOTP or U2F required)");
+    logMessage.debug("Session has no valid MFA factor (TOTP, U2F, or OTP Email required)");
     return false;
   }
 

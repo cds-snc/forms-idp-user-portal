@@ -1,5 +1,7 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import pino from "pino";
-
 const pinoLogger = pino({
   level: process.env.NODE_ENV === "development" ? "debug" : "info",
   browser: {
@@ -52,17 +54,34 @@ export type AppLogger = {
  */
 export const logMessage: AppLogger = {
   debug: (message: string | Record<string, unknown>) => {
-    pinoLogger.debug(message);
+    try {
+      pinoLogger.debug(message);
+    } catch {
+      if (typeof message === "string") {
+        pinoLogger.debug(message);
+        return;
+      }
+
+      try {
+        pinoLogger.debug(JSON.stringify(message));
+      } catch {
+        pinoLogger.debug("Failed to serialize debug log payload");
+      }
+    }
   },
   info: (message: string) => pinoLogger.info(message),
   warn: (message: string) => pinoLogger.warn(message),
   error: (message: unknown) => {
-    if (message instanceof Error) {
-      pinoLogger.error(message.message);
-    } else if (typeof message === "string") {
-      pinoLogger.error(message);
-    } else {
-      pinoLogger.error(JSON.stringify(message));
+    try {
+      if (message instanceof Error) {
+        pinoLogger.error(message.message);
+      } else if (typeof message === "string") {
+        pinoLogger.error(message);
+      } else {
+        pinoLogger.error(JSON.stringify(message));
+      }
+    } catch {
+      pinoLogger.error("Failed to serialize error log payload");
     }
   },
 };

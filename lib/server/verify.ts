@@ -1,6 +1,22 @@
 "use server";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { cookies, headers } from "next/headers";
+import { GCNotifyConnector } from "@gcforms/connectors";
+import { create } from "@zitadel/client";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import crypto from "crypto";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { getPasswordChangedTemplate, getSecurityCodeTemplate } from "@lib/emailTemplates";
 import {
+  addOTPEmail,
   getLoginSettings,
   getSession,
   getUserByID,
@@ -8,26 +24,17 @@ import {
   sendEmailCodeWithReturn,
   verifyEmail,
   verifyTOTPRegistration,
-  addOTPEmail,
 } from "@lib/zitadel";
-import { getPasswordChangedTemplate, getSecurityCodeTemplate } from "@lib/emailTemplates";
-import crypto from "crypto";
-import { GCNotifyConnector } from "@gcforms/connectors";
+import { serverTranslation } from "@i18n/server";
 
-import { create } from "@zitadel/client";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { cookies, headers } from "next/headers";
+import { logMessage } from "../../lib/logger";
+import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
+import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
-import { logMessage } from "../../lib/logger";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
-import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
-import { serverTranslation } from "@i18n/server";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();

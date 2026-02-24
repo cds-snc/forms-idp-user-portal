@@ -1,30 +1,32 @@
-import { I18n } from "@i18n";
-import Link from "next/link";
-import { headers } from "next/headers";
-
 /*--------------------------------------------*
- * Types and Constants
+ * Framework and Third-Party
  *--------------------------------------------*/
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
- * Methods
+ * Internal Aliases
  *--------------------------------------------*/
-import { registerTOTP } from "@lib/zitadel";
+import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
+import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
-import { getSessionCredentials } from "@lib/cookies";
 import { buildUrlWithRequestId } from "@lib/utils";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
+import { registerTOTP } from "@lib/zitadel";
+import { getZitadelUiError } from "@lib/zitadel-errors";
+import { I18n } from "@i18n";
+import { serverTranslation } from "@i18n/server";
+import { UserAvatar } from "@components/account/user-avatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
 import { TotpRegister } from "@components/mfa/otp/TotpRegister";
-import { Alert } from "@clientComponents/globals";
-import { BackButton, Button } from "@clientComponents/globals/Buttons";
-import { UserAvatar } from "@serverComponents/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
-import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
+import * as Alert from "@components/ui/alert/Alert";
+import { BackButton } from "@components/ui/button/BackButton";
+import { Button } from "@components/ui/button/Button";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -37,9 +39,27 @@ export default async function Page(props: {
   const checkAfter = searchParams.checkAfter === "true";
 
   const { method } = params;
+  const { t } = await serverTranslation("otp");
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const authCheck = await checkAuthenticationLevel(
+    serviceUrl,
+    AuthLevel.PASSWORD_REQUIRED,
+    loginName,
+    organization
+  );
+
+  if (!authCheck.satisfied) {
+    logMessage.debug({
+      message: "OTP setup page auth check failed",
+      method,
+      reason: authCheck.reason,
+      redirect: authCheck.redirect,
+    });
+    redirect(authCheck.redirect || "/password");
+  }
 
   const session = await loadMostRecentSession({
     serviceUrl,
@@ -49,26 +69,55 @@ export default async function Page(props: {
     },
   });
 
-  let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
+  let totpResponse: RegisterTOTPResponse | undefined,
+    error: Error | undefined,
+    mappedUiError: ReturnType<typeof getZitadelUiError>;
   if (session && session.factors?.user?.id) {
+    const userId = session.factors.user.id;
+
     if (method === "time-based") {
-      await registerTOTP({
-        serviceUrl,
-        userId: session.factors.user.id,
-      })
-        .then((resp) => {
-          if (resp) {
-            totpResponse = resp;
-          }
-        })
-        .catch((err) => {
-          error = err;
+      try {
+        const resp = await registerTOTP({
+          serviceUrl,
+          userId,
         });
+
+        if (resp) {
+          totpResponse = resp;
+        }
+      } catch (err) {
+        logMessage.debug({
+          message: "Failed to register TOTP during OTP setup",
+          error: err,
+        });
+
+        mappedUiError = getZitadelUiError("otp.set", err);
+
+        error = err instanceof Error ? err : undefined;
+      }
+    } else if (method === "email") {
+      const addOtpEmailResponse = await protectedAddOTPEmail(session.factors.user.id);
+      if ("error" in addOtpEmailResponse && addOtpEmailResponse.error) {
+        logMessage.debug({
+          message: "Failed to enable OTP email during OTP setup",
+          error: addOtpEmailResponse.error,
+        });
+      }
     } else {
-      throw new Error("Invalid authentication method");
+      logMessage.debug({
+        message: "Invalid OTP setup method",
+        method,
+      });
+      redirect("/mfa/set");
     }
   } else {
-    throw new Error("No session found");
+    logMessage.debug({
+      message: "OTP setup page missing session",
+      method,
+      hasLoginName: !!loginName,
+      hasOrganization: !!organization,
+    });
+    redirect("/mfa/set");
   }
 
   let urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
@@ -78,6 +127,8 @@ export default async function Page(props: {
   } else if (loginName) {
     urlToContinue = buildUrlWithRequestId(LOGGED_IN_HOME_PAGE, requestId);
   }
+
+  const shouldBlockContinue = Boolean(error) && (!mappedUiError || mappedUiError.blockContinue);
 
   return (
     <>
@@ -93,7 +144,9 @@ export default async function Page(props: {
 
         {error && (
           <div className="py-4">
-            <Alert.Warning>{error?.message}</Alert.Warning>
+            <Alert.Warning>
+              {mappedUiError ? t(mappedUiError.i18nKey) : t("set.genericError")}
+            </Alert.Warning>
           </div>
         )}
 
@@ -123,11 +176,17 @@ export default async function Page(props: {
             <BackButton />
             <span className="grow"></span>
 
-            <Link href={urlToContinue}>
-              <Button>
+            {shouldBlockContinue ? (
+              <Button disabled>
                 <I18n i18nKey="set.submit" namespace="otp" />
               </Button>
-            </Link>
+            ) : (
+              <Link href={urlToContinue}>
+                <Button>
+                  <I18n i18nKey="set.submit" namespace="otp" />
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </div>

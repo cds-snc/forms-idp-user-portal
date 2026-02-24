@@ -16,6 +16,12 @@ Instructions for building high-quality ReactJS applications with modern patterns
 
 ## Development Standards
 
+### Component Structure
+Placement decision for a new component:
+- Route-only usage: colocate under that route’s `components` folder.
+- Reused across routes: place under `@components/*` in the closest matching domain folder.
+- If no domain fits, default to `@components/ui/*` only when it is a true primitive.
+
 ### Architecture
 - Use functional components with hooks as the primary pattern
 - Implement component composition over inheritance
@@ -60,6 +66,25 @@ Instructions for building high-quality ReactJS applications with modern patterns
 
 ## Additional Guidelines
 - Use ESLint and Prettier for consistent code formatting
+
+### Import Sort Order
+This project enforces import ordering with `eslint-plugin-simple-import-sort`.
+
+Required group order:
+1. React / Next / third-party packages
+2. Project aliases (`@root`, `@lib`, `@i18n`, `@components`)
+3. Parent relative imports (`../...`)
+4. Same-folder relative imports (`./...`)
+5. Style imports (`.css`, `.scss`)
+
+Notes:
+- Keep one blank line between groups.
+- Let ESLint auto-fix ordering; avoid manual re-sorting.
+- In files with section comments, use standardized headings (`Framework and Third-Party`, `Internal Aliases`, `Parent Relative`, `Local Relative`, `Styles`) while remaining lint-compliant.
+
+Workflow:
+- Run `pnpm lint` to validate.
+- Run `pnpm eslint . --fix` to auto-apply ordering.
 
 ### Form Handling (React 19)
 Client components use `useActionState` with local validation before server action:

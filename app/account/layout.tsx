@@ -1,7 +1,9 @@
-import { SiteHeader } from "@components/siteHeader/SiteHeader";
-import { Logout } from "@components/serverComponents/globals/Logout";
-import LanguageToggle from "@clientComponents/globals/LanguageToggle";
-
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { Logout } from "@components/auth/Logout";
+import { SiteHeader } from "@components/layout/site-header/SiteHeader";
+import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
 // Note: This is a single column layout as we don't need the left nav yet.
 
 export default async function Layout({ children }: { children: React.ReactNode }) {

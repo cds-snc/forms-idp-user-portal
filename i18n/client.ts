@@ -1,8 +1,15 @@
 "use client";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import i18next from "i18next";
-import { initReactI18next, useTranslation as reactUseTranslation } from "react-i18next";
-import resourcesToBackend from "i18next-resources-to-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
+import resourcesToBackend from "i18next-resources-to-backend";
+import { initReactI18next, useTranslation as reactUseTranslation } from "react-i18next";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { getOptions } from "./settings";
 export const LANGUAGE_COOKIE_NAME = "i18next";
 

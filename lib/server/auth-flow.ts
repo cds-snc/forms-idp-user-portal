@@ -1,11 +1,17 @@
 "use server";
 
-import { loginWithOIDCAndSession } from "@lib/oidc";
-import { loginWithSAMLAndSession } from "@lib/saml";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionsWithCookies } from "@lib/server/session";
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { headers } from "next/headers";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { loginWithOIDCAndSession } from "@lib/oidc";
+import { loginWithSAMLAndSession } from "@lib/saml";
+import { loadSessionsWithCookies } from "@lib/server/session";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
 export interface AuthFlowParams {
   sessionId: string;
   requestId: string;

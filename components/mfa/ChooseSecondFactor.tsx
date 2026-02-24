@@ -1,17 +1,24 @@
 "use client";
 
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@i18n/client";
-
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { Button } from "@clientComponents/globals/Buttons";
+
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { buildUrlWithRequestId } from "@lib/utils";
-
-import { MethodOptionCard } from "./MethodOptionCard";
-
 import { cn } from "@lib/utils";
+import { useTranslation } from "@i18n/client";
+import { Button } from "@components/ui/button/Button";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { MethodOptionCard } from "./MethodOptionCard";
 type Props = {
   loginName?: string;
   sessionId?: string;

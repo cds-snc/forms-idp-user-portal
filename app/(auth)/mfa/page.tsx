@@ -1,32 +1,26 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
+import { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Metadata } from "next";
-import { I18n } from "@i18n";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { serverTranslation } from "i18n/server";
 
 /*--------------------------------------------*
- * Types and Constants
+ * Internal Aliases
  *--------------------------------------------*/
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-
-/*--------------------------------------------*
- * Methods
- *--------------------------------------------*/
-
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { checkAuthenticationLevel, AuthLevel } from "@lib/server/route-protection";
-
-/*--------------------------------------------*
- * Components
- *--------------------------------------------*/
-import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
-import { UserAvatar } from "@serverComponents/UserAvatar/UserAvatar";
-import { AuthPanel } from "@serverComponents/globals/AuthPanel";
 import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { getServiceUrlFromHeaders } from "@lib/service-url";
+import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
-
+import { I18n } from "@i18n";
+import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
+import { AuthPanel } from "@components/auth/AuthPanel";
+import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
 
@@ -58,7 +52,13 @@ export default async function Page() {
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   if (!sessionFactors) {
-    throw new Error("No session factors found");
+    logMessage.debug({
+      message: "MFA page missing session factors",
+      hasSessionId: !!sessionId,
+      hasLoginName: !!loginName,
+      hasOrganization: !!organization,
+    });
+    redirect(authCheck.redirect || "/password");
   }
 
   // Check if user has at least one strong MFA method (TOTP or U2F)
@@ -78,7 +78,7 @@ export default async function Page() {
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
-            showDropdown
+            showDropdown={false}
           ></UserAvatar>
         </div>
         <ChooseSecondFactor
