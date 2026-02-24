@@ -126,17 +126,6 @@
       "invalidCredentials": "Adresse courriel ou mot de passe invalide. Veuillez réessayer."
     }
   },
-  "logout": {
-    "title": "Se déconnecter",
-    "description": "Cliquez sur un compte pour mettre fin à la session.",
-    "noResults": "Aucun compte trouvé",
-    "clear": "Mettre fin à la session",
-    "verifiedAt": "Dernière activité : {time}",
-    "success": {
-      "title": "Déconnexion réussie",
-      "description": "Vous vous êtes déconnecté."
-    }
-  },
   "password": {
     "title": "Enter your password [FR]",
     "forgot": "Mot de passe oublié?",
@@ -325,22 +314,9 @@
       }
     }
   },
-  "signedin": {
-    "title": "Bienvenue {{user}}",
-    "description": "Vous êtes connecté.",
-    "continue": "Continuer",
-    "error": {
-      "title": "Erreur",
-      "description": "Une erreur s'est produite lors de la tentative de connexion."
-    }
-  },
   "register": {
     "methods": {
       "password": "Mot de passe"
-    },
-    "missingdata": {
-      "title": "Données manquantes",
-      "description": "Veuillez fournir votre adresse courriel, prénom et nom de famille pour vous inscrire."
     },
     "title": "Créer votre compte",
     "emailInputHint": "Utilisez une adresse courriel du gouvernement à laquelle vous seul avez accès, et non une boîte de réception partagée.",
