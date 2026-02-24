@@ -9,7 +9,7 @@ import Link from "next/link";
  *--------------------------------------------*/
 import { useTranslation } from "@i18n/client";
 export const SkipLink = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("layout");
 
   return (
     <div id="skip-link-container">
