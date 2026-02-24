@@ -61,7 +61,7 @@
       "lastName": "[FR]Last name",
       "change": "[FR]Change",
       "cancel": "[FR]Cancel",
-      "updateAccount": "[FR]Update Account",
+      "updateAccount": "[FR]Update",
       "success": {
         "updateSuccess": "[FR]Personal details updated successfully"
       },
