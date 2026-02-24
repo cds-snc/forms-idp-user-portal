@@ -104,13 +104,9 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
           };
         }
 
-        if (e instanceof Error) {
-          return {
-            error: genericErrorMessage,
-          };
-        } else {
-          throw e;
-        }
+        return {
+          error: genericErrorMessage,
+        };
       });
   };
   const [state, formAction, isPending] = useActionState(localFormAction, {});
