@@ -5,8 +5,15 @@
  *--------------------------------------------*/
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { create, JsonObject } from "@zitadel/client";
+import {
+  RequestChallengesSchema,
+  UserVerificationRequirement as ZitadelUserVerificationRequirement,
+} from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
+import { updateSession } from "@lib/server/session";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -138,7 +145,7 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
         authenticatorAttachment: "cross-platform" as AuthenticatorAttachment,
         residentKey: "discouraged" as ResidentKeyRequirement,
         requireResidentKey: false,
-        userVerification: "discouraged" as UserVerificationRequirement,
+        userVerification: "discouraged",
       };
 
       // For U2F, we want direct attestation to prevent passkey prompts
@@ -206,12 +213,108 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
       }
 
       if (checkAfter) {
+        const challengeResponse = await updateSession({
+          sessionId,
+          requestId,
+          challenges: create(RequestChallengesSchema, {
+            webAuthN: {
+              domain: "",
+              userVerificationRequirement: ZitadelUserVerificationRequirement.DISCOURAGED,
+            },
+          }),
+        }).catch(() => {
+          setError("set.errors.sessionVerificationFailed");
+          return;
+        });
+
+        if (
+          !challengeResponse ||
+          ("error" in challengeResponse && challengeResponse.error) ||
+          !challengeResponse.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey
+        ) {
+          setError("set.errors.sessionVerificationFailed");
+          return;
+        }
+
+        const publicKeyCredentialRequestOptions = challengeResponse.challenges.webAuthN
+          .publicKeyCredentialRequestOptions
+          .publicKey as unknown as PublicKeyCredentialRequestOptions;
+
+        publicKeyCredentialRequestOptions.challenge = coerceToArrayBuffer(
+          publicKeyCredentialRequestOptions.challenge,
+          "publicKey.challenge"
+        );
+
+        if (publicKeyCredentialRequestOptions.allowCredentials) {
+          publicKeyCredentialRequestOptions.allowCredentials.map(
+            (listItem: PublicKeyCredentialDescriptor) => {
+              listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
+              listItem.transports = ["usb", "ble", "nfc"] as AuthenticatorTransport[];
+              return listItem;
+            }
+          );
+        }
+
+        const credential = await navigator.credentials
+          .get({
+            publicKey: publicKeyCredentialRequestOptions,
+          } as CredentialRequestOptions)
+          .catch(() => {
+            setError("set.errors.sessionVerificationFailed");
+            return;
+          });
+
+        if (!credential) {
+          setError("set.errors.sessionVerificationFailed");
+          return;
+        }
+
+        const assertedCredential = credential as PublicKeyCredential;
+        const assertionResponse = assertedCredential.response as AuthenticatorAssertionResponse;
+        const authData = new Uint8Array(assertionResponse.authenticatorData);
+        const clientDataJSON = new Uint8Array(assertionResponse.clientDataJSON);
+        const rawId = new Uint8Array(assertedCredential.rawId);
+        const sig = new Uint8Array(assertionResponse.signature);
+        const userHandle = new Uint8Array(assertionResponse.userHandle || []);
+
+        const assertionData = {
+          id: assertedCredential.id,
+          rawId: coerceToBase64Url(rawId, "rawId"),
+          type: assertedCredential.type,
+          response: {
+            authenticatorData: coerceToBase64Url(authData, "authData"),
+            clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
+            signature: coerceToBase64Url(sig, "sig"),
+            userHandle: coerceToBase64Url(userHandle, "userHandle"),
+          },
+        } as JsonObject;
+
+        const verificationResponse = await updateSession({
+          sessionId,
+          requestId,
+          checks: create(ChecksSchema, {
+            webAuthN: {
+              credentialAssertionData: assertionData,
+            },
+          }),
+        }).catch(() => {
+          setError("set.errors.sessionVerificationFailed");
+          return;
+        });
+
+        if (
+          !verificationResponse ||
+          ("error" in verificationResponse && verificationResponse.error)
+        ) {
+          setError("set.errors.sessionVerificationFailed");
+          return;
+        }
+
         const params = new URLSearchParams({});
         if (requestId) {
           params.append("requestId", requestId);
         }
-        params.append("checkAfter", "true");
-        params.append("method", "u2f");
+
         return router.push(`/all-set?` + params);
       } else {
         // Redirect to all-set page after successful setup
