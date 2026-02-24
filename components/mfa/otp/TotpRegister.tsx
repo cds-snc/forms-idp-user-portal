@@ -6,12 +6,15 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { QRCodeSVG } from "qrcode.react";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { getSafeErrorMessage } from "@lib/safeErrorMessage";
+import { updateSession } from "@lib/server/session";
 import { verifyTOTP } from "@lib/server/verify";
 import { validateTotpCode } from "@lib/validationSchemas";
 import { getZitadelUiError } from "@lib/zitadel-errors";
@@ -63,21 +66,31 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
 
     return verifyTOTP(normalizedCode, loginName, organization)
       .then(async () => {
-        // Redirect to all-set page after successful setup
+        if (checkAfter) {
+          // Reuse the just-entered TOTP code to verify the active session inline.
+          const checks = create(ChecksSchema, {
+            totp: { code: normalizedCode },
+          });
+
+          // Mark second-factor checks complete for this session during setup.
+          const sessionResponse = await updateSession({
+            loginName,
+            organization,
+            checks,
+            requestId,
+          });
+
+          if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
+            throw sessionResponse.error;
+          }
+        }
+
+        // Setup (and optional inline verification) succeeded; continue to all-set.
         const params = new URLSearchParams({});
         if (requestId) {
           params.append("requestId", requestId);
         }
-        if (checkAfter) {
-          params.append("checkAfter", "true");
-          params.append("method", "time-based");
-          if (loginName) {
-            params.append("loginName", loginName);
-          }
-          if (organization) {
-            params.append("organization", organization);
-          }
-        }
+
         return router.push(`/all-set?` + params);
       })
       .then(() => {
