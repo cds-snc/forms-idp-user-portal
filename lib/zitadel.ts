@@ -47,6 +47,7 @@ import {
 import { serverTranslation } from "@i18n/server";
 
 import { getUserAgent } from "./fingerprint";
+import { logMessage } from "./logger";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
@@ -276,16 +277,23 @@ export async function getLegalAndSupportSettings({
   serviceUrl: string;
   organization?: string;
 }) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+  try {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(
+      SettingsService,
+      serviceUrl
+    );
 
-  const callback = settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    const callback = settingsService
+      .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
 
-  return useCache ? cacheWrapper(callback) : callback;
+    return useCache ? cacheWrapper(callback) : callback;
+  } catch (error) {
+    logMessage.error(
+      `Failed to fetch legal and support settings. Errors: ${JSON.stringify(getSerializableObject(error))}`
+    );
+    throw new Error(`Failed to fetch legal and support settings`, { cause: error });
+  }
 }
 
 export async function getPasswordComplexitySettings({
@@ -319,14 +327,21 @@ export async function createSessionFromChecks({
   checks: Checks;
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+  try {
+    const sessionService: Client<typeof SessionService> = await createServiceForHost(
+      SessionService,
+      serviceUrl
+    );
 
-  const userAgent = await getUserAgent();
+    const userAgent = await getUserAgent();
 
-  return sessionService.createSession({ checks, lifetime, userAgent }, {});
+    return sessionService.createSession({ checks, lifetime, userAgent }, {});
+  } catch (error) {
+    logMessage.error(
+      `Failed to create session from checks. Errors: ${JSON.stringify(getSerializableObject(error))}`
+    );
+    throw new Error(`Failed to fetch legal and support settings`, { cause: error });
+  }
 }
 
 /**
