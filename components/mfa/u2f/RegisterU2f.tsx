@@ -213,6 +213,7 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
       }
 
       if (checkAfter) {
+        // Step 1: request a WebAuthn assertion challenge for the active session.
         const challengeResponse = await updateSession({
           sessionId,
           requestId,
@@ -255,6 +256,7 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
           );
         }
 
+        // Step 2: run navigator.credentials.get() to produce assertion data.
         const credential = await navigator.credentials
           .get({
             publicKey: publicKeyCredentialRequestOptions,
@@ -289,6 +291,7 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
           },
         } as JsonObject;
 
+        // Step 3: submit the assertion as WebAuthN session checks.
         const verificationResponse = await updateSession({
           sessionId,
           requestId,
@@ -310,6 +313,7 @@ export function RegisterU2f({ sessionId, requestId, checkAfter }: Props) {
           return;
         }
 
+        // Session is verified inline, so continue without a separate /u2f verify hop.
         const params = new URLSearchParams({});
         if (requestId) {
           params.append("requestId", requestId);

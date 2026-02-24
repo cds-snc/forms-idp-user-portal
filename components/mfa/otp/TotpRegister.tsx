@@ -67,10 +67,12 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
     return verifyTOTP(normalizedCode, loginName, organization)
       .then(async () => {
         if (checkAfter) {
+          // Reuse the just-entered TOTP code to verify the active session inline.
           const checks = create(ChecksSchema, {
             totp: { code: normalizedCode },
           });
 
+          // Mark second-factor checks complete for this session during setup.
           const sessionResponse = await updateSession({
             loginName,
             organization,
@@ -83,7 +85,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
           }
         }
 
-        // Redirect to all-set page after successful setup
+        // Setup (and optional inline verification) succeeded; continue to all-set.
         const params = new URLSearchParams({});
         if (requestId) {
           params.append("requestId", requestId);
