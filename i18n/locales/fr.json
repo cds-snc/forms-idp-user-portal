@@ -440,7 +440,8 @@
     },
     "errors": {
       "couldNotVerifyEmail": "Problème de vérification du courriel",
-      "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer."
+      "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer.",
+      "couldNotResentEmail": "[FR]Could not resend verification email. Please try again."
     }
   },
   "allSet": {
