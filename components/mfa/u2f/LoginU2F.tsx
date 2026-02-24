@@ -61,6 +61,7 @@ export function LoginU2F({
       initialized.current = true;
       updateSessionForChallenge()
         .then((response) => {
+          console.error("Received response for challenge request", response);
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
           if (!pK) {
@@ -101,11 +102,15 @@ export function LoginU2F({
       }),
       requestId,
     }).catch(() => {
+      console.error("Error requesting challenge - likely network or server error");
       setError(t("verify.errors.couldNotRequestChallenge"));
       return;
     });
 
     if (session && "error" in session && session.error) {
+      console.error(
+        "Error in response when requesting challenge - likely validation or other server error"
+      );
       setError(
         typeof session.error === "string"
           ? session.error
