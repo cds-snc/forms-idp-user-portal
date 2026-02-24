@@ -22,14 +22,13 @@ export const VerifiedAccount = ({ email }: { email: string }) => {
     i18n: { language },
   } = useTranslation("account");
 
-  const registerUser = async () => {
+  const logoutAndRedirectToRegister = async () => {
     try {
-      const result = await logoutCurrentSession({
-        postLogoutRedirectUri: "/register",
-      });
-
+      const result = await logoutCurrentSession({ postLogoutRedirectUri: "/register" });
       if ("redirect" in result) {
         router.push(result.redirect);
+      } else if ("error" in result) {
+        throw new Error(result.error);
       }
     } catch (error) {
       logMessage.info(
@@ -55,7 +54,7 @@ export const VerifiedAccount = ({ email }: { email: string }) => {
               ns="account"
               components={[
                 <strong key="0" />,
-                <Button key="1" theme="link" onClick={registerUser} />,
+                <Button key="1" theme="link" onClick={logoutAndRedirectToRegister} />,
                 <Link key="2" href={`${FORMS_PRODUCTION_URL}/${language}/support`} />,
               ]}
             />
