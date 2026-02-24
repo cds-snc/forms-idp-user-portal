@@ -29,7 +29,7 @@ export const VerifiedAccount = ({ email }: { email: string }) => {
               ns="account"
               components={[
                 <strong key="0" />,
-                <Link key="1" href="/logout-session?returnUrl=/register" />,
+                <Link key="1" prefetch={false} href="/logout-session?returnUrl=/register" />,
                 <Link key="2" href={`${FORMS_PRODUCTION_URL}/${language}/support`} />,
               ]}
             />
