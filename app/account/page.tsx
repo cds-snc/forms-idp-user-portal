@@ -70,11 +70,8 @@ export default async function Page() {
       serviceUrl,
       sessionParams: { loginName, organization },
     });
-    if (!authSession) {
-      redirect("/");
-    }
-    const result = await isSessionValid({ serviceUrl, session: authSession });
-    if (!result) {
+
+    if (!authSession || !(await isSessionValid({ serviceUrl, session: authSession }))) {
       redirect("/");
     }
   } catch (error) {
