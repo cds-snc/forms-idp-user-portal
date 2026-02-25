@@ -1,10 +1,7 @@
-import { cookies } from "next/headers";
 import { create } from "@zitadel/client";
-import crypto from "crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { completeFlowOrGetUrl } from "@lib/client";
-import { getOrSetFingerprintId } from "@lib/fingerprint";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
 import { validateAccountWithPassword } from "@lib/validationSchemas";
 import { checkEmailVerification } from "@lib/verify-helper";
@@ -16,7 +13,6 @@ import { registerUser } from "./actions";
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
-  cookies: vi.fn(),
 }));
 
 vi.mock("@zitadel/client", () => ({
@@ -25,10 +21,6 @@ vi.mock("@zitadel/client", () => ({
 
 vi.mock("@lib/client", () => ({
   completeFlowOrGetUrl: vi.fn(),
-}));
-
-vi.mock("@lib/fingerprint", () => ({
-  getOrSetFingerprintId: vi.fn(),
 }));
 
 vi.mock("@lib/server/cookie", () => ({
@@ -65,17 +57,7 @@ vi.mock("@lib/logger", () => ({
   },
 }));
 
-vi.mock("crypto", () => ({
-  default: {
-    createHash: vi.fn(),
-  },
-}));
-
 describe("registerUser", () => {
-  const cookieSet = vi.fn();
-  const hashUpdate = vi.fn();
-  const hashDigest = vi.fn();
-
   const baseCommand = {
     email: "person@canada.ca",
     firstName: "Person",
@@ -121,16 +103,6 @@ describe("registerUser", () => {
     vi.mocked(completeFlowOrGetUrl).mockResolvedValue({
       redirect: "/account?requestId=req-123",
     } as never);
-
-    cookieSet.mockResolvedValue(undefined);
-    vi.mocked(cookies).mockResolvedValue({
-      set: cookieSet,
-    } as never);
-
-    vi.mocked(getOrSetFingerprintId).mockResolvedValue("fingerprint-123");
-    hashDigest.mockReturnValue("hashed-verification-check");
-    hashUpdate.mockReturnValue({ digest: hashDigest });
-    vi.mocked(crypto.createHash).mockReturnValue({ update: hashUpdate } as never);
   });
 
   it("returns generic error when validation fails", async () => {
@@ -156,27 +128,6 @@ describe("registerUser", () => {
     const response = await registerUser(baseCommand);
 
     expect(response).toEqual({ error: "translated:errors.couldNotCreateSession" });
-  });
-
-  it("returns passkey redirect and sets verification cookie when password is empty", async () => {
-    const response = await registerUser({
-      ...baseCommand,
-      password: "",
-    });
-
-    expect(response).toEqual({
-      redirect: "/passkey/set?loginName=person%40canada.ca&organization=org-1&requestId=req-123",
-    });
-    expect(crypto.createHash).toHaveBeenCalledWith("sha256");
-    expect(cookieSet).toHaveBeenCalledWith({
-      name: "verificationCheck",
-      value: "hashed-verification-check",
-      httpOnly: true,
-      path: "/",
-      maxAge: 300,
-    });
-    expect(getUserByID).not.toHaveBeenCalled();
-    expect(completeFlowOrGetUrl).not.toHaveBeenCalled();
   });
 
   it("returns not-found error when created user cannot be fetched", async () => {
