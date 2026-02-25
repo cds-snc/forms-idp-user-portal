@@ -4,7 +4,8 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { headers } from "next/headers";
-import { ConnectError, Duration, timestampMs } from "@zitadel/client";
+import type { ConnectError } from "@connectrpc/connect";
+import { Duration, timestampMs } from "@zitadel/client";
 import {
   CredentialsCheckError,
   CredentialsCheckErrorSchema,

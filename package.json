@@ -46,6 +46,7 @@
     "valibot": "^1.2.0"
   },
   "devDependencies": {
+    "@connectrpc/connect": "^2.1.1",
     "@gcds-core/fonts": "^1.0.0",
     "@gcds-core/tokens": "^1.0.0",
     "@gcforms/types": "1.0.27",
