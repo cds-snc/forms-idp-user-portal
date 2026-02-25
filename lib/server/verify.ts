@@ -40,23 +40,29 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  return loadMostRecentSession({
-    serviceUrl,
-    sessionParams: {
-      loginName,
-      organization,
-    },
-  }).then((session) => {
-    if (session?.factors?.user?.id) {
-      return verifyTOTPRegistration({
-        serviceUrl,
-        code,
-        userId: session.factors.user.id,
-      });
-    } else {
-      throw Error("No user id found in session.");
+  try {
+    const session = await loadMostRecentSession({
+      serviceUrl,
+      sessionParams: {
+        loginName,
+        organization,
+      },
+    });
+
+    if (!session?.factors?.user?.id) {
+      return { error: new Error("No user id found in session.") };
     }
-  });
+
+    await verifyTOTPRegistration({
+      serviceUrl,
+      code,
+      userId: session.factors.user.id,
+    });
+
+    return { success: true };
+  } catch (error) {
+    return { error };
+  }
 }
 
 type VerifyUserByEmailCommand = {
