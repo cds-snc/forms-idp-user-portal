@@ -59,9 +59,10 @@ export default async function Page() {
   const firstName = user?.profile?.givenName;
   const lastName = user?.profile?.familyName;
   const email = user?.email?.email;
+  const hasRequiredProfile = !!firstName && !!lastName && !!email;
 
-  if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
-    logMessage.info("Missing required user information or password factor, redirecting to login");
+  if (!hasRequiredProfile || !userId) {
+    logMessage.info("Missing required user information, redirecting to login");
     redirect("/");
   }
 
