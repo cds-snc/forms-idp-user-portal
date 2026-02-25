@@ -1,11 +1,8 @@
-import { headers } from "next/headers";
 import { GCNotifyConnector } from "@gcforms/connectors";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getPasswordResetTemplate } from "@lib/emailTemplates";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
-import { serverTranslation } from "@i18n/server";
 
 import { setupServerActionContext } from "../../../../test/helpers/serverAction";
 
