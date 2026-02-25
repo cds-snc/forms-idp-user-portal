@@ -65,7 +65,11 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
     }
 
     return verifyTOTP(normalizedCode, loginName, organization)
-      .then(async () => {
+      .then(async (verifyResponse) => {
+        if (verifyResponse && "error" in verifyResponse && verifyResponse.error) {
+          throw verifyResponse.error;
+        }
+
         if (checkAfter) {
           // Reuse the just-entered TOTP code to verify the active session inline.
           const checks = create(ChecksSchema, {
