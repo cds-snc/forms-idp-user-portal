@@ -10,15 +10,17 @@ This project uses Vitest + Testing Library for unit tests.
 - Path aliases: `vite-tsconfig-paths`
 - Coverage provider: `v8`
 - Coverage reporters: `text`, `html`, `json-summary`
+- Coverage include scope: `app/**/*.{ts,tsx}`, `lib/**/*.{ts,tsx}`, `components/**/*.{ts,tsx}`
+- Coverage exclude scope: test files, `test/**`, declarations, build output, and dependencies
 
 ### Coverage thresholds
 
 Global minimums are enforced during `pnpm test:coverage`:
 
-- statements: `70`
-- branches: `65`
-- functions: `60`
-- lines: `70`
+- statements: `10`
+- branches: `10`
+- functions: `10`
+- lines: `10`
 
 ### Scripts
 
