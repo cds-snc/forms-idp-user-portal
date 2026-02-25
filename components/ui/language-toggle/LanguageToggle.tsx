@@ -34,7 +34,7 @@ const LanguageToggle = () => {
       </h2>
       <a
         id="lang-toggle-link"
-        className="gcds-lang-toggle"
+        className="gcds-lang-toggle cursor-pointer border-none bg-transparent p-0 text-inherit underline hover:no-underline"
         lang={displayLang.abbr}
         onClick={() => {
           changeLanguage(currentLang === "en" ? "fr" : "en");
