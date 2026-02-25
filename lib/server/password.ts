@@ -4,7 +4,8 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { headers } from "next/headers";
-import { ConnectError, create, Duration } from "@zitadel/client";
+import type { ConnectError } from "@connectrpc/connect";
+import { create, Duration } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";

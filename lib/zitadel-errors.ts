@@ -1,3 +1,4 @@
+import type { ConnectError } from "@connectrpc/connect";
 import { ErrorDetailSchema } from "@zitadel/proto/zitadel/message_pb";
 
 export type ZitadelErrorContext = string;
@@ -64,12 +65,12 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
   ],
 };
 
-function isConnectErrorLike(err: unknown): err is {
-  code?: number;
-  message?: string;
-  rawMessage?: string;
-  findDetails: (schema: unknown) => unknown[];
-} {
+type ConnectErrorLike = Pick<
+  ConnectError,
+  "code" | "message" | "rawMessage" | "metadata" | "findDetails"
+>;
+
+function isConnectErrorLike(err: unknown): err is ConnectErrorLike {
   if (!err || typeof err !== "object") {
     return false;
   }
@@ -98,7 +99,7 @@ function getErrorDetailFields(detail: unknown): { id?: string; message?: string 
   };
 }
 
-function parseZitadelError(err: {
+export function parseZitadelError(err: {
   code?: unknown;
   message?: unknown;
   rawMessage?: unknown;
