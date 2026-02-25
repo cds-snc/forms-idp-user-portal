@@ -7,7 +7,6 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { logMessage } from "@lib/logger";
 import { loadMostRecentSession } from "@lib/session";
 /**
@@ -228,18 +227,8 @@ export function getSmartRedirect(
   // Preserve important params
   if (searchParams) {
     const requestId = searchParams.get("requestId");
-    const loginName = searchParams.get("loginName");
 
     if (requestId) params.set("requestId", requestId);
-    if (loginName) params.set("loginName", loginName);
-  }
-
-  // Always set organization to hardcoded value
-  params.set("organization", ZITADEL_ORGANIZATION);
-
-  // Extract loginName from session if available
-  if (!params.has("loginName") && session?.factors?.user?.loginName) {
-    params.set("loginName", session.factors.user.loginName);
   }
 
   // No session at all - go to login
