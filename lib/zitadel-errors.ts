@@ -98,7 +98,7 @@ function getErrorDetailFields(detail: unknown): { id?: string; message?: string 
   };
 }
 
-function parseZitadelError(err: {
+export function parseZitadelError(err: {
   code?: unknown;
   message?: unknown;
   rawMessage?: unknown;
