@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -32,6 +36,16 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Coverage
+        if: github.event_name == 'pull_request'
+        run: pnpm test:coverage
+
+      - name: Coverage Comment
+        if: github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: ./coverage/coverage-summary.json
 
       - name: Build
         run: pnpm build

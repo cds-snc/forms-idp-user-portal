@@ -9,6 +9,16 @@ This project uses Vitest + Testing Library for unit tests.
 - Environment: `jsdom`
 - Path aliases: `vite-tsconfig-paths`
 - Coverage provider: `v8`
+- Coverage reporters: `text`, `html`, `json-summary`
+
+### Coverage thresholds
+
+Global minimums are enforced during `pnpm test:coverage`:
+
+- statements: `70`
+- branches: `65`
+- functions: `60`
+- lines: `70`
 
 ### Scripts
 
@@ -22,7 +32,10 @@ CI runs in `.github/workflows/ci.yml` and executes:
 
 1. `pnpm lint`
 2. `pnpm test`
-3. `pnpm build`
+3. `pnpm test:coverage` (pull requests only)
+4. `pnpm build`
+
+For pull requests, CI also posts a coverage comment based on `coverage/coverage-summary.json`.
 
 Local changes should pass the same sequence before merge.
 
