@@ -51,7 +51,9 @@ export function LoginOTP({
     t,
     i18n: { language },
   } = useTranslation("otp");
-  const genericErrorMessage = t("title", { ns: "error" });
+  const genericErrorMessage = t("set.genericError");
+  const invalidCodeMessage = t("set.invalidCode");
+  const invalidCodeLengthMessage = t("set.invalidCodeLength");
   const [, setError] = useState<string>("");
   const [codeSent, setCodeSent] = useState<boolean>(false);
   const [codeLoading, setCodeLoading] = useState<boolean>(false);
@@ -116,7 +118,7 @@ export function LoginOTP({
       .finally(() => setCodeLoading(false));
   };
 
-  const [state, formAction] = useActionState(localFormAction, {
+  const [state, formAction, isPending] = useActionState(localFormAction, {
     validationErrors: undefined,
     error: undefined,
     formData: {
@@ -126,13 +128,13 @@ export function LoginOTP({
 
   return (
     <>
-      {state.error && (
+      {!isPending && state.error && (
         <div className="py-4" data-testid="error">
-          <Alert type={ErrorStatus.ERROR}>
+          <Alert type={ErrorStatus.ERROR} focussable>
             {getSafeErrorMessage({
               error: state.error,
               fallback: genericErrorMessage,
-              allowedMessages: [genericErrorMessage],
+              allowedMessages: [genericErrorMessage, invalidCodeMessage, invalidCodeLengthMessage],
             })}
           </Alert>
         </div>

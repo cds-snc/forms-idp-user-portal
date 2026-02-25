@@ -1,21 +1,36 @@
+"use client";
+
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { serverTranslation } from "@i18n/server";
+import { useTranslation } from "@i18n";
 
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
 import { SignatureEn } from "./assets/SignatureEn";
 import { SignatureFr } from "./assets/SignatureFr";
-export const Fip = async ({ language }: { language: string }) => {
-  const { t } = await serverTranslation(["fip"]);
+const normalizeLanguage = (language: string): "en" | "fr" => {
+  if (language.toLowerCase().startsWith("fr")) {
+    return "fr";
+  }
 
-  const link = t("fip.link", { lng: language });
+  return "en";
+};
+
+export const Fip = ({ language }: { language: string }) => {
+  const {
+    t,
+    i18n: { language: currentLanguage },
+  } = useTranslation("fip");
+
+  const normalizedLanguage = normalizeLanguage(currentLanguage || language);
+
+  const link = t("link", { lng: normalizedLanguage });
 
   return (
     <div className="gcds-signature brand__signature">
-      <a href={link}>{language === "fr" ? <SignatureFr /> : <SignatureEn />}</a>
+      <a href={link}>{normalizedLanguage === "fr" ? <SignatureFr /> : <SignatureEn />}</a>
     </div>
   );
 };

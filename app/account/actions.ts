@@ -13,7 +13,7 @@ import {
   protectedGetU2FList,
   protectedRemoveTOTP,
   protectedRemoveU2F,
-  protectedUpdateAccount,
+  protectedUpdatePersonalDetails,
 } from "@lib/server/zitadel-protected";
 import { validatePersonalDetails } from "@lib/validationSchemas";
 
@@ -65,7 +65,7 @@ export async function removeTOTPAction(userId: string) {
   }
 }
 
-export async function updateAccountAction({
+export async function updatePersonalDetailsAction({
   userId,
   firstName,
   lastName,
@@ -85,7 +85,7 @@ export async function updateAccountAction({
       return { error: "Failed to update account. Invalid fields." };
     }
 
-    await protectedUpdateAccount(userId, { firstName, lastName });
+    await protectedUpdatePersonalDetails(userId, { firstName, lastName });
     logMessage.info(`Updating account with firstName: ${firstName}, lastName: ${lastName}`);
     revalidatePath("/account");
     return { success: true };

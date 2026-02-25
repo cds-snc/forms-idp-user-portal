@@ -15,22 +15,28 @@ export const ROUTE_PATTERNS: Record<string, AuthLevel> = {
   // MFA selection (during auth flow) - requires password
   "/mfa": AuthLevel.PASSWORD_REQUIRED,
 
+  // Email verification (during auth flow) - requires password
+  "/verify": AuthLevel.PASSWORD_REQUIRED,
+
   // Password entry - requires basic session
   "/password": AuthLevel.BASIC_SESSION,
 
+  // Verify success page - requires password verification
+  "/verify/success": AuthLevel.PASSWORD_REQUIRED,
+
   "/password/reset": AuthLevel.OPEN,
 
-  // OTP verification pages - require basic session
-  "/otp": AuthLevel.BASIC_SESSION,
+  // OTP pages - require password verification
+  "/otp": AuthLevel.PASSWORD_REQUIRED,
 
-  // U2F verification - requires basic session
-  "/u2f": AuthLevel.BASIC_SESSION,
+  // U2F pages - require password verification
+  "/u2f": AuthLevel.PASSWORD_REQUIRED,
 
-  // MFA setup - requires basic session
-  "/mfa/set": AuthLevel.BASIC_SESSION,
+  // MFA setup - requires password verification
+  "/mfa/set": AuthLevel.PASSWORD_REQUIRED,
 
-  // Completion page - requires basic session (uses getSessionCredentials)
-  "/all-set": AuthLevel.BASIC_SESSION,
+  // Completion page - requires password verification
+  "/all-set": AuthLevel.PASSWORD_REQUIRED,
 };
 
 /**
@@ -40,9 +46,6 @@ export const PUBLIC_ROUTES = [
   "/", // Login/username entry
   "/login", // OIDC/SAML initiation
   "/register", // User registratio (accessed via email link with userId)
-  "/verify", // Email verification
-  "/verify/success", // Email verification success
-  "/all-set", // Completion page
   "/healthy", // Health check
   "/security", // Security settings (cached)
   "/logout-session", // Session termination

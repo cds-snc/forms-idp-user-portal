@@ -57,28 +57,28 @@
       "noSession": "[FR]User information could not be retrieved from session."
     },
     "personalDetails": {
-      "title": "[FR]Account Details",
+      "title": "[FR]Personal Details",
       "firstName": "[FR]First name",
       "lastName": "[FR]Last name",
       "change": "[FR]Change",
       "cancel": "[FR]Cancel",
-      "updateAccount": "[FR]Update Account",
+      "updateAccount": "[FR]Update",
       "success": {
-        "updateSuccess": "[FR]Account details updated successfully"
+        "updateSuccess": "[FR]Personal details updated successfully"
       },
       "errors": {
-        "updateFailed": "[FR]Failed to update account details"
+        "updateFailed": "[FR]Failed to update personal details"
       },
       "validation": {
         "required": "[FR]Complete the required fields to continue.",
-        "requiredFirstname": "Y[FR]our first name is required.",
+        "requiredFirstname": "[FR]Your first name is required.",
         "requiredLastname": "[FR]Your last name is required."
       }
     },
     "verifiedAccount": {
-      "title": "Verified Account",
-      "email": "Email address",
-      "changeMessage": "<0>Cannot be changed</0> <1>create new account</1> or <2>contact support</2>"
+      "title": "[FR]Verified Account",
+      "email": "[FR]Email address",
+      "changeMessage": "[FR]<0>Cannot be changed</0> <1>create new account</1> or <2>contact support</2>"
     },
     "authentication": {
       "title": "[FR]Authentication",
@@ -124,17 +124,6 @@
       "validGovEmail": "Veuillez entrer une adresse courriel individuelle valide du gouvernement du Canada.",
       "requiredPassword": "Le mot de passe est obligatoire.",
       "invalidCredentials": "Adresse courriel ou mot de passe invalide. Veuillez réessayer."
-    }
-  },
-  "logout": {
-    "title": "Se déconnecter",
-    "description": "Cliquez sur un compte pour mettre fin à la session.",
-    "noResults": "Aucun compte trouvé",
-    "clear": "Mettre fin à la session",
-    "verifiedAt": "Dernière activité : {time}",
-    "success": {
-      "title": "Déconnexion réussie",
-      "description": "Vous vous êtes déconnecté."
     }
   },
   "password": {
@@ -272,7 +261,6 @@
       "title": "Ajouter une méthode de vérification",
       "description": "Lors de la connexion, on vous demandera de confirmer votre identité d'une autre façon, comme couche de sécurité supplémentaire. Vous pourrez ajouter d'autres méthodes plus tard dans les paramètres de votre compte.",
       "skip": "Ignorer",
-      "addAnother": "Ajouter une autre méthode",
       "securityKey": {
         "title": "Clé de sécurité",
         "recommended": "Recommandé",
@@ -303,7 +291,8 @@
       },
       "validation": {
         "required": "Ce champ ne peut pas être vide",
-        "maxLength": "Moins de 10 caractères"
+        "maxLength": "Moins de 10 caractères",
+        "invalidCodeLength": "Entrez le code à 6 chiffres de votre application d’authentification."
       }
     },
     "set": {
@@ -314,6 +303,7 @@
       "submit": "Continuer",
       "genericError": "Nous n’avons pas pu configurer votre application d’authentification pour le moment. Veuillez réessayer.",
       "invalidCode": "Le code est invalide. Veuillez réessayer.",
+      "invalidCodeLength": "Le code doit contenir exactement 6 chiffres.",
       "alreadySetUp": "Votre application d'authentification est déjà configurée sur votre compte.",
       "labels": {
         "code": "Code"
@@ -323,22 +313,9 @@
       }
     }
   },
-  "signedin": {
-    "title": "Bienvenue {{user}}",
-    "description": "Vous êtes connecté.",
-    "continue": "Continuer",
-    "error": {
-      "title": "Erreur",
-      "description": "Une erreur s'est produite lors de la tentative de connexion."
-    }
-  },
   "register": {
     "methods": {
       "password": "Mot de passe"
-    },
-    "missingdata": {
-      "title": "Données manquantes",
-      "description": "Veuillez fournir votre adresse courriel, prénom et nom de famille pour vous inscrire."
     },
     "title": "Créer votre compte",
     "emailInputHint": "Utilisez une adresse courriel du gouvernement à laquelle vous seul avez accès, et non une boîte de réception partagée.",
@@ -438,7 +415,8 @@
     },
     "errors": {
       "couldNotVerifyEmail": "Problème de vérification du courriel",
-      "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer."
+      "failedToAddOTPEmail": "Impossible de configurer la vérification par courriel. Veuillez réessayer.",
+      "couldNotResentEmail": "[FR]Could not resend verification email. Please try again."
     }
   },
   "allSet": {

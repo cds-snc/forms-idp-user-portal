@@ -545,12 +545,12 @@ export const protectedGetPasswordExpirySettings = AuthenticatedAction(
 );
 
 /**
- * Protected wrapper for protectedUpdateAccount.
+ * Protected wrapper for protectedUpdatePersonalDetails.
  * Ensures user can only update their own profile data.
  *
  * @security Requires authenticated session. Verifies userId matches authenticated user.
  */
-export const protectedUpdateAccount = AuthenticatedAction(
+export const protectedUpdatePersonalDetails = AuthenticatedAction(
   async (
     credentials: SessionCredentials,
     userId: string,
