@@ -55,10 +55,6 @@ describe("submitUserNameForm", () => {
     vi.clearAllMocks();
     setupServerActionContext();
 
-    vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(getServiceUrlFromHeaders).mockReturnValue({ serviceUrl: "https://idp.example" });
-    vi.mocked(serverTranslation).mockResolvedValue({ t: (key: string) => key } as never);
-
     vi.mocked(listUsers).mockResolvedValue({
       details: { totalResult: BigInt(1) },
       result: [
