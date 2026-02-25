@@ -26,6 +26,7 @@ COPY --from=base /src/package.json ./package.json
 COPY --from=base /src/.next/standalone ./
 COPY --from=base /src/.next/static ./.next/static
 
+RUN mkdir /src/.next/cache
 
 EXPOSE 3000
 

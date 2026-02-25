@@ -3,16 +3,17 @@
  *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 
-/*--------------------------------------------*
- * Internal Aliases
- *--------------------------------------------*/
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { SearchParams } from "@lib/utils";
 import { getUserByID } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
 
@@ -20,6 +21,7 @@ import { AuthPanel } from "@components/auth/AuthPanel";
  * Local Relative
  *--------------------------------------------*/
 import { VerifyEmailForm } from "./components/VerifyEmailForm";
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };
@@ -61,7 +63,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 
   if (!id) {
-    throw Error("Failed to get user id");
+    redirect("/");
   }
 
   return (

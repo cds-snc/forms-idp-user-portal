@@ -24,6 +24,11 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
   "otp.verify": [
     {
       match: (error) =>
+        error.text.includes("value length must be 6") || error.text.includes("6 runes"),
+      i18nKey: "set.invalidCodeLength",
+    },
+    {
+      match: (error) =>
         error.code === 3 ||
         error.text.includes("invalid code") ||
         error.text.includes("invalid argument"),
@@ -31,6 +36,12 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
     },
   ],
   "otp.set": [
+    {
+      match: (error) =>
+        error.text.includes("value length must be 6") || error.text.includes("6 runes"),
+      i18nKey: "set.invalidCodeLength",
+      blockContinue: true,
+    },
     {
       match: (error) =>
         error.code === 3 ||
@@ -49,7 +60,6 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
         error.text.includes("otpalreadyready") ||
         error.text.includes("multifactor otp"),
       i18nKey: "set.alreadySetUp",
-      blockContinue: true,
     },
   ],
 };
@@ -69,7 +79,11 @@ function isConnectErrorLike(err: unknown): err is {
 }
 
 function getFirstErrorDetail(err: { findDetails: (schema: unknown) => unknown[] }) {
-  return err.findDetails(ErrorDetailSchema)[0];
+  try {
+    return err.findDetails(ErrorDetailSchema)[0];
+  } catch {
+    return undefined;
+  }
 }
 
 function getErrorDetailFields(detail: unknown): { id?: string; message?: string } {
@@ -100,7 +114,11 @@ function parseZitadelError(err: {
       return undefined;
     }
 
-    return metadata.get(name) ?? undefined;
+    try {
+      return metadata.get(name) ?? undefined;
+    } catch {
+      return undefined;
+    }
   };
 
   const headerStatus = getHeader("grpc-status");
@@ -117,10 +135,7 @@ function parseZitadelError(err: {
   const detail = isConnectErrorLike(err) ? getFirstErrorDetail(err) : undefined;
   const detailFields = getErrorDetailFields(detail);
 
-  const detailText =
-    isConnectErrorLike(err) && getFirstErrorDetail(err)
-      ? `${detailFields.id ?? ""} ${detailFields.message ?? ""}`
-      : "";
+  const detailText = detail ? `${detailFields.id ?? ""} ${detailFields.message ?? ""}` : "";
 
   const text = `${detailText} ${grpcMessage} ${rawMessage} ${message}`.toLowerCase();
 
@@ -139,22 +154,30 @@ export function getZitadelUiError(
     return undefined;
   }
 
-  const rules = rulesByContext[context] ?? [];
-  const parsedError = parseZitadelError(
-    err as {
-      code?: unknown;
-      message?: unknown;
-      rawMessage?: unknown;
-    }
-  );
+  try {
+    const rules = rulesByContext[context] ?? [];
+    const parsedError = parseZitadelError(
+      err as {
+        code?: unknown;
+        message?: unknown;
+        rawMessage?: unknown;
+      }
+    );
 
-  for (const rule of rules) {
-    if (rule.match(parsedError)) {
-      return {
-        i18nKey: rule.i18nKey,
-        blockContinue: rule.blockContinue,
-      };
+    for (const rule of rules) {
+      try {
+        if (rule.match(parsedError)) {
+          return {
+            i18nKey: rule.i18nKey,
+            blockContinue: rule.blockContinue,
+          };
+        }
+      } catch {
+        continue;
+      }
     }
+  } catch {
+    return undefined;
   }
 
   return undefined;

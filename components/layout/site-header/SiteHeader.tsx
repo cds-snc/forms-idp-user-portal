@@ -4,12 +4,23 @@
  * Internal Aliases
  *--------------------------------------------*/
 import { cn } from "@lib/utils";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { SkipLink } from "@components/ui/skip-link/SkipLink";
 
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
 import { SiteLink } from "./SiteLink";
-export const SiteHeader = ({ children }: { children?: React.ReactNode }) => {
+
+export const SiteHeader = ({
+  skipLink = true,
+  children,
+}: {
+  skipLink?: boolean;
+  children?: React.ReactNode;
+}) => {
   return (
     <>
       <header className={cn("mb-5 border-b-1 border-gray-500 bg-white")}>
@@ -24,6 +35,7 @@ export const SiteHeader = ({ children }: { children?: React.ReactNode }) => {
             {children}
           </div>
         </div>
+        {skipLink && <SkipLink />}
       </header>
     </>
   );

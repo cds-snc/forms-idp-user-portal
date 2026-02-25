@@ -111,6 +111,36 @@ export async function loadSessionsWithCookies({
 
 export type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
 
+type SerializedActionError = {
+  message: string;
+  rawMessage?: string;
+  code?: number;
+};
+
+function serializeActionError(
+  error: unknown,
+  fallbackMessage: string = "Could not update session"
+): SerializedActionError {
+  if (!error || typeof error !== "object") {
+    return { message: fallbackMessage };
+  }
+
+  const serializedError: SerializedActionError = {
+    message:
+      "message" in error && typeof error.message === "string" ? error.message : fallbackMessage,
+  };
+
+  if ("rawMessage" in error && typeof error.rawMessage === "string") {
+    serializedError.rawMessage = error.rawMessage;
+  }
+
+  if ("code" in error && typeof error.code === "number") {
+    serializedError.code = error.code;
+  }
+
+  return serializedError;
+}
+
 export async function continueWithSession({
   requestId,
   redirect,
@@ -166,80 +196,112 @@ export type UpdateSessionCommand = {
 
 export async function updateSession(options: UpdateSessionCommand) {
   const { loginName, sessionId, organization, checks, requestId, challenges } = options;
-  const recentSession = sessionId
-    ? await getSessionCookieById({ sessionId })
-    : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization })
-      : await getMostRecentSessionCookie();
+  try {
+    const recentSession = sessionId
+      ? await getSessionCookieById({ sessionId })
+      : loginName
+        ? await getSessionCookieByLoginName({ loginName, organization })
+        : await getMostRecentSessionCookie();
 
-  if (!recentSession) {
+    if (!recentSession) {
+      return {
+        error: "Could not find session",
+      };
+    }
+
+    const _headers = await headers();
+    const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+    const host = await getOriginalHost();
+
+    if (!host) {
+      return { error: "Could not get host" };
+    }
+
+    if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
+      const [hostname] = host.split(":");
+
+      challenges.webAuthN.domain = hostname;
+    }
+
+    const loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization,
+    });
+
+    let lifetime = checks?.webAuthN
+      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
+      : checks?.otpEmail || checks?.otpSms
+        ? loginSettings?.secondFactorCheckLifetime
+        : undefined;
+
+    if (!lifetime || !lifetime.seconds) {
+      lifetime = {
+        seconds: BigInt(60 * 60 * 24), // default to 24 hours
+        nanos: 0,
+      } as Duration;
+    }
+
+    let session;
+
+    try {
+      session = await setSessionAndUpdateCookie({
+        recentCookie: recentSession,
+        checks,
+        challenges,
+        requestId,
+        lifetime,
+      });
+    } catch (error) {
+      const serializedError = serializeActionError(error, "Could not update session");
+
+      logMessage.debug({
+        message: "Failed to update session with checks/challenges",
+        error: serializedError,
+        hasChecks: !!checks,
+        hasChallenges: !!challenges,
+      });
+
+      return {
+        error: serializedError,
+      };
+    }
+
+    if (!session) {
+      return { error: "Could not update session" };
+    }
+
+    // if password, check if user has MFA methods
+    let authMethods;
+    if (checks && checks.password && session.factors?.user?.id) {
+      const response = await listAuthenticationMethodTypes({
+        serviceUrl,
+        userId: session.factors.user.id,
+      });
+      if (response.authMethodTypes && response.authMethodTypes.length) {
+        authMethods = response.authMethodTypes;
+      }
+    }
+
     return {
-      error: "Could not find session",
+      sessionId: session.id,
+      factors: session.factors,
+      challenges: session.challenges,
+      authMethods,
+    };
+  } catch (error) {
+    const serializedError = serializeActionError(error, "Could not update session");
+
+    logMessage.debug({
+      message: "Unexpected failure while updating session",
+      error: serializedError,
+      hasChecks: !!checks,
+      hasChallenges: !!challenges,
+    });
+
+    return {
+      error: serializedError,
     };
   }
-
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = await getOriginalHost();
-
-  if (!host) {
-    return { error: "Could not get host" };
-  }
-
-  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
-    const [hostname] = host.split(":");
-
-    challenges.webAuthN.domain = hostname;
-  }
-
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
-
-  let lifetime = checks?.webAuthN
-    ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-    : checks?.otpEmail || checks?.otpSms
-      ? loginSettings?.secondFactorCheckLifetime
-      : undefined;
-
-  if (!lifetime || !lifetime.seconds) {
-    lifetime = {
-      seconds: BigInt(60 * 60 * 24), // default to 24 hours
-      nanos: 0,
-    } as Duration;
-  }
-
-  const session = await setSessionAndUpdateCookie({
-    recentCookie: recentSession,
-    checks,
-    challenges,
-    requestId,
-    lifetime,
-  });
-
-  if (!session) {
-    return { error: "Could not update session" };
-  }
-
-  // if password, check if user has MFA methods
-  let authMethods;
-  if (checks && checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({
-      serviceUrl,
-      userId: session.factors.user.id,
-    });
-    if (response.authMethodTypes && response.authMethodTypes.length) {
-      authMethods = response.authMethodTypes;
-    }
-  }
-
-  return {
-    sessionId: session.id,
-    factors: session.factors,
-    challenges: session.challenges,
-    authMethods,
-  };
 }
 
 type ClearSessionOptions = {

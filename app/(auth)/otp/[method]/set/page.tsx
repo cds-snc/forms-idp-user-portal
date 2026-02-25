@@ -144,9 +144,9 @@ export default async function Page(props: {
 
         {error && (
           <div className="py-4">
-            <Alert.Warning>
-              {mappedUiError ? t(mappedUiError.i18nKey) : t("set.genericError")}
-            </Alert.Warning>
+            <Alert.Warning
+              body={mappedUiError ? t(mappedUiError.i18nKey) : t("set.genericError")}
+            />
           </div>
         )}
 

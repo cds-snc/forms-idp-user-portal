@@ -12,7 +12,8 @@ import { completeFlowOrGetUrl } from "@lib/client";
 import { logMessage } from "@lib/logger";
 import { sendOtpEmail } from "@lib/server/otp";
 import { updateSession } from "@lib/server/session";
-import { validateCode } from "@lib/validationSchemas";
+import { validateCode, validateTotpCode } from "@lib/validationSchemas";
+import { getZitadelUiError } from "@lib/zitadel-errors";
 export type FormState = {
   error?: string;
   validationErrors?: { fieldKey: string; fieldValue: string }[];
@@ -42,7 +43,7 @@ type SessionResponse = {
       organizationId?: string;
     };
   };
-  error?: string;
+  error?: unknown;
 };
 
 type OTPChallengeParams = {
@@ -110,7 +111,22 @@ export async function updateSessionForOTPChallenge(
     });
 
     if (response && "error" in response && response.error) {
-      return { error: response.error };
+      let normalizedError = "Could not update session";
+
+      if (typeof response.error === "string") {
+        normalizedError = response.error;
+      } else if (
+        response.error &&
+        typeof response.error === "object" &&
+        "message" in response.error &&
+        typeof response.error.message === "string"
+      ) {
+        normalizedError = response.error.message;
+      }
+
+      return {
+        error: normalizedError,
+      };
     }
 
     return { response };
@@ -119,7 +135,7 @@ export async function updateSessionForOTPChallenge(
       message: "OTP challenge request failed during session update",
       method,
     });
-    return { error: "Could not request OTP challenge" };
+    return { error: "Could not update session" };
   }
 }
 
@@ -131,98 +147,135 @@ export async function handleOTPFormSubmit(
   }
 ): Promise<FormState & { redirect?: string }> {
   const { loginSettings, t, ...submitParams } = params;
+  const normalizedCode = code.trim();
 
-  // Validate form entries and map any errors to form state with translated messages
-  const validationResult = await validateCode({ code });
-  if (!validationResult.success) {
-    return {
-      validationErrors: validationResult.issues.map((issue) => ({
-        fieldKey: issue.path?.[0].key as string,
-        fieldValue: t(`verify.validation.${issue.message}`),
-      })),
-      error: undefined,
-      formData: { code },
-    };
-  }
-
-  const response = await _submitOTPCode({ code }, submitParams);
-
-  if (!response) {
-    return {
-      validationErrors: undefined,
-      error: undefined,
-      formData: { code },
-    };
-  }
-
-  if (response.error) {
-    logMessage.debug({
-      message: "OTP code submission returned error",
-      method: submitParams.method,
-      error: response.error,
-    });
-    return {
-      validationErrors: undefined,
-      error: response.error,
-      formData: { code },
-    };
-  }
-
-  if (response.sessionId && response.factors?.user) {
-    // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const redirectUrl = submitParams.redirect || loginSettings?.defaultRedirectUri;
-
-    // Always include sessionId to ensure we load the exact session that was just updated
-    const callbackResponse = await completeFlowOrGetUrl(
-      submitParams.requestId
-        ? {
-            sessionId: response.sessionId,
-            requestId: submitParams.requestId,
-            organization: response.factors.user.organizationId,
-          }
-        : {
-            sessionId: response.sessionId,
-            loginName: response.factors.user.loginName,
-            organization: response.factors.user.organizationId,
-          },
-      redirectUrl
-    );
-
-    if ("error" in callbackResponse) {
-      logMessage.debug({
-        message: "OTP callback flow returned error",
-        method: submitParams.method,
-        error: callbackResponse.error,
-      });
-      return {
-        validationErrors: undefined,
-        formData: { code },
-        error: callbackResponse.error,
-      };
+  try {
+    if (submitParams.method === "time-based") {
+      const totpValidationResult = await validateTotpCode({ code: normalizedCode });
+      if (!totpValidationResult.success) {
+        return {
+          validationErrors: totpValidationResult.issues.map((issue) => ({
+            fieldKey: (issue.path?.[0]?.key as string) || "code",
+            fieldValue: t(`verify.validation.${issue.message}`),
+          })),
+          error: undefined,
+          formData: { code: normalizedCode },
+        };
+      }
     }
 
-    if ("redirect" in callbackResponse) {
-      logMessage.debug({
-        message: "OTP callback flow returned redirect",
-        method: submitParams.method,
-        redirect: callbackResponse.redirect,
-      });
+    if (submitParams.method !== "time-based") {
+      // Validate non-TOTP code entries and map any errors to form state with translated messages
+      const validationResult = await validateCode({ code: normalizedCode });
+      if (!validationResult.success) {
+        return {
+          validationErrors: validationResult.issues.map((issue) => ({
+            fieldKey: (issue.path?.[0]?.key as string) || "code",
+            fieldValue: t(`verify.validation.${issue.message}`),
+          })),
+          error: undefined,
+          formData: { code: normalizedCode },
+        };
+      }
+    }
+
+    const response = await _submitOTPCode({ code: normalizedCode }, submitParams);
+
+    if (!response) {
       return {
         validationErrors: undefined,
         error: undefined,
-        formData: { code },
-        redirect: callbackResponse.redirect,
+        formData: { code: normalizedCode },
       };
     }
-  }
 
-  return {
-    validationErrors: undefined,
-    error: undefined,
-    formData: { code },
-  };
+    if (response.error) {
+      const mappedUiError = getZitadelUiError("otp.verify", response.error);
+      const mappedErrorMessage = mappedUiError ? t(mappedUiError.i18nKey) : undefined;
+
+      logMessage.debug({
+        message: "OTP code submission returned error",
+        method: submitParams.method,
+        error: response.error,
+      });
+
+      return {
+        validationErrors: undefined,
+        error:
+          mappedErrorMessage ||
+          (typeof response.error === "string" ? response.error : t("set.genericError")),
+        formData: { code: normalizedCode },
+      };
+    }
+
+    if (response.sessionId && response.factors?.user) {
+      // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const redirectUrl = submitParams.redirect || loginSettings?.defaultRedirectUri;
+
+      // Always include sessionId to ensure we load the exact session that was just updated
+      const callbackResponse = await completeFlowOrGetUrl(
+        submitParams.requestId
+          ? {
+              sessionId: response.sessionId,
+              requestId: submitParams.requestId,
+              organization: response.factors.user.organizationId,
+            }
+          : {
+              sessionId: response.sessionId,
+              loginName: response.factors.user.loginName,
+              organization: response.factors.user.organizationId,
+            },
+        redirectUrl
+      );
+
+      if ("error" in callbackResponse) {
+        logMessage.debug({
+          message: "OTP callback flow returned error",
+          method: submitParams.method,
+          error: callbackResponse.error,
+        });
+        return {
+          validationErrors: undefined,
+          formData: { code: normalizedCode },
+          error: callbackResponse.error,
+        };
+      }
+
+      if ("redirect" in callbackResponse) {
+        logMessage.debug({
+          message: "OTP callback flow returned redirect",
+          method: submitParams.method,
+          redirect: callbackResponse.redirect,
+        });
+        return {
+          validationErrors: undefined,
+          error: undefined,
+          formData: { code: normalizedCode },
+          redirect: callbackResponse.redirect,
+        };
+      }
+    }
+
+    return {
+      validationErrors: undefined,
+      error: undefined,
+      formData: { code: normalizedCode },
+    };
+  } catch (error) {
+    logMessage.debug({
+      message: "OTP form submit failed with unexpected error",
+      method: submitParams.method,
+      error,
+    });
+
+    return {
+      validationErrors: undefined,
+      error: t("set.genericError"),
+      formData: { code: normalizedCode },
+    };
+  }
 }
 
 async function _submitOTPCode(
@@ -263,11 +316,12 @@ async function _submitOTPCode(
     }
 
     return response;
-  } catch {
+  } catch (error) {
     logMessage.debug({
       message: "OTP code verification failed with unexpected error",
       method,
+      error,
     });
-    return { error: "Could not verify OTP code" };
+    return { error };
   }
 }
