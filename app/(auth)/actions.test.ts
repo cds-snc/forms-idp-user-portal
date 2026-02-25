@@ -1,11 +1,9 @@
-import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import {
@@ -14,7 +12,8 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@lib/zitadel";
-import { serverTranslation } from "@i18n/server";
+
+import { setupServerActionContext } from "../../test/helpers/serverAction";
 
 import { submitLoginForm } from "./actions";
 
@@ -67,13 +66,7 @@ describe("submitLoginForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(getServiceUrlFromHeaders).mockReturnValue({
-      serviceUrl: "https://idp.example",
-    });
-    vi.mocked(serverTranslation).mockResolvedValue({
-      t: (key: string) => `translated:${key}`,
-    } as never);
+    setupServerActionContext();
 
     vi.mocked(validateUsernameAndPassword).mockResolvedValue({ success: true } as never);
     vi.mocked(getLoginSettings).mockResolvedValue({} as never);
