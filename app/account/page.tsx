@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
  * Internal Aliases
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
+import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
@@ -31,8 +32,13 @@ export default async function Page() {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  // Load account information from the session cookie
-  const { sessionId, organization, loginName } = await getSessionCredentials();
+  // Attempt to get session credentials from cookies
+  let sessionId, organization, loginName;
+  try {
+    ({ sessionId, organization, loginName } = await getSessionCredentials());
+  } catch (error) {
+    redirect("/");
+  }
 
   // Page-level authentication check - defense in depth
   const authCheck = await checkAuthenticationLevel(
@@ -53,9 +59,11 @@ export default async function Page() {
   const firstName = user?.profile?.givenName;
   const lastName = user?.profile?.familyName;
   const email = user?.email?.email;
+  const hasRequiredProfile = !!firstName && !!lastName && !!email;
 
-  if (!firstName || !lastName || !email || !userId || !session.factors?.password) {
-    redirect("/login");
+  if (!hasRequiredProfile || !userId) {
+    logMessage.info("Missing required user information, redirecting to login");
+    redirect("/");
   }
 
   try {
@@ -63,15 +71,15 @@ export default async function Page() {
       serviceUrl,
       sessionParams: { loginName, organization },
     });
-    if (!authSession) {
-      redirect("/login");
-    }
-    const result = await isSessionValid({ serviceUrl, session: authSession });
-    if (!result) {
-      redirect("/login");
+
+    if (!authSession || !(await isSessionValid({ serviceUrl, session: authSession }))) {
+      redirect("/");
     }
   } catch (error) {
-    redirect("/login");
+    logMessage.error(
+      `Error validating session, redirecting to login. Errors: ${JSON.stringify(error)}`
+    );
+    redirect("/");
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([
