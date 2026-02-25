@@ -6,11 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Trans, useTranslation } from "react-i18next";
 
-import { logMessage } from "@lib/logger";
-import { logoutCurrentSession } from "@lib/server/session";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { logMessage } from "@lib/logger";
+import { logoutCurrentSession } from "@lib/server/session";
 import { Button } from "@components/ui/button/Button";
 
 const FORMS_PRODUCTION_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
