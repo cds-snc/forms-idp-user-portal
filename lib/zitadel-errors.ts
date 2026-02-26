@@ -62,6 +62,29 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
       i18nKey: "set.alreadySetUp",
     },
   ],
+  // TODO: add an action with zitadel functions garbage values
+  // TODO:  could try zitadel wrapper around zitadel calls e.g. connect eror to parse the error to what we're expecting
+  login: [
+    {
+      match: (error) => error.code === 5 || error.text.includes("User could not be found"),
+      i18nKey: "validation.invalidCredentials",
+    },
+    {
+      match: (error) => error.code === 3 || error.text.includes("Password is invalid"),
+      i18nKey: "validation.invalidCredentials",
+    },
+    // TODO: add auditLogs.ts matching type + message
+    // Max attempts = Incative = Locked. (z)
+    // Inactive and Locked accounts return same error BUT show differently in Zitadel console
+    {
+      match: (error) => error.code === 9 || error.text.includes("Errors.User.NotActive"),
+      i18nKey: "validation.maxAttemptsReached",
+    },
+  ],
+  //
+  // Custom App Errors below?
+  //
+  //"account.something": [...
 };
 
 function isConnectErrorLike(err: unknown): err is {

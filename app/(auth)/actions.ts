@@ -12,18 +12,19 @@ import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
  * Internal Aliases
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
-import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
+import { createSessionAndUpdateCookie } from "@lib/server/cookie";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import {
   // getOrgsByDomain,
-  getLockoutSettings,
+  // getLockoutSettings,
   getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@lib/zitadel";
+import { getZitadelUiError } from "@lib/zitadel-errors";
 import { serverTranslation } from "@i18n/server";
 // import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
@@ -82,6 +83,17 @@ export const submitLoginForm = async (
       requestId: command.requestId,
     });
   } catch (error: unknown) {
+    const zError = getZitadelUiError("login", error);
+
+    if (zError?.i18nKey) {
+      logMessage.error(`Login failed: ${zError?.i18nKey}. Errors: ${JSON.stringify(error)}`);
+      return { error: t(zError.i18nKey) };
+    }
+
+    logMessage.error(`Unkown error during login: ${JSON.stringify(error)}`);
+    return { error: t("validation.invalidCredentials") };
+
+    /*
     // Handle authentication failures with generic error message
     // This prevents username enumeration attacks
     const errorDetail = error as CreateSessionFailedError;
@@ -111,6 +123,7 @@ export const submitLoginForm = async (
     // Always return generic error (don't reveal if user exists or password is wrong)
     logMessage.info("Authentication failed, returning generic error");
     return { error: t("validation.invalidCredentials") };
+    */
   }
 
   if (!session?.factors?.user?.id) {
@@ -118,16 +131,37 @@ export const submitLoginForm = async (
     return { error: t("validation.invalidCredentials") };
   }
 
+  let userResponse;
+  try {
+    userResponse = await getUserByID({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+
+    // Todo: getUserById zitadel function returns an error on not found not sure why this can return undefined
+    if (!userResponse.user) {
+      logMessage.error("User not found after successful authentication");
+      return { error: t("validation.invalidCredentials") };
+    }
+  } catch (error) {
+    const zError = getZitadelUiError("login", error);
+
+    if (zError?.i18nKey) {
+      logMessage.error(`Login failed: ${zError?.i18nKey}. Errors: ${JSON.stringify(error)}`);
+      return { error: t(zError.i18nKey) };
+    }
+
+    logMessage.error(`Unkown error during login: ${JSON.stringify(error)}`);
+    return { error: t("validation.invalidCredentials") };
+  }
+
+  /*
   // Fetch user details
   const userResponse = await getUserByID({
     serviceUrl,
     userId: session.factors.user.id,
   });
-
-  if (!userResponse.user) {
-    logMessage.error("User not found after successful authentication");
-    return { error: t("validation.invalidCredentials") };
-  }
+  */
 
   const user = userResponse.user;
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
