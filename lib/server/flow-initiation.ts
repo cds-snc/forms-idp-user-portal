@@ -60,6 +60,30 @@ export interface FlowInitiationParams {
   request: NextRequest;
 }
 
+async function safeFindValidSession({
+  serviceUrl,
+  sessions,
+  authRequest,
+  samlRequest,
+}: {
+  serviceUrl: string;
+  sessions: Session[];
+  authRequest?: Awaited<ReturnType<typeof getAuthRequest>>["authRequest"];
+  samlRequest?: Awaited<ReturnType<typeof getSAMLRequest>>["samlRequest"];
+}): Promise<Session | undefined> {
+  try {
+    return await findValidSession({
+      serviceUrl,
+      sessions,
+      authRequest,
+      samlRequest,
+    });
+  } catch (error) {
+    console.error("Failed to resolve valid session during flow initiation:", error);
+    return undefined;
+  }
+}
+
 /**
  * Handle OIDC flow initiation
  */
@@ -223,7 +247,7 @@ export async function handleOIDCFlowInitiation(
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
-      const selectedSession = await findValidSession({
+      const selectedSession = await safeFindValidSession({
         serviceUrl,
         sessions,
         authRequest,
@@ -264,7 +288,7 @@ export async function handleOIDCFlowInitiation(
 
       return callbackResponse;
     } else {
-      const selectedSession = await findValidSession({
+      const selectedSession = await safeFindValidSession({
         serviceUrl,
         sessions,
         authRequest,
@@ -369,7 +393,7 @@ export async function handleSAMLFlowInitiation(
   }
 
   // Try to find a valid session
-  const selectedSession = await findValidSession({
+  const selectedSession = await safeFindValidSession({
     serviceUrl,
     sessions,
     samlRequest,
