@@ -20,7 +20,7 @@ import { useTranslation } from "@i18n";
  *--------------------------------------------*/
 import { Alert, ErrorStatus } from "@components/ui/form";
 
-import { verifyU2FLogin } from "./actions";
+import { verifyU2FLogin } from "../actions";
 
 type PublicKeyCredentialRequestOptionsData = {
   challenge: BufferSource | string;

@@ -5,24 +5,19 @@
  *--------------------------------------------*/
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { create, Duration } from "@zitadel/client";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { create } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCookieById, getSessionCookieByLoginName } from "@lib/cookies";
-import { setSessionAndUpdateCookie } from "@lib/server/cookie";
+import { getSessionCookieById } from "@lib/cookies";
 import { getOriginalHost } from "@lib/server/host";
-import { continueWithSession } from "@lib/server/session";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { getLoginSettings, getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
+import { getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 
-/*--------------------------------------------*
- * Local Relative
- *--------------------------------------------*/
-import { U2F_ERRORS } from "./u2f-errors";
+import { U2F_ERRORS } from "../u2f-errors";
+
 type RegisterU2FCommand = {
   sessionId: string;
 };
@@ -167,61 +162,4 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   }
 
   return result;
-}
-
-type VerifyU2FLoginCommand = {
-  loginName?: string;
-  sessionId?: string;
-  organization?: string;
-  checks: Checks;
-  requestId?: string;
-  redirect?: string | null;
-};
-
-export async function verifyU2FLogin({
-  loginName,
-  sessionId,
-  organization,
-  checks,
-  requestId,
-  redirect,
-}: VerifyU2FLoginCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  let sessionCookie;
-  if (sessionId) {
-    sessionCookie = await getSessionCookieById({ sessionId, organization });
-  } else if (loginName) {
-    sessionCookie = await getSessionCookieByLoginName({ loginName, organization });
-  }
-
-  if (!sessionCookie) {
-    return { error: U2F_ERRORS.SESSION_NOT_FOUND };
-  }
-
-  // Get login settings to determine lifetime
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
-
-  const lifetime = loginSettings?.multiFactorCheckLifetime ?? {
-    seconds: BigInt(60 * 60 * 24), // default to 24 hours
-    nanos: 0,
-  };
-
-  // Actually verify the U2F credential by updating the session with the checks
-  const updatedSession = await setSessionAndUpdateCookie({
-    recentCookie: sessionCookie,
-    checks,
-    requestId,
-    lifetime: lifetime as Duration,
-  });
-
-  if (!updatedSession) {
-    return { error: U2F_ERRORS.SESSION_VERIFICATION_FAILED };
-  }
-
-  return continueWithSession({ ...updatedSession, requestId, redirect });
 }

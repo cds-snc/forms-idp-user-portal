@@ -18,7 +18,7 @@ import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { ChooseSecondFactor } from "@components/mfa/ChooseSecondFactor";
+import { ChooseSecondFactor } from "@root/app/(auth)/u2f/components/ChooseSecondFactor";
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
 

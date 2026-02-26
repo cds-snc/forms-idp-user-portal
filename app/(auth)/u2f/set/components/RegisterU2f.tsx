@@ -28,7 +28,8 @@ import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { addU2F, verifyU2F } from "./actions";
+import { addU2F, verifyU2F } from "../actions";
+
 type PublicKeyCredentialJSON = {
   id: string;
   rawId: string;

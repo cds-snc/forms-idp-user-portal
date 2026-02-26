@@ -18,7 +18,7 @@ import { SearchParams } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { LoginU2F } from "@components/mfa/u2f/LoginU2F";
+import { LoginU2F } from "@root/app/(auth)/u2f/components/LoginU2F";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
   return { title: t("verify.title") };
