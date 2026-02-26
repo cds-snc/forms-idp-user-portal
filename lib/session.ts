@@ -197,17 +197,24 @@ export async function isSessionValid({
 
   // Check email verification if EMAIL_VERIFICATION environment variable is enabled
   if (process.env.EMAIL_VERIFICATION === "true") {
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session.factors.user.id,
-    });
+    try {
+      const userResponse = await getUserByID({
+        serviceUrl,
+        userId: session.factors.user.id,
+      });
 
-    const humanUser =
-      userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
+      const humanUser =
+        userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
 
-    if (humanUser && !humanUser.email?.isVerified) {
+      if (humanUser && !humanUser.email?.isVerified) {
+        logMessage.info(
+          `Session invalid: Email not verified and EMAIL_VERIFICATION is enabled for user: ${session.factors.user.id}`
+        );
+        return false;
+      }
+    } catch (error) {
       logMessage.info(
-        `Session invalid: Email not verified and EMAIL_VERIFICATION is enabled for user: ${session.factors.user.id}`
+        `Session invalid: Could not load user ${session.factors.user.id} while validating email verification`
       );
       return false;
     }
