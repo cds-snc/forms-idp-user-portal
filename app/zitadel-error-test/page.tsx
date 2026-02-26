@@ -10,24 +10,66 @@ import { useState, useTransition } from "react";
  *--------------------------------------------*/
 import type { ZitadelTestResult } from "./actions";
 import {
+  // extended – all zitadel.ts functions
+  testAddHuman,
   testAddHumanUser,
+  testAddIDPLink,
+  testAddOTPEmail,
+  testAddOTPSMS,
+  testAuthorizeOrDenyDeviceAuthorization,
+  testCreateCallback,
+  testCreateInviteCode,
+  testCreateSAMLResponse,
+  testCreateSessionForUserIdAndIdpIntent,
+  testCreateSessionFromChecks,
+  testDeleteSession,
+  testGetActiveIdentityProviders,
+  testGetAuthRequest,
+  testGetBrandingSettings,
+  testGetDefaultOrg,
+  testGetDeviceAuthorizationRequest,
+  testGetGeneralSettings,
+  testGetHostedLoginTranslation,
+  testGetIDPByID,
   testGetLegalAndSupportSettings,
   testGetLockoutSettings,
   testGetLoginSettings,
+  testGetOrgsByDomain,
   testGetPasswordComplexitySettings,
+  testGetPasswordExpirySettings,
+  testGetSAMLRequest,
+  testGetSecuritySettings,
   testGetSerializableLoginSettings,
   testGetSession,
   testGetTOTPStatus,
   testGetU2FList,
   testGetUserByID,
+  testHumanMFAInitSkipped,
   testListAuthenticationMethodTypes,
+  testListIDPLinks,
+  testListSessions,
   testListUsers,
+  testPasswordReset,
   testPasswordResetWithReturn,
   testRegisterTOTP,
+  testRegisterU2F,
+  testRemoveTOTP,
+  testRemoveU2F,
   testResendEmailCode,
+  testRetrieveIDPIntent,
+  testSearchUsers,
+  testSendEmailCode,
+  testSendEmailCodeWithReturn,
+  testSetPassword,
+  testSetSession,
   testSetUserPassword,
+  testStartIdentityProviderFlow,
+  testStartLDAPIdentityProviderFlow,
+  testUpdateHuman,
   testVerifyEmail,
+  testVerifyInviteCode,
   testVerifyTOTPRegistration,
+  testVerifyU2FRegistration,
 } from "./actions";
 
 // ---------------------------------------------------------------------------
@@ -253,18 +295,249 @@ function TestRow({ test }: TestRowProps) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Extended tests – every exported function in zitadel.ts
+// ---------------------------------------------------------------------------
+const NEW_TESTS: TestDef[] = [
+  {
+    label: "addHuman",
+    description: "addHuman with empty AddHumanUserRequest",
+    action: testAddHuman,
+  },
+  {
+    label: "addIDPLink",
+    description: "Link a garbage IDP to a garbage user ID",
+    action: testAddIDPLink,
+  },
+  {
+    label: "addOTPEmail",
+    description: "Add OTP email for a garbage user ID",
+    action: testAddOTPEmail,
+  },
+  {
+    label: "addOTPSMS",
+    description: "Add OTP SMS for a garbage user ID",
+    action: testAddOTPSMS,
+  },
+  {
+    label: "authorizeOrDenyDeviceAuthorization",
+    description: "Authorize a device with a garbage deviceAuthorizationId",
+    action: testAuthorizeOrDenyDeviceAuthorization,
+  },
+  {
+    label: "createCallback",
+    description: "Create an OIDC callback with a garbage authRequestId",
+    action: testCreateCallback,
+  },
+  {
+    label: "createInviteCode",
+    description: "Create an invite code for a garbage user ID",
+    action: testCreateInviteCode,
+  },
+  {
+    label: "createResponse",
+    description: "Create a SAML response with a garbage samlRequestId",
+    action: testCreateSAMLResponse,
+  },
+  {
+    label: "createSessionForUserIdAndIdpIntent",
+    description: "Create session with garbage userId and IDP intent tokens",
+    action: testCreateSessionForUserIdAndIdpIntent,
+  },
+  {
+    label: "createSessionFromChecks",
+    description: "Create session with garbage userId and negative lifetime",
+    action: testCreateSessionFromChecks,
+  },
+  {
+    label: "deleteSession",
+    description: "Delete a session with garbage sessionId and token",
+    action: testDeleteSession,
+  },
+  {
+    label: "getActiveIdentityProviders",
+    description: "List active IDPs for a garbage org ID",
+    action: testGetActiveIdentityProviders,
+  },
+  {
+    label: "getAuthRequest",
+    description: "Fetch an OIDC auth request with a garbage authRequestId",
+    action: testGetAuthRequest,
+  },
+  {
+    label: "getBrandingSettings",
+    description: "Fetch branding settings with a garbage org ID",
+    action: testGetBrandingSettings,
+  },
+  {
+    label: "getDefaultOrg",
+    description: "Fetch the default organisation (no invalid args – may succeed)",
+    action: testGetDefaultOrg,
+  },
+  {
+    label: "getDeviceAuthorizationRequest",
+    description: "Fetch device auth request with a garbage user code",
+    action: testGetDeviceAuthorizationRequest,
+  },
+  {
+    label: "getGeneralSettings",
+    description: "Fetch general settings (no invalid args – may succeed)",
+    action: testGetGeneralSettings,
+  },
+  {
+    label: "getHostedLoginTranslation",
+    description: "Fetch hosted login translation with garbage org and invalid locale",
+    action: testGetHostedLoginTranslation,
+  },
+  {
+    label: "getIDPByID",
+    description: "Fetch an IDP by a garbage IDP ID",
+    action: testGetIDPByID,
+  },
+  {
+    label: "getOrgsByDomain",
+    description: "Search organisations by a non-existent domain",
+    action: testGetOrgsByDomain,
+  },
+  {
+    label: "getPasswordExpirySettings",
+    description: "Fetch password expiry settings with a garbage org ID",
+    action: testGetPasswordExpirySettings,
+  },
+  {
+    label: "getSAMLRequest",
+    description: "Fetch a SAML request with a garbage samlRequestId",
+    action: testGetSAMLRequest,
+  },
+  {
+    label: "getSecuritySettings",
+    description: "Fetch security settings (no invalid args – may succeed)",
+    action: testGetSecuritySettings,
+  },
+  {
+    label: "humanMFAInitSkipped",
+    description: "Mark MFA init as skipped for a garbage user ID",
+    action: testHumanMFAInitSkipped,
+  },
+  {
+    label: "listIDPLinks",
+    description: "List IDP links for a garbage user ID",
+    action: testListIDPLinks,
+  },
+  {
+    label: "listSessions",
+    description: "List sessions with garbage session IDs",
+    action: testListSessions,
+  },
+  {
+    label: "passwordReset",
+    description: "Send a password reset link for a garbage user ID",
+    action: testPasswordReset,
+  },
+  {
+    label: "registerU2F",
+    description: "Register a U2F device for a garbage user ID",
+    action: testRegisterU2F,
+  },
+  {
+    label: "removeTOTP",
+    description: "Remove TOTP for a garbage user ID",
+    action: testRemoveTOTP,
+  },
+  {
+    label: "removeU2F",
+    description: "Remove a U2F device with garbage userId and u2fId",
+    action: testRemoveU2F,
+  },
+  {
+    label: "retrieveIDPIntent",
+    description: "Retrieve an IDP intent with garbage id and token",
+    action: testRetrieveIDPIntent,
+  },
+  {
+    label: "searchUsers",
+    description: "Search users with a malformed value and garbage org ID",
+    action: testSearchUsers,
+  },
+  {
+    label: "sendEmailCode",
+    description: "Send an email verification code for a garbage user ID",
+    action: testSendEmailCode,
+  },
+  {
+    label: "sendEmailCodeWithReturn",
+    description: "Return an email verification code for a garbage user ID",
+    action: testSendEmailCodeWithReturn,
+  },
+  {
+    label: "setPassword",
+    description: "Set password for a garbage user ID with too-short password",
+    action: testSetPassword,
+  },
+  {
+    label: "setSession",
+    description: "Update session state with garbage sessionId and token",
+    action: testSetSession,
+  },
+  {
+    label: "startIdentityProviderFlow",
+    description: "Start an IDP OAuth flow with a garbage IDP ID",
+    action: testStartIdentityProviderFlow,
+  },
+  {
+    label: "startLDAPIdentityProviderFlow",
+    description: "Start an LDAP IDP flow with a garbage IDP ID",
+    action: testStartLDAPIdentityProviderFlow,
+  },
+  {
+    label: "updateHuman",
+    description: "Update a human user with only a garbage userId",
+    action: testUpdateHuman,
+  },
+  {
+    label: "verifyInviteCode",
+    description: "Verify an invite code for a garbage user ID",
+    action: testVerifyInviteCode,
+  },
+  {
+    label: "verifyU2FRegistration",
+    description: "Verify a U2F registration for a garbage user ID",
+    action: testVerifyU2FRegistration,
+  },
+];
+
 export default function ZitadelErrorTestPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">Zitadel Error Test</h1>
+      <p>
+        Each test shows how the related function will handle invalid data. (generated by Claude :)
+      </p>
 
-      <section>
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">Zitadel API Errors</h2>
+      <section className="my-10">
+        <h2 className="mb-3 text-lg font-semibold text-gray-800">Zitadel API Tests</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          Zitadel API functions used in the app ({TESTS.length})
+        </p>
         <ul>
           {[...TESTS]
             .sort((a, b) => a.label.localeCompare(b.label))
             .map((test) => (
-              <TestRow key={test.label} test={test} />
+              <TestRow key={`app-${test.label}`} test={test} />
+            ))}
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-lg font-semibold text-gray-800">Zitadel Custom Functions</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          Zitadel wraper functions in <code>lib/zitadel.ts</code> ({NEW_TESTS.length}).
+        </p>
+        <ul>
+          {[...NEW_TESTS]
+            .sort((a, b) => a.label.localeCompare(b.label))
+            .map((test) => (
+              <TestRow key={`custom-${test.label}`} test={test} />
             ))}
         </ul>
       </section>
