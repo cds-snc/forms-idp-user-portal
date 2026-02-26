@@ -9,7 +9,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 import { Cookie } from "@lib/cookies";
-import { sendLoginname, SendLoginnameCommand } from "@lib/server/username";
+import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
 import { createCallback, getLoginSettings } from "@lib/zitadel";
 
 import { isSessionValid } from "./session";
