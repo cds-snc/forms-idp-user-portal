@@ -1,6 +1,7 @@
 "use client";
+
 /*--------------------------------------------*
- * Local Relative
+ * Internal Aliases
  *--------------------------------------------*/
 import { useTranslation } from "./client";
 export function I18n({

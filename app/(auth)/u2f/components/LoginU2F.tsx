@@ -12,15 +12,18 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
-import { updateSession } from "@lib/server/session";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
-import { useTranslation } from "@i18n";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { updateSession } from "@lib/server/session";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { useTranslation } from "@i18n";
 import { Alert, ErrorStatus } from "@components/ui/form";
 
-import { verifyU2FLogin } from "./actions";
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { verifyU2FLogin } from "../actions";
 
 type PublicKeyCredentialRequestOptionsData = {
   challenge: BufferSource | string;
@@ -61,7 +64,6 @@ export function LoginU2F({
       initialized.current = true;
       updateSessionForChallenge()
         .then((response) => {
-          console.error("Received response for challenge request", response);
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
           if (!pK) {

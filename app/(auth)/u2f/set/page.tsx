@@ -16,7 +16,9 @@ import { loadSessionById } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { RegisterU2f } from "@components/mfa/u2f/RegisterU2f";
+
+import { RegisterU2f } from "./components/RegisterU2f";
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");
   return { title: t("set.title") };

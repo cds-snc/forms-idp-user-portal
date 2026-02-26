@@ -17,7 +17,12 @@ import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { LoginOTP } from "@components/mfa/otp/LoginOTP";
+
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
+import { LoginOTP } from "./components/LoginOTP";
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };

@@ -4,9 +4,6 @@
  * Internal Aliases
  *--------------------------------------------*/
 import { cn } from "@lib/utils";
-/*--------------------------------------------*
- * Internal Aliases
- *--------------------------------------------*/
 import { SkipLink } from "@components/ui/skip-link/SkipLink";
 
 /*--------------------------------------------*

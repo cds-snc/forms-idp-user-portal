@@ -17,7 +17,7 @@ import { Button } from "@components/ui/button/Button";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { MethodOptionCard } from "./MethodOptionCard";
+import { MethodOptionCard } from "../../components/MethodOptionCard";
 type Props = {
   checkAfter: boolean;
   requestId?: string;

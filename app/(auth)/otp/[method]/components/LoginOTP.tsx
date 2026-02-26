@@ -1,4 +1,5 @@
 "use client";
+
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
@@ -8,10 +9,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
-import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 import { I18n, useTranslation } from "@i18n";
 import { BackButton } from "@components/ui/button/BackButton";
 import { Button } from "@components/ui/button/Button";
@@ -23,7 +24,7 @@ import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { FormState, handleOTPFormSubmit, updateSessionForOTPChallenge } from "./action";
+import { FormState, handleOTPFormSubmit, updateSessionForOTPChallenge } from "../actions";
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export function LoginOTP({

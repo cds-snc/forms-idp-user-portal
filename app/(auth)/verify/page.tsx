@@ -6,14 +6,14 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { SearchParams } from "@lib/utils";
 import { getUserByID } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
-/*--------------------------------------------*
- * Internal Aliases
- *--------------------------------------------*/
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
 
