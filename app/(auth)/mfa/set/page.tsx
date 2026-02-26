@@ -21,7 +21,8 @@ import { AuthPanel } from "@components/auth/AuthPanel";
 /*--------------------------------------------*
  * Parent Relative
  *--------------------------------------------*/
-import { ChooseSecondFactorToSetup } from "../u2f/set/components/ChooseSecondFactorToSetup";
+import { ChooseSecondFactorToSetup } from "../../u2f/set/components/ChooseSecondFactorToSetup";
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
   return { title: t("set.title") };
