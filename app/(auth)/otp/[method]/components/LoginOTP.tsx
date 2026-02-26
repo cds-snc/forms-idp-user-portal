@@ -23,7 +23,7 @@ import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { FormState, handleOTPFormSubmit, updateSessionForOTPChallenge } from "./action";
+import { FormState, handleOTPFormSubmit, updateSessionForOTPChallenge } from "../actions";
 const SUPPORT_URL = process.env.NEXT_PUBLIC_FORMS_PRODUCTION_URL || "";
 
 export function LoginOTP({
