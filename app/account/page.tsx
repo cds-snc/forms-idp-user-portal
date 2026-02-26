@@ -13,6 +13,7 @@ import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
+import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { getTOTPStatus, getU2FList, getUserByID } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 
@@ -28,7 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function Page() {
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const requestId = searchParams.requestId;
+  const loginRedirect = buildUrlWithRequestId("/", requestId);
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -37,7 +42,7 @@ export default async function Page() {
   try {
     ({ sessionId, organization, loginName } = await getSessionCredentials());
   } catch (error) {
-    redirect("/");
+    redirect(loginRedirect);
   }
 
   // Page-level authentication check - defense in depth
@@ -49,7 +54,7 @@ export default async function Page() {
   );
 
   if (!authCheck.satisfied) {
-    redirect(authCheck.redirect || "/");
+    redirect(buildUrlWithRequestId(authCheck.redirect || "/", requestId));
   }
 
   const session = await loadSessionById(serviceUrl, sessionId, organization);
@@ -63,7 +68,7 @@ export default async function Page() {
 
   if (!hasRequiredProfile || !userId) {
     logMessage.info("Missing required user information, redirecting to login");
-    redirect("/");
+    redirect(loginRedirect);
   }
 
   try {
@@ -73,13 +78,13 @@ export default async function Page() {
     });
 
     if (!authSession || !(await isSessionValid({ serviceUrl, session: authSession }))) {
-      redirect("/");
+      redirect(loginRedirect);
     }
   } catch (error) {
     logMessage.error(
       `Error validating session, redirecting to login. Errors: ${JSON.stringify(error)}`
     );
-    redirect("/");
+    redirect(loginRedirect);
   }
 
   const [u2fList, authenticatorStatus] = await Promise.all([

@@ -17,6 +17,7 @@ import { idpTypeToSlug } from "@lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
 import { constructUrl } from "@lib/service-url";
 import { findValidSession } from "@lib/session";
+import { buildUrlWithRequestId } from "@lib/utils";
 import {
   createCallback,
   createResponse,
@@ -40,16 +41,25 @@ const gotoAccounts = ({
   requestId: string;
   organization?: string;
 }): NextResponse<unknown> => {
-  const accountsUrl = constructUrl(request, "/account");
+  const accountsUrl = constructUrl(request, buildUrlWithRequestId("/account", requestId));
 
-  if (requestId) {
-    accountsUrl.searchParams.set("requestId", requestId);
-  }
   if (organization) {
     accountsUrl.searchParams.set("organization", organization);
   }
 
   return NextResponse.redirect(accountsUrl);
+};
+
+const gotoLogin = ({
+  request,
+  requestId,
+}: {
+  request: NextRequest;
+  requestId: string;
+}): NextResponse<unknown> => {
+  const loginNameUrl = constructUrl(request, buildUrlWithRequestId("/", requestId));
+
+  return NextResponse.redirect(loginNameUrl);
 };
 
 export interface FlowInitiationParams {
@@ -97,8 +107,9 @@ export async function handleOIDCFlowInitiation(
     authRequestId: requestId.replace("oidc_", ""),
   });
 
+  const oidcRequestId = authRequest?.id ? `oidc_${authRequest.id}` : requestId;
+
   let organization = "";
-  let suffix = "";
   let idpId = "";
 
   if (authRequest?.scope) {
@@ -124,7 +135,6 @@ export async function handleOIDCFlowInitiation(
 
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
-            suffix = orgDomain;
           }
         }
       }
@@ -204,12 +214,30 @@ export async function handleOIDCFlowInitiation(
 
   // use existing session and hydrate it for oidc
   if (authRequest && sessions.length) {
+    // OIDC prompt=select_account requires explicit user account selection.
+    // Only route to account selection if we have at least one valid reusable session.
+    // Otherwise, send the user to login to establish a fresh session.
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
+      const selectedSession = await safeFindValidSession({
+        serviceUrl,
+        sessions,
+        authRequest,
+      });
+
+      if (!selectedSession?.id) {
+        return gotoLogin({
+          request,
+          requestId: oidcRequestId,
+        });
+      }
+
       return gotoAccounts({
         request,
-        requestId: `oidc_${authRequest.id}`,
+        requestId: oidcRequestId,
         organization,
       });
+      // OIDC prompt=login requires active re-authentication.
+      // Prefer known login hint flow when available, otherwise show login page.
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       if (authRequest.loginHint) {
         try {
@@ -233,19 +261,12 @@ export async function handleOIDCFlowInitiation(
         }
       }
 
-      const loginNameUrl = constructUrl(request, "/");
-      loginNameUrl.searchParams.set("requestId", requestId);
-
-      if (authRequest.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      }
-      if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
-      }
-      if (suffix) {
-        loginNameUrl.searchParams.set("suffix", suffix);
-      }
-      return NextResponse.redirect(loginNameUrl);
+      return gotoLogin({
+        request,
+        requestId: oidcRequestId,
+      });
+      // OIDC prompt=none must not require user interaction.
+      // If no valid reusable session is found, return an interaction-required style error response.
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       const selectedSession = await safeFindValidSession({
         serviceUrl,
@@ -287,6 +308,9 @@ export async function handleOIDCFlowInitiation(
       const callbackResponse = NextResponse.redirect(callbackUrl);
 
       return callbackResponse;
+      // Default OIDC behavior: silently continue with a valid session when possible.
+      // If continuation cannot be completed (no valid session/cookie/callback failure),
+      // fall back to interactive login with requestId context.
     } else {
       const selectedSession = await safeFindValidSession({
         serviceUrl,
@@ -295,20 +319,18 @@ export async function handleOIDCFlowInitiation(
       });
 
       if (!selectedSession || !selectedSession.id) {
-        return gotoAccounts({
+        return gotoLogin({
           request,
-          requestId: `oidc_${authRequest.id}`,
-          organization,
+          requestId: oidcRequestId,
         });
       }
 
       const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
       if (!cookie || !cookie.id || !cookie.token) {
-        return gotoAccounts({
+        return gotoLogin({
           request,
-          requestId: `oidc_${authRequest.id}`,
-          organization,
+          requestId: oidcRequestId,
         });
       }
 
@@ -331,40 +353,26 @@ export async function handleOIDCFlowInitiation(
         if (callbackUrl) {
           return NextResponse.redirect(callbackUrl);
         } else {
-          console.log("could not create callback, redirect user to choose other account");
-          return gotoAccounts({
+          console.log("could not create callback, redirect user to login");
+          return gotoLogin({
             request,
-            organization,
             requestId,
           });
         }
       } catch (error) {
         console.error(error);
-        return gotoAccounts({
+        return gotoLogin({
           request,
           requestId,
-          organization,
         });
       }
     }
   } else {
-    const loginNameUrl = constructUrl(request, "/");
-    loginNameUrl.searchParams.set("requestId", requestId);
-
-    if (authRequest?.loginHint) {
-      loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      loginNameUrl.searchParams.set("submit", "true");
-    }
-
-    if (organization) {
-      loginNameUrl.searchParams.append("organization", organization);
-    }
-
-    if (suffix) {
-      loginNameUrl.searchParams.append("suffix", suffix);
-    }
-
-    return NextResponse.redirect(loginNameUrl);
+    // No local sessions available - start an interactive login with request context.
+    return gotoLogin({
+      request,
+      requestId,
+    });
   }
 }
 
