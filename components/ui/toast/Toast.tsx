@@ -1,4 +1,5 @@
 "use client";
+
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
@@ -10,6 +11,9 @@ import {
   type ToastPosition,
 } from "react-toastify/unstyled";
 
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
 import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
 import { InfoIcon } from "@components/icons/InfoIcon";
 import { WarningIcon } from "@components/icons/WarningIcon";

@@ -6,7 +6,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { ChooseSecondFactorToSetup } from "@root/app/(auth)/u2f/set/components/ChooseSecondFactorToSetup";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -18,6 +17,11 @@ import { checkSessionFactorValidity, loadSessionById } from "@lib/session";
 import { getSerializableLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { ChooseSecondFactorToSetup } from "../u2f/set/components/ChooseSecondFactorToSetup";
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
   return { title: t("set.title") };

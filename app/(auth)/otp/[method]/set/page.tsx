@@ -27,6 +27,9 @@ import * as Alert from "@components/ui/alert/Alert";
 import { BackButton } from "@components/ui/button/BackButton";
 import { Button } from "@components/ui/button/Button";
 
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 import { TotpRegister } from "../components/TotpRegister";
 
 export default async function Page(props: {

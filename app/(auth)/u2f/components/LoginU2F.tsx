@@ -12,14 +12,17 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
-import { updateSession } from "@lib/server/session";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
-import { useTranslation } from "@i18n";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { updateSession } from "@lib/server/session";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
+import { useTranslation } from "@i18n";
 import { Alert, ErrorStatus } from "@components/ui/form";
 
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
 import { verifyU2FLogin } from "../actions";
 
 type PublicKeyCredentialRequestOptionsData = {

@@ -13,10 +13,10 @@ import {
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { updateSession } from "@lib/server/session";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { updateSession } from "@lib/server/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@lib/utils/base64";
 import { I18n } from "@i18n";

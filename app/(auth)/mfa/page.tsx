@@ -5,9 +5,7 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { serverTranslation } from "i18n/server";
 
-import { ChooseSecondFactor } from "@root/app/(auth)/u2f/components/ChooseSecondFactor";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -17,8 +15,14 @@ import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protectio
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
+import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
+
+/*--------------------------------------------*
+ * Parent Relative
+ *--------------------------------------------*/
+import { ChooseSecondFactor } from "../u2f/components/ChooseSecondFactor";
 // Strong MFA methods that must be configured before accessing the MFA selection page
 const STRONG_MFA_METHODS = [AuthenticationMethodType.TOTP, AuthenticationMethodType.U2F];
 
