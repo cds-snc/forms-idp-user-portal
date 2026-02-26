@@ -61,7 +61,6 @@ export function LoginU2F({
       initialized.current = true;
       updateSessionForChallenge()
         .then((response) => {
-          console.error("Received response for challenge request", response);
           const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
           if (!pK) {
