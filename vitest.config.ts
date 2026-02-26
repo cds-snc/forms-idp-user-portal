@@ -10,7 +10,22 @@ export default defineConfig({
     include: ["**/*.{test,spec}.{ts,tsx}"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "json-summary"],
+      include: ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+      exclude: [
+        "**/*.{test,spec}.{ts,tsx}",
+        "**/*.d.ts",
+        "test/**",
+        ".next/**",
+        "coverage/**",
+        "node_modules/**",
+      ],
+      thresholds: {
+        statements: 10,
+        branches: 10,
+        functions: 10,
+        lines: 10,
+      },
     },
   },
 });
