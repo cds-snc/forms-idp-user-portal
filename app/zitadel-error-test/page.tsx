@@ -132,9 +132,6 @@ const TESTS: TestDef[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
 type ResultCardProps = {
   result: ZitadelTestResult;
 };
@@ -256,79 +253,13 @@ function TestRow({ test }: TestRowProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Run-all state machine
-// ---------------------------------------------------------------------------
-type AllResultsState = {
-  results: ZitadelTestResult[];
-  running: boolean;
-};
-
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
 export default function ZitadelErrorTestPage() {
-  const [allState, setAllState] = useState<AllResultsState>({
-    results: [],
-    running: false,
-  });
-
-  async function runAll() {
-    setAllState({ results: [], running: true });
-    const results = await Promise.all(
-      TESTS.map(async (test) => {
-        const res = await test.action();
-        if (res.error) {
-          console.error(`[zitadel-error-test] ${res.fnName}`, res);
-        } else {
-          console.log(`[zitadel-error-test] ${res.fnName}`, res);
-        }
-        return res;
-      })
-    );
-    setAllState({ results, running: false });
-  }
-
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">Zitadel Error Test</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        Each button calls the named Zitadel function with intentionally invalid arguments. Results
-        and errors are displayed inline and also written to the browser console via{" "}
-        <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">[zitadel-error-test]</code>.
-      </p>
 
-      {/* Run-all section */}
-      <section className="mb-8 rounded border border-gray-300 bg-gray-50 p-4">
-        <div className="flex items-center gap-4">
-          <button
-            className="rounded bg-gray-800 px-5 py-2 text-sm font-bold text-white hover:bg-gray-900 disabled:opacity-50"
-            disabled={allState.running}
-            onClick={runAll}
-          >
-            {allState.running ? "Running all tests…" : "Run all tests in parallel"}
-          </button>
-          {!allState.running && allState.results.length > 0 && (
-            <span className="text-sm text-gray-600">
-              {allState.results.filter((r) => r.error).length} errors /{" "}
-              {allState.results.filter((r) => !r.error).length} successes out of{" "}
-              {allState.results.length} tests
-            </span>
-          )}
-        </div>
-
-        {allState.results.length > 0 && (
-          <ul className="mt-4 space-y-2">
-            {allState.results.map((r) => (
-              <ResultCard key={r.fnName} result={r} />
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Individual test rows */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">Individual tests</h2>
+        <h2 className="mb-3 text-lg font-semibold text-gray-800">Zitadel API Errors</h2>
         <ul>
           {[...TESTS]
             .sort((a, b) => a.label.localeCompare(b.label))
