@@ -246,14 +246,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
       if (
-        user.preferredLoginName !== concatLoginname ||
+        user.preferredLoginName !== concatLoginname &&
         humanUser?.phone?.phone !== command.loginName
       ) {
         return { error: t("errors.userNotFound") };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
       if (
-        user.preferredLoginName !== concatLoginname ||
+        user.preferredLoginName !== concatLoginname &&
         humanUser?.email?.email !== command.loginName
       ) {
         return { error: t("errors.userNotFound") };

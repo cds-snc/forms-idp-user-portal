@@ -17,7 +17,7 @@ import { createResponse, getLoginSettings } from "@lib/zitadel";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { sendLoginname, SendLoginnameCommand } from "./server/username";
+import { sendLoginname, SendLoginnameCommand } from "./server/loginname";
 import { isSessionValid } from "./session";
 type LoginWithSAMLAndSession = {
   serviceUrl: string;
