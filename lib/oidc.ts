@@ -10,7 +10,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 import { Cookie } from "@lib/cookies";
 import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
-import { createCallback, getAuthRequest, getLoginSettings } from "@lib/zitadel";
+import { createCallback } from "@lib/zitadel";
 
 import { isSessionValid } from "./session";
 
@@ -89,39 +89,8 @@ export async function loginWithOIDCAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
-          // First, try to get the original redirectUri from the auth request
-          try {
-            const { authRequest: authRequestData } = await getAuthRequest({
-              serviceUrl,
-              authRequestId: authRequest,
-            });
-
-            // If we have a redirectUri from the original auth request, use that
-            if (authRequestData?.redirectUri) {
-              console.log(
-                "Redirecting to original auth request redirectUri:",
-                authRequestData.redirectUri
-              );
-              return { redirect: authRequestData.redirectUri };
-            }
-          } catch (authRequestError) {
-            console.error("Failed to get auth request:", authRequestError);
-            // Continue to fallback options
-          }
-
-          // Fallback to login settings defaultRedirectUri
-          const loginSettings = await getLoginSettings({
-            serviceUrl,
-            organization: selectedSession.factors?.user?.organizationId,
-          });
-
-          if (loginSettings?.defaultRedirectUri) {
-            return { redirect: loginSettings.defaultRedirectUri };
-          }
-
-          const signedinUrl = `/account${authRequest ? `?requestId=oidc_${authRequest}` : ""}`;
-          console.log("Redirecting to signed-in page:", signedinUrl);
-          return { redirect: signedinUrl };
+          // Auth request already handled - signal this so the caller can redirect to login for a fresh flow
+          return { error: "Auth request already handled" };
         } else {
           return { error: "Unknown error occurred" };
         }
