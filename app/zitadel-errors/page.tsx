@@ -132,56 +132,6 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
     ],
   },
   {
-    label: "getLegalAndSupportSettings",
-    errorScenarios: [
-      {
-        possibleError: E_SUCCESS,
-        action: testGetLegalAndSupportSettings,
-        note: "Settings cascade from org \u2192 instance: any org ID (valid, invalid, or omitted) returns instance-level defaults. No error path via org context.",
-      },
-    ],
-  },
-  {
-    label: "getLockoutSettings",
-    errorScenarios: [
-      {
-        possibleError: E_SUCCESS,
-        action: testGetLockoutSettings,
-        note: "Settings cascade from org \u2192 instance: any org ID (valid, invalid, or omitted) returns instance-level defaults. No error path via org context.",
-      },
-    ],
-  },
-  {
-    label: "getLoginSettings",
-    errorScenarios: [
-      {
-        possibleError: E_SUCCESS,
-        action: testGetLoginSettings,
-        note: "Settings cascade from org \u2192 instance: any org ID (valid, invalid, or omitted) returns instance-level defaults. No error path via org context.",
-      },
-    ],
-  },
-  {
-    label: "getPasswordComplexitySettings",
-    errorScenarios: [
-      {
-        possibleError: E_SUCCESS,
-        action: testGetPasswordComplexitySettings,
-        note: "Settings cascade from org \u2192 instance: any org ID (valid, invalid, or omitted) returns instance-level defaults. No error path via org context.",
-      },
-    ],
-  },
-  {
-    label: "getSerializableLoginSettings",
-    errorScenarios: [
-      {
-        possibleError: E_SUCCESS,
-        action: testGetSerializableLoginSettings,
-        note: "Settings cascade from org \u2192 instance: any org ID (valid, invalid, or omitted) returns instance-level defaults. No error path via org context.",
-      },
-    ],
-  },
-  {
     label: "getSession",
     errorScenarios: [
       {
@@ -310,6 +260,290 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
         note: "userId: valid-format ID; only code: '123' is invalid (must be 6 digits)",
       },
     ],
+  },
+];
+
+const ZITADEL_WRAPER_FUNCTIONS_TESTS: SimpleTestDef[] = [
+  {
+    label: "addHuman",
+    description: "addHuman with empty AddHumanUserRequest",
+    action: testAddHuman,
+    possibleErrors: [E_INVALID_ARG],
+  },
+  {
+    label: "addIDPLink",
+    description: "Link a garbage IDP to a garbage user ID",
+    action: testAddIDPLink,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "addOTPEmail",
+    description: "Add OTP email for a garbage user ID",
+    action: testAddOTPEmail,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "addOTPSMS",
+    description: "Add OTP SMS for a garbage user ID",
+    action: testAddOTPSMS,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "authorizeOrDenyDeviceAuthorization",
+    description: "Authorize a device with a garbage deviceAuthorizationId",
+    action: testAuthorizeOrDenyDeviceAuthorization,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "createCallback",
+    description: "Create an OIDC callback with a garbage authRequestId",
+    action: testCreateCallback,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "createInviteCode",
+    description: "Create an invite code for a garbage user ID",
+    action: testCreateInviteCode,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "createResponse",
+    description: "Create a SAML response with a garbage samlRequestId",
+    action: testCreateSAMLResponse,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "createSessionForUserIdAndIdpIntent",
+    description: "Create session with garbage userId and IDP intent tokens",
+    action: testCreateSessionForUserIdAndIdpIntent,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "createSessionFromChecks",
+    description: "Create session with garbage userId and negative lifetime",
+    action: testCreateSessionFromChecks,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "deleteSession",
+    description: "Delete a session with garbage sessionId and token",
+    action: testDeleteSession,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "getActiveIdentityProviders",
+    description: "List active IDPs using makeReqCtx (always cascades to instance)",
+    action: testGetActiveIdentityProviders,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getAuthRequest",
+    description: "Fetch an OIDC auth request with a garbage authRequestId",
+    action: testGetAuthRequest,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "getBrandingSettings",
+    description: "Fetch branding settings — makeReqCtx cascades to instance defaults",
+    action: testGetBrandingSettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getDefaultOrg",
+    description: "Fetch the default organisation — list query, returns null if none configured",
+    action: testGetDefaultOrg,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getDeviceAuthorizationRequest",
+    description: "Fetch device auth request with a garbage user code",
+    action: testGetDeviceAuthorizationRequest,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "getGeneralSettings",
+    description: "Fetch general settings (no invalid args – may succeed)",
+    action: testGetGeneralSettings,
+    possibleErrors: [],
+  },
+  {
+    label: "getHostedLoginTranslation",
+    description:
+      "Fetch hosted login translation — org cascades to instance, unknown locale returns empty",
+    action: testGetHostedLoginTranslation,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getIDPByID",
+    description: "Fetch an IDP by a garbage IDP ID",
+    action: testGetIDPByID,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "getLegalAndSupportSettings",
+    description: "Fetch legal and support settings — makeReqCtx cascades to instance defaults",
+    action: testGetLegalAndSupportSettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getLockoutSettings",
+    description: "Fetch lockout settings — makeReqCtx cascades to instance defaults",
+    action: testGetLockoutSettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getLoginSettings",
+    description: "Fetch login settings — makeReqCtx cascades to instance defaults",
+    action: testGetLoginSettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getOrgsByDomain",
+    description: "Search organisations by a non-existent domain",
+    action: testGetOrgsByDomain,
+    possibleErrors: [],
+  },
+  {
+    label: "getPasswordComplexitySettings",
+    description: "Fetch password complexity settings — makeReqCtx cascades to instance defaults",
+    action: testGetPasswordComplexitySettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getPasswordExpirySettings",
+    description: "Fetch password expiry settings — makeReqCtx cascades to instance defaults",
+    action: testGetPasswordExpirySettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "getSAMLRequest",
+    description: "Fetch a SAML request with a garbage samlRequestId",
+    action: testGetSAMLRequest,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "getSecuritySettings",
+    description: "Fetch security settings (no invalid args – may succeed)",
+    action: testGetSecuritySettings,
+    possibleErrors: [],
+  },
+  {
+    label: "getSerializableLoginSettings",
+    description: "Fetch serializable login settings — makeReqCtx cascades to instance defaults",
+    action: testGetSerializableLoginSettings,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "humanMFAInitSkipped",
+    description: "Mark MFA init as skipped for a garbage user ID",
+    action: testHumanMFAInitSkipped,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "listIDPLinks",
+    description: "List IDP links for a garbage user ID",
+    action: testListIDPLinks,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "listSessions",
+    description: "List sessions — IDs query returns empty array for unknown IDs",
+    action: testListSessions,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "passwordReset",
+    description: "Send a password reset link for a garbage user ID",
+    action: testPasswordReset,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "registerU2F",
+    description: "Register a U2F device for a garbage user ID",
+    action: testRegisterU2F,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "removeTOTP",
+    description: "Remove TOTP for a garbage user ID",
+    action: testRemoveTOTP,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "removeU2F",
+    description: "Remove a U2F device with garbage userId and u2fId",
+    action: testRemoveU2F,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "retrieveIDPIntent",
+    description: "Retrieve an IDP intent with garbage id and token",
+    action: testRetrieveIDPIntent,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "searchUsers",
+    description: "Search users — returns empty result array, not an error, when no matches found",
+    action: testSearchUsers,
+    possibleErrors: [E_SUCCESS],
+  },
+  {
+    label: "sendEmailCode",
+    description: "Send an email verification code for a garbage user ID",
+    action: testSendEmailCode,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "sendEmailCodeWithReturn",
+    description: "Return an email verification code for a garbage user ID",
+    action: testSendEmailCodeWithReturn,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "setPassword",
+    description:
+      "Set password for a garbage user ID — user lookup fires before password validation",
+    action: testSetPassword,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "setSession",
+    description: "Update session state with garbage sessionId — lookup fires before token check",
+    action: testSetSession,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "startIdentityProviderFlow",
+    description: "Start an IDP OAuth flow with a garbage IDP ID",
+    action: testStartIdentityProviderFlow,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "startLDAPIdentityProviderFlow",
+    description:
+      "Start an LDAP IDP flow with a garbage IDP ID — IDP lookup fires before LDAP checks",
+    action: testStartLDAPIdentityProviderFlow,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "updateHuman",
+    description: "Update a human user with only a garbage userId",
+    action: testUpdateHuman,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "verifyInviteCode",
+    description:
+      "Verify an invite code for a garbage user ID — user lookup fires before code validation",
+    action: testVerifyInviteCode,
+    possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "verifyU2FRegistration",
+    description:
+      "Verify a U2F registration for a garbage user ID — user lookup fires before registration check",
+    action: testVerifyU2FRegistration,
+    possibleErrors: [E_NOT_FOUND],
   },
 ];
 
@@ -568,260 +802,6 @@ function SimpleTestRow({ test }: SimpleTestRowProps) {
     </li>
   );
 }
-
-const ZITADEL_WRAPER_FUNCTIONS_TESTS: SimpleTestDef[] = [
-  {
-    label: "addHuman",
-    description: "addHuman with empty AddHumanUserRequest",
-    action: testAddHuman,
-    possibleErrors: [E_INVALID_ARG],
-  },
-  {
-    label: "addIDPLink",
-    description: "Link a garbage IDP to a garbage user ID",
-    action: testAddIDPLink,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "addOTPEmail",
-    description: "Add OTP email for a garbage user ID",
-    action: testAddOTPEmail,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "addOTPSMS",
-    description: "Add OTP SMS for a garbage user ID",
-    action: testAddOTPSMS,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "authorizeOrDenyDeviceAuthorization",
-    description: "Authorize a device with a garbage deviceAuthorizationId",
-    action: testAuthorizeOrDenyDeviceAuthorization,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createCallback",
-    description: "Create an OIDC callback with a garbage authRequestId",
-    action: testCreateCallback,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createInviteCode",
-    description: "Create an invite code for a garbage user ID",
-    action: testCreateInviteCode,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createResponse",
-    description: "Create a SAML response with a garbage samlRequestId",
-    action: testCreateSAMLResponse,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createSessionForUserIdAndIdpIntent",
-    description: "Create session with garbage userId and IDP intent tokens",
-    action: testCreateSessionForUserIdAndIdpIntent,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createSessionFromChecks",
-    description: "Create session with garbage userId and negative lifetime",
-    action: testCreateSessionFromChecks,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "deleteSession",
-    description: "Delete a session with garbage sessionId and token",
-    action: testDeleteSession,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "getActiveIdentityProviders",
-    description: "List active IDPs using makeReqCtx (always cascades to instance)",
-    action: testGetActiveIdentityProviders,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "getAuthRequest",
-    description: "Fetch an OIDC auth request with a garbage authRequestId",
-    action: testGetAuthRequest,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "getBrandingSettings",
-    description: "Fetch branding settings — makeReqCtx cascades to instance defaults",
-    action: testGetBrandingSettings,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "getDefaultOrg",
-    description: "Fetch the default organisation — list query, returns null if none configured",
-    action: testGetDefaultOrg,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "getDeviceAuthorizationRequest",
-    description: "Fetch device auth request with a garbage user code",
-    action: testGetDeviceAuthorizationRequest,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "getGeneralSettings",
-    description: "Fetch general settings (no invalid args – may succeed)",
-    action: testGetGeneralSettings,
-    possibleErrors: [],
-  },
-  {
-    label: "getHostedLoginTranslation",
-    description:
-      "Fetch hosted login translation — org cascades to instance, unknown locale returns empty",
-    action: testGetHostedLoginTranslation,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "getIDPByID",
-    description: "Fetch an IDP by a garbage IDP ID",
-    action: testGetIDPByID,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "getOrgsByDomain",
-    description: "Search organisations by a non-existent domain",
-    action: testGetOrgsByDomain,
-    possibleErrors: [],
-  },
-  {
-    label: "getPasswordExpirySettings",
-    description: "Fetch password expiry settings — makeReqCtx cascades to instance defaults",
-    action: testGetPasswordExpirySettings,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "getSAMLRequest",
-    description: "Fetch a SAML request with a garbage samlRequestId",
-    action: testGetSAMLRequest,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "getSecuritySettings",
-    description: "Fetch security settings (no invalid args – may succeed)",
-    action: testGetSecuritySettings,
-    possibleErrors: [],
-  },
-  {
-    label: "humanMFAInitSkipped",
-    description: "Mark MFA init as skipped for a garbage user ID",
-    action: testHumanMFAInitSkipped,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "listIDPLinks",
-    description: "List IDP links for a garbage user ID",
-    action: testListIDPLinks,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "listSessions",
-    description: "List sessions — IDs query returns empty array for unknown IDs",
-    action: testListSessions,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "passwordReset",
-    description: "Send a password reset link for a garbage user ID",
-    action: testPasswordReset,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "registerU2F",
-    description: "Register a U2F device for a garbage user ID",
-    action: testRegisterU2F,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "removeTOTP",
-    description: "Remove TOTP for a garbage user ID",
-    action: testRemoveTOTP,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "removeU2F",
-    description: "Remove a U2F device with garbage userId and u2fId",
-    action: testRemoveU2F,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "retrieveIDPIntent",
-    description: "Retrieve an IDP intent with garbage id and token",
-    action: testRetrieveIDPIntent,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "searchUsers",
-    description: "Search users — returns empty result array, not an error, when no matches found",
-    action: testSearchUsers,
-    possibleErrors: [E_SUCCESS],
-  },
-  {
-    label: "sendEmailCode",
-    description: "Send an email verification code for a garbage user ID",
-    action: testSendEmailCode,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "sendEmailCodeWithReturn",
-    description: "Return an email verification code for a garbage user ID",
-    action: testSendEmailCodeWithReturn,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "setPassword",
-    description:
-      "Set password for a garbage user ID — user lookup fires before password validation",
-    action: testSetPassword,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "setSession",
-    description: "Update session state with garbage sessionId — lookup fires before token check",
-    action: testSetSession,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "startIdentityProviderFlow",
-    description: "Start an IDP OAuth flow with a garbage IDP ID",
-    action: testStartIdentityProviderFlow,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "startLDAPIdentityProviderFlow",
-    description:
-      "Start an LDAP IDP flow with a garbage IDP ID — IDP lookup fires before LDAP checks",
-    action: testStartLDAPIdentityProviderFlow,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "updateHuman",
-    description: "Update a human user with only a garbage userId",
-    action: testUpdateHuman,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "verifyInviteCode",
-    description:
-      "Verify an invite code for a garbage user ID — user lookup fires before code validation",
-    action: testVerifyInviteCode,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "verifyU2FRegistration",
-    description:
-      "Verify a U2F registration for a garbage user ID — user lookup fires before registration check",
-    action: testVerifyU2FRegistration,
-    possibleErrors: [E_NOT_FOUND],
-  },
-];
 
 export default function ZitadelErrorTestPage() {
   return (
