@@ -98,7 +98,6 @@ export async function loginWithOIDCAndSession({
             return { redirect: loginSettings.defaultRedirectUri };
           }
 
-          // Only include requestId, do not leak loginName or organization
           const signedinUrl = `/account${authRequest ? `?requestId=oidc_${authRequest}` : ""}`;
           console.log("Redirecting to signed-in page:", signedinUrl);
           return { redirect: signedinUrl };
