@@ -17,6 +17,7 @@ import {
   type VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -86,12 +87,23 @@ import {
 // ---------------------------------------------------------------------------
 // Constants – deliberately invalid to provoke Zitadel errors
 // ---------------------------------------------------------------------------
+// Garbage-format IDs (non-numeric) – Zitadel may reject on argument validation alone
 const INVALID_USER_ID = "invalid-user-id-test-garbage-000";
-const INVALID_ORG_ID = "invalid-org-id-test-garbage-000";
 const INVALID_SESSION_ID = "invalid-session-id-test-garbage-000";
 const INVALID_SESSION_TOKEN = "invalid-session-token-garbage-000";
 const INVALID_IDP_ID = "invalid-idp-id-test-garbage-000";
 const INVALID_AUTH_REQUEST_ID = "invalid-auth-request-id-garbage-000";
+
+// Valid-format IDs (18-digit numeric strings matching Zitadel's ID format) that
+// reference resources guaranteed not to exist → triggers NOT_FOUND rather than
+// INVALID_ARGUMENT from argument validation.
+const NONEXISTENT_USER_ID = "999999999999999999";
+const NONEXISTENT_ORG_ID = "999999999999999998";
+const NONEXISTENT_SESSION_ID = "999999999999999997";
+
+// Real configured org ID – used when a valid org is required to isolate a specific
+// field as the sole source of error (e.g. email/name validation in addHumanUser).
+const REAL_ORG_ID = ZITADEL_ORGANIZATION;
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -178,76 +190,64 @@ async function runTest(
 // Individual test actions
 // ---------------------------------------------------------------------------
 
+// Settings functions use makeReqCtx(org) which Zitadel treats as a hint, always cascading to
+// instance-level defaults if no org-specific override exists. No error can be triggered via
+// the org context — all org IDs (invalid, nonexistent, or omitted) succeed.
 export async function testGetLoginSettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organization: INVALID_ORG_ID };
+  const args = { organization: REAL_ORG_ID };
   return runTest("getLoginSettings", args, () =>
-    getLoginSettings({ serviceUrl, organization: INVALID_ORG_ID })
+    getLoginSettings({ serviceUrl, organization: REAL_ORG_ID })
   );
 }
 
 export async function testGetSerializableLoginSettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organizationId: INVALID_ORG_ID };
+  const args = { organizationId: REAL_ORG_ID };
   return runTest("getSerializableLoginSettings", args, () =>
-    getSerializableLoginSettings({ serviceUrl, organizationId: INVALID_ORG_ID })
+    getSerializableLoginSettings({ serviceUrl, organizationId: REAL_ORG_ID })
   );
 }
 
 export async function testGetLockoutSettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { orgId: INVALID_ORG_ID };
+  const args = { orgId: REAL_ORG_ID };
   return runTest("getLockoutSettings", args, () =>
-    getLockoutSettings({ serviceUrl, orgId: INVALID_ORG_ID })
+    getLockoutSettings({ serviceUrl, orgId: REAL_ORG_ID })
   );
 }
 
 export async function testGetPasswordComplexitySettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organization: INVALID_ORG_ID };
+  const args = { organization: REAL_ORG_ID };
   return runTest("getPasswordComplexitySettings", args, () =>
-    getPasswordComplexitySettings({ serviceUrl, organization: INVALID_ORG_ID })
+    getPasswordComplexitySettings({ serviceUrl, organization: REAL_ORG_ID })
   );
 }
 
 export async function testGetLegalAndSupportSettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organization: INVALID_ORG_ID };
+  const args = { organization: REAL_ORG_ID };
   return runTest("getLegalAndSupportSettings", args, () =>
-    getLegalAndSupportSettings({ serviceUrl, organization: INVALID_ORG_ID })
-  );
-}
-
-export async function testGetUserByID(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("getUserByID", args, () => getUserByID({ serviceUrl, userId: INVALID_USER_ID }));
-}
-
-export async function testListAuthenticationMethodTypes(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("listAuthenticationMethodTypes", args, () =>
-    listAuthenticationMethodTypes({ serviceUrl, userId: INVALID_USER_ID })
+    getLegalAndSupportSettings({ serviceUrl, organization: REAL_ORG_ID })
   );
 }
 
 export async function testAddHumanUser(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  // Invalid: empty firstName/lastName, malformed email, garbage org
+  // INVALID_ARGUMENT: org is REAL so Zitadel reaches field validation;
+  // only email + name fields are invalid, isolating the INVALID_ARGUMENT path.
   const args = {
     email: "not-an-email",
     firstName: "",
     lastName: "",
-    organization: INVALID_ORG_ID,
+    organization: REAL_ORG_ID,
   };
   return runTest("addHumanUser", args, () =>
     addHumanUser({
@@ -255,110 +255,188 @@ export async function testAddHumanUser(): Promise<ZitadelTestResult> {
       email: "not-an-email",
       firstName: "",
       lastName: "",
-      organization: INVALID_ORG_ID,
+      organization: REAL_ORG_ID,
     })
   );
 }
 
+// listUsers: flexible search query — always returns results (possibly empty). No error path
+// reachable via org/loginName args, similar to the settings functions.
 export async function testListUsers(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  // Use a garbage org ID to trigger an error; loginName alone usually returns empty, not an error
-  const args = { loginName: "garbage@@@@##invalid", organizationId: INVALID_ORG_ID };
-  return runTest("listUsers", args, () =>
-    listUsers({
-      serviceUrl,
-      loginName: "garbage@@@@##invalid",
-      organizationId: INVALID_ORG_ID,
-    })
-  );
-}
-
-export async function testPasswordResetWithReturn(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("passwordResetWithReturn", args, () =>
-    passwordResetWithReturn({ serviceUrl, userId: INVALID_USER_ID })
-  );
-}
-
-export async function testRegisterTOTP(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("registerTOTP", args, () => registerTOTP({ serviceUrl, userId: INVALID_USER_ID }));
-}
-
-export async function testGetTOTPStatus(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("getTOTPStatus", args, () =>
-    getTOTPStatus({ serviceUrl, userId: INVALID_USER_ID })
-  );
-}
-
-export async function testGetU2FList(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID };
-  return runTest("getU2FList", args, () => getU2FList({ serviceUrl, userId: INVALID_USER_ID }));
+  const args = { organizationId: REAL_ORG_ID };
+  return runTest("listUsers", args, () => listUsers({ serviceUrl, organizationId: REAL_ORG_ID }));
 }
 
 export async function testVerifyEmail(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID, verificationCode: "000000" };
+  // NOT_FOUND: valid-format userId that doesn't exist + properly-formatted 6-digit code
+  const args = { userId: NONEXISTENT_USER_ID, verificationCode: "000000" };
   return runTest("verifyEmail", args, () =>
-    verifyEmail({ serviceUrl, userId: INVALID_USER_ID, verificationCode: "000000" })
+    verifyEmail({ serviceUrl, userId: NONEXISTENT_USER_ID, verificationCode: "000000" })
   );
 }
 
 export async function testVerifyTOTPRegistration(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID, code: "000000" };
+  // NOT_FOUND: valid-format userId that doesn't exist + properly-formatted 6-digit code
+  const args = { userId: NONEXISTENT_USER_ID, code: "000000" };
   return runTest("verifyTOTPRegistration", args, () =>
-    verifyTOTPRegistration({ serviceUrl, userId: INVALID_USER_ID, code: "000000" })
-  );
-}
-
-export async function testSetUserPassword(): Promise<ZitadelTestResult> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID, password: "x", code: "000000" };
-  return runTest("setUserPassword", args, () =>
-    setUserPassword({
-      serviceUrl,
-      userId: INVALID_USER_ID,
-      password: "x",
-      code: "000000",
-    })
+    verifyTOTPRegistration({ serviceUrl, userId: NONEXISTENT_USER_ID, code: "000000" })
   );
 }
 
 export async function testGetSession(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { sessionId: INVALID_SESSION_ID, sessionToken: INVALID_SESSION_TOKEN };
+  // NOT_FOUND: valid-format sessionId that doesn't exist; token doesn't matter
+  const args = { sessionId: NONEXISTENT_SESSION_ID, sessionToken: INVALID_SESSION_TOKEN };
   return runTest("getSession", args, () =>
     getSession({
       serviceUrl,
-      sessionId: INVALID_SESSION_ID,
+      sessionId: NONEXISTENT_SESSION_ID,
       sessionToken: INVALID_SESSION_TOKEN,
     })
   );
 }
 
+// ---------------------------------------------------------------------------
+// Variant actions – alternate args designed to target a specific error code
+// ---------------------------------------------------------------------------
+
+// addHumanUser – PERMISSION_DENIED variant: valid names/email, only organization doesn't exist.
+// Zitadel returns PERMISSION_DENIED (7) rather than NOT_FOUND when the org is unknown because
+// the service account has no access to that org – it's an auth boundary, not a DB miss.
+export async function testAddHumanUserPermissionDenied(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = {
+    email: "test.user@example.com",
+    firstName: "Test",
+    lastName: "User",
+    organization: NONEXISTENT_ORG_ID,
+  };
+  return runTest("addHumanUser", args, () =>
+    addHumanUser({
+      serviceUrl,
+      email: "test.user@example.com",
+      firstName: "Test",
+      lastName: "User",
+      organization: NONEXISTENT_ORG_ID,
+    })
+  );
+}
+
+// verifyTOTPRegistration – INVALID_ARGUMENT: valid-format userId, only the code is too short
+export async function testVerifyTOTPRegistrationShortCode(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, code: "123" };
+  return runTest("verifyTOTPRegistration", args, () =>
+    verifyTOTPRegistration({ serviceUrl, userId: NONEXISTENT_USER_ID, code: "123" })
+  );
+}
+
+// setUserPassword – NOT_FOUND: valid-format userId that doesn't exist + valid password + valid code
+export async function testSetUserPasswordNotFound(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, password: "TestPass123!", code: "000000" };
+  return runTest("setUserPassword", args, () =>
+    setUserPassword({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      password: "TestPass123!",
+      code: "000000",
+    })
+  );
+}
+
+// setUserPassword – INVALID_ARGUMENT: valid-format userId + valid code, only password is too short
+export async function testSetUserPasswordShortPassword(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, password: "x", code: "000000" };
+  return runTest("setUserPassword", args, () =>
+    setUserPassword({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      password: "x",
+      code: "000000",
+    })
+  );
+}
+
+// getTOTPStatus – NOT_FOUND: valid-format userId that doesn't exist
+export async function testGetTOTPStatus(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("getTOTPStatus", args, () =>
+    getTOTPStatus({ serviceUrl, userId: NONEXISTENT_USER_ID })
+  );
+}
+
+// getU2FList – NOT_FOUND: valid-format userId that doesn't exist
+export async function testGetU2FList(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("getU2FList", args, () => getU2FList({ serviceUrl, userId: NONEXISTENT_USER_ID }));
+}
+
+// getUserByID – NOT_FOUND: valid-format userId that doesn't exist
+export async function testGetUserByID(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("getUserByID", args, () =>
+    getUserByID({ serviceUrl, userId: NONEXISTENT_USER_ID })
+  );
+}
+
+// listAuthenticationMethodTypes – NOT_FOUND: valid-format userId that doesn't exist
+export async function testListAuthenticationMethodTypes(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("listAuthenticationMethodTypes", args, () =>
+    listAuthenticationMethodTypes({ serviceUrl, userId: NONEXISTENT_USER_ID })
+  );
+}
+
+// passwordResetWithReturn – NOT_FOUND: valid-format userId that doesn't exist
+export async function testPasswordResetWithReturn(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("passwordResetWithReturn", args, () =>
+    passwordResetWithReturn({ serviceUrl, userId: NONEXISTENT_USER_ID })
+  );
+}
+
+// registerTOTP – NOT_FOUND: valid-format userId that doesn't exist
+export async function testRegisterTOTP(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID };
+  return runTest("registerTOTP", args, () =>
+    registerTOTP({ serviceUrl, userId: NONEXISTENT_USER_ID })
+  );
+}
+
+// resendEmailCode – NOT_FOUND: valid-format userId that doesn't exist
 export async function testResendEmailCode(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { userId: INVALID_USER_ID, urlTemplate: "https://example.com" };
+  const args = { userId: NONEXISTENT_USER_ID, urlTemplate: "https://example.com" };
   return runTest("resendEmailCode", args, () =>
     resendEmailCode({
       serviceUrl,
-      userId: INVALID_USER_ID,
+      userId: NONEXISTENT_USER_ID,
       urlTemplate: "https://example.com",
     })
   );
@@ -496,12 +574,13 @@ export async function testDeleteSession(): Promise<ZitadelTestResult> {
   );
 }
 
+// getActiveIdentityProviders uses makeReqCtx(orgId) → always cascades to instance defaults
 export async function testGetActiveIdentityProviders(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { orgId: INVALID_ORG_ID };
+  const args = { orgId: REAL_ORG_ID };
   return runTest("getActiveIdentityProviders", args, () =>
-    getActiveIdentityProviders({ serviceUrl, orgId: INVALID_ORG_ID })
+    getActiveIdentityProviders({ serviceUrl, orgId: REAL_ORG_ID })
   );
 }
 
@@ -514,12 +593,13 @@ export async function testGetAuthRequest(): Promise<ZitadelTestResult> {
   );
 }
 
+// getBrandingSettings uses makeReqCtx(organization) → always cascades to instance defaults
 export async function testGetBrandingSettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organization: INVALID_ORG_ID };
+  const args = { organization: REAL_ORG_ID };
   return runTest("getBrandingSettings", args, () =>
-    getBrandingSettings({ serviceUrl, organization: INVALID_ORG_ID })
+    getBrandingSettings({ serviceUrl, organization: REAL_ORG_ID })
   );
 }
 
@@ -546,12 +626,13 @@ export async function testGetGeneralSettings(): Promise<ZitadelTestResult> {
   return runTest("getGeneralSettings", args, () => getGeneralSettings({ serviceUrl }));
 }
 
+// getHostedLoginTranslation: org cascades to instance; unknown locale returns empty translations
 export async function testGetHostedLoginTranslation(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { organization: INVALID_ORG_ID, locale: "xx-INVALID" };
+  const args = { organization: REAL_ORG_ID, locale: "en" };
   return runTest("getHostedLoginTranslation", args, () =>
-    getHostedLoginTranslation({ serviceUrl, organization: INVALID_ORG_ID, locale: "xx-INVALID" })
+    getHostedLoginTranslation({ serviceUrl, organization: REAL_ORG_ID, locale: "en" })
   );
 }
 
@@ -571,12 +652,13 @@ export async function testGetOrgsByDomain(): Promise<ZitadelTestResult> {
   );
 }
 
+// getPasswordExpirySettings uses makeReqCtx(orgId) → always cascades to instance defaults
 export async function testGetPasswordExpirySettings(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const args = { orgId: INVALID_ORG_ID };
+  const args = { orgId: REAL_ORG_ID };
   return runTest("getPasswordExpirySettings", args, () =>
-    getPasswordExpirySettings({ serviceUrl, orgId: INVALID_ORG_ID })
+    getPasswordExpirySettings({ serviceUrl, orgId: REAL_ORG_ID })
   );
 }
 
@@ -668,6 +750,7 @@ export async function testRetrieveIDPIntent(): Promise<ZitadelTestResult> {
   );
 }
 
+// searchUsers returns { result: [] } on no matches — not an error (same as listUsers flexible query)
 export async function testSearchUsers(): Promise<ZitadelTestResult> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -675,13 +758,13 @@ export async function testSearchUsers(): Promise<ZitadelTestResult> {
     disableLoginWithEmail: false,
     disableLoginWithPhone: false,
   } as unknown as LoginSettings;
-  const args = { searchValue: "garbage@@##search", organizationId: INVALID_ORG_ID };
+  const args = { searchValue: "nonexistent-user-zitadel-test", organizationId: REAL_ORG_ID };
   return runTest("searchUsers", args, () =>
     searchUsers({
       serviceUrl,
-      searchValue: "garbage@@##search",
+      searchValue: "nonexistent-user-zitadel-test",
       loginSettings: fakeLoginSettings,
-      organizationId: INVALID_ORG_ID,
+      organizationId: REAL_ORG_ID,
     })
   );
 }
