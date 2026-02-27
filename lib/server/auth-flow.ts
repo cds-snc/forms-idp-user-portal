@@ -56,6 +56,12 @@ export async function completeAuthFlow(
       return { error: "Authentication completed but navigation failed" };
     }
 
+    // Handle "already handled" error - redirect to login route to trigger fresh flow
+    // This happens when the auth request was consumed during registration
+    if ("error" in result && result.error === "Auth request already handled") {
+      return { redirect: `/login?requestId=${requestId}` };
+    }
+
     return result;
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
