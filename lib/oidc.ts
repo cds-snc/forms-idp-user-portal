@@ -98,17 +98,9 @@ export async function loginWithOIDCAndSession({
             return { redirect: loginSettings.defaultRedirectUri };
           }
 
-          const signedinUrl = "/account";
-
-          const params = new URLSearchParams();
-          if (selectedSession.factors?.user?.loginName) {
-            params.append("loginName", selectedSession.factors?.user?.loginName);
-          }
-          if (selectedSession.factors?.user?.organizationId) {
-            params.append("organization", selectedSession.factors?.user?.organizationId);
-          }
-          console.log("Redirecting to signed-in page:", signedinUrl + "?" + params.toString());
-          return { redirect: signedinUrl + "?" + params.toString() };
+          const signedinUrl = `/account${authRequest ? `?requestId=oidc_${authRequest}` : ""}`;
+          console.log("Redirecting to signed-in page:", signedinUrl);
+          return { redirect: signedinUrl };
         } else {
           return { error: "Unknown error occurred" };
         }
