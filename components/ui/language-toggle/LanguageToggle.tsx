@@ -33,7 +33,7 @@ const LanguageToggle = () => {
       <h2 className="sr-only" lang={currentLang}>
         {t("lang-toggle")}
       </h2>
-      <a
+      <button
         id="lang-toggle-link"
         className="gcds-lang-toggle cursor-pointer border-none bg-transparent p-0 text-inherit underline hover:no-underline"
         lang={displayLang.abbr}
@@ -44,7 +44,7 @@ const LanguageToggle = () => {
       >
         <span>{displayLang.text}</span>
         <abbr title={displayLang.text}>{displayLang.abbr}</abbr>
-      </a>
+      </button>
     </div>
   );
 };

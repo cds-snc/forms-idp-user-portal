@@ -36,6 +36,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const organization = ZITADEL_ORGANIZATION;
 
   // Check if user is already authenticated
+  let isAuthenticated = false;
   try {
     const { loginName } = await getSessionCredentials();
 
@@ -44,14 +45,14 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
       sessionParams: { loginName, organization },
     });
 
-    const isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
-
-    if (isAuthenticated) {
-      // User is already logged in, redirect to account page
-      redirect(buildUrlWithRequestId("/account", requestId));
-    }
+    isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
   } catch (error) {
     // No valid session, continue to login form
+  }
+
+  if (isAuthenticated) {
+    // User is already logged in, redirect to account page
+    redirect(buildUrlWithRequestId("/account", requestId));
   }
 
   const registerLink = buildUrlWithRequestId("/register", requestId);

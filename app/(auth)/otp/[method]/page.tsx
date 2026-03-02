@@ -32,15 +32,12 @@ export default async function Page(props: {
   searchParams: Promise<SearchParams>;
   params: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
+  const [params, searchParams, _headers, { sessionId, loginName, organization, requestId }] =
+    await Promise.all([props.params, props.searchParams, headers(), getSessionCredentials()]);
 
-  const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { code, redirect } = searchParams;
-
-  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
 
   // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
   const { method } = params;
