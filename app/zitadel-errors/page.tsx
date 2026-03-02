@@ -800,7 +800,7 @@ function ApiTestRow({ test }: ApiTestRowProps) {
       <div className="space-y-2 pl-2">
         {test.errorScenarios.map((scenario, i) => (
           <ScenarioCard
-            key={scenario.possibleError.code}
+            key={i}
             scenario={scenario}
             result={results[i]}
             isPending={isPending}

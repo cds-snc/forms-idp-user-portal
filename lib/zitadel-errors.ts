@@ -80,6 +80,12 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
       match: (error) => error.code === 9 || error.text.includes("Errors.User.NotActive"),
       i18nKey: "validation.maxAttemptsReached",
     },
+    // no code for this one
+    // TODO careful about case
+    {
+      match: (error) => error.text.includes("No instance url found".toLocaleLowerCase()),
+      i18nKey: "validation.somethingWentWrong", // Todo: message
+    },
   ],
   //
   // Custom App Errors below?
