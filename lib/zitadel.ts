@@ -61,6 +61,40 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
+export type ZitadelError = {
+  code: number | undefined;
+  message: string;
+};
+
+export type ZitadelResult<T> = { data: T; error?: never } | { data?: never; error: ZitadelError };
+
+/**
+ * Wraps any async Zitadel call so that thrown gRPC / connect-web errors are
+ * caught and returned as a structured `{ error }` value instead of propagating.
+ *
+ * ```ts
+ * const result = await withZitadelResult(() =>
+ *   getLoginSettings({ serviceUrl, organization })
+ * );
+ * if ("error" in result) {
+ *   // result.error.code, result.error.message
+ * } else {
+ *   // result.data — the successful Zitadel response
+ * }
+ * ```
+ */
+export async function withZitadelResult<T>(fn: () => Promise<T>): Promise<ZitadelResult<T>> {
+  try {
+    const data = await fn();
+    return { data };
+  } catch (err) {
+    const e = err && typeof err === "object" ? (err as Record<string, unknown>) : {};
+    const code = typeof e.code === "number" ? e.code : undefined;
+    const message = typeof e.message === "string" ? e.message : String(err);
+    return { error: { code, message } };
+  }
+}
+
 export async function getHostedLoginTranslation({
   serviceUrl,
   organization,
@@ -117,6 +151,7 @@ export async function getBrandingSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+// on null serviceUrl throws 'No instance url found'
 export async function getLoginSettings({
   serviceUrl,
   organization,
@@ -134,6 +169,20 @@ export async function getLoginSettings({
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
+}
+
+/**
+ * `getLoginSettings` wrapped with `withZitadelResult` — returns `{ data }` on
+ * success or `{ error }` on failure instead of throwing.
+ */
+export async function getLoginSettingsHandled({
+  serviceUrl,
+  organization,
+}: {
+  serviceUrl: string;
+  organization?: string;
+}): Promise<ZitadelResult<Awaited<ReturnType<typeof getLoginSettings>>>> {
+  return withZitadelResult(() => getLoginSettings({ serviceUrl, organization }));
 }
 
 export async function getSerializableLoginSettings({

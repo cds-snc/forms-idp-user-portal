@@ -20,6 +20,10 @@ import {
   testAuthorizeOrDenyDeviceAuthorization,
   testCreateCallback,
   testCreateInviteCode,
+  testCreateInviteCodeEmptyUrlTemplate,
+  testCreateInviteCodeEmptyUserId,
+  testCreateInviteCodeMissingPlaceholder,
+  testCreateInviteCodeNotFound,
   testCreateSAMLResponse,
   testCreateSessionForUserIdAndIdpIntent,
   testCreateSessionFromChecks,
@@ -42,6 +46,7 @@ import {
   testGetSecuritySettings,
   testGetSerializableLoginSettings,
   testGetSession,
+  testGetSessionEmptyId,
   testGetTOTPStatus,
   testGetU2FList,
   testGetUserByID,
@@ -62,15 +67,20 @@ import {
   testSendEmailCode,
   testSendEmailCodeWithReturn,
   testSetPassword,
+  testSetPasswordEmptyPassword,
   testSetSession,
+  testSetUserPasswordEmptyPassword,
+  testSetUserPasswordNoSpecialChar,
   testSetUserPasswordNotFound,
   testSetUserPasswordShortPassword,
+  testSetUserPasswordTooLongPassword,
   testStartIdentityProviderFlow,
   testStartLDAPIdentityProviderFlow,
   testUpdateHuman,
   testVerifyEmail,
   testVerifyInviteCode,
   testVerifyTOTPRegistration,
+  testVerifyTOTPRegistrationEmptyCode,
   testVerifyTOTPRegistrationShortCode,
   testVerifyU2FRegistration,
 } from "./actions";
@@ -138,6 +148,11 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
         possibleError: E_NOT_FOUND,
         action: testGetSession,
         note: "sessionId: valid-format 18-digit ID that doesn't exist. UNAUTHENTICATED (16) is also possible but only when the session exists with a wrong token — untestable with static IDs.",
+      },
+      {
+        possibleError: E_NOT_FOUND,
+        action: testGetSessionEmptyId,
+        note: "sessionId: '' (proto3 default when undefined). Zitadel does not validate ID format before lookup — empty string is treated as a nonexistent session, not a malformed argument.",
       },
     ],
   },
@@ -222,6 +237,36 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
     ],
   },
   {
+    label: "createInviteCode (function name in both API and Custom so just this list)",
+    errorScenarios: [
+      {
+        possibleError: E_INVALID_ARG,
+        action: testCreateInviteCode,
+        note: "userId is a non-numeric garbage string — Zitadel may reject the ID format before the user lookup. urlTemplate is a valid URL without a {{.Code}} placeholder.",
+      },
+      {
+        possibleError: E_NOT_FOUND,
+        action: testCreateInviteCodeNotFound,
+        note: "userId is a valid-format 18-digit ID that doesn't exist. urlTemplate includes the {{.Code}} placeholder — all argument validation passes before the user lookup.",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testCreateInviteCodeEmptyUserId,
+        note: "userId: '' (proto3 default when undefined). Zitadel treats an empty userId as a missing required field — INVALID_ARGUMENT fires before the user lookup.",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testCreateInviteCodeEmptyUrlTemplate,
+        note: "urlTemplate: '' (proto3 default when undefined). Shows whether Zitadel validates the urlTemplate field before or after the user lookup.",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testCreateInviteCodeMissingPlaceholder,
+        note: "urlTemplate is a valid URL but lacks the {{.Code}} placeholder Zitadel requires to embed the one-time code. Shows whether template structure is validated before or after the user lookup.",
+      },
+    ],
+  },
+  {
     label: "setUserPassword",
     errorScenarios: [
       {
@@ -233,6 +278,21 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
         possibleError: E_INVALID_ARG,
         action: testSetUserPasswordShortPassword,
         note: "userId: valid-format ID; only password: 'x' is invalid (too short)",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testSetUserPasswordTooLongPassword,
+        note: "password: 300-character string. Zitadel enforces a maximum password length (~200 chars) at the API level — INVALID_ARGUMENT fires before any user lookup.",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testSetUserPasswordNoSpecialChar,
+        note: "password: 'TestPassword123' — meets length but lacks a special character. If the org policy requires one, Zitadel raises INVALID_ARGUMENT before the user lookup.",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testSetUserPasswordEmptyPassword,
+        note: "password: '' (proto3 default when undefined). Password is validated BEFORE user lookup — INVALID_ARGUMENT fires even for a nonexistent userId.",
       },
     ],
   },
@@ -258,6 +318,11 @@ const ZITADEL_API_TESTS: ApiTestDef[] = [
         possibleError: E_INVALID_ARG,
         action: testVerifyTOTPRegistrationShortCode,
         note: "userId: valid-format ID; only code: '123' is invalid (must be 6 digits)",
+      },
+      {
+        possibleError: E_INVALID_ARG,
+        action: testVerifyTOTPRegistrationEmptyCode,
+        note: "code: '' (proto3 default when undefined). Code format is validated BEFORE user lookup — INVALID_ARGUMENT fires even for a nonexistent userId.",
       },
     ],
   },
@@ -298,12 +363,6 @@ const ZITADEL_WRAPER_FUNCTIONS_TESTS: SimpleTestDef[] = [
     label: "createCallback",
     description: "Create an OIDC callback with a garbage authRequestId",
     action: testCreateCallback,
-    possibleErrors: [E_NOT_FOUND],
-  },
-  {
-    label: "createInviteCode",
-    description: "Create an invite code for a garbage user ID",
-    action: testCreateInviteCode,
     possibleErrors: [E_NOT_FOUND],
   },
   {
@@ -502,9 +561,16 @@ const ZITADEL_WRAPER_FUNCTIONS_TESTS: SimpleTestDef[] = [
   {
     label: "setPassword",
     description:
-      "Set password for a garbage user ID — user lookup fires before password validation",
+      "Set password for a garbage user ID with password: 'x' — user lookup fires before password complexity check",
     action: testSetPassword,
     possibleErrors: [E_NOT_FOUND],
+  },
+  {
+    label: "setPassword (empty password)",
+    description:
+      "password: '' (proto3 default when undefined). Zitadel treats an empty-string password as a missing required field and validates it BEFORE user lookup — INVALID_ARGUMENT fires even for a nonexistent userId.",
+    action: testSetPasswordEmptyPassword,
+    possibleErrors: [E_INVALID_ARG],
   },
   {
     label: "setSession",

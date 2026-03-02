@@ -370,6 +370,41 @@ export async function testSetUserPasswordShortPassword(): Promise<ZitadelTestRes
   );
 }
 
+// setUserPassword – INVALID_ARGUMENT: valid-format userId + valid code, only password is too long.
+// Zitadel enforces a maximum password length (typically 200 characters) at the API level.
+// A 300-character password should trigger INVALID_ARGUMENT before any user lookup occurs.
+export async function testSetUserPasswordTooLongPassword(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const tooLongPassword = "A1!" + "a".repeat(297); // 300 chars total, meets all other policy rules
+  const args = { userId: NONEXISTENT_USER_ID, password: tooLongPassword, code: "000000" };
+  return runTest("setUserPassword", args, () =>
+    setUserPassword({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      password: tooLongPassword,
+      code: "000000",
+    })
+  );
+}
+
+// setUserPassword – INVALID_ARGUMENT: password meets length requirements but contains no special
+// character. If the org's password complexity policy requires at least one special character,
+// Zitadel raises INVALID_ARGUMENT against the request body before performing a user lookup.
+export async function testSetUserPasswordNoSpecialChar(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, password: "TestPassword123", code: "000000" };
+  return runTest("setUserPassword", args, () =>
+    setUserPassword({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      password: "TestPassword123",
+      code: "000000",
+    })
+  );
+}
+
 // getTOTPStatus – NOT_FOUND: valid-format userId that doesn't exist
 export async function testGetTOTPStatus(): Promise<ZitadelTestResult> {
   const _headers = await headers();
@@ -439,6 +474,42 @@ export async function testResendEmailCode(): Promise<ZitadelTestResult> {
       userId: NONEXISTENT_USER_ID,
       urlTemplate: "https://example.com",
     })
+  );
+}
+
+// getSession – INVALID_ARGUMENT or NOT_FOUND: both sessionId and sessionToken are empty strings
+// (the proto3 default when undefined is passed). Tests what happens at the API boundary when
+// no session identity is supplied at all.
+export async function testGetSessionEmptyId(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { sessionId: "", sessionToken: "" };
+  return runTest("getSession", args, () =>
+    getSession({ serviceUrl, sessionId: "", sessionToken: "" })
+  );
+}
+
+// setUserPassword – INVALID_ARGUMENT: empty password string (proto3 default when undefined).
+// Password is validated by Zitadel BEFORE the user lookup, so this fires even for a
+// nonexistent userId.
+export async function testSetUserPasswordEmptyPassword(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, password: "", code: "000000" };
+  return runTest("setUserPassword", args, () =>
+    setUserPassword({ serviceUrl, userId: NONEXISTENT_USER_ID, password: "", code: "000000" })
+  );
+}
+
+// verifyTOTPRegistration – INVALID_ARGUMENT: empty code string (proto3 default when undefined).
+// Code format is validated by Zitadel BEFORE the user lookup, so this fires even for a
+// nonexistent userId.
+export async function testVerifyTOTPRegistrationEmptyCode(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, code: "" };
+  return runTest("verifyTOTPRegistration", args, () =>
+    verifyTOTPRegistration({ serviceUrl, userId: NONEXISTENT_USER_ID, code: "" })
   );
 }
 
@@ -514,6 +585,73 @@ export async function testCreateInviteCode(): Promise<ZitadelTestResult> {
     createInviteCode({
       serviceUrl,
       userId: INVALID_USER_ID,
+      urlTemplate: "https://example.com/invite",
+    })
+  );
+}
+
+// createInviteCode – NOT_FOUND: valid-format 18-digit userId that doesn't exist + valid URL
+// template with {{.Code}} placeholder. All arguments are structurally valid so Zitadel passes
+// argument validation and proceeds to the user lookup.
+export async function testCreateInviteCodeNotFound(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = {
+    userId: NONEXISTENT_USER_ID,
+    urlTemplate: "https://example.com/invite?code={{.Code}}",
+  };
+  return runTest("createInviteCode", args, () =>
+    createInviteCode({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      urlTemplate: "https://example.com/invite?code={{.Code}}",
+    })
+  );
+}
+
+// createInviteCode – INVALID_ARGUMENT: empty userId string (proto3 default when undefined).
+// Zitadel treats an empty userId as a missing required field and raises INVALID_ARGUMENT.
+export async function testCreateInviteCodeEmptyUserId(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: "", urlTemplate: "https://example.com/invite?code={{.Code}}" };
+  return runTest("createInviteCode", args, () =>
+    createInviteCode({
+      serviceUrl,
+      userId: "",
+      urlTemplate: "https://example.com/invite?code={{.Code}}",
+    })
+  );
+}
+
+// createInviteCode – INVALID_ARGUMENT: empty urlTemplate string (proto3 default when undefined).
+// Zitadel validates the urlTemplate field before performing the user lookup, so
+// INVALID_ARGUMENT fires even when the userId corresponds to a nonexistent user.
+export async function testCreateInviteCodeEmptyUrlTemplate(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, urlTemplate: "" };
+  return runTest("createInviteCode", args, () =>
+    createInviteCode({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
+      urlTemplate: "",
+    })
+  );
+}
+
+// createInviteCode – INVALID_ARGUMENT: urlTemplate is a valid URL but is missing the
+// {{.Code}} placeholder that Zitadel requires to embed the one-time code. If Zitadel
+// validates the template before performing the user lookup, INVALID_ARGUMENT fires.
+// If user lookup comes first, NOT_FOUND fires instead.
+export async function testCreateInviteCodeMissingPlaceholder(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const args = { userId: NONEXISTENT_USER_ID, urlTemplate: "https://example.com/invite" };
+  return runTest("createInviteCode", args, () =>
+    createInviteCode({
+      serviceUrl,
+      userId: NONEXISTENT_USER_ID,
       urlTemplate: "https://example.com/invite",
     })
   );
@@ -802,6 +940,20 @@ export async function testSetPassword(): Promise<ZitadelTestResult> {
     newPassword: { password: "x" },
   });
   const args = { userId: INVALID_USER_ID, password: "x" };
+  return runTest("setPassword", args, () => setPassword({ serviceUrl, payload: fakePayload }));
+}
+
+// setPassword – INVALID_ARGUMENT: empty password string (proto3 default when undefined).
+// Zitadel treats an empty-string password as a missing required field and validates it
+// BEFORE the user lookup — same mechanism as setUserPassword with empty password.
+export async function testSetPasswordEmptyPassword(): Promise<ZitadelTestResult> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const fakePayload = create(SetPasswordRequestSchema, {
+    userId: INVALID_USER_ID,
+    newPassword: { password: "" },
+  });
+  const args = { userId: INVALID_USER_ID, password: "" };
   return runTest("setPassword", args, () => setPassword({ serviceUrl, payload: fakePayload }));
 }
 
