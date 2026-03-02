@@ -20,7 +20,8 @@ import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import {
   // getOrgsByDomain,
   // getLockoutSettings,
-  getLoginSettings,
+  // getLoginSettings,
+  getLoginSettingsHandled,
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@lib/zitadel";
@@ -58,15 +59,24 @@ export const submitLoginForm = async (
     };
   }
 
-  // Get login settings for organization context
+  /*
+  OLD - can throw an error
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: command.organization,
   });
-
   if (!loginSettings) {
     logMessage.error("Could not load login settings");
     return { error: t("validation.invalidCredentials") };
+  }
+  */
+  // NEW - error handled and "standardized"
+  const loginSettings = await getLoginSettingsHandled({
+    serviceUrl,
+    organization: command.organization,
+  });
+  if ("error" in loginSettings) {
+    return { error: t(loginSettings.error) };
   }
 
   // Create session with combined username + password check
@@ -83,15 +93,16 @@ export const submitLoginForm = async (
       requestId: command.requestId,
     });
   } catch (error: unknown) {
-    const zError = getZitadelUiError("login", error);
+    const zError = getZitadelUiError("login", { message: error });
 
-    if (zError?.i18nKey) {
-      logMessage.error(`Login failed: ${zError?.i18nKey}. Errors: ${JSON.stringify(error)}`);
-      return { error: t(zError.i18nKey) };
+    // TODO could also provide a default from above if not found
+    if (!zError) {
+      logMessage.error(`Unkown error during login: ${JSON.stringify(error)}`);
+      return { error: t("validation.invalidCredentials") };
     }
 
-    logMessage.error(`Unkown error during login: ${JSON.stringify(error)}`);
-    return { error: t("validation.invalidCredentials") };
+    logMessage.error(`Login failed: ${zError?.i18nKey}. Errors: ${JSON.stringify(error)}`);
+    return { error: t(zError.i18nKey) };
 
     /*
     // Handle authentication failures with generic error message
@@ -128,7 +139,7 @@ export const submitLoginForm = async (
 
   if (!session?.factors?.user?.id) {
     logMessage.error("Session created but no user ID found");
-    return { error: t("validation.invalidCredentials") };
+    return { error: t("validation.invalidCredentials") }; // generic default error
   }
 
   let userResponse;
@@ -201,7 +212,7 @@ export const submitLoginForm = async (
   const mfaFactorCheck = await checkMFAFactors(
     serviceUrl,
     session,
-    loginSettings,
+    loginSettings.success,
     authMethods,
     command.requestId
   );

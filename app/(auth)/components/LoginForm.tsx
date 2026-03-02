@@ -73,9 +73,11 @@ export function LoginForm({ requestId }: Props) {
       password: password,
       requestId,
     })
-      .catch(() => {
+      .catch((err) => {
+        debugger;
         return {
-          error: t("validation.invalidCredentials"),
+          // error: t("validation.invalidCredentials"),
+          error: t(err.message),
         };
       })
       .finally(() => {

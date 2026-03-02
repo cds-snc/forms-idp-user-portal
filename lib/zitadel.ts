@@ -51,6 +51,7 @@ import { logMessage } from "./logger";
 import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
+import { getZitadelUiError } from "./zitadel-errors";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -65,33 +66,34 @@ export type ZitadelError = {
   code: number | undefined;
   message: string;
 };
-
-export type ZitadelResult<T> = { data: T; error?: never } | { data?: never; error: ZitadelError };
-
+export type ZitadelResult<T> = { success: T } | { error: string };
 /**
  * Wraps any async Zitadel call so that thrown gRPC / connect-web errors are
  * caught and returned as a structured `{ error }` value instead of propagating.
  *
- * ```ts
- * const result = await withZitadelResult(() =>
- *   getLoginSettings({ serviceUrl, organization })
- * );
- * if ("error" in result) {
- *   // result.error.code, result.error.message
- * } else {
- *   // result.data — the successful Zitadel response
- * }
- * ```
  */
-export async function withZitadelResult<T>(fn: () => Promise<T>): Promise<ZitadelResult<T>> {
+export async function withZitadelResult<T>(
+  fn: () => Promise<T>,
+  namespace: string = "login" //temp
+): Promise<ZitadelResult<T>> {
   try {
-    const data = await fn();
-    return { data };
+    const success = await fn();
+    if (!success) {
+      return {
+        error: "somethingWentWrong",
+      };
+    }
+    return { success };
   } catch (err) {
-    const e = err && typeof err === "object" ? (err as Record<string, unknown>) : {};
-    const code = typeof e.code === "number" ? e.code : undefined;
-    const message = typeof e.message === "string" ? e.message : String(err);
-    return { error: { code, message } };
+    // 1) Only use for formatting Error/Success object
+    // const e = err && typeof err === "object" ? (err as Record<string, unknown>) : {};
+    // const code = typeof e.code === "number" ? e.code : undefined;
+    // const message = typeof e.message === "string" ? e.message : String(err);
+    // return { error: { code, message } };
+
+    // 2) Also lookup error in our mapping to return i18n key
+    const zError = getZitadelUiError(namespace, err);
+    return { error: zError?.i18nKey || "GENERIC_ERROR" };
   }
 }
 

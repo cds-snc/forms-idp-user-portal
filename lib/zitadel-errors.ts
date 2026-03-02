@@ -66,11 +66,11 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
   // TODO:  could try zitadel wrapper around zitadel calls e.g. connect eror to parse the error to what we're expecting
   login: [
     {
-      match: (error) => error.code === 5 || error.text.includes("User could not be found"),
-      i18nKey: "validation.invalidCredentials",
-    },
-    {
-      match: (error) => error.code === 3 || error.text.includes("Password is invalid"),
+      match: (error) =>
+        error.code === 5 ||
+        error.text.includes("User could not be found") ||
+        error.code === 3 ||
+        error.text.includes("Password is invalid"),
       i18nKey: "validation.invalidCredentials",
     },
     // TODO: add auditLogs.ts matching type + message
@@ -80,11 +80,12 @@ const defaultRulesByContext: ZitadelErrorRulesByContext = {
       match: (error) => error.code === 9 || error.text.includes("Errors.User.NotActive"),
       i18nKey: "validation.maxAttemptsReached",
     },
-    // no code for this one
-    // TODO careful about case
+    // System errors - probably just throw to error boundary instead
     {
-      match: (error) => error.text.includes("No instance url found".toLocaleLowerCase()),
-      i18nKey: "validation.somethingWentWrong", // Todo: message
+      match: (error) =>
+        error.text.includes("No instance url found".toLocaleLowerCase()) || // TODO careful about case
+        error.text.includes("could not get session"),
+      i18nKey: "validation.somethingWentWrong",
     },
   ],
   //
@@ -211,3 +212,16 @@ export function getZitadelUiError(
 
   return undefined;
 }
+
+// Something simpler? Still helpful as consolidated reference? --OR-- easier to just pass the hardcoded key instead
+//  zitadel.ts error > action.ts that uses in t()
+export const ZITADEL_ERROR_KEYS = {
+  OTP_VERIFY_INVALID_CODE: "set.invalidCode",
+  OTP_VERIFY_INVALID_CODE_LENGTH: "set.invalidCodeLength",
+  OTP_SET_INVALID_CODE: "set.invalidCode",
+  OTP_SET_INVALID_CODE_LENGTH: "set.invalidCodeLength",
+  OTP_SET_ALREADY_SET_UP: "set.alreadySetUp",
+  LOGIN_INVALID_CREDENTIALS: "login.invalidCredentials",
+  LOGIN_MAX_ATTEMPTS: "login.maxAttemptsReached",
+  LOGIN_SOMETHING_WENT_WRONG: "login.somethingWentWrong",
+};
