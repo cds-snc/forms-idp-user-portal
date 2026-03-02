@@ -710,7 +710,7 @@ export async function createInviteCode({
   );
 }
 
-export type ListUsersCommand = {
+type ListUsersCommand = {
   serviceUrl: string;
   loginName?: string;
   userName?: string;
