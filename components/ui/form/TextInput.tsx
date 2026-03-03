@@ -17,6 +17,7 @@ export const TextInput = ({
   ariaDescribedbyIds,
   onChange,
   defaultValue = "",
+  ref,
 }: {
   id: string;
   type: string;
@@ -27,6 +28,7 @@ export const TextInput = ({
   ariaDescribedbyIds?: string[] | string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   defaultValue?: string;
+  ref?: React.Ref<HTMLInputElement>;
 }): React.ReactElement => {
   const classes = cn("gc-input-text", className);
 
@@ -48,6 +50,7 @@ export const TextInput = ({
             ? ariaDescribedbyIds.join(" ")
             : ariaDescribedbyIds,
         })}
+        ref={ref}
       />
     </>
   );
