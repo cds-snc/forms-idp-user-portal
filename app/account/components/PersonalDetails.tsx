@@ -53,7 +53,7 @@ export const PersonalDetails = ({
     }
   }, [editMode]);
 
-  const localFormAction = async (previousState: FormState, formData: FormData) => {
+  const localFormAction = async (_: FormState, formData: FormData) => {
     const formEntries = {
       firstname: (formData.get("firstname") as string) || "",
       lastname: (formData.get("lastname") as string) || "",
@@ -84,10 +84,11 @@ export const PersonalDetails = ({
       };
     }
 
-    setEditMode(false);
     toast.success(t("personalDetails.success.updateSuccess"), "account-details");
-
-    return previousState;
+    setEditMode(false);
+    return {
+      formData: formEntries,
+    };
   };
 
   const [state, formAction] = useActionState(localFormAction, {
