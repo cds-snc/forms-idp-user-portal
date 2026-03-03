@@ -24,6 +24,7 @@ import { MFAAuthentication } from "./components/MFAAuthentication";
 import { PasswordAuthentication } from "./components/PasswordAuthentication";
 import { PersonalDetails } from "./components/PersonalDetails";
 import { VerifiedAccount } from "./components/VerifiedAccount";
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("account");
   return { title: t("title") };
