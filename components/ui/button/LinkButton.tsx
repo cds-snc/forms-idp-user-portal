@@ -34,6 +34,7 @@ type LinkButtonProps = {
   isActive?: boolean;
   testid?: string;
   target?: string;
+  "aria-describedby"?: string;
   "data-testid"?: string;
 };
 
@@ -51,6 +52,7 @@ export const Primary = ({
   className,
   scroll,
   target,
+  "aria-describedby": ariaDescribedby,
   "data-testid": dataTestId,
 }: LinkButtonProps) => {
   return (
@@ -59,6 +61,7 @@ export const Primary = ({
       href={href}
       className={cn(themes.primary, themes.base, themes.htmlLink, className)}
       target={target}
+      {...(ariaDescribedby && { "aria-describedby": ariaDescribedby })}
       data-testid={dataTestId}
     >
       {children}
@@ -72,6 +75,7 @@ export const Secondary = ({
   children,
   scroll,
   target,
+  "aria-describedby": ariaDescribedby,
   "data-testid": dataTestId,
 }: LinkButtonProps) => {
   return (
@@ -85,6 +89,7 @@ export const Secondary = ({
         className
       )}
       target={target}
+      {...(ariaDescribedby && { "aria-describedby": ariaDescribedby })}
       data-testid={dataTestId}
     >
       {children}
