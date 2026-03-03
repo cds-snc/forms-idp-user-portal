@@ -181,8 +181,6 @@ export function LoginU2F({
   }
 
   async function startU2FLoginFlow() {
-    setError("");
-
     const response = await updateSessionForChallenge();
     const publicKey = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
