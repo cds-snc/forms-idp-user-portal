@@ -6,6 +6,7 @@
 import { useActionState, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { cn } from "@lib/utils";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -35,10 +36,12 @@ export const PersonalDetails = ({
   userId,
   firstName,
   lastName,
+  className,
 }: {
   userId: string;
   firstName: string;
   lastName: string;
+  className?: string;
 }) => {
   const { t } = useTranslation("account");
   const [editMode, setEditMode] = useState(false);
@@ -94,7 +97,7 @@ export const PersonalDetails = ({
 
   return (
     <>
-      <div className="rounded-2xl border-1 border-[#D1D5DB] bg-white p-6">
+      <div className={cn("rounded-2xl border-1 border-[#D1D5DB] bg-white p-6", className)}>
         <div className="flex items-center justify-between">
           <h3 className="mb-6">{t("personalDetails.title")}</h3>
           <div>
