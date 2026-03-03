@@ -74,8 +74,9 @@ export const MFAAuthentication = ({
                   u2fList
                     .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
                     .map((data) => {
+                      const id = `u2f-${data.id}`;
                       return (
-                        <li key={data.id} className="mb-4 flex items-center gap-1">
+                        <li key={data.id} className="mb-4 flex items-center gap-2">
                           <Image
                             src={getImageUrl("/img/fingerprint_24px.png")}
                             alt=""
@@ -83,14 +84,18 @@ export const MFAAuthentication = ({
                             height={32}
                             className="inline-block"
                           />
-                          <div className="flex items-center gap-1">
+                          <div id={id} className="flex items-center gap-1">
                             <span className="font-semibold">
                               {t("mfaAuthentication.securityKey")}
                             </span>
                             <span>({data.name || t("mfaAuthentication.unknownDevice")})</span>
                           </div>
                           <span className="">&#8226;</span>
-                          <Button onClick={() => handleRemoveU2F(data.id)} theme="link">
+                          <Button
+                            onClick={() => handleRemoveU2F(data.id)}
+                            theme="link"
+                            aria-describedby={id}
+                          >
                             {t("mfaAuthentication.remove")}
                           </Button>
                         </li>
@@ -98,7 +103,7 @@ export const MFAAuthentication = ({
                     })}
 
                 {authenticatorStatus && (
-                  <li className="mb-4 flex items-center gap-1">
+                  <li className="mb-4 flex items-center gap-2">
                     <Image
                       src={getImageUrl("/img/verified_user_24px.png")}
                       alt=""
