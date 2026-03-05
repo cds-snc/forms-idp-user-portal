@@ -32,7 +32,7 @@ export function AccountNavigation() {
       aria-label={t("navigation.ariaLabel")}
       className="rounded-2xl border border-[#D1D5DB] bg-white p-6"
     >
-      <h2 className="mb-6 text-3xl font-semibold">{t("navigation.title")}</h2>
+      <h1 className="mb-6 text-3xl font-semibold">{t("navigation.title")}</h1>
       <ul className="list-none space-y-4 p-0">
         <li>
           {isAccountPage ? (
