@@ -53,6 +53,12 @@
   },
   "account": {
     "title": "[FR]GC Platform Accounts",
+    "navigation": {
+      "title": "[FR]Account settings",
+      "ariaLabel": "[FR]Account navigation",
+      "account": "[FR]Account",
+      "profile": "[FR]Profile"
+    },
     "errors": {
       "noSession": "[FR]User information could not be retrieved from session."
     },
