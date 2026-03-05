@@ -53,7 +53,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         <RegisterForm
           organization={organization}
           requestId={requestId}
-          baseUrl={siteConfig.baseUrl}
+          siteConfig={siteConfig}
         ></RegisterForm>
       )}
     </AuthPanel>

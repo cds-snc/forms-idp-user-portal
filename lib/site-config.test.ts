@@ -23,6 +23,7 @@ describe("site-config", () => {
 
     expect(config).toEqual({
       id: "forms_dev",
+      productId: "gcforms",
       baseUrl: "http://localhost:3000",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });
@@ -33,7 +34,8 @@ describe("site-config", () => {
 
     expect(config).toEqual({
       id: "forms_staging",
-      baseUrl: "https://forms-staging.cdssandbox.xyz/",
+      productId: "gcforms",
+      baseUrl: "https://forms-staging.cdssandbox.xyz",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });
   });
@@ -43,7 +45,8 @@ describe("site-config", () => {
 
     expect(config).toEqual({
       id: "forms_production",
-      baseUrl: "https://forms-formulaires.alpha.canada.ca/",
+      productId: "gcforms",
+      baseUrl: "https://forms-formulaires.alpha.canada.ca",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });
   });

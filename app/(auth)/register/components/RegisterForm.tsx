@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
+import { getSiteLink, SiteConfig } from "@lib/site-config";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateAccount } from "@lib/validationSchemas";
 import { useTranslation } from "@i18n";
@@ -37,10 +38,10 @@ type FormState = {
 type Props = {
   organization: string;
   requestId?: string;
-  baseUrl: string;
+  siteConfig: SiteConfig;
 };
 
-export function RegisterForm({ organization, requestId, baseUrl }: Props) {
+export function RegisterForm({ organization, requestId, siteConfig }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
   const { setRegistrationData } = useRegistration();
   const router = useRouter();
@@ -150,7 +151,9 @@ export function RegisterForm({ organization, requestId, baseUrl }: Props) {
 
         <p className="-mt-2 mb-10">
           {t("terms.agreement")}
-          <Link href={`${baseUrl}/${i18n.language}/terms-of-use`}>{t("terms.linkText")}</Link>
+          <Link href={getSiteLink(siteConfig, "termsOfUse", i18n.language)}>
+            {t("terms.linkText")}
+          </Link>
         </p>
 
         <div>

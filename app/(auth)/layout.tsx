@@ -7,6 +7,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
  * Internal Aliases
  *--------------------------------------------*/
 import { getSiteConfigFromHeaders } from "@lib/server/site-config";
+import { getSiteLink } from "@lib/site-config";
 import { I18n } from "@i18n";
 /*--------------------------------------------*
  * Internal Aliases
@@ -41,7 +42,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
             <main id="content">
               <a
                 className="mb-6 mr-10 inline-flex no-underline focus:bg-white"
-                href={`${siteConfig.baseUrl}/${language}/about`}
+                href={getSiteLink(siteConfig, "about", language)}
               >
                 <span className="">
                   <SiteLogo />
@@ -57,7 +58,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         </div>
       </div>
       <Footer>
-        <FooterLinks baseUrl={siteConfig.baseUrl} />
+        <FooterLinks siteConfig={siteConfig} />
       </Footer>
     </div>
   );

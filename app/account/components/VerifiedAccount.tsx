@@ -12,17 +12,18 @@ import { Trans, useTranslation } from "react-i18next";
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
 import { logoutCurrentSession } from "@lib/server/session";
+import { getSiteLink, SiteConfig } from "@lib/site-config";
 import { cn } from "@lib/utils";
 import { Button } from "@components/ui/button/Button";
 
 export const VerifiedAccount = ({
   email,
   className,
-  baseUrl,
+  siteConfig,
 }: {
   email: string;
   className?: string;
-  baseUrl: string;
+  siteConfig: SiteConfig;
 }) => {
   const router = useRouter();
   const {
@@ -66,7 +67,7 @@ export const VerifiedAccount = ({
               components={[
                 <strong key="0" />,
                 <Button key="1" theme="link" onClick={logoutAndRedirectToRegister} />,
-                <Link key="2" href={`${baseUrl}/${language}/support`} />,
+                <Link key="2" href={getSiteLink(siteConfig, "support", language)} />,
               ]}
             />
           </p>

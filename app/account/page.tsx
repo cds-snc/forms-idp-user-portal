@@ -106,7 +106,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   return (
     <>
       <PersonalDetails userId={userId} firstName={firstName} lastName={lastName} className="mb-4" />
-      <VerifiedAccount email={email} className="mb-4" baseUrl={siteConfig.baseUrl} />
+      <VerifiedAccount email={email} className="mb-4" siteConfig={siteConfig} />
       <PasswordAuthentication className="mb-4" />
       <MFAAuthentication
         u2fList={u2fList}

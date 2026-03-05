@@ -78,7 +78,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         userId={id}
         code={code}
         requestId={requestId}
-        baseUrl={siteConfig.baseUrl}
+        siteConfig={siteConfig}
       >
         <div className="my-8">
           {sessionFactors ? (

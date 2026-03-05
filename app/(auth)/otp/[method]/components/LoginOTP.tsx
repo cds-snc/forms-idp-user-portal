@@ -13,6 +13,7 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
  * Internal Aliases
  *--------------------------------------------*/
 import { getSafeErrorMessage } from "@lib/safeErrorMessage";
+import { getSiteLink, SiteConfig } from "@lib/site-config";
 import { I18n, useTranslation } from "@i18n";
 import { UserAvatar } from "@components/account/user-avatar";
 import { BackButton } from "@components/ui/button/BackButton";
@@ -34,10 +35,10 @@ export function LoginOTP({
   organization,
   method,
   code,
+  siteConfig,
   loginSettings,
   redirect,
   displayName,
-  baseUrl,
 }: {
   loginName?: string; // either loginName or sessionId must be provided
   sessionId?: string;
@@ -45,10 +46,10 @@ export function LoginOTP({
   organization?: string;
   method: string;
   code?: string;
+  siteConfig: SiteConfig;
   loginSettings?: LoginSettings;
   redirect?: string | null;
   displayName?: string;
-  baseUrl: string;
 }) {
   const {
     t,
@@ -94,7 +95,6 @@ export function LoginOTP({
       redirect,
     });
 
-    // Handle redirect if present
     if ("redirect" in result && result.redirect) {
       router.push(result.redirect);
     }
@@ -157,7 +157,7 @@ export function LoginOTP({
         </form>
 
         <div className="mt-8 flex items-center gap-4">
-          <Link href={`${baseUrl}/${language}/support`}>
+          <Link href={getSiteLink(siteConfig, "support", language)}>
             <I18n i18nKey="help" namespace="verify" />
           </Link>
           {method === "email" && (

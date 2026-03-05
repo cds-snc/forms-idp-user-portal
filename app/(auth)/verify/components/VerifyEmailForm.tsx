@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
  * Internal Aliases
  *--------------------------------------------*/
 import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
+import { getSiteLink, SiteConfig } from "@lib/site-config";
 import { validateCode } from "@lib/validationSchemas";
 import { I18n, useTranslation } from "@i18n";
 import * as AlertNotification from "@components/ui/alert/Alert";
@@ -36,7 +37,7 @@ export function VerifyEmailForm({
   requestId,
   code,
   children,
-  baseUrl,
+  siteConfig,
 }: {
   userId: string;
   loginName?: string;
@@ -44,7 +45,7 @@ export function VerifyEmailForm({
   code?: string;
   requestId?: string;
   children?: React.ReactNode;
-  baseUrl: string;
+  siteConfig: SiteConfig;
 }) {
   const router = useRouter();
   const processedCodeRef = useRef<string | null>(null);
@@ -202,7 +203,7 @@ export function VerifyEmailForm({
             >
               <I18n i18nKey="newCode" namespace="verify" />
             </Button>
-            <Link href={`${baseUrl}/${language}/support`}>
+            <Link href={getSiteLink(siteConfig, "support", language)}>
               <I18n i18nKey="help" namespace="verify" />
             </Link>
           </div>

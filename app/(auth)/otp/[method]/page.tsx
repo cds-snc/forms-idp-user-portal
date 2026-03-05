@@ -78,7 +78,7 @@ export default async function Page(props: {
           code={code}
           redirect={safeRedirect}
           displayName={sessionFactors.factors?.user?.displayName}
-          baseUrl={siteConfig.baseUrl}
+          siteConfig={siteConfig}
         />
       )}
     </AuthPanel>
