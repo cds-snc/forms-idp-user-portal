@@ -43,11 +43,7 @@ export function getOriginalHostFromHeaders(_headers: HeaderReader): string {
   }
 
   if (!isLocalHost(host) && !isTrustedSiteHost(host)) {
-    logMessage.warn(`Untrusted host header: ${host}`);
-    logMessage.warn(`_headers.get("x-forwarded-host"): ${_headers.get("x-forwarded-host")}`);
-    logMessage.warn(`_headers.get("x-original-host"): ${_headers.get("x-original-host")}`);
-    logMessage.warn(`_headers.get("host"): ${_headers.get("host")}`);
-    // throw new Error(`Untrusted host header: ${host}`);
+    throw new Error(`Untrusted host header: ${host}`);
   }
 
   return host;
