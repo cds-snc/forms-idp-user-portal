@@ -23,6 +23,10 @@ header {
   background-color: #fff;
 }
 
+a {
+  @apply underline text-blue-dark hover:text-blue-hover;
+}
+
 #page-container {
   @apply grow shrink-0 basis-auto px-6 laptop:px-0;
   max-width: 71.25rem;
