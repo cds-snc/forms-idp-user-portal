@@ -11,7 +11,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Cookie } from "@lib/cookies";
 import { toAuthRequestId, toOidcRequestId } from "@lib/oidc-request-id";
 import { sendLoginname, SendLoginnameCommand } from "@lib/server/loginname";
-import { createCallback } from "@lib/zitadel";
+import { createCallback, getAuthRequest, getLoginSettings } from "@lib/zitadel";
 
 import { isSessionValid } from "./session";
 
@@ -93,8 +93,32 @@ export async function loginWithOIDCAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
-          // Auth request already handled - signal this so the caller can redirect to login for a fresh flow
-          return { error: "Auth request already handled" };
+          // Already-handled auth requests can happen due to retries or duplicate RSC renders.
+          // In that case, recover with a deterministic redirect to the relying party when possible.
+          try {
+            const { authRequest: authRequestData } = await getAuthRequest({
+              serviceUrl,
+              authRequestId,
+            });
+
+            if (authRequestData?.redirectUri) {
+              return { redirect: authRequestData.redirectUri };
+            }
+          } catch (_authRequestError) {
+            // Fall through to login settings fallback when auth request lookup fails.
+          }
+
+          const loginSettings = await getLoginSettings({
+            serviceUrl,
+            organization: selectedSession.factors?.user?.organizationId,
+          });
+
+          if (loginSettings?.defaultRedirectUri) {
+            return { redirect: loginSettings.defaultRedirectUri };
+          }
+
+          // Final fallback keeps the user in a signed-in state within the portal.
+          return { redirect: "/account" };
         } else {
           return { error: "Unknown error occurred" };
         }

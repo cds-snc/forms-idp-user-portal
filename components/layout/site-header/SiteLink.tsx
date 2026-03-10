@@ -4,10 +4,9 @@
 import Link from "next/link";
 
 /*--------------------------------------------*
- * Internal Aliases
+ * Relative
  *--------------------------------------------*/
-import { SiteLogo } from "@components/icons/SiteLogo";
-
+import { Logo } from "./Logo";
 import SiteTitle from "./SiteTitle";
 export const SiteLink = ({ href }: { href: string }) => {
   return (
@@ -18,7 +17,7 @@ export const SiteLink = ({ href }: { href: string }) => {
       className="flex items-center no-underline focus:bg-white"
     >
       <span className="inline-block">
-        <SiteLogo />
+        <Logo />
       </span>
       <SiteTitle />
     </Link>
