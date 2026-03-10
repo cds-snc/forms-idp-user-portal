@@ -174,6 +174,9 @@ export async function sendPassword(
   let session;
   let user: User;
   let loginSettings: LoginSettings | undefined;
+  // Capture organisation from the cookie before it may be cleared, so the
+  // fallback new-session path retains the correct tenant context.
+  const cookieOrganization: string | undefined = sessionCookie?.organization;
 
   if (sessionCookie) {
     loginSettings = await getLoginSettings({
@@ -198,10 +201,23 @@ export async function sendPassword(
         requestId: command.requestId,
         lifetime,
       });
-    } catch {
+    } catch (error: unknown) {
+      // A failed-attempts error means the password was wrong — return the
+      // auth failure directly rather than retrying, which would count as a
+      // second attempt and could lock the account sooner than intended.
+      const authFailure = await handleAuthenticationFailure(
+        error,
+        serviceUrl,
+        command.organization,
+        t
+      );
+      if (authFailure) {
+        return authFailure;
+      }
+
       logMessage.warn("Could not update existing session; falling back to creating a new session.");
-      // Any error updating the existing session (e.g. it has expired on Zitadel's side)
-      // is treated as a signal to abandon the stale cookie and create a fresh session below.
+      // Any other error (e.g. session expired on Zitadel's side) is treated as
+      // a signal to abandon the stale cookie and create a fresh session below.
       sessionCookie = undefined;
       session = undefined;
     }
@@ -210,13 +226,13 @@ export async function sendPassword(
   if (!sessionCookie) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-      organization: command.organization,
+      organization: cookieOrganization ?? command.organization,
     });
 
     const users = await listUsers({
       serviceUrl,
       loginName: command.loginName,
-      organizationId: command.organization,
+      organizationId: cookieOrganization ?? command.organization,
     });
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
