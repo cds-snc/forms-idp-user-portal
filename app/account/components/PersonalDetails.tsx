@@ -105,7 +105,7 @@ export const PersonalDetails = ({
 
   return (
     <>
-      <div className={cn("rounded-2xl border-1 border-[#D1D5DB] bg-white p-6", className)}>
+      <div className={cn("rounded-2xl border-3 border-highlight bg-white p-6", className)}>
         <div className="flex items-center justify-between">
           <h3 id="personal-details-title" className="mb-6">
             {t("personalDetails.title")}

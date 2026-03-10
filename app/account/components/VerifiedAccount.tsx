@@ -48,7 +48,7 @@ export const VerifiedAccount = ({
 
   return (
     <>
-      <div className={cn("rounded-2xl border-1 border-[#D1D5DB] bg-white p-6", className)}>
+      <div className={cn("rounded-2xl border border-highlight bg-white p-6", className)}>
         <div className="grid grid-cols-[1fr_auto] items-start gap-4">
           <div>
             <h3 className="mb-6">{t("verifiedAccount.title")}</h3>
@@ -57,7 +57,7 @@ export const VerifiedAccount = ({
               <em>{email}</em>
             </div>
           </div>
-          <p className="max-w-48 self-start text-right">
+          <p className="max-w-48 self-start text-left">
             <Trans
               i18nKey="verifiedAccount.changeMessage"
               ns="account"
