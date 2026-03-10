@@ -174,7 +174,7 @@ export async function sendPassword(
   let session;
   let user: User;
   let loginSettings: LoginSettings | undefined;
-  // Capture organisation from the cookie before it may be cleared, so the
+  // Capture organization from the cookie before it may be cleared, so the
   // fallback new-session path retains the correct tenant context.
   const cookieOrganization: string | undefined = sessionCookie?.organization;
 
