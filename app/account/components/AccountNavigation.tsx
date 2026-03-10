@@ -33,7 +33,7 @@ export function AccountNavigation({ siteConfig }: { siteConfig: SiteConfig }) {
         <li>
           <h2 className="text-base">
             {isAccountPage ? (
-              <span aria-current="page" className="font-semibold text-highlight">
+              <span aria-current="page" className="font-semibold text-gcds-green-750">
                 {t("navigation.account")}
               </span>
             ) : (
