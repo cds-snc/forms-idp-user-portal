@@ -164,7 +164,7 @@ export async function sendPassword(
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
 
-  const sessionCookie = await getSessionCookieByLoginName({
+  let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
   }).catch(() => {
@@ -175,7 +175,44 @@ export async function sendPassword(
   let user: User;
   let loginSettings: LoginSettings | undefined;
 
+  if (sessionCookie) {
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: sessionCookie.organization,
+    });
+
+    let lifetime = loginSettings?.passwordCheckLifetime;
+
+    if (!lifetime || !lifetime.seconds) {
+      logMessage.warn("No password lifetime provided, defaulting to 24 hours");
+      lifetime = {
+        seconds: BigInt(60 * 60 * 24), // default to 24 hours
+        nanos: 0,
+      } as Duration;
+    }
+
+    try {
+      session = await setSessionAndUpdateCookie({
+        recentCookie: sessionCookie,
+        checks: command.checks,
+        requestId: command.requestId,
+        lifetime,
+      });
+    } catch {
+      logMessage.warn("Could not update existing session; falling back to creating a new session.");
+      // Any error updating the existing session (e.g. it has expired on Zitadel's side)
+      // is treated as a signal to abandon the stale cookie and create a fresh session below.
+      sessionCookie = undefined;
+      session = undefined;
+    }
+  }
+
   if (!sessionCookie) {
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: command.organization,
+    });
+
     const users = await listUsers({
       serviceUrl,
       loginName: command.loginName,
@@ -188,11 +225,6 @@ export async function sendPassword(
       const checks = create(ChecksSchema, {
         user: { search: { case: "userId", value: users.result[0].userId } },
         password: { password: command.checks.password?.password },
-      });
-
-      loginSettings = await getLoginSettings({
-        serviceUrl,
-        organization: command.organization,
       });
 
       try {
@@ -217,61 +249,22 @@ export async function sendPassword(
       // this is a fake error message to hide that the user does not even exist
       return { error: "Could not verify password" };
     }
-  } else {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: sessionCookie.organization,
-    });
-
-    if (!loginSettings) {
-      return { error: "Could not load login settings" };
-    }
-
-    let lifetime = loginSettings.passwordCheckLifetime;
-
-    if (!lifetime || !lifetime.seconds) {
-      console.warn("No password lifetime provided, defaulting to 24 hours");
-      lifetime = {
-        seconds: BigInt(60 * 60 * 24), // default to 24 hours
-        nanos: 0,
-      } as Duration;
-    }
-
-    try {
-      session = await setSessionAndUpdateCookie({
-        recentCookie: sessionCookie,
-        checks: command.checks,
-        requestId: command.requestId,
-        lifetime,
-      });
-    } catch (error: unknown) {
-      const authFailure = await handleAuthenticationFailure(
-        error,
-        serviceUrl,
-        command.organization,
-        t
-      );
-      if (authFailure) {
-        return authFailure;
-      }
-      throw error;
-    }
-
-    if (!session?.factors?.user?.id) {
-      return { error: t("errors.couldNotCreateSessionForUser") };
-    }
-
-    const userResponse = await getUserByID({
-      serviceUrl,
-      userId: session?.factors?.user?.id,
-    });
-
-    if (!userResponse.user) {
-      return { error: t("errors.userNotFound") };
-    }
-
-    user = userResponse.user;
   }
+
+  if (!session?.factors?.user?.id) {
+    return { error: t("errors.couldNotCreateSessionForUser") };
+  }
+
+  const userResponse = await getUserByID({
+    serviceUrl,
+    userId: session.factors.user.id,
+  });
+
+  if (!userResponse.user) {
+    return { error: t("errors.userNotFound") };
+  }
+
+  user = userResponse.user;
 
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
