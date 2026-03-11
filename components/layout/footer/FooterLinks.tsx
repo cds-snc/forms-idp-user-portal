@@ -14,24 +14,39 @@ const BulletPoint = () => {
 export const FooterLinks = ({ siteConfig }: { siteConfig: SiteConfig }) => {
   const { i18n } = useTranslation();
   const locale = i18n.language;
+  const aboutLink = getSiteLink(siteConfig, "about", locale);
+  const termsOfUseLink = getSiteLink(siteConfig, "termsOfUse", locale);
+  const slaLink = getSiteLink(siteConfig, "sla", locale);
+
+  if (!aboutLink && !termsOfUseLink && !slaLink) {
+    return null; // Don't render the component if all links are missing
+  }
 
   return (
     <span className="mr-10 inline-block">
-      <a
-        className="whitespace-nowrap"
-        href={getSiteLink(siteConfig, "about", locale)}
-        target="_blank"
-      >
-        <I18n i18nKey="about.desc" namespace="footer" />
-      </a>
-      <BulletPoint />
-      <a className="whitespace-nowrap" href={getSiteLink(siteConfig, "termsOfUse", locale)}>
-        <I18n i18nKey="terms-of-use.desc" namespace="footer" />
-      </a>
-      <BulletPoint />
-      <a className="whitespace-nowrap" href={getSiteLink(siteConfig, "sla", locale)}>
-        <I18n i18nKey="sla.desc" namespace="footer" />
-      </a>
+      {aboutLink && (
+        <>
+          <a className="whitespace-nowrap" href={aboutLink} target="_blank">
+            <I18n i18nKey="about.desc" namespace="footer" />
+          </a>
+          <BulletPoint />
+        </>
+      )}
+      {termsOfUseLink && (
+        <>
+          <a className="whitespace-nowrap" href={termsOfUseLink} target="_blank">
+            <I18n i18nKey="terms-of-use.desc" namespace="footer" />
+          </a>
+          <BulletPoint />
+        </>
+      )}
+      {slaLink && (
+        <>
+          <a className="whitespace-nowrap" href={slaLink} target="_blank">
+            <I18n i18nKey="sla.desc" namespace="footer" />
+          </a>
+        </>
+      )}
     </span>
   );
 };

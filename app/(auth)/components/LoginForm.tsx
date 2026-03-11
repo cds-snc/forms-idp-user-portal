@@ -169,10 +169,7 @@ export function LoginForm({ requestId }: Props) {
 
             {/* Forgot password link */}
             <div className="mt-2">
-              <Link
-                href={buildUrlWithRequestId("/password/reset", requestId)}
-                className="text-sm underline"
-              >
+              <Link href={buildUrlWithRequestId("/password/reset", requestId)}>
                 {t("form.forgotPasswordLink")}
               </Link>
             </div>

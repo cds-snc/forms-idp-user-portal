@@ -55,6 +55,9 @@ export function LoginOTP({
     t,
     i18n: { language },
   } = useTranslation("otp");
+
+  const supportLink = getSiteLink(siteConfig, "support", language);
+
   const genericErrorMessage = t("set.genericError");
   const invalidCodeMessage = t("set.invalidCode");
   const invalidCodeLengthMessage = t("set.invalidCodeLength");
@@ -157,9 +160,11 @@ export function LoginOTP({
         </form>
 
         <div className="mt-8 flex items-center gap-4">
-          <Link href={getSiteLink(siteConfig, "support", language)}>
-            <I18n i18nKey="help" namespace="verify" />
-          </Link>
+          {supportLink && (
+            <Link href={supportLink}>
+              <I18n i18nKey="help" namespace="verify" />
+            </Link>
+          )}
           {method === "email" && (
             <div className="flex whitespace-nowrap" aria-live="polite">
               <Button

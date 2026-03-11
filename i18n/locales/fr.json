@@ -85,7 +85,8 @@
     "verifiedAccount": {
       "title": "Compte vérifié",
       "email": "Adresse courriel",
-      "changeMessage": "<0>Ne peut être modifié</0> <1>créer un nouveau compte</1> ou <2>contacter l'équipe de soutien</2>"
+      "changeMessage": "<0>Ne peut être modifié</0> <1>créer un nouveau compte</1> ou <2>contacter l'équipe de soutien</2>",
+      "changeMessageNoSupport": "<0>Ne peut être modifié</0> <1>créer un nouveau compte</1>"
     },
     "authentication": {
       "title": "Authentification",

@@ -70,8 +70,7 @@ describe("RegisterForm", () => {
         organization="org-1"
         requestId="req-123"
         siteConfig={{
-          id: "forms_dev",
-          productId: "gcforms",
+          id: "dev",
           baseUrl: "http://localhost:3000",
           zitadelOrganizationId: "org-1",
         }}
@@ -82,9 +81,7 @@ describe("RegisterForm", () => {
     expect(screen.getByLabelText(/labels\.lastname/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/labels\.email/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "button.continue" })).toBeInTheDocument();
-
-    const termsLink = screen.getByRole("link", { name: "terms.linkText" });
-    expect(termsLink).toHaveAttribute("href", "http://localhost:3000/en/terms-of-use");
+    expect(screen.queryByRole("link", { name: "terms.linkText" })).not.toBeInTheDocument();
   });
 
   it("shows validation errors and stays on page when form is invalid", async () => {
@@ -101,8 +98,7 @@ describe("RegisterForm", () => {
         organization="org-1"
         requestId="req-123"
         siteConfig={{
-          id: "forms_dev",
-          productId: "gcforms",
+          id: "dev",
           baseUrl: "http://localhost:3000",
           zitadelOrganizationId: "org-1",
         }}
@@ -126,8 +122,7 @@ describe("RegisterForm", () => {
         organization="org-1"
         requestId="req-123"
         siteConfig={{
-          id: "forms_dev",
-          productId: "gcforms",
+          id: "dev",
           baseUrl: "http://localhost:3000",
           zitadelOrganizationId: "org-1",
         }}

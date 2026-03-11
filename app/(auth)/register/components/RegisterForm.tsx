@@ -43,6 +43,7 @@ type Props = {
 
 export function RegisterForm({ organization, requestId, siteConfig }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
+  const termsOfUseLink = getSiteLink(siteConfig, "termsOfUse", i18n.language);
   const { setRegistrationData } = useRegistration();
   const router = useRouter();
 
@@ -149,12 +150,12 @@ export function RegisterForm({ organization, requestId, siteConfig }: Props) {
           </div>
         </div>
 
-        <p className="-mt-2 mb-10">
-          {t("terms.agreement")}
-          <Link href={getSiteLink(siteConfig, "termsOfUse", i18n.language)}>
-            {t("terms.linkText")}
-          </Link>
-        </p>
+        {termsOfUseLink && (
+          <p className="-mt-2 mb-10">
+            {t("terms.agreement")}
+            <Link href={termsOfUseLink}>{t("terms.linkText")}</Link>
+          </p>
+        )}
 
         <div>
           <SubmitButtonAction>{t("button.continue", { ns: "common" })}</SubmitButtonAction>

@@ -21,7 +21,8 @@ export function AccountNavigation({ siteConfig }: { siteConfig: SiteConfig }) {
   } = useTranslation("account");
 
   const isAccountPage = pathname === "/account" || pathname.includes("/account/");
-  const profileUrl = getSiteLink(siteConfig, "profile", language);
+
+  const gcFormsLink = getSiteLink(siteConfig, "gcForms", language);
 
   return (
     <nav
@@ -46,9 +47,11 @@ export function AccountNavigation({ siteConfig }: { siteConfig: SiteConfig }) {
             )}
           </h2>
         </li>
-        <li>
-          <ExternalLink href={profileUrl} i18nKey="gcForms" namespace="common" />
-        </li>
+        {gcFormsLink && (
+          <li>
+            <ExternalLink href={gcFormsLink} i18nKey="gcForms" namespace="common" />
+          </li>
+        )}
       </ul>
     </nav>
   );

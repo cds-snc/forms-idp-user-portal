@@ -80,7 +80,8 @@
     "verifiedAccount": {
       "title": "Verified account",
       "email": "Email address",
-      "changeMessage": "<0>Cannot be changed</0> <1>create new account</1> or <2>contact the support team</2>"
+      "changeMessage": "<0>Cannot be changed</0> <1>create new account</1> or <2>contact the support team</2>",
+      "changeMessageNoSupport": "<0>Cannot be changed</0> <1>create new account</1>"
     },
     "authentication": {
       "title": "Authentication",

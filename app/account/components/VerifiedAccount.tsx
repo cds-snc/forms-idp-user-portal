@@ -31,6 +31,8 @@ export const VerifiedAccount = ({
     i18n: { language },
   } = useTranslation("account");
 
+  const supportLink = getSiteLink(siteConfig, "support", language);
+
   const logoutAndRedirectToRegister = async () => {
     try {
       const result = await logoutCurrentSession({ postLogoutRedirectUri: "/register" });
@@ -64,7 +66,7 @@ export const VerifiedAccount = ({
               components={[
                 <strong key="0" />,
                 <Button key="1" theme="link" onClick={logoutAndRedirectToRegister} />,
-                <Link key="2" href={getSiteLink(siteConfig, "support", language)} />,
+                (supportLink && <Link key="2" href={supportLink} />) || <></>,
               ]}
             />
           </p>

@@ -2,44 +2,55 @@
  * Internal Aliases
  *--------------------------------------------*/
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-import siteLinksByProductJson from "@root/constants/site-links.json";
 
-export type SiteId = "forms_dev" | "forms_staging" | "forms_production";
-export type ProductId = "gcforms";
-
+export type SiteId = "dev" | "staging" | "production";
 export type SiteConfig = {
   id: SiteId;
-  productId: ProductId;
   baseUrl: string;
   zitadelOrganizationId: string;
 };
 
-export type SiteLinkKey = "about" | "termsOfUse" | "sla" | "support" | "profile";
+export type SiteLinkKey = "home" | "about" | "termsOfUse" | "sla" | "support" | "gcForms";
+type ConfigurableSiteLinkKey = Exclude<SiteLinkKey, "home">;
 
-type SiteLinkTemplates = Record<SiteLinkKey, string>;
+// Use URL templates with {baseUrl} and optional {locale}; set false to hide a link.
+type SiteLinkValue = string | false;
+type SiteLinksConfig = Record<ConfigurableSiteLinkKey, SiteLinkValue>;
 
-type ProductLinksConfig = {
-  defaults: SiteLinkTemplates;
-  overrides?: Partial<Record<SiteId, Partial<SiteLinkTemplates>>>;
+type TrustedDomainConfig = Pick<SiteConfig, "baseUrl"> & {
+  links: SiteLinksConfig;
 };
 
-type SiteLinksByProductId = Record<ProductId, ProductLinksConfig>;
-
-const SITE_LINKS_BY_PRODUCT_ID: SiteLinksByProductId =
-  siteLinksByProductJson as SiteLinksByProductId;
-
-const SITE_CONFIG_BY_ID: Record<SiteId, Pick<SiteConfig, "productId" | "baseUrl">> = {
-  forms_dev: {
-    productId: "gcforms",
+const TRUSTED_DOMAINS: Record<SiteId, TrustedDomainConfig> = {
+  dev: {
     baseUrl: "http://localhost:3000",
+    links: {
+      about: false,
+      termsOfUse: false,
+      sla: false,
+      support: false,
+      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
+    },
   },
-  forms_staging: {
-    productId: "gcforms",
+  staging: {
     baseUrl: "https://forms-staging.cdssandbox.xyz",
+    links: {
+      about: false,
+      termsOfUse: false,
+      sla: false,
+      support: false,
+      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
+    },
   },
-  forms_production: {
-    productId: "gcforms",
+  production: {
     baseUrl: "https://forms-formulaires.alpha.canada.ca",
+    links: {
+      about: false,
+      termsOfUse: false,
+      sla: false,
+      support: false,
+      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
+    },
   },
 };
 
@@ -49,24 +60,23 @@ function normalizeHost(rawHost: string): string {
       .trim()
       .toLowerCase()
       .replace(/^https?:\/\//, "")
-      .split("/")[0] || ""
+      .split("/")[0]
+      .replace(/:\d+$/, "") || ""
   );
 }
 
-const TRUSTED_SITE_HOSTS = Object.values(SITE_CONFIG_BY_ID).map((config) => {
+const TRUSTED_SITE_HOSTS = Object.values(TRUSTED_DOMAINS).map((config) => {
   return normalizeHost(config.baseUrl);
 });
 
 class SiteConfigService {
   private static instance: SiteConfigService;
 
-  private constructor(
-    private readonly configById: Record<SiteId, Pick<SiteConfig, "productId" | "baseUrl">>
-  ) {}
+  private constructor(private readonly configById: Record<SiteId, TrustedDomainConfig>) {}
 
   static getInstance() {
     if (!SiteConfigService.instance) {
-      SiteConfigService.instance = new SiteConfigService(SITE_CONFIG_BY_ID);
+      SiteConfigService.instance = new SiteConfigService(TRUSTED_DOMAINS);
     }
 
     return SiteConfigService.instance;
@@ -74,11 +84,11 @@ class SiteConfigService {
 
   requestHost(host: string): SiteId {
     if (host.includes("forms-staging") || process.env.REVIEW_ENV) {
-      return "forms_staging";
+      return "staging";
     } else if (host.includes("localhost") || host === "") {
-      return "forms_dev";
+      return "dev";
     } else {
-      return "forms_production";
+      return "production";
     }
   }
 
@@ -88,7 +98,6 @@ class SiteConfigService {
 
     return {
       id,
-      productId: defaults.productId,
       baseUrl: defaults.baseUrl,
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     };
@@ -115,19 +124,31 @@ export const isTrustedSiteHost = (rawHost: string): boolean => {
   });
 };
 
-export const getSiteLinksByProductId = (productId: ProductId) => {
-  return SITE_LINKS_BY_PRODUCT_ID[productId];
+const resolveSiteLinkTemplate = (
+  site: Pick<SiteConfig, "id" | "baseUrl">,
+  linkKey: SiteLinkKey
+) => {
+  if (linkKey === "home") {
+    return "{baseUrl}";
+  }
+
+  const links = TRUSTED_DOMAINS[site.id].links;
+  return links[linkKey];
 };
 
-export const getSiteLink = (
-  site: Pick<SiteConfig, "id" | "productId" | "baseUrl">,
-  linkKey: SiteLinkKey,
+export function getSiteLink<K extends SiteLinkKey>(
+  site: Pick<SiteConfig, "id" | "baseUrl">,
+  linkKey: K,
   locale: string
-) => {
-  const links = getSiteLinksByProductId(site.productId);
-  const overrideTemplate = links.overrides?.[site.id]?.[linkKey];
-  const linkTemplate = overrideTemplate || links.defaults[linkKey];
+): K extends "home" ? string : string | false {
+  const linkTemplate = resolveSiteLinkTemplate(site, linkKey);
   const resolvedLocale = locale || "en";
 
-  return linkTemplate.replaceAll("{baseUrl}", site.baseUrl).replaceAll("{locale}", resolvedLocale);
-};
+  if (linkTemplate === false) {
+    return false as K extends "home" ? string : string | false;
+  }
+
+  return linkTemplate
+    .replaceAll("{baseUrl}", site.baseUrl)
+    .replaceAll("{locale}", resolvedLocale) as K extends "home" ? string : string | false;
+}

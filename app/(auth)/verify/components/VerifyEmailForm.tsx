@@ -56,6 +56,8 @@ export function VerifyEmailForm({
     i18n: { language },
   } = useTranslation("verify");
 
+  const supportLink = getSiteLink(siteConfig, "support", language);
+
   const [error, setError] = useState<string>("");
 
   const [codeLoading, setCodeLoading] = useState<boolean>(false);
@@ -203,9 +205,11 @@ export function VerifyEmailForm({
             >
               <I18n i18nKey="newCode" namespace="verify" />
             </Button>
-            <Link href={getSiteLink(siteConfig, "support", language)}>
-              <I18n i18nKey="help" namespace="verify" />
-            </Link>
+            {supportLink && (
+              <Link href={supportLink}>
+                <I18n i18nKey="help" namespace="verify" />
+              </Link>
+            )}
           </div>
 
           <SubmitButtonAction>

@@ -5,25 +5,24 @@ import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { isTrustedSiteHost, requestHost, resolveSiteConfigByHost } from "./site-config";
 
 describe("site-config", () => {
-  it("classifies localhost hosts as forms_dev", () => {
-    expect(requestHost("localhost:3002")).toBe("forms_dev");
-    expect(requestHost("127.0.0.1:3002")).toBe("forms_production");
+  it("classifies localhost hosts as dev", () => {
+    expect(requestHost("localhost:3002")).toBe("dev");
+    expect(requestHost("127.0.0.1:3002")).toBe("production");
   });
 
-  it("classifies forms-staging hosts as forms_staging", () => {
-    expect(requestHost("forms-staging.cdssandbox.xyz")).toBe("forms_staging");
+  it("classifies forms-staging hosts as staging", () => {
+    expect(requestHost("forms-staging.cdssandbox.xyz")).toBe("staging");
   });
 
-  it("classifies other hosts as forms_production", () => {
-    expect(requestHost("forms-formulaires.alpha.canada.ca")).toBe("forms_production");
+  it("classifies other hosts as production", () => {
+    expect(requestHost("forms-formulaires.alpha.canada.ca")).toBe("production");
   });
 
   it("resolves dev baseUrl from localhost host", () => {
     const config = resolveSiteConfigByHost("localhost:3002");
 
     expect(config).toEqual({
-      id: "forms_dev",
-      productId: "gcforms",
+      id: "dev",
       baseUrl: "http://localhost:3000",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });
@@ -33,8 +32,7 @@ describe("site-config", () => {
     const config = resolveSiteConfigByHost("https://forms-staging.cdssandbox.xyz/some/path");
 
     expect(config).toEqual({
-      id: "forms_staging",
-      productId: "gcforms",
+      id: "staging",
       baseUrl: "https://forms-staging.cdssandbox.xyz",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });
@@ -44,8 +42,7 @@ describe("site-config", () => {
     const config = resolveSiteConfigByHost("forms-formulaires.alpha.canada.ca");
 
     expect(config).toEqual({
-      id: "forms_production",
-      productId: "gcforms",
+      id: "production",
       baseUrl: "https://forms-formulaires.alpha.canada.ca",
       zitadelOrganizationId: ZITADEL_ORGANIZATION,
     });

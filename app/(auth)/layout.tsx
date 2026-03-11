@@ -37,7 +37,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           >
             <main id="content">
               <div className="mb-6 mr-10 inline-flex">
-                <SiteLink href={getSiteLink(siteConfig, "about", language)} />
+                <SiteLink href={getSiteLink(siteConfig, "home", language)} />
               </div>
               <Tooltip.Provider>{children}</Tooltip.Provider>
               <ToastContainer autoClose={false} containerId="default" />
