@@ -21,36 +21,28 @@ type TrustedDomainConfig = Pick<SiteConfig, "baseUrl"> & {
   links: SiteLinksConfig;
 };
 
+const createLinks = (): SiteLinksConfig => {
+  return {
+    about: false,
+    termsOfUse: false,
+    sla: false,
+    support: false,
+    gcForms: "https://forms-staging.cdssandbox.xyz/{locale}/profile/oidc",
+  };
+};
+
 const TRUSTED_DOMAINS: Record<SiteId, TrustedDomainConfig> = {
   dev: {
     baseUrl: "http://localhost:3000",
-    links: {
-      about: false,
-      termsOfUse: false,
-      sla: false,
-      support: false,
-      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
-    },
+    links: createLinks(),
   },
   staging: {
     baseUrl: "https://forms-staging.cdssandbox.xyz",
-    links: {
-      about: false,
-      termsOfUse: false,
-      sla: false,
-      support: false,
-      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
-    },
+    links: createLinks(),
   },
   production: {
     baseUrl: "https://forms-formulaires.alpha.canada.ca",
-    links: {
-      about: false,
-      termsOfUse: false,
-      sla: false,
-      support: false,
-      gcForms: "https://forms-formulaires.alpha.canada.ca/{locale}/profile/oidc",
-    },
+    links: createLinks(),
   },
 };
 
