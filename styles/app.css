@@ -2,7 +2,7 @@
 
 @import "@gcds-core/tokens/build/web/css/tokens.css";
 @import "@gcds-core/tokens/build/web/css/global.css";
-@import "./core/typography.css";
+@import "@gcforms/core/styles/typography.css";
 @import "@gcforms/core/styles/forms.css";
 @import "@gcforms/core/styles/gc-header.css";
 @import "react-toastify/dist/ReactToastify.css";
