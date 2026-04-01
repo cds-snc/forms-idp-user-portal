@@ -47,7 +47,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <LanguageToggle />
         </div>
       </SiteHeader>
-      <main id="content" className="mx-auto max-w-[71.25rem] px-6 py-2 laptop:px-0">
+      <main id="content" className="mx-auto max-w-[71.25rem] px-6 py-2 laptop:px-0" tabIndex={-1}>
         <div className="mb-20 grid items-start gap-6 py-4 tablet:grid-cols-[22rem_1fr] tablet:gap-8">
           <aside className="w-full">
             <AccountNavigation siteConfig={siteConfig} />
