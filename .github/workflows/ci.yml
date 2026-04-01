@@ -49,3 +49,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Docker build
+        run: |
+          docker build \
+            --platform linux/arm64 \
+            --tag idp-login \
+            .
