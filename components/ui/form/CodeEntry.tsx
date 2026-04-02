@@ -51,6 +51,7 @@ export const CodeEntry = ({
           ariaDescribedbyIds={["codeHint", "errorMessageCode"]}
           className="!w-36"
           required
+          invalid={!!getError("code", state)}
         />
       </div>
     </div>

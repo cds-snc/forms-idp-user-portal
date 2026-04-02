@@ -137,6 +137,7 @@ export const UserNameForm = ({ organization, requestId }: Props) => {
               required
               defaultValue={state.formData?.username || ""}
               ariaDescribedbyIds={getError("username") ? ["errorMessageUsername"] : undefined}
+              invalid={!!getError("username")}
             />
           </div>
         </div>

@@ -111,6 +111,7 @@ export function RegisterForm({ organization, requestId, siteConfig }: Props) {
               required
               defaultValue={state.formData?.firstname ?? ""}
               ariaDescribedbyIds={getError("firstname") ? ["errorMessageFirstname"] : undefined}
+              invalid={!!getError("firstname")}
             />
           </div>
           <div className="gcds-input-wrapper">
@@ -128,6 +129,7 @@ export function RegisterForm({ organization, requestId, siteConfig }: Props) {
               id="lastname"
               defaultValue={state.formData?.lastname ?? ""}
               ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
+              invalid={!!getError("lastname")}
             />
           </div>
           <div className="gcds-input-wrapper col-span-2">
@@ -146,6 +148,7 @@ export function RegisterForm({ organization, requestId, siteConfig }: Props) {
               id="email"
               defaultValue={state.formData?.email ?? ""}
               ariaDescribedbyIds={getError("email") ? ["errorMessageEmail"] : undefined}
+              invalid={!!getError("email")}
             />
           </div>
         </div>

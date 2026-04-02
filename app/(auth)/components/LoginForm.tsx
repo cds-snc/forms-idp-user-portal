@@ -145,7 +145,10 @@ export function LoginForm({ requestId }: Props) {
               required
               autoComplete={"email"}
               defaultValue={state.formData?.username || ""}
-              ariaDescribedbyIds={getError("username") ? ["errorMessageUsername"] : undefined}
+              ariaDescribedbyIds={
+                getError("username") ? ["errorMessageUsername"] : "login-description"
+              }
+              invalid={!!getError("password")}
             />
           </div>
         </div>
@@ -165,6 +168,7 @@ export function LoginForm({ requestId }: Props) {
               required
               autoComplete={"current-password"}
               ariaDescribedbyIds={getError("password") ? ["errorMessagePassword"] : undefined}
+              invalid={!!getError("password")}
             />
 
             {/* Forgot password link */}

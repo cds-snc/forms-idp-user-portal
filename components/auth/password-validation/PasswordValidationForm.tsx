@@ -148,6 +148,7 @@ export function PasswordValidationForm({
                 type="text"
                 required
                 autoComplete="one-time-code"
+                invalid={!!getError("code")}
               />
             </div>
           )}
@@ -179,6 +180,7 @@ export function PasswordValidationForm({
               ariaDescribedbyIds={["password-complexity-requirements"]}
               defaultValue={state.formData?.password ?? ""}
               onChange={(e) => setWatchPassword(e.target.value)}
+              invalid={!!getError("password")}
             />
           </div>
           <div className="gcds-input-wrapper">
@@ -196,6 +198,7 @@ export function PasswordValidationForm({
               type="password"
               required
               defaultValue={state.formData?.confirmPassword ?? ""}
+              invalid={!!getError("confirmPassword")}
             />
           </div>
         </div>
