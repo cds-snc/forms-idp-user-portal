@@ -70,6 +70,7 @@
       "change": "Modifier",
       "cancel": "Annuler",
       "updateAccount": "Mettre à jour",
+      "updateDetails": "[FR]Update your personal details",
       "success": {
         "updateSuccess": "Vos renseignements personnels ont été mis à jour"
       },
