@@ -33,6 +33,7 @@ jobs:
       run: |
         docker build \
           --platform linux/arm64 \
+          --build-arg GIT_SHA=${{ github.sha }} \
           --tag idp-login:latest \
           .
 
