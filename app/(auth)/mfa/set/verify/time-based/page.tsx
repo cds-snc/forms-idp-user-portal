@@ -9,11 +9,9 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCredentials } from "@lib/cookies";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
+import { loadMfaVerificationSession } from "@lib/server/mfa-verify";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
@@ -27,35 +25,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  let sessionId: string | undefined;
-  let loginName: string | undefined;
-  let organization: string | undefined;
-
-  try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
-  } catch {
-    redirect("/password");
-  }
-
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const authCheck = await checkAuthenticationLevel(
+  const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
     serviceUrl,
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
-
-  if (!authCheck.satisfied) {
-    redirect(authCheck.redirect || "/password");
-  }
-
-  const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    pageName: "TOTP verify page",
+    missingSessionRedirect: "/mfa/set/verify",
+  });
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/mfa/set/verify");
