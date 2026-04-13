@@ -53,6 +53,7 @@ jobs:
         docker buildx build \
           --push \
           --platform linux/arm64 \
+          --build-arg GIT_SHA=$GITHUB_SHA \
           -t "${{ env.REGISTRY_PREFIX }}/idp-login:sha-$GITHUB_SHA" \
           -t "${{ env.REGISTRY_PREFIX }}/idp-login:latest" \
           .
