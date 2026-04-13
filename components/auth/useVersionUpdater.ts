@@ -42,8 +42,7 @@ export function useVersionUpdater(): VersionUpdateState {
       const previousVersion = currentVersion;
       currentVersion = latestVersion;
 
-      // const didChange = previousVersion !== null && latestVersion !== previousVersion;
-      const didChange = true;
+      const didChange = previousVersion !== null && latestVersion !== previousVersion;
 
       setState({
         latestVersion,
