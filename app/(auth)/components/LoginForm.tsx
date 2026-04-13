@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { getSafeErrorMessage } from "@lib/safeErrorMessage";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
+import { getError, hasError } from "@lib/validators";
 import { useTranslation } from "@i18n";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { Alert, ErrorStatus, Label, TextInput } from "@components/ui/form";
@@ -105,11 +106,6 @@ export function LoginForm({ requestId }: Props) {
     },
   });
 
-  // Helper to get field error
-  const getError = (fieldKey: string) => {
-    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
-  };
-
   return (
     <div>
       <ErrorSummary id="errorSummary" validationErrors={state.validationErrors} />
@@ -136,8 +132,10 @@ export function LoginForm({ requestId }: Props) {
             <div className="mb-4 text-sm text-black" id="login-description">
               {t("form.description")}
             </div>
-            {getError("username") && (
-              <ErrorMessage id={"errorMessageUsername"}>{getError("username")}</ErrorMessage>
+            {getError("username", state.validationErrors) && (
+              <ErrorMessage id={"errorMessageUsername"}>
+                {getError("username", state.validationErrors)}
+              </ErrorMessage>
             )}
             <TextInput
               type={"email"}
@@ -146,11 +144,11 @@ export function LoginForm({ requestId }: Props) {
               autoComplete={"email"}
               defaultValue={state.formData?.username || ""}
               ariaDescribedbyIds={
-                getError("username")
+                hasError("username", state.validationErrors)
                   ? ["login-description", "errorMessageUsername"]
                   : "login-description"
               }
-              invalid={!!getError("password")}
+              invalid={hasError("password", state.validationErrors)}
             />
           </div>
         </div>
@@ -161,16 +159,20 @@ export function LoginForm({ requestId }: Props) {
             <Label id={"label-password"} htmlFor={"password"} className="required" required>
               {t("form.passwordLabel")}
             </Label>
-            {getError("password") && (
-              <ErrorMessage id={"errorMessagePassword"}>{getError("password")}</ErrorMessage>
+            {getError("password", state.validationErrors) && (
+              <ErrorMessage id={"errorMessagePassword"}>
+                {getError("password", state.validationErrors)}
+              </ErrorMessage>
             )}
             <TextInput
               type={"password"}
               id={"password"}
               required
               autoComplete={"current-password"}
-              ariaDescribedbyIds={getError("password") ? ["errorMessagePassword"] : undefined}
-              invalid={!!getError("password")}
+              ariaDescribedbyIds={
+                hasError("password", state.validationErrors) ? ["errorMessagePassword"] : undefined
+              }
+              invalid={hasError("password", state.validationErrors)}
             />
 
             {/* Forgot password link */}

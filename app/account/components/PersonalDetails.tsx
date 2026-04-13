@@ -12,6 +12,7 @@ import { cn } from "@lib/utils";
  * Internal Aliases
  *--------------------------------------------*/
 import { validatePersonalDetails } from "@lib/validationSchemas";
+import { getError, hasError } from "@lib/validators";
 import { Button } from "@components/ui/button/Button";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { Label, TextInput } from "@components/ui/form";
@@ -115,10 +116,6 @@ export const PersonalDetails = ({
     },
   });
 
-  const getError = (fieldKey: string) => {
-    return state.validationErrors?.find((e) => e.fieldKey === fieldKey)?.fieldValue || "";
-  };
-
   return (
     <>
       <div className={cn("rounded-2xl border-3 border-highlight bg-white p-6", className)}>
@@ -166,8 +163,10 @@ export const PersonalDetails = ({
                 <Label className="required" htmlFor="firstname" required>
                   {t("personalDetails.firstName")}
                 </Label>
-                {getError("firstname") && (
-                  <ErrorMessage id={"errorMessageFirstname"}>{getError("firstname")}</ErrorMessage>
+                {getError("firstname", state.validationErrors) && (
+                  <ErrorMessage id={"errorMessageFirstname"}>
+                    {getError("firstname", state.validationErrors)}
+                  </ErrorMessage>
                 )}
                 <TextInput
                   className="w-full"
@@ -177,16 +176,22 @@ export const PersonalDetails = ({
                   ref={firstNameRef}
                   required
                   defaultValue={state.formData?.firstname ?? ""}
-                  ariaDescribedbyIds={getError("firstname") ? ["errorMessageFirstname"] : undefined}
-                  invalid={!!getError("firstname")}
+                  ariaDescribedbyIds={
+                    hasError("firstname", state.validationErrors)
+                      ? ["errorMessageFirstname"]
+                      : undefined
+                  }
+                  invalid={hasError("firstname", state.validationErrors)}
                 />
               </div>
               <div className="gcds-input-wrapper">
                 <Label htmlFor="lastname" required>
                   {t("personalDetails.lastName")}
                 </Label>
-                {getError("lastname") && (
-                  <ErrorMessage id={"errorMessageLastname"}>{getError("lastname")}</ErrorMessage>
+                {getError("lastname", state.validationErrors) && (
+                  <ErrorMessage id={"errorMessageLastname"}>
+                    {getError("lastname", state.validationErrors)}
+                  </ErrorMessage>
                 )}
                 <TextInput
                   className="w-full"
@@ -195,8 +200,12 @@ export const PersonalDetails = ({
                   required
                   id="lastname"
                   defaultValue={state.formData?.lastname ?? ""}
-                  ariaDescribedbyIds={getError("lastname") ? ["errorMessageLastname"] : undefined}
-                  invalid={!!getError("lastname")}
+                  ariaDescribedbyIds={
+                    hasError("lastname", state.validationErrors)
+                      ? ["errorMessageLastname"]
+                      : undefined
+                  }
+                  invalid={hasError("lastname", state.validationErrors)}
                 />
               </div>
             </div>

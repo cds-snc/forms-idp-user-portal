@@ -15,7 +15,6 @@ export const GcdsHeader = ({
   children,
 }: {
   language: string;
-  showLanguageToggle?: boolean;
   skipLink?: boolean;
   children?: React.ReactNode;
 }) => {
