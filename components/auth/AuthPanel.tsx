@@ -2,13 +2,13 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { ReactNode } from "react";
-import Image from "next/image";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { getImageUrl } from "@lib/imageUrl";
 import { I18n } from "@i18n";
+import { Image } from "@components/ui/image/Image";
 
 /*--------------------------------------------*
  * Local Relative

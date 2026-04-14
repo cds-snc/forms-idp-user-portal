@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.git
+.github
+.next
+.vscode
+coverage
+dist
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+tsconfig.tsbuildinfo

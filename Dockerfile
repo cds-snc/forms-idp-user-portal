@@ -19,8 +19,11 @@ RUN pnpm build
 FROM node:24-alpine AS final
 LABEL maintainer="-"
 
+ARG GIT_SHA
+
 ENV NODE_ENV=production
 ENV EMAIL_VERIFICATION=true
+ENV GIT_SHA=$GIT_SHA
 
 WORKDIR /src
 

@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { getVersion } from "@lib/version";
+import { VERSION } from "@lib/version";
 
 export const dynamic = "force-static";
-
-const VERSION = getVersion();
 
 export function GET() {
   return new NextResponse(VERSION, {
