@@ -1,13 +1,13 @@
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getShortVersion, getVersion } from "@lib/version";
+import { getShortVersion, VERSION } from "@lib/version";
 import { serverTranslation } from "@i18n/server";
 
 const deploymentId = process.env.NEXT_DEPLOYMENT_ID || "local";
 
 export const Version = async () => {
-  const shortVersion = getShortVersion(getVersion());
+  const shortVersion = getShortVersion(VERSION);
   const { t } = await serverTranslation(["footer"]);
 
   return (
