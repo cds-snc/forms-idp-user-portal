@@ -10,10 +10,13 @@ import { getSiteConfigFromHeaders } from "@lib/server/site-config";
 import { getSiteLink } from "@lib/site-config";
 import { serverTranslation } from "@i18n/server";
 import { Logout } from "@components/auth/Logout";
+import { VersionUpdater } from "@components/auth/VersionUpdater";
 import { Footer } from "@components/layout/footer/Footer";
 import { FooterLinks } from "@components/layout/footer/FooterLinks";
 import { GcdsHeader } from "@components/layout/gcds-header/GcdsHeader";
 import { SiteLink } from "@components/layout/site-header/SiteLink";
+import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
+import { NavMenu } from "@components/ui/nav-menu/NavMenu";
 import { ToastContainer } from "@components/ui/toast/Toast";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -25,17 +28,18 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex min-h-full flex-col bg-gray-soft">
       <GcdsHeader language={language}>
-        <div className="inline-block">
-          <Logout className="mr-2" />
-        </div>
+        <NavMenu>
+          {await Logout({}) /* allow to resolve to null or element */}
+          <LanguageToggle />
+        </NavMenu>
       </GcdsHeader>
 
       <div id="page-container" className="gc-authpages">
         <div className="account-wrapper mt-10 flex items-center justify-center">
           <div
-            className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-[658px] has-[#auth-panel-wide]:tablet:w-[950px] laptop:w-[850px] has-[#auth-panel-wide]:laptop:w-[1200px]`}
+            className={`rounded-2xl border-1 border-[#D1D5DB] bg-white p-10 tablet:w-164.5 has-[#auth-panel-wide]:tablet:w-237.5 laptop:w-212.5 has-[#auth-panel-wide]:laptop:w-[1200px]`}
           >
-            <main id="content">
+            <main id="content" tabIndex={-1}>
               <div className="mr-10 mb-6 inline-flex">
                 <SiteLink href={getSiteLink(siteConfig, "home", language)} />
               </div>
@@ -45,6 +49,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           </div>
         </div>
       </div>
+      <VersionUpdater />
       <Footer>
         <FooterLinks siteConfig={siteConfig} />
       </Footer>

@@ -15,11 +15,7 @@ import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-
-/*--------------------------------------------*
- * Parent Relative
- *--------------------------------------------*/
-import { LoginU2F } from "../../../../u2f/components/LoginU2F";
+import { LoginU2F } from "@components/mfa/LoginU2F";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("u2f");

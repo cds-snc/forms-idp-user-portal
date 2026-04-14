@@ -15,11 +15,7 @@ import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
-
-/*--------------------------------------------*
- * Local Relative
- *--------------------------------------------*/
-import { PasswordResetSecondFactor } from "./components/PasswordResetSecondFactor";
+import { StrongFactorSelection } from "@components/mfa/StrongFactorSelection";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("mfa");
@@ -54,7 +50,12 @@ export default async function Page() {
 
   return (
     <AuthPanel titleI18nKey="verify.title" descriptionI18nKey="verify.description" namespace="mfa">
-      <PasswordResetSecondFactor canUseTotp={canUseTotp} canUseU2F={canUseU2F} />
+      <StrongFactorSelection
+        canUseTotp={canUseTotp}
+        canUseU2F={canUseU2F}
+        totpUrl="/password/reset/verify/time-based"
+        u2fUrl="/password/reset/verify/u2f"
+      />
     </AuthPanel>
   );
 }

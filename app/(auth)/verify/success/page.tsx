@@ -1,9 +1,4 @@
 /*--------------------------------------------*
- * Framework and Third-Party
- *--------------------------------------------*/
-import Image from "next/image";
-
-/*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { getImageUrl } from "@lib/imageUrl";
@@ -11,6 +6,7 @@ import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
 import { AuthPanel } from "@components/auth/AuthPanel";
 import { LinkButton } from "@components/ui/button/LinkButton";
+import { Image } from "@components/ui/image/Image";
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 

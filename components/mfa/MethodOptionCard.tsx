@@ -1,15 +1,12 @@
 "use client";
 
 /*--------------------------------------------*
- * Framework and Third-Party
- *--------------------------------------------*/
-import Image from "next/image";
-
-/*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { getImageUrl } from "@lib/imageUrl";
 import { cn } from "@lib/utils";
+import { Image } from "@components/ui/image/Image";
+
 type Props = {
   method: string;
   title: string;
@@ -63,7 +60,7 @@ export function MethodOptionCard({
               {isDefault && (
                 <>
                   {" "}
-                  — <span className="italic">{defaultText}</span>
+                  <span className="italic">{defaultText}</span>
                 </>
               )}
             </div>
@@ -71,7 +68,13 @@ export function MethodOptionCard({
           </div>
         </div>
         {isSelected && (
-          <Image src={getImageUrl("/img/check_24px.png")} alt="Selected" width={24} height={24} />
+          <Image
+            src={getImageUrl("/img/check_24px.png")}
+            alt="Selected"
+            width={24}
+            height={24}
+            style={{ color: "" }}
+          />
         )}
       </div>
     </div>

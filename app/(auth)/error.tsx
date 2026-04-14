@@ -4,13 +4,13 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { useEffect } from "react";
-import Image from "next/image";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { getImageUrl } from "@lib/imageUrl";
 import { I18n } from "@i18n";
+import { Image } from "@components/ui/image/Image";
 export default function Error({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
     console.error(error);
@@ -27,8 +27,8 @@ export default function Error({ error }: { error: Error & { digest?: string } })
           alt="Goose"
           width={200}
           height={200}
-          className="mx-auto mb-6"
-          priority
+          className="mx-auto mb-6 h-auto"
+          preload={true}
         />
       </div>
     </div>
