@@ -1,6 +1,29 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
-import { getShortVersion } from "./version";
+const { originalGitSha } = vi.hoisted(() => {
+  const originalGitSha = process.env.GIT_SHA;
+  process.env.GIT_SHA = "abcdef1234567890";
+
+  return { originalGitSha };
+});
+
+import { getShortVersion, VERSION } from "./version";
+
+afterAll(() => {
+  if (originalGitSha === undefined) {
+    delete process.env.GIT_SHA;
+  } else {
+    process.env.GIT_SHA = originalGitSha;
+  }
+});
+
+describe("getVersion", () => {
+  it("captures GIT_SHA once at module load", () => {
+    process.env.GIT_SHA = "1234567890abcdef";
+
+    expect(VERSION).toBe("abcdef1234567890");
+  });
+});
 
 describe("getShortVersion", () => {
   it("shortens SHA-like versions to 7 characters", () => {
