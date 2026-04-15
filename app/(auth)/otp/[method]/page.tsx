@@ -79,7 +79,7 @@ export default async function Page(props: {
           method={method}
           loginSettings={loginSettings}
           code={code}
-          redirect={safeRedirect ?? redirectParam}
+          redirect={safeRedirect}
           displayName={sessionFactors.factors?.user?.displayName}
           siteConfig={siteConfig}
         />
