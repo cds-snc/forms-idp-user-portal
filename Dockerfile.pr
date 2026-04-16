@@ -1,0 +1,54 @@
+# User portal that runs as a Lambda function.  It is used to create
+# Lambda function review environments for each PR.
+FROM node:24-alpine AS build
+
+ARG GIT_SHA
+ARG NEXT_PUBLIC_ENABLE_EMAIL_OTP=false
+
+ENV NODE_ENV=production
+ENV EMAIL_VERIFICATION=true
+ENV NEXT_PUBLIC_ENABLE_EMAIL_OTP=$NEXT_PUBLIC_ENABLE_EMAIL_OTP
+ENV NEXT_OUTPUT_STANDALONE=true
+ENV CI=true
+ENV GIT_SHA=$GIT_SHA
+ENV PORT=3002
+
+COPY . /src
+WORKDIR /src
+
+RUN corepack enable
+RUN pnpm install
+RUN pnpm build
+
+FROM node:24-alpine AS final
+LABEL maintainer="-"
+
+ARG GIT_SHA
+
+ENV NODE_ENV=production
+ENV EMAIL_VERIFICATION=true
+ENV GIT_SHA=$GIT_SHA
+ENV AWS_LWA_ENABLE_COMPRESSION=true
+ENV HOSTNAME=localhost
+ENV PORT=3002
+
+WORKDIR /src
+
+COPY --from=build /src/.next/standalone ./
+COPY --from=build /src/.next/static ./.next/static
+
+COPY public ./public
+COPY scripts/pr-review-entrypoint.sh ./entrypoint.sh
+
+# Required by the entrypoint.sh to load the SSM ParameterStore environment variables
+RUN apk update && apk add --no-cache aws-cli
+
+# Lambda web adapter: https://github.com/awslabs/aws-lambda-web-adapter
+# The public.ecr.aws/awsguru/aws-lambda-adapter:0.7.0 image reference in the docs has
+# been pushed to the public CDS ECR to avoid rate limiting when pulling the image.
+COPY --from=public.ecr.aws/cds-snc/aws-lambda-adapter:0.9.0@sha256:19cd0b92bc4a376b2b63e3b02d8b9ad3b4031ea3549fd5e54faa848c49948e09 /lambda-adapter /opt/extensions/lambda-adapter
+RUN ln -s /tmp ./.next/cache
+
+EXPOSE 3002
+
+ENTRYPOINT ["./entrypoint.sh"]

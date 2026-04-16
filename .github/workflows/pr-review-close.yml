@@ -1,0 +1,47 @@
+name: PR review close
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  AWS_DEFAULT_REGION: ca-central-1
+  FUNCTION_NAME: idp-login-pr
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  pr-review-close:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'Renovate') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit DNS requests
+        uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # v1.1.0
+        env:
+          DNS_PROXY_FORWARDTOSENTINEL: "true"
+          DNS_PROXY_LOGANALYTICSWORKSPACEID: "${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}"
+          DNS_PROXY_LOGANALYTICSSHAREDKEY: "${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}"
+          DNS_PROXY_SAFELIST: "${{ vars.DNS_PROXY_SAFELIST }}"
+          DNS_PROXY_WILDCARDGREEDY: "true"
+
+      - name: Set envs
+        run: echo "PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.STAGING_AWS_ACCOUNT_ID }}:role/platform-unified-accounts-user-portal-pr-review-deploy
+          role-session-name: PRReviewRemove
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Delete lambda function resources
+        run: |
+          aws lambda wait function-active --function-name $FUNCTION_NAME-$PR_NUMBER > /dev/null 2>&1
+          aws lambda delete-function-url-config --function-name $FUNCTION_NAME-$PR_NUMBER > /dev/null 2>&1
+          aws lambda delete-function --function-name $FUNCTION_NAME-$PR_NUMBER > /dev/null 2>&1
+          aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME-$PR_NUMBER > /dev/null 2>&1
