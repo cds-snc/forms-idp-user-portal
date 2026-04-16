@@ -58,7 +58,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const registerLink = buildUrlWithRequestId("/register", requestId);
 
   return (
-    <AuthPanel titleI18nKey="title" namespace="start">
+    <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
       <LoginForm requestId={requestId} organization={organization} />
 
       <p className="mt-10">
