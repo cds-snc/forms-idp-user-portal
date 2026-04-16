@@ -106,7 +106,6 @@ export function getRequiredAuthLevel(pathname: string): AuthLevel {
     }
   }
 
-  // Default to open for unmatched routes
-  // In production, you might want to default to BASIC_SESSION for safety
-  return AuthLevel.OPEN;
+  // Default to highest level of auth (Strong MFA) for unmatched routes for safety
+  return AuthLevel.STRONG_MFA_REQUIRED;
 }
