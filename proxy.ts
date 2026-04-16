@@ -85,7 +85,7 @@ export async function proxy(request: NextRequest) {
   const { csp, nonce } = generateCSP();
   requestHeaders.set("x-nonce", nonce);
 
-  if (!ENABLE_EMAIL_OTP && (pathname === "/otp/email" || pathname.startsWith("/otp/email/"))) {
+  if (!ENABLE_EMAIL_OTP && pathname.startsWith("/otp/email/")) {
     const url = request.nextUrl.clone();
     url.pathname = pathname.startsWith("/otp/email/set") ? "/mfa/set" : "/mfa";
 

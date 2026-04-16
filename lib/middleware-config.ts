@@ -76,15 +76,10 @@ export const AUTH_FLOW_ROUTES = [
 export const API_ROUTES = ["/healthy", "/security", "/login"];
 
 /**
- * Check if a pathname matches any pattern in a list
+ * Check if a pathname matches or begins with any pattern in a list
  */
 export function matchesPattern(pathname: string, patterns: string[]): boolean {
   return patterns.some((pattern) => {
-    if (pattern.endsWith("*")) {
-      // Wildcard match
-      const prefix = pattern.slice(0, -1);
-      return pathname.startsWith(prefix);
-    }
     return pathname === pattern || pathname.startsWith(pattern + "/");
   });
 }
@@ -111,7 +106,6 @@ export function getRequiredAuthLevel(pathname: string): AuthLevel {
     }
   }
 
-  // Default to open for unmatched routes
-  // In production, you might want to default to BASIC_SESSION for safety
-  return AuthLevel.OPEN;
+  // Default to highest level of auth (Strong MFA) for unmatched routes for safety
+  return AuthLevel.STRONG_MFA_REQUIRED;
 }
