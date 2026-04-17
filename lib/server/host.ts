@@ -34,7 +34,7 @@ function isLocalHost(host: string): boolean {
 function isLambdaPRReviewHost(host: string): boolean {
   const hostname = new URL(`http://${host}`).hostname;
 
-  return hostname.endsWith(".lambda-url.ca-central-1.on.aws");
+  return process.env.PR_REVIEW === "true" && hostname.endsWith(".lambda-url.ca-central-1.on.aws");
 }
 
 export function getOriginalHostFromHeaders(_headers: HeaderReader): string {

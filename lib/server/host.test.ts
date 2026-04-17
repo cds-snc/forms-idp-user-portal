@@ -7,10 +7,10 @@ function makeHeaders(map: Record<string, string | null>): { get: (name: string) 
 }
 
 describe("host helpers", () => {
-  const originalReviewEnv = process.env.REVIEW_ENV;
+  const originalPrReview = process.env.PR_REVIEW;
 
   afterEach(() => {
-    process.env.REVIEW_ENV = originalReviewEnv;
+    process.env.PR_REVIEW = originalPrReview;
   });
 
   test("accepts trusted site hosts from site-config", () => {
@@ -94,9 +94,17 @@ describe("host helpers", () => {
     ).toBe("forms-formulaires.alpha.canada.ca");
   });
 
-  test("allows lambda PR review hosts", () => {
+  test("allows lambda PR review hosts when PR_REVIEW=true", () => {
+    process.env.PR_REVIEW = "true";
     const lambdaHost = "abc123.lambda-url.ca-central-1.on.aws";
     expect(getOriginalHostFromHeaders(makeHeaders({ host: lambdaHost }))).toBe(lambdaHost);
+  });
+
+  test("rejects lambda PR review hosts when PR_REVIEW is unset", () => {
+    delete process.env.PR_REVIEW;
+    expect(() =>
+      getOriginalHostFromHeaders(makeHeaders({ host: "abc123.lambda-url.ca-central-1.on.aws" }))
+    ).toThrow("Untrusted host header");
   });
 
   test("rejects lambda-like hosts that do not match the expected suffix", () => {
