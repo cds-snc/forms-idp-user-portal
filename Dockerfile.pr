@@ -1,0 +1,54 @@
+# User portal that runs as a Lambda function.  It is used to create
+# Lambda function review environments for each PR.
+FROM node:24-alpine AS build
+
+ARG GIT_SHA
+ARG NEXT_PUBLIC_ENABLE_EMAIL_OTP=false
+
+ENV NODE_ENV=production
+ENV EMAIL_VERIFICATION=true
+ENV NEXT_PUBLIC_ENABLE_EMAIL_OTP=$NEXT_PUBLIC_ENABLE_EMAIL_OTP
+ENV NEXT_PUBLIC_BASE_PATH=/ui/v2
+ENV NEXT_OUTPUT_STANDALONE=true
+ENV CI=true
+ENV GIT_SHA=$GIT_SHA
+ENV PORT=3002
+
+COPY . /src
+WORKDIR /src
+
+RUN corepack enable
+RUN pnpm install
+RUN pnpm build
+
+FROM node:24-alpine AS final
+LABEL maintainer="-"
+
+ARG GIT_SHA
+
+ENV NODE_ENV=production
+ENV EMAIL_VERIFICATION=true
+ENV GIT_SHA=$GIT_SHA
+ENV AWS_LWA_ENABLE_COMPRESSION=true
+ENV HOSTNAME=localhost
+ENV PORT=3002
+ENV PR_REVIEW=true
+
+WORKDIR /src
+
+COPY --from=build /src/.next/standalone ./
+COPY --from=build /src/.next/static ./.next/static
+
+COPY public ./public
+COPY scripts/pr-review-entrypoint.sh ./entrypoint.sh
+
+# Required by the entrypoint.sh to load the SSM ParameterStore environment variables
+RUN apk update && apk add --no-cache aws-cli
+
+# Lambda web adapter: https://github.com/awslabs/aws-lambda-web-adapter
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0@sha256:b4da35991627bdac98a81c377d0cc28e6989687359576dfda9f0b64be835d648 /lambda-adapter /opt/extensions/lambda-adapter
+RUN ln -s /tmp ./.next/cache
+
+EXPOSE 3002
+
+ENTRYPOINT ["./entrypoint.sh"]

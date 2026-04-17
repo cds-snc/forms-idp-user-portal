@@ -1,0 +1,57 @@
+name: PR review delete unused
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *" # Nightly at 4am
+
+env:
+  AWS_DEFAULT_REGION: ca-central-1
+  DELETE_AFTER_DAYS: 21
+  FUNCTION_PREFIX: idp-login-pr
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  pr-review-delete-unused:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit DNS requests
+        uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # v1.1.0
+        env:
+          DNS_PROXY_FORWARDTOSENTINEL: "true"
+          DNS_PROXY_LOGANALYTICSWORKSPACEID: "${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}"
+          DNS_PROXY_LOGANALYTICSSHAREDKEY: "${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}"
+          DNS_PROXY_SAFELIST: "${{ vars.DNS_PROXY_SAFELIST }}"
+          DNS_PROXY_WILDCARDGREEDY: "true"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.STAGING_AWS_ACCOUNT_ID }}:role/platform-unified-accounts-user-portal-pr-review-delete-unused
+          role-session-name: PRReviewDeleteUnused
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Delete old PR review environments
+        run: |
+          IFS=$'\n\t'
+          DELETE_DATE_EPOCH=$(date -d "-${{ env.DELETE_AFTER_DAYS }} days" +%s)
+          PR_REVIEW_ENVS="$(aws lambda list-functions --query 'Functions[?starts_with(FunctionName, `${{ env.FUNCTION_PREFIX }}`) == `true`]' | jq -c -r '.[]')"
+
+          for ENV in $PR_REVIEW_ENVS; do
+              FUNCTION_NAME="$(jq -r '.FunctionName' <<< $ENV)"
+              LAST_MODIFIED="$(jq -r '.LastModified' <<< $ENV)"
+              LAST_MODIFIED_EPOCH="$(date -d $LAST_MODIFIED +%s)"
+
+              if [ $LAST_MODIFIED_EPOCH -lt $DELETE_DATE_EPOCH ]; then
+                  echo "Deleting $FUNCTION_NAME"
+                  PR_NUMBER="${FUNCTION_NAME##*-}"
+                  aws lambda delete-function-url-config --function-name $FUNCTION_PREFIX-$PR_NUMBER > /dev/null 2>&1
+                  aws lambda delete-function --function-name $FUNCTION_PREFIX-$PR_NUMBER > /dev/null 2>&1
+                  aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_PREFIX-$PR_NUMBER > /dev/null 2>&1
+                  IMAGES_TO_DELETE="$(aws ecr list-images --repository-name $FUNCTION_PREFIX --filter "tagStatus=TAGGED" --query "imageIds[?starts_with(imageTag, 'pr-$PR_NUMBER')]" --output json)"
+                  aws ecr batch-delete-image --repository-name $FUNCTION_PREFIX --image-ids "$IMAGES_TO_DELETE" || true > /dev/null 2>&1
+              fi
+          done
