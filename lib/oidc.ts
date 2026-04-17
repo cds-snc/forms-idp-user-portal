@@ -33,7 +33,7 @@ export async function loginWithOIDCAndSession({
   const authRequestId = toAuthRequestId(authRequest);
   const oidcRequestId = toOidcRequestId(authRequest);
 
-  logMessage.debug(`OIDC login attempt for requestId: ${oidcRequestId}`);
+  logMessage.info(`OIDC login attempt for requestId: ${oidcRequestId}`);
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
 

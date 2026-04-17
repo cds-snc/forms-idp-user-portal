@@ -30,7 +30,7 @@ export async function completeAuthFlow(
   const { sessionId, requestId } = command;
 
   logMessage.info(
-    `Completing ${requestId.startsWith("oidc_") ? "OIDC" : requestId.startsWith("saml_") ? "SAML" : "unknown"} auth flow for requestId: ${requestId}`
+    `Completing ${requestId.startsWith("oidc_") ? "OIDC" : "unknown"} auth flow for requestId: ${requestId}`
   );
 
   const _headers = await headers();

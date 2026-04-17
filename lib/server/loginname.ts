@@ -79,7 +79,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   if ("error" in searchResult && searchResult.error) {
-    logMessage.warn("searchUsers returned an error, returning early");
+    logMessage.warn(`searchUsers returned an error, returning early: ${searchResult.error}`);
     return searchResult;
   }
 

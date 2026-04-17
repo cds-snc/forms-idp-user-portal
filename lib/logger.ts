@@ -74,14 +74,15 @@ export const logMessage: AppLogger = {
   error: (message: unknown) => {
     try {
       if (message instanceof Error) {
-        pinoLogger.error(message.message);
+        pinoLogger.error({ err: message }, message.message);
       } else if (typeof message === "string") {
         pinoLogger.error(message);
       } else {
         pinoLogger.error(JSON.stringify(message));
       }
     } catch {
-      pinoLogger.error("Failed to serialize error log payload");
+      const typeName = message?.constructor?.name ?? typeof message;
+      pinoLogger.error(`Failed to serialize error payload [${typeName}]: ${String(message)}`);
     }
   },
 };
