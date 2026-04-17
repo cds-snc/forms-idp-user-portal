@@ -61,7 +61,7 @@ jobs:
 
       - name: Delete old images
         run: |
-          IMAGES_TO_DELETE="$(aws ecr list-images --repository-name $IMAGE --output json | jq --arg pr "pr-$PR_NUMBER" '[.imageIds[] | select(.imageTag | startswith($pr))]')"
+          IMAGES_TO_DELETE="$(aws ecr list-images --repository-name $IMAGE --filter "tagStatus=TAGGED" --output json | jq -r --arg pr "pr-$PR_NUMBER" '[.imageIds[] | select(.imageTag | startswith($pr)) | .imageTag][]')"
           aws ecr batch-delete-image \
             --repository-name $IMAGE \
             --image-ids "$IMAGES_TO_DELETE" || true
