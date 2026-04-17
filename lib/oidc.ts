@@ -94,7 +94,7 @@ export async function loginWithOIDCAndSession({
         }
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
-        logMessage.error(error);
+        logMessage.error("OIDC authentication error", error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
           // Already-handled auth requests can happen due to retries or duplicate RSC renders.
           // In that case, recover with a deterministic redirect to the relying party when possible.

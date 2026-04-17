@@ -85,9 +85,7 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
     requestId,
     lifetime: lifetime as Duration,
   }).catch((error) => {
-    logMessage.error(
-      `Could not set session for OTP challenge: ${error instanceof Error ? error.message : String(error)}`
-    );
+    logMessage.error("Could not set session for OTP challenge", error);
     return null;
   });
 
@@ -130,9 +128,7 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
       factors: session.factors,
     };
   } catch (error) {
-    logMessage.error(
-      `Failed to send OTP email via GC Notify: ${error instanceof Error ? error.message : String(error)}`
-    );
+    logMessage.error("Failed to send OTP email via GC Notify", error);
     return { error: t("errors.emailSendFailed") };
   }
 }

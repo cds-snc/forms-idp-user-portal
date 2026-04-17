@@ -52,36 +52,45 @@ describe("logMessage.warn", () => {
 });
 
 describe("logMessage.error", () => {
-  it("logs an Error object with err serialization and message as msg", () => {
+  it("logs message string alone when no cause provided", () => {
+    logMessage.error("Could not load session");
+    expect(mockPinoInstance.error).toHaveBeenCalledWith("Could not load session");
+  });
+
+  it("logs an Error cause with err serialization and message as msg", () => {
     const error = new Error("something went wrong");
-    logMessage.error(error);
-    expect(mockPinoInstance.error).toHaveBeenCalledWith({ err: error }, "something went wrong");
+    logMessage.error("Failed to get user abc123", error);
+    expect(mockPinoInstance.error).toHaveBeenCalledWith(
+      { err: error },
+      "Failed to get user abc123"
+    );
   });
 
   it("preserves stack trace via the err object", () => {
     const error = new Error("oops");
-    logMessage.error(error);
+    logMessage.error("Operation failed", error);
     const call = mockPinoInstance.error.mock.calls[0];
     expect(call[0]).toEqual({ err: error });
     expect(call[0].err.stack).toContain("oops");
   });
 
-  it("logs a string error directly", () => {
-    logMessage.error("plain error string");
-    expect(mockPinoInstance.error).toHaveBeenCalledWith("plain error string");
-  });
-
-  it("serializes unknown non-string values as JSON", () => {
-    logMessage.error({ code: 404, detail: "not found" });
+  it("appends a string cause to message", () => {
+    logMessage.error("Could not load session", "connection refused");
     expect(mockPinoInstance.error).toHaveBeenCalledWith(
-      JSON.stringify({ code: 404, detail: "not found" })
+      "Could not load session: connection refused"
     );
   });
 
-  it("falls back gracefully when JSON.stringify throws", () => {
+  it("serializes an unknown object cause as JSON appended to message", () => {
+    const obj = { code: 404, detail: "not found" };
+    logMessage.error("Upstream error", obj);
+    expect(mockPinoInstance.error).toHaveBeenCalledWith(`Upstream error: ${JSON.stringify(obj)}`);
+  });
+
+  it("falls back gracefully when JSON.stringify throws on cause", () => {
     const circular: Record<string, unknown> = {};
     circular.self = circular;
-    logMessage.error(circular);
+    logMessage.error("Serialization failed", circular);
     const call = mockPinoInstance.error.mock.calls[0][0] as string;
     expect(call).toContain("Failed to serialize error payload");
     expect(call).toContain("[Object]");
@@ -93,7 +102,7 @@ describe("logMessage.error", () => {
       code = 7;
     }
     const error = new CustomError("connect error");
-    logMessage.error(error);
-    expect(mockPinoInstance.error).toHaveBeenCalledWith({ err: error }, "connect error");
+    logMessage.error("Failed to connect", error);
+    expect(mockPinoInstance.error).toHaveBeenCalledWith({ err: error }, "Failed to connect");
   });
 });

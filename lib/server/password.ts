@@ -574,7 +574,7 @@ export async function checkSessionAndSetPassword({
   try {
     sessionCookie = await getSessionCookieById({ sessionId });
   } catch (error) {
-    logMessage.error(error);
+    logMessage.error("Could not load session cookie", error);
     return { error: "Could not load session cookie" };
   }
 
@@ -587,7 +587,7 @@ export async function checkSessionAndSetPassword({
     });
     session = sessionResponse.session;
   } catch (error) {
-    logMessage.error(error);
+    logMessage.error("Could not load session", error);
     return { error: "Could not load session" };
   }
 
@@ -610,7 +610,7 @@ export async function checkSessionAndSetPassword({
       userId: session.factors.user.id,
     });
   } catch (error) {
-    logMessage.error(error);
+    logMessage.error("Could not load auth methods", error);
     return { error: "Could not load auth methods" };
   }
 
@@ -625,7 +625,7 @@ export async function checkSessionAndSetPassword({
       organization: session.factors.user.organizationId,
     });
   } catch (error) {
-    logMessage.error(error);
+    logMessage.error("Could not load login settings", error);
     return { error: "Could not load login settings" };
   }
 
@@ -691,7 +691,7 @@ export async function checkSessionAndSetPassword({
         return result;
       })
       .catch((error: ConnectError) => {
-        logMessage.error(error);
+        logMessage.error("Could not set password", error);
         if (error.code === 7) {
           return { error: t("errors.sessionNotValid") };
         }

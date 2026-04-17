@@ -86,9 +86,7 @@ async function safeFindValidSession({
       authRequest,
     });
   } catch (error) {
-    logMessage.error(
-      `Failed to resolve valid session during flow initiation: ${error instanceof Error ? error.message : String(error)}`
-    );
+    logMessage.error("Failed to resolve valid session during flow initiation", error);
     return undefined;
   }
 }
@@ -260,9 +258,7 @@ export async function handleOIDCFlowInitiation(
             return NextResponse.redirect(absoluteUrl.toString());
           }
         } catch (error) {
-          logMessage.error(
-            `sendLoginname failed during OIDC login hint flow: ${error instanceof Error ? error.message : String(error)}`
-          );
+          logMessage.error("sendLoginname failed during OIDC login hint flow", error);
         }
       }
 
@@ -367,7 +363,7 @@ export async function handleOIDCFlowInitiation(
           });
         }
       } catch (error) {
-        logMessage.error(error);
+        logMessage.error("Flow initiation failed, redirecting to login", error);
         return gotoLogin({
           request,
           requestId: oidcRequestId,
