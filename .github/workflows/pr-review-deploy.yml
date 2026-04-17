@@ -61,7 +61,7 @@ jobs:
 
       - name: Delete old images
         run: |
-          IMAGES_TO_DELETE="$(aws ecr list-images --repository-name $IMAGE --filter "tagStatus=TAGGED" --output json | jq -r --arg pr "pr-$PR_NUMBER" '[.imageIds[] | select(.imageTag | startswith($pr)) | .imageTag][]')"
+          IMAGES_TO_DELETE="$(aws ecr list-images --repository-name $IMAGE --filter "tagStatus=TAGGED" --query "imageIds[?starts_with(imageTag, 'pr-$PR_NUMBER')]" --output json)"
           aws ecr batch-delete-image \
             --repository-name $IMAGE \
             --image-ids "$IMAGES_TO_DELETE" || true
@@ -114,6 +114,7 @@ jobs:
             "$ROLE_ARN" \
             "${{ secrets.PR_REVIEW_ENV_SUBNET_IDS }}" \
             "${{ secrets.PR_REVIEW_ENV_SECURITY_GROUP_IDS }}")
+          echo $URL
           if [[ -n "$URL" && "$URL" == https://* ]]; then
             echo "URL=$URL" >> $GITHUB_ENV
           fi
