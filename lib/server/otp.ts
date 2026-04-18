@@ -122,6 +122,7 @@ export async function sendOtpEmail(command: SendOtpEmailCommand) {
     const gcNotify = GCNotifyConnector.default(apiKey);
     await gcNotify.sendEmail(userEmail, templateId, getSecurityCodeTemplate(otpCode));
 
+    logMessage.info("OTP email sent successfully");
     return {
       success: true,
       sessionId: session.id,
