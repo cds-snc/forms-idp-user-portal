@@ -56,7 +56,6 @@ export default async function Page() {
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
         organization={organization ?? sessionData.factors?.user?.organizationId}
-        method="time-based"
         loginSettings={loginSettings}
         redirect="/mfa/set"
         displayName={sessionData.factors?.user?.displayName}

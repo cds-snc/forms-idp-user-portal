@@ -32,7 +32,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const { code, redirect } = searchParams;
+  const { redirect } = searchParams;
 
   const sessionData = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -63,9 +63,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           sessionId={sessionId}
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           requestId={requestId}
-          method="time-based"
           loginSettings={loginSettings}
-          code={code}
           redirect={safeRedirect}
           displayName={sessionFactors.factors?.user?.displayName}
           siteConfig={siteConfig}
