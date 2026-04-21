@@ -108,12 +108,10 @@ export async function checkMFAFactors(
       m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
-  // All available MFA methods including OTP_EMAIL
+  // All available MFA methods
   const allMfaFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
-      m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.U2F ||
-      m === AuthenticationMethodType.OTP_EMAIL
+      m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
   // If no strong factor exists, redirect to setup
