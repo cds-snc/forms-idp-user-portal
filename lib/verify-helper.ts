@@ -12,11 +12,6 @@ import crypto from "crypto";
 import moment from "moment";
 
 /*--------------------------------------------*
- * Internal Aliases
- *--------------------------------------------*/
-import { ENABLE_EMAIL_OTP } from "@root/constants/config";
-
-/*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
 import { getFingerprintIdCookie } from "./fingerprint";
@@ -113,14 +108,6 @@ export async function checkMFAFactors(
       m === AuthenticationMethodType.TOTP || m === AuthenticationMethodType.U2F
   );
 
-  // All available MFA methods including OTP_EMAIL
-  const allMfaFactors = authMethods?.filter(
-    (m: AuthenticationMethodType) =>
-      m === AuthenticationMethodType.TOTP ||
-      m === AuthenticationMethodType.U2F ||
-      (m === AuthenticationMethodType.OTP_EMAIL && ENABLE_EMAIL_OTP)
-  );
-
   // If no strong factor exists, redirect to setup
   if (!strongFactors.length) {
     logMessage.info("Redirecting user to MFA setup - strong MFA required");
@@ -128,8 +115,8 @@ export async function checkMFAFactors(
   }
 
   // If user has only one MFA method total, redirect directly to that
-  if (allMfaFactors.length === 1) {
-    const factor = allMfaFactors[0];
+  if (strongFactors.length === 1) {
+    const factor = strongFactors[0];
     if (factor === AuthenticationMethodType.TOTP) {
       logMessage.info("Redirecting user to TOTP verification");
       return { redirect: buildUrlWithRequestId(`/otp/time-based`, requestId) };
@@ -140,7 +127,7 @@ export async function checkMFAFactors(
   }
 
   // Multiple MFA methods available - show selection page
-  if (allMfaFactors.length > 1) {
+  if (strongFactors.length > 1) {
     logMessage.info("Redirecting user to MFA selection page");
     return { redirect: buildUrlWithRequestId(`/mfa`, requestId) };
   }

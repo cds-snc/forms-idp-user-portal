@@ -3,49 +3,36 @@
  *--------------------------------------------*/
 import { Metadata } from "next";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ENABLE_EMAIL_OTP } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
-import { buildUrlWithRequestId } from "@lib/utils";
 import { getSerializableObject, SearchParams } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import { LoginOTP } from "@components/mfa/LoginOTP";
+import { LoginTOTP } from "@components/mfa/LoginTOTP";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await serverTranslation("otp");
   return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<SearchParams>;
-  params: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
-  const [params, searchParams, _headers, { sessionId, loginName, organization, requestId }] =
-    await Promise.all([props.params, props.searchParams, headers(), getSessionCredentials()]);
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const [searchParams, _headers, { sessionId, loginName, organization, requestId }] =
+    await Promise.all([props.searchParams, headers(), getSessionCredentials()]);
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const { code, redirect: redirectParam } = searchParams;
-
-  // Method =  `/otp/email` or `/otp/time-based` (authenticator app)
-  const { method } = params;
-
-  if (method === "email" && !ENABLE_EMAIL_OTP) {
-    return redirect(buildUrlWithRequestId("/mfa", requestId));
-  }
+  const { redirect } = searchParams;
 
   const sessionData = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -56,7 +43,7 @@ export default async function Page(props: {
     ? { factors: sessionData.factors, expirationDate: sessionData.expirationDate }
     : undefined;
 
-  const safeRedirect = getSafeRedirectUrl(redirectParam);
+  const safeRedirect = getSafeRedirectUrl(redirect);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
@@ -65,20 +52,18 @@ export default async function Page(props: {
 
   return (
     <AuthPanel
-      titleI18nKey={method === "time-based" ? "verify.authAppTitle" : "verify.title"}
+      titleI18nKey={"verify.authAppTitle"}
       descriptionI18nKey="none"
       namespace="otp"
-      imageSrc={method === "time-based" ? "/img/auth-app-icon.png" : undefined}
+      imageSrc={"/img/auth-app-icon.png"}
     >
-      {method && sessionFactors && (
-        <LoginOTP
+      {sessionFactors && (
+        <LoginTOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
           organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           requestId={requestId}
-          method={method}
           loginSettings={loginSettings}
-          code={code}
           redirect={safeRedirect}
           displayName={sessionFactors.factors?.user?.displayName}
           siteConfig={siteConfig}

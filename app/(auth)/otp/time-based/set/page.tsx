@@ -9,11 +9,10 @@ import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_s
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ENABLE_EMAIL_OTP, LOGGED_IN_HOME_PAGE } from "@root/constants/config";
+import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { protectedAddOTPEmail } from "@lib/server/zitadel-protected";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { registerTOTP } from "@lib/zitadel";
@@ -54,10 +53,6 @@ export default async function Page(props: {
   const { method } = params;
   const { t } = await serverTranslation("otp");
 
-  if (method === "email" && !ENABLE_EMAIL_OTP) {
-    redirect(buildUrlWithRequestId("/mfa/set", requestId));
-  }
-
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -76,40 +71,24 @@ export default async function Page(props: {
   if (session && session.factors?.user?.id) {
     const userId = session.factors.user.id;
 
-    if (method === "time-based") {
-      try {
-        const resp = await registerTOTP({
-          serviceUrl,
-          userId,
-        });
-
-        if (resp) {
-          totpResponse = resp;
-        }
-      } catch (err) {
-        logMessage.debug({
-          message: "Failed to register TOTP during OTP setup",
-          error: err,
-        });
-
-        mappedUiError = getZitadelUiError("otp.set", err);
-
-        error = err instanceof Error ? err : undefined;
-      }
-    } else if (method === "email") {
-      const addOtpEmailResponse = await protectedAddOTPEmail(session.factors.user.id);
-      if ("error" in addOtpEmailResponse && addOtpEmailResponse.error) {
-        logMessage.debug({
-          message: "Failed to enable OTP email during OTP setup",
-          error: addOtpEmailResponse.error,
-        });
-      }
-    } else {
-      logMessage.debug({
-        message: "Invalid OTP setup method",
-        method,
+    try {
+      const resp = await registerTOTP({
+        serviceUrl,
+        userId,
       });
-      redirect("/mfa/set");
+
+      if (resp) {
+        totpResponse = resp;
+      }
+    } catch (err) {
+      logMessage.debug({
+        message: "Failed to register TOTP during OTP setup",
+        error: err,
+      });
+
+      mappedUiError = getZitadelUiError("otp.set", err);
+
+      error = err instanceof Error ? err : undefined;
     }
   } else {
     logMessage.debug({

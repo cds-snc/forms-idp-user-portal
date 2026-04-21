@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 
-import { ENABLE_EMAIL_OTP, ZITADEL_ORGANIZATION } from "@root/constants/config";
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { generateCSP, responseWithCSP } from "@lib/cspScripts";
 import { logMessage } from "@lib/logger";
 
@@ -34,8 +34,6 @@ export const config = {
   ],
 };
 
-const MFA_FLOW_COOKIE = "mfa-flow-authorized";
-
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
@@ -64,8 +62,6 @@ function isMfaSetupRoute(pathname: string): boolean {
     pathname.startsWith("/mfa/set/") ||
     pathname === "/u2f/set" ||
     pathname.startsWith("/u2f/set/") ||
-    pathname === "/otp/email/set" ||
-    pathname.startsWith("/otp/email/set/") ||
     pathname === "/otp/time-based/set" ||
     pathname.startsWith("/otp/time-based/set/")
   );
@@ -73,7 +69,6 @@ function isMfaSetupRoute(pathname: string): boolean {
 
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
-  const isAuthFlowRoute = matchesPattern(pathname, AUTH_FLOW_ROUTES);
 
   // Add the original URL as a header to all requests
   const requestHeaders = new Headers(request.headers);
@@ -84,13 +79,6 @@ export async function proxy(request: NextRequest) {
   // Generate CSP once for this request; propagate nonce to layouts via request header
   const { csp, nonce } = generateCSP();
   requestHeaders.set("x-nonce", nonce);
-
-  if (!ENABLE_EMAIL_OTP && pathname.startsWith("/otp/email/")) {
-    const url = request.nextUrl.clone();
-    url.pathname = pathname.startsWith("/otp/email/set") ? "/mfa/set" : "/mfa";
-
-    return responseWithCSP(NextResponse.redirect(url), csp);
-  }
 
   // Only run the proxy logic for OIDC paths
   const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/"];
@@ -166,40 +154,19 @@ export async function proxy(request: NextRequest) {
 
   // If satisfied, allow the request
   if (authCheck.satisfied) {
-    const response = responseWithCSP(
-      NextResponse.next({ request: { headers: requestHeaders } }),
-      csp
-    );
-
-    if (
-      ENABLE_EMAIL_OTP &&
-      isAuthFlowRoute &&
-      (pathname.startsWith("/mfa") || pathname.startsWith("/otp") || pathname.startsWith("/u2f")) &&
-      authCheck.session?.factors?.password?.verifiedAt
-    ) {
-      response.cookies.set({
-        name: MFA_FLOW_COOKIE,
-        value: "1",
-        httpOnly: true,
-        maxAge: 300,
-        path: "/",
-        sameSite: "lax",
-        secure: request.nextUrl.protocol === "https:",
-      });
-    }
-
-    return response;
+    return responseWithCSP(NextResponse.next({ request: { headers: requestHeaders } }), csp);
   }
 
   // Special handling for auth flow routes
   // Allow partial authentication if user is progressing through multi-step flows
   // This works both with OIDC flows (requestId present) and standalone auth
+  const isAuthFlowRoute = matchesPattern(pathname, AUTH_FLOW_ROUTES);
+
   if (isAuthFlowRoute) {
     // Allow access to MFA pages if password is verified
     if (pathname.startsWith("/mfa") || pathname.startsWith("/otp") || pathname.startsWith("/u2f")) {
       const session = authCheck.session;
       const hasPassword = session?.factors?.password?.verifiedAt;
-      const hasMfaFlowCookie = request.cookies.get(MFA_FLOW_COOKIE)?.value === "1";
 
       if (hasPassword) {
         if (isMfaSetupRoute(pathname) && session?.id) {
@@ -221,27 +188,6 @@ export async function proxy(request: NextRequest) {
         }
 
         // Allow access to MFA flow pages when password is already verified
-        const response = responseWithCSP(
-          NextResponse.next({ request: { headers: requestHeaders } }),
-          csp
-        );
-
-        if (ENABLE_EMAIL_OTP) {
-          response.cookies.set({
-            name: MFA_FLOW_COOKIE,
-            value: "1",
-            httpOnly: true,
-            maxAge: 300,
-            path: "/",
-            sameSite: "lax",
-            secure: request.nextUrl.protocol === "https:",
-          });
-        }
-
-        return response;
-      }
-
-      if (ENABLE_EMAIL_OTP && pathname.startsWith("/otp/email") && hasMfaFlowCookie) {
         return responseWithCSP(NextResponse.next({ request: { headers: requestHeaders } }), csp);
       }
     }
