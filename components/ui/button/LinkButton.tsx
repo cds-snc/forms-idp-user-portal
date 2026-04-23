@@ -8,7 +8,7 @@ import type { JSX } from "react";
  * Internal Aliases
  *--------------------------------------------*/
 import { cn } from "@lib/utils";
-export const themes = {
+const themes = {
   base: "inline-flex items-center rounded-md border-2 border-solid p-3 leading-[24px] transition-all duration-150 ease-in-out focus:border-gcds-blue-850 focus:bg-gcds-blue-850 focus:text-white-default focus:outline focus:outline-[3px] focus:outline-offset-2 focus:outline-gcds-blue-850 active:top-0.5 active:bg-black active:text-white-default active:outline-[3px] active:outline-offset-2 active:outline-gcds-blue-850 disabled:cursor-not-allowed disabled:!border-none disabled:bg-gray-light disabled:text-gray-dark font-medium",
   htmlLink: "no-underline visited:text-white-default",
   primary:
@@ -21,8 +21,6 @@ export const themes = {
   icon: "ml-1.5 max-h-9 !rounded-full !border-none !p-1.5",
   disabled: "cursor-not-allowed border-none bg-gcds-gray-100 text-gcds-gray-800",
 } as const;
-
-export type Theme = keyof typeof themes;
 
 type LinkButtonProps = {
   href: string;
@@ -38,15 +36,7 @@ type LinkButtonProps = {
   "data-testid"?: string;
 };
 
-export const Default = ({ href, children, className, scroll }: LinkButtonProps) => {
-  return (
-    <Link scroll={scroll} href={href} className={cn(themes.link, className)}>
-      {children}
-    </Link>
-  );
-};
-
-export const Primary = ({
+const Primary = ({
   href,
   children,
   className,
@@ -69,7 +59,7 @@ export const Primary = ({
   );
 };
 
-export const Secondary = ({
+const Secondary = ({
   href,
   className,
   children,

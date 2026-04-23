@@ -72,21 +72,3 @@ export async function getOriginalHost(): Promise<string> {
 
   return getOriginalHostFromHeaders(_headers);
 }
-
-/**
- * Gets the original host with protocol prefix.
- * Automatically detects if localhost should use http:// or https://
- *
- * ⚠️ SERVER-SIDE ONLY: This function can only be used in:
- * - Server Actions (functions with "use server")
- * - Server Components (React components that run on the server)
- * - Route Handlers (API routes)
- * - Middleware
- *
- * @returns The full URL prefix (e.g., "https://zitadel.com")
- */
-export async function getOriginalHostWithProtocol(): Promise<string> {
-  const host = await getOriginalHost();
-  const protocol = isLocalHost(host) ? "http://" : "https://";
-  return `${protocol}${host}`;
-}

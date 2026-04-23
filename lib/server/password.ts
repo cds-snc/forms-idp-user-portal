@@ -25,7 +25,6 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
   listUsers,
-  passwordReset,
   setPassword,
   setUserPassword,
 } from "@lib/zitadel";
@@ -44,7 +43,6 @@ import {
   checkUserVerification,
 } from "../verify-helper";
 
-import { getOriginalHostWithProtocol } from "./host";
 import { sendPasswordChangedEmail } from "./verify";
 
 /**
@@ -115,44 +113,7 @@ async function handleAuthenticationFailure(
   };
 }
 
-type ResetPasswordCommand = {
-  loginName: string;
-  organization?: string;
-  requestId?: string;
-};
-
-export async function resetPassword(command: ResetPasswordCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const { t } = await serverTranslation("password");
-
-  logMessage.info("Password reset requested");
-  const hostWithProtocol = await getOriginalHostWithProtocol();
-
-  const users = await listUsers({
-    serviceUrl,
-    loginName: command.loginName,
-    organizationId: command.organization,
-  });
-
-  if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
-    return { error: t("errors.couldNotSendResetLink") };
-  }
-  const userId = users.result[0].userId;
-
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-  return passwordReset({
-    serviceUrl,
-    userId,
-    urlTemplate:
-      `${hostWithProtocol}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-      (command.requestId ? `&requestId=${command.requestId}` : ""),
-  });
-}
-
-export type UpdateSessionCommand = {
+type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
   checks: Checks;

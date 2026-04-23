@@ -82,7 +82,3 @@ export const Button = ({
     </button>
   );
 };
-
-export const RoundedButton = ({ className, ...props }: ButtonProps) => (
-  <Button {...props} className={cn(className, "rounded-[100px]")} />
-);

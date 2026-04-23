@@ -7,11 +7,6 @@ import { cookies } from "next/headers";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 
 /*--------------------------------------------*
- * Internal Aliases
- *--------------------------------------------*/
-import { LANGUAGE_COOKIE_NAME } from "@i18n";
-
-/*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
 import { logMessage } from "./logger";
@@ -56,17 +51,6 @@ async function setSessionHttpOnlyCookie<T>(
     path: "/",
     sameSite: resolvedSameSite,
     secure: process.env.NODE_ENV === "production",
-  });
-}
-
-export async function setLanguageCookie(language: string) {
-  const cookiesList = await cookies();
-
-  await cookiesList.set({
-    name: LANGUAGE_COOKIE_NAME,
-    value: language,
-    httpOnly: true,
-    path: "/",
   });
 }
 

@@ -13,7 +13,7 @@ interface AvatarProps {
   shadow?: boolean;
 }
 
-export function getInitials(name: string, loginName: string) {
+function getInitials(name: string, loginName: string) {
   let credentials = "";
   if (name) {
     const split = name.split(" ");

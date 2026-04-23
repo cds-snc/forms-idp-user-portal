@@ -49,27 +49,6 @@ export function checkPasswordChangeRequired(
   }
 }
 
-export function checkEmailVerified(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string
-) {
-  if (!humanUser?.email?.isVerified) {
-    const paramsVerify = new URLSearchParams({
-      userId: session.factors?.user?.id as string, // verify needs user id
-      send: "true", // we request a new email code once the page is loaded
-    });
-
-    const verifyUrl = buildUrlWithRequestId("/verify", requestId);
-    const [basePath, existingQuery = ""] = verifyUrl.split("?");
-    const mergedParams = new URLSearchParams(existingQuery);
-    paramsVerify.forEach((value, key) => mergedParams.set(key, value));
-
-    return { redirect: `${basePath}?${mergedParams.toString()}` };
-  }
-}
-
 export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,
@@ -133,47 +112,6 @@ export async function checkMFAFactors(
   }
 
   return { error: "No MFA factors available" };
-}
-
-/**
- * Determines if MFA should be enforced based on the authentication method used and login settings
- * @param session - The current session
- * @param loginSettings - The login settings containing MFA enforcement rules
- * @returns true if MFA should be enforced, false otherwise
- */
-export function shouldEnforceMFA(
-  session: Session,
-  loginSettings: LoginSettings | undefined
-): boolean {
-  if (!loginSettings) {
-    return false;
-  }
-
-  // If forceMfa is enabled, MFA is required for ALL authentication methods
-  if (loginSettings.forceMfa) {
-    return true;
-  }
-
-  // If forceMfaLocalOnly is enabled, MFA is only required for local/password authentication
-  if (loginSettings.forceMfaLocalOnly) {
-    // Check if user authenticated with password (local authentication)
-    const authenticatedWithPassword = !!session.factors?.password?.verifiedAt;
-
-    // Check if user authenticated with IDP (external authentication)
-    const authenticatedWithIDP = !!session.factors?.intent?.verifiedAt;
-
-    // If user authenticated with IDP, MFA is not required for forceMfaLocalOnly
-    if (authenticatedWithIDP) {
-      return false;
-    }
-
-    // If user authenticated with password, MFA is required for forceMfaLocalOnly
-    if (authenticatedWithPassword) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 export async function checkUserVerification(userId: string): Promise<boolean> {

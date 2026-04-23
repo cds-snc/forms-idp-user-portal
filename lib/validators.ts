@@ -86,7 +86,7 @@ export const containsSymbol = (field: string): boolean => {
   return true;
 };
 
-export type ValidationError = { fieldKey: string; fieldValue: string };
+type ValidationError = { fieldKey: string; fieldValue: string };
 
 /**
  * Helper to get the realted error key if one exists.

@@ -52,4 +52,3 @@ jobs:
           aws ecr batch-delete-image \
             --repository-name $FUNCTION_NAME \
             --image-ids "$IMAGES_TO_DELETE" || true
-

@@ -15,7 +15,7 @@ import { sendVerification, sendVerificationEmail } from "@lib/server/verify";
 import { getSiteLink, SiteConfig } from "@lib/site-config";
 import { validateCode } from "@lib/validationSchemas";
 import { I18n, useTranslation } from "@i18n";
-import * as AlertNotification from "@components/ui/alert/Alert";
+import { Alert as AlertNotification } from "@components/ui/alert/Alert";
 import { Button } from "@components/ui/button/Button";
 import { SubmitButtonAction } from "@components/ui/button/SubmitButton";
 import { Alert, ErrorStatus } from "@components/ui/form";

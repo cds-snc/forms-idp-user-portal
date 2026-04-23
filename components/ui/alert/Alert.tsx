@@ -13,7 +13,7 @@ import { useTranslation } from "@i18n/client";
 import { CircleCheckIcon } from "@components/icons/CircleCheckIcon";
 import { InfoIcon } from "@components/icons/InfoIcon";
 import { WarningIcon } from "@components/icons/WarningIcon";
-export enum ErrorStatus {
+enum ErrorStatus {
   SUCCESS = "SUCCESS",
   WARNING = "WARNING",
   ERROR = "ERROR",
@@ -26,7 +26,7 @@ const headingClasses = {
   h4: "text-lg font-semibold",
 };
 
-export const Title = ({
+const Title = ({
   children,
   headingTag: HeadingTag = "h2",
   status,
@@ -52,13 +52,7 @@ export const Title = ({
   );
 };
 
-export const Body = ({
-  children,
-  className,
-}: {
-  children: JSX.Element | string;
-  className?: string;
-}) => {
+const Body = ({ children, className }: { children: JSX.Element | string; className?: string }) => {
   return (
     <div data-testid="alert-body" className={cn(className)}>
       {children}
@@ -66,7 +60,7 @@ export const Body = ({
   );
 };
 
-export const IconWrapper = ({
+const IconWrapper = ({
   children,
   status,
   className,
@@ -110,7 +104,7 @@ const defaultClasses = {
 
 const defaultIconClasses = "h-12 w-12";
 
-export const defaultIcons = {
+const defaultIcons = {
   [ErrorStatus.SUCCESS]: (
     <IconWrapper status={ErrorStatus.SUCCESS}>
       <CircleCheckIcon className={defaultIconClasses} />
@@ -237,7 +231,7 @@ const AlertContainer = ({
   ) : null;
 };
 
-export const Info = ({
+const Info = ({
   children,
   title,
   body,
@@ -265,7 +259,7 @@ export const Info = ({
   );
 };
 
-export const Warning = ({
+const Warning = ({
   children,
   title,
   body,
@@ -293,7 +287,7 @@ export const Warning = ({
   );
 };
 
-export const Danger = ({
+const Danger = ({
   children,
   title,
   body,
@@ -321,7 +315,7 @@ export const Danger = ({
   );
 };
 
-export const Success = ({
+const Success = ({
   children,
   title,
   body,

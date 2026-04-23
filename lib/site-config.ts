@@ -10,7 +10,7 @@ export type SiteConfig = {
   zitadelOrganizationId: string;
 };
 
-export type SiteLinkKey = "home" | "about" | "termsOfUse" | "sla" | "support" | "gcForms";
+type SiteLinkKey = "home" | "about" | "termsOfUse" | "sla" | "support" | "gcForms";
 type ConfigurableSiteLinkKey = Exclude<SiteLinkKey, "home">;
 
 // Use URL templates with {baseUrl} and optional {locale}; set false to hide a link.
@@ -101,7 +101,7 @@ class SiteConfigService {
   }
 }
 
-export const siteConfig = SiteConfigService.getInstance();
+const siteConfig = SiteConfigService.getInstance();
 
 export const requestHost = (host: string): SiteId => siteConfig.requestHost(host);
 

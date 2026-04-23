@@ -43,7 +43,7 @@ import { getOriginalHost } from "./host";
  * @param ids - Array of session IDs to load
  * @returns Array of Session objects
  */
-export async function loadSessionsByIds({
+async function loadSessionsByIds({
   serviceUrl,
   ids,
 }: {
@@ -109,7 +109,7 @@ export async function loadSessionsWithCookies({
   return { sessions, sessionCookies };
 }
 
-export type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
+type ContinueWithSessionCommand = Session & { requestId?: string; redirect?: string | null };
 
 type SerializedActionError = {
   message: string;
@@ -184,7 +184,7 @@ export async function continueWithSession({
   return { error: t("couldNotContinueSession") };
 }
 
-export type UpdateSessionCommand = {
+type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
@@ -308,7 +308,7 @@ type ClearSessionOptions = {
   sessionId: string;
 };
 
-export async function clearSession(options: ClearSessionOptions) {
+async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
