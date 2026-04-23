@@ -1,25 +1,22 @@
 {
-	"name": "platform-unified-accounts-user-portal",
-	"image": "mcr.microsoft.com/devcontainers/base:bullseye@sha256:c4a714ff46f28f8502a69d18756b5d9d7e49c2cc3e5ca166b5f74ff80d1792d0",
-	"containerEnv": {
-		"SHELL": "/bin/zsh"
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "24.14.1",
-			"pnpmVersion": "10.33.0"
-		}
-	},
+  "name": "platform-unified-accounts-user-portal",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye@sha256:c4a714ff46f28f8502a69d18756b5d9d7e49c2cc3e5ca166b5f74ff80d1792d0",
+  "containerEnv": {
+    "SHELL": "/bin/zsh"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24.14.1",
+      "pnpmVersion": "10.33.0"
+    }
+  },
 
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"github.copilot",
-				"github.vscode-github-actions"
-			]
-		}
-	},
+  "customizations": {
+    "vscode": {
+      "extensions": ["github.copilot", "github.vscode-github-actions"]
+    }
+  },
 
-	"remoteUser": "vscode",
-	"postCreateCommand": "pnpm install"
+  "remoteUser": "vscode",
+  "postCreateCommand": "pnpm install"
 }

@@ -12,7 +12,7 @@ import { logMessage } from "@lib/logger";
 import { loginWithOIDCAndSession } from "@lib/oidc";
 import { loadSessionsWithCookies } from "@lib/server/session";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
-export interface AuthFlowParams {
+interface AuthFlowParams {
   sessionId: string;
   requestId: string;
   organization?: string;

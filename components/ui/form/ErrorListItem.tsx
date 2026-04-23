@@ -2,7 +2,7 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import React from "react";
-export interface ErrorListProps {
+interface ErrorListProps {
   errorKey: string;
   value: string | undefined;
 }

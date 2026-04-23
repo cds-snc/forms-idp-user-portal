@@ -6,7 +6,7 @@ import { I18n } from "@i18n";
 /*--------------------------------------------*
  * Component
  *--------------------------------------------*/
-export const SiteTitle = ({ className }: { className?: string }) => {
+const SiteTitle = ({ className }: { className?: string }) => {
   return (
     <span
       className={

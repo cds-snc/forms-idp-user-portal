@@ -9,7 +9,7 @@ import React from "react";
  * Internal Aliases
  *--------------------------------------------*/
 import { cn } from "@lib/utils";
-export interface ErrorMessageProps {
+interface ErrorMessageProps {
   children: React.ReactNode;
   id?: string;
   className?: string;

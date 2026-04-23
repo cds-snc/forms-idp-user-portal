@@ -2,7 +2,7 @@
  * Validates that a redirect URL is safe (relative URL only)
  * Prevents open redirect vulnerabilities by only allowing same-origin redirects
  */
-export function isValidRelativeUrl(url: string | null | undefined): boolean {
+function isValidRelativeUrl(url: string | null | undefined): boolean {
   if (!url || typeof url !== "string") {
     return false;
   }

@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'failure'
     env:
-      WORKFLOW_NAME: '${{ github.event.workflow_run.name }}'
-      WORKFLOW_URL: '${{ github.event.workflow_run.html_url }}'
+      WORKFLOW_NAME: "${{ github.event.workflow_run.name }}"
+      WORKFLOW_URL: "${{ github.event.workflow_run.html_url }}"
     steps:
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # v1.1.0

@@ -11,29 +11,18 @@ import {
   TextQueryMethod,
 } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks, SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
-import {
-  ReturnEmailVerificationCodeSchema,
-  SendEmailVerificationCodeSchema,
-} from "@zitadel/proto/zitadel/user/v2/email_pb";
+import { ReturnEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import {
-  NotificationType,
-  ReturnPasswordResetCodeSchema,
-  SendPasswordResetLinkSchema,
-} from "@zitadel/proto/zitadel/user/v2/password_pb";
+import { ReturnPasswordResetCodeSchema } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import { SearchQuery, SearchQuerySchema } from "@zitadel/proto/zitadel/user/v2/query_pb";
-import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
-  ResendEmailCodeRequest,
-  ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
@@ -57,62 +46,6 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   // cacheLife("hours");
 
   return callback;
-}
-
-export async function getHostedLoginTranslation({
-  serviceUrl,
-  organization,
-  locale,
-}: {
-  serviceUrl: string;
-  organization?: string;
-  locale?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
-
-  const callback = settingsService
-    .getHostedLoginTranslation(
-      {
-        level: organization
-          ? {
-              case: "organizationId",
-              value: organization,
-            }
-          : {
-              case: "instance",
-              value: true,
-            },
-        locale: locale,
-      },
-      {}
-    )
-    .then((resp) => {
-      return resp.translations ? resp.translations : undefined;
-    });
-
-  return useCache ? cacheWrapper(callback) : callback;
-}
-
-export async function getBrandingSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
-
-  const callback = settingsService
-    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLoginSettings({
@@ -220,30 +153,6 @@ export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string;
 }
 
 /**
- * @security Requires authenticated session. Use protectedAddOTPEmail from lib/server/zitadel-protected.ts
- */
-export async function addOTPEmail({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.addOTPEmail({ userId }, {});
-}
-
-/**
- * @security Requires authenticated session. Use protectedAddOTPSMS from lib/server/zitadel-protected.ts
- */
-export async function addOTPSMS({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.addOTPSMS({ userId }, {});
-}
-
-/**
  * @security Requires authenticated session. Returns cryptographic secret material. Use protectedRegisterTOTP from lib/server/zitadel-protected.ts
  */
 export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
@@ -253,38 +162,6 @@ export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string;
   );
 
   return userService.registerTOTP({ userId }, {});
-}
-
-export async function getGeneralSettings({ serviceUrl }: { serviceUrl: string }) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
-
-  const callback = settingsService
-    .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
-
-  return useCache ? cacheWrapper(callback) : callback;
-}
-
-export async function getLegalAndSupportSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
-
-  const callback = settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getPasswordComplexitySettings({
@@ -326,50 +203,6 @@ export async function createSessionFromChecks({
   const userAgent = await getUserAgent();
 
   return sessionService.createSession({ checks, lifetime, userAgent }, {});
-}
-
-/**
- * @security Creates session after IDP login. Internal use in auth flow.
- */
-export async function createSessionForUserIdAndIdpIntent({
-  serviceUrl,
-  userId,
-  idpIntent,
-  lifetime,
-}: {
-  serviceUrl: string;
-  userId: string;
-  idpIntent: {
-    idpIntentId?: string | undefined;
-    idpIntentToken?: string | undefined;
-  };
-  lifetime: Duration;
-}) {
-  logMessage.debug({
-    message: "Creating IDP intent session",
-    userId,
-    hasIdpIntentId: !!idpIntent.idpIntentId,
-  });
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
-
-  const userAgent = await getUserAgent();
-
-  return sessionService.createSession({
-    checks: {
-      user: {
-        search: {
-          case: "userId",
-          value: userId,
-        },
-      },
-      idpIntent,
-    },
-    lifetime,
-    userAgent,
-  });
 }
 
 /**
@@ -526,21 +359,6 @@ export async function addHumanUser({
   return userService.addHumanUser(addHumanUserRequest);
 }
 
-export async function addHuman({
-  serviceUrl,
-  request,
-}: {
-  serviceUrl: string;
-  request: AddHumanUserRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.addHumanUser(request);
-}
-
 /**
  * @security Requires authenticated session. Use protected wrapper from lib/server/zitadel-protected.ts
  */
@@ -591,70 +409,6 @@ export async function getUserByID({ serviceUrl, userId }: { serviceUrl: string; 
   return userService.getUserByID({ userId }, {});
 }
 
-/**
- * @security Requires authenticated session. Use protectedHumanMFAInitSkipped from lib/server/zitadel-protected.ts
- */
-export async function humanMFAInitSkipped({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.humanMFAInitSkipped({ userId }, {});
-}
-
-export async function verifyInviteCode({
-  serviceUrl,
-  userId,
-  verificationCode,
-}: {
-  serviceUrl: string;
-  userId: string;
-  verificationCode: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.verifyInviteCode({ userId, verificationCode }, {});
-}
-
-export async function sendEmailCode({
-  serviceUrl,
-  userId,
-  urlTemplate,
-}: {
-  serviceUrl: string;
-  userId: string;
-  urlTemplate: string;
-}) {
-  let medium = create(SendEmailCodeRequestSchema, { userId });
-
-  medium = create(SendEmailCodeRequestSchema, {
-    ...medium,
-    verification: {
-      case: "sendCode",
-      value: create(SendEmailVerificationCodeSchema, {
-        urlTemplate,
-      }),
-    },
-  });
-
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.sendEmailCode(medium, {});
-}
-
 export async function sendEmailCodeWithReturn({
   serviceUrl,
   userId,
@@ -676,41 +430,6 @@ export async function sendEmailCodeWithReturn({
   );
 
   return userService.sendEmailCode(medium, {});
-}
-
-export async function createInviteCode({
-  serviceUrl,
-  urlTemplate,
-  userId,
-}: {
-  serviceUrl: string;
-  urlTemplate: string;
-  userId: string;
-}) {
-  let medium = create(SendInviteCodeSchema, {
-    applicationName: process.env.NEXT_PUBLIC_APPLICATION_NAME || "Zitadel Login",
-  });
-
-  medium = {
-    ...medium,
-    urlTemplate,
-  };
-
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.createInviteCode(
-    {
-      userId,
-      verification: {
-        case: "sendCode",
-        value: medium,
-      },
-    },
-    {}
-  );
 }
 
 type ListUsersCommand = {
@@ -827,9 +546,6 @@ export type SearchUsersCommand = {
   organizationId?: string;
   suffix?: string;
 };
-
-// Re-export types used by protected server actions
-export type { VerifyU2FRegistrationRequest };
 
 const PhoneQuery = (searchValue: string) =>
   create(SearchQuerySchema, {
@@ -988,33 +704,6 @@ export async function searchUsers({
   return { result: [] };
 }
 
-export async function getDefaultOrg({
-  serviceUrl,
-}: {
-  serviceUrl: string;
-}): Promise<Organization | null> {
-  const orgService: Client<typeof OrganizationService> = await createServiceForHost(
-    OrganizationService,
-    serviceUrl
-  );
-
-  return orgService
-    .listOrganizations(
-      {
-        queries: [
-          {
-            query: {
-              case: "defaultQuery",
-              value: {},
-            },
-          },
-        ],
-      },
-      {}
-    )
-    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
-}
-
 export async function getOrgsByDomain({
   serviceUrl,
   domain,
@@ -1073,34 +762,6 @@ export async function startIdentityProviderFlow({
     });
 }
 
-export async function startLDAPIdentityProviderFlow({
-  serviceUrl,
-  idpId,
-  username,
-  password,
-}: {
-  serviceUrl: string;
-  idpId: string;
-  username: string;
-  password: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.startIdentityProviderIntent({
-    idpId,
-    content: {
-      case: "ldap",
-      value: {
-        username,
-        password,
-      },
-    },
-  });
-}
-
 export async function getAuthRequest({
   serviceUrl,
   authRequestId,
@@ -1112,45 +773,6 @@ export async function getAuthRequest({
 
   return oidcService.getAuthRequest({
     authRequestId,
-  });
-}
-
-export async function getDeviceAuthorizationRequest({
-  serviceUrl,
-  userCode,
-}: {
-  serviceUrl: string;
-  userCode: string;
-}) {
-  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
-
-  return oidcService.getDeviceAuthorizationRequest({
-    userCode,
-  });
-}
-
-export async function authorizeOrDenyDeviceAuthorization({
-  serviceUrl,
-  deviceAuthorizationId,
-  session,
-}: {
-  serviceUrl: string;
-  deviceAuthorizationId: string;
-  session?: { sessionId: string; sessionToken: string };
-}) {
-  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
-
-  return oidcService.authorizeOrDenyDeviceAuthorization({
-    deviceAuthorizationId,
-    decision: session
-      ? {
-          case: "session",
-          value: session,
-        }
-      : {
-          case: "deny",
-          value: {},
-        },
   });
 }
 
@@ -1189,50 +811,6 @@ export async function verifyEmail({
   );
 }
 
-export async function resendEmailCode({
-  serviceUrl,
-  userId,
-  urlTemplate,
-}: {
-  serviceUrl: string;
-  userId: string;
-  urlTemplate: string;
-}) {
-  let request: ResendEmailCodeRequest = create(ResendEmailCodeRequestSchema, {
-    userId,
-  });
-
-  const medium = create(SendEmailVerificationCodeSchema, {
-    urlTemplate,
-  });
-
-  request = { ...request, verification: { case: "sendCode", value: medium } };
-
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.resendEmailCode(request, {});
-}
-
-export async function retrieveIDPIntent({
-  serviceUrl,
-  id,
-  token,
-}: {
-  serviceUrl: string;
-  id: string;
-  token: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.retrieveIdentityProviderIntent({ idpIntentId: id, idpIntentToken: token }, {});
-}
-
 export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: string }) {
   const idpService: Client<typeof IdentityProviderService> = await createServiceForHost(
     IdentityProviderService,
@@ -1240,71 +818,6 @@ export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: s
   );
 
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
-}
-
-/**
- * @security Requires authenticated session. Use protectedAddIDPLink from lib/server/zitadel-protected.ts
- */
-export async function addIDPLink({
-  serviceUrl,
-  idp,
-  userId,
-}: {
-  serviceUrl: string;
-  idp: { id: string; userId: string; userName: string };
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.addIDPLink(
-    {
-      idpLink: {
-        userId: idp.userId,
-        idpId: idp.id,
-        userName: idp.userName,
-      },
-      userId,
-    },
-    {}
-  );
-}
-
-export async function passwordReset({
-  serviceUrl,
-  userId,
-  urlTemplate,
-}: {
-  serviceUrl: string;
-  userId: string;
-  urlTemplate?: string;
-}) {
-  let medium = create(SendPasswordResetLinkSchema, {
-    notificationType: NotificationType.Email,
-  });
-
-  medium = {
-    ...medium,
-    urlTemplate,
-  };
-
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
-
-  return userService.passwordReset(
-    {
-      userId,
-      medium: {
-        case: "sendLink",
-        value: medium,
-      },
-    },
-    {}
-  );
 }
 
 /**

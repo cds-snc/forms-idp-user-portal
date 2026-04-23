@@ -1,4 +1,4 @@
-export type GCNotifyTemplate = {
+type GCNotifyTemplate = {
   subject: string;
   formResponse: string;
 };

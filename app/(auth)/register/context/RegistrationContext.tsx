@@ -6,7 +6,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 const STORAGE_KEY = "registration-data";
 
-export type RegistrationData = {
+type RegistrationData = {
   firstname: string;
   lastname: string;
   email: string;

@@ -1,3 +1,2 @@
-export { LANGUAGE_COOKIE_NAME, useTranslation } from "./client";
-export { languages } from "./settings";
+export { useTranslation } from "./client";
 export { I18n } from "./Translate";
