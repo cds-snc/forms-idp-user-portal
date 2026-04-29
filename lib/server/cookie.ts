@@ -6,24 +6,14 @@
 import { headers } from "next/headers";
 import type { ConnectError } from "@connectrpc/connect";
 import { Duration, timestampMs } from "@zitadel/client";
-import {
-  CredentialsCheckError,
-  CredentialsCheckErrorSchema,
-  ErrorDetail,
-} from "@zitadel/proto/zitadel/message_pb";
-import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { CredentialsCheckErrorSchema } from "@zitadel/proto/zitadel/message_pb";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
 import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import {
-  createSessionForUserIdAndIdpIntent,
-  createSessionFromChecks,
-  getSecuritySettings,
-  getSession,
-  setSession,
-} from "@lib/zitadel";
+import { createSessionFromChecks, getSecuritySettings, getSession, setSession } from "@lib/zitadel";
 
 import { getServiceUrlFromHeaders } from "../service-url";
 
@@ -127,95 +117,6 @@ export async function createSessionAndUpdateCookie(command: {
     throw "Could not create session";
   }
 }
-
-export async function createSessionForIdpAndUpdateCookie({
-  userId,
-  idpIntent,
-  requestId,
-  lifetime,
-}: {
-  userId: string;
-  idpIntent: {
-    idpIntentId?: string | undefined;
-    idpIntentToken?: string | undefined;
-  };
-  requestId: string | undefined;
-  lifetime?: Duration;
-}): Promise<Session> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  let sessionLifetime = lifetime;
-
-  if (!sessionLifetime || !sessionLifetime.seconds) {
-    logMessage.warn("No IDP session lifetime provided, using default of 24 hours.");
-
-    sessionLifetime = {
-      seconds: BigInt(24 * 60 * 60), // 24 hours
-      nanos: 0,
-    } as Duration;
-  }
-
-  const createdSession = await createSessionForUserIdAndIdpIntent({
-    serviceUrl,
-    userId,
-    idpIntent,
-    lifetime: sessionLifetime,
-  }).catch((error: ErrorDetail | CredentialsCheckError) => {
-    logMessage.error("Could not set session");
-    if ("failedAttempts" in error && error.failedAttempts) {
-      throw {
-        error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
-        failedAttempts: error.failedAttempts,
-      };
-    }
-    throw error;
-  });
-
-  if (!createdSession) {
-    throw "Could not create session";
-  }
-
-  const { session } = await getSession({
-    serviceUrl,
-    sessionId: createdSession.sessionId,
-    sessionToken: createdSession.sessionToken,
-  });
-
-  if (!session || !session.factors?.user?.loginName) {
-    throw "Could not retrieve session";
-  }
-
-  const sessionCookie: CustomCookieData = {
-    id: createdSession.sessionId,
-    token: createdSession.sessionToken,
-    creationTs: session.creationDate ? `${timestampMs(session.creationDate)}` : "",
-    expirationTs: session.expirationDate ? `${timestampMs(session.expirationDate)}` : "",
-    changeTs: session.changeDate ? `${timestampMs(session.changeDate)}` : "",
-    loginName: session.factors.user.loginName ?? "",
-    userId: session.factors.user.id ?? "",
-    organization: session.factors.user.organizationId ?? "",
-  };
-
-  if (requestId) {
-    sessionCookie.requestId = requestId;
-  }
-
-  if (session.factors.user.organizationId) {
-    sessionCookie.organization = session.factors.user.organizationId;
-  }
-
-  const securitySettings = await getSecuritySettings({ serviceUrl });
-  const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
-
-  return addSessionToCookie({ session: sessionCookie, iFrameEnabled }).then(() => {
-    return session as Session;
-  });
-}
-
-export type SessionWithChallenges = Session & {
-  challenges: Challenges | undefined;
-};
 
 export async function setSessionAndUpdateCookie(command: {
   recentCookie: CustomCookieData;

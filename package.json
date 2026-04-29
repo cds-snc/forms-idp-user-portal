@@ -21,11 +21,14 @@
     "lint": "eslint",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "upgrade": "next upgrade",
-    "prepare": "husky"
+    "prepare": "husky",
+    "knip": "knip"
   },
   "dependencies": {
     "@gcforms/connectors": "^2.2.16",
@@ -52,7 +55,6 @@
   },
   "devDependencies": {
     "@connectrpc/connect": "^2.1.1",
-    "@gcds-core/fonts": "^1.0.0",
     "@gcds-core/tokens": "^1.0.0",
     "@gcforms/types": "1.0.30",
     "@tailwindcss/postcss": "^4.2.1",
@@ -64,7 +66,6 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.0.18",
-    "baseline-browser-mapping": "^2.9.11",
     "clsx": "^2.1.1",
     "cssnano": "^7.1.2",
     "eslint": "^9.39.2",
@@ -75,6 +76,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
+    "knip": "^6.4.1",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",

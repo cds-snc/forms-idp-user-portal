@@ -23,15 +23,6 @@ const normalizeLocaleToSupportedLanguage = (locale: string) => {
   return languages[0];
 };
 
-export const languageParamSanitization = (locale: string | string[] | undefined) => {
-  // If provided with an array, return the first the default locale
-  if (Array.isArray(locale) || locale === undefined) {
-    return languages[0];
-  }
-
-  return normalizeLocaleToSupportedLanguage(locale);
-};
-
 export async function getCurrentLanguage() {
   const cookieLang = (await cookies()).get(LANGUAGE_COOKIE_NAME)?.value;
   if (!cookieLang) {

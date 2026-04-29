@@ -21,7 +21,7 @@ import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
-import * as Alert from "@components/ui/alert/Alert";
+import { Alert } from "@components/ui/alert/Alert";
 import { BackButton } from "@components/ui/button/BackButton";
 import { Button } from "@components/ui/button/Button";
 

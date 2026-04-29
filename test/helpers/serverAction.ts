@@ -4,7 +4,7 @@ import { vi } from "vitest";
 import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 
-export const TEST_SERVICE_URL = "https://idp.example";
+const TEST_SERVICE_URL = "https://idp.example";
 
 export const setupServerActionContext = () => {
   vi.mocked(headers).mockResolvedValue(new Headers());

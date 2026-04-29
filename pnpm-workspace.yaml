@@ -1,7 +1,7 @@
 packages: []
 
 ignoredBuiltDependencies:
-  - '@parcel/watcher'
+  - "@parcel/watcher"
   - sharp
   - unrs-resolver
 

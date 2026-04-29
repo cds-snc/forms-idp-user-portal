@@ -18,18 +18,14 @@ import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
 import {
-  // getOrgsByDomain,
   getLockoutSettings,
   getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
-// import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
-// const ORG_SUFFIX_REGEX = /@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
-
-export type SubmitLoginCommand = {
+type SubmitLoginCommand = {
   username: string;
   password: string;
   requestId?: string;

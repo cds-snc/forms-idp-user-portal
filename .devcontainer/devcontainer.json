@@ -1,28 +1,25 @@
 {
-	"name": "platform-unified-accounts-user-portal",
-	"image": "mcr.microsoft.com/devcontainers/base:bullseye@sha256:5139be2118c8a62624cd9256b78610458b05bd64d539e4b81f9c51bf70810a08",
-	"containerEnv": {
-		"SHELL": "/bin/zsh"
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "24.15.0",
-			"pnpmVersion": "10.33.0"
-		},
-		"ghcr.io/grafana/devcontainer-features/k6:1": {
-			"version": "latest"
-		}
-	},
+  "name": "platform-unified-accounts-user-portal",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye@sha256:5139be2118c8a62624cd9256b78610458b05bd64d539e4b81f9c51bf70810a08",
+  "containerEnv": {
+    "SHELL": "/bin/zsh"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24.15.0",
+      "pnpmVersion": "10.33.0"
+    },
+    "ghcr.io/grafana/devcontainer-features/k6:1": {
+      "version": "latest"
+    }
+  },
 
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"github.copilot",
-				"github.vscode-github-actions"
-			]
-		}
-	},
+  "customizations": {
+    "vscode": {
+      "extensions": ["github.copilot", "github.vscode-github-actions"]
+    }
+  },
 
-	"remoteUser": "vscode",
-	"postCreateCommand": "pnpm install"
+  "remoteUser": "vscode",
+  "postCreateCommand": "pnpm install"
 }

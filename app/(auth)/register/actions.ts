@@ -5,7 +5,6 @@
  *--------------------------------------------*/
 import { headers } from "next/headers";
 import { create } from "@zitadel/client";
-import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
 /*--------------------------------------------*
@@ -28,11 +27,6 @@ type RegisterUserCommand = {
   requestId?: string;
 };
 
-export type RegisterUserResponse = {
-  userId: string;
-  sessionId: string;
-  factors: Factors | undefined;
-};
 export async function registerUser(command: RegisterUserCommand) {
   const { t } = await serverTranslation("register");
   const _headers = await headers();

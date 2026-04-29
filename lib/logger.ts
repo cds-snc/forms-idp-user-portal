@@ -25,7 +25,7 @@ const pinoLogger = pino({
  * Messages should be strings or serialized objects (for debug).
  * Errors can accept any value from catch blocks (unknown) and handles them appropriately.
  */
-export type AppLogger = {
+type AppLogger = {
   debug(message: string | Record<string, unknown>): void;
   info(message: string): void;
   warn(message: string): void;

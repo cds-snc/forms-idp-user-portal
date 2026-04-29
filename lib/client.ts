@@ -42,7 +42,7 @@ export async function completeFlowOrGetUrl(
  * @param command
  * @returns
  */
-export async function getNextUrl(defaultRedirectUri?: string, requestId?: string): Promise<string> {
+async function getNextUrl(defaultRedirectUri?: string, requestId?: string): Promise<string> {
   // OIDC flows are now handled by completeAuthFlowAction() server action
 
   if (defaultRedirectUri) {

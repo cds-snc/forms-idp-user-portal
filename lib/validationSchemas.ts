@@ -14,7 +14,7 @@ import {
   isValidGovEmail,
 } from "@lib/validators";
 
-export const firstnameSchema = () => ({
+const firstnameSchema = () => ({
   firstname: v.pipe(
     v.string(),
     v.trim(),
@@ -25,11 +25,11 @@ export const firstnameSchema = () => ({
   ),
 });
 
-export const lastnameSchema = () => ({
+const lastnameSchema = () => ({
   lastname: v.pipe(v.string(), v.trim(), v.minLength(1, "requiredLastname")),
 });
 
-export const emailSchema = () => ({
+const emailSchema = () => ({
   email: v.pipe(
     v.string(),
     v.toLowerCase(),
@@ -40,7 +40,7 @@ export const emailSchema = () => ({
 });
 
 // TODO: is username always an email? If so, replace above with username
-export const usernameSchema = (min = 1) => ({
+const usernameSchema = (min = 1) => ({
   // username: v.pipe(v.string(), v.trim(), v.minLength(min, "requiredUsername")),
   username: v.pipe(
     v.string(),
@@ -98,7 +98,7 @@ export const codeSchema = (min = 1, max = 10) => ({
   },
 });
 
-export const totpCodeSchema = () => ({
+const totpCodeSchema = () => ({
   ...{
     code: v.pipe(v.string(), v.trim(), v.regex(/^\d{6}$/, "invalidCodeLength")),
   },
