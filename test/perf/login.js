@@ -69,10 +69,11 @@ export const options = {
       executor: "ramping-vus",
       startVUs: 1,
       stages: [
-        { duration: "1m", target: 1 },
         { duration: "3m", target: 5 },
-        { duration: "5m", target: 10 },
-        { duration: "3m", target: 0 },
+        { duration: "3m", target: 10 },
+        { duration: "3m", target: 20 },
+        { duration: "3m", target: 10 },
+        { duration: "3m", target: 5 },
       ],
       gracefulRampDown: "30s",
       gracefulStop: "30s",
@@ -337,8 +338,7 @@ export default async function loginFlow() {
 export function setup() {
   console.log(`=== k6 Browser Login Flow Test ===`);
   console.log(`Target: ${ZITADEL_URL}`);
-  console.log(`User:   ${USERNAME || "(not set – will fail)"}`);
-  console.log(`TOTP:   ${TOTP_SECRET ? "configured" : "NOT SET – TOTP step will fail"}`);
+  console.log(`User:   ${USERNAME}`);
   const oidcMode =
     CLIENT_ID && REDIRECT_URI ? `${ZITADEL_URL} → ${REDIRECT_URI} (PKCE)` : "disabled";
   console.log(`OIDC:   ${oidcMode}`);
