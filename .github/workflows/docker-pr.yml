@@ -1,0 +1,47 @@
+name: Docker PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  GITHUB_SHA: ${{ github.sha }}
+
+permissions:
+  contents: read
+
+jobs:
+  docker-pr:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        include:
+          - image: idp-login
+            directory: .
+          - image: idp-load-test
+            directory: ./test/perf
+
+    steps:
+      - name: Audit DNS requests
+        uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # v1.1.0
+        env:
+          DNS_PROXY_FORWARDTOSENTINEL: "true"
+          DNS_PROXY_LOGANALYTICSWORKSPACEID: "${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}"
+          DNS_PROXY_LOGANALYTICSSHAREDKEY: "${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}"
+          DNS_PROXY_SAFELIST: "${{ vars.DNS_PROXY_SAFELIST }}"
+          DNS_PROXY_WILDCARDGREEDY: "true"
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Docker build
+        working-directory: ${{ matrix.directory }}
+        run: |
+          docker build \
+            --platform linux/arm64 \
+            --build-arg GIT_SHA=$GITHUB_SHA \
+            --tag ${{ matrix.image }}:latest \
+            .

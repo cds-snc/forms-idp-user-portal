@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 env:
   GITHUB_SHA: ${{ github.sha }}
@@ -15,7 +17,7 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
 
     steps:
       - name: Audit DNS requests
@@ -29,6 +31,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
@@ -59,11 +63,3 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@3c50566c523e04813df28de8f7c48dd97d663f1c # v2.11.2
         with:
           json-summary-path: ./coverage/coverage-summary.json
-
-      - name: Docker build
-        run: |
-          docker build \
-            --platform linux/arm64 \
-            --build-arg GIT_SHA=$GITHUB_SHA \
-            --tag idp-login:latest \
-            .
