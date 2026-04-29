@@ -45,6 +45,7 @@ describe("useVersionUpdater", () => {
     const { result } = renderHook(() => useVersionUpdater());
 
     await act(async () => {
+      vi.advanceTimersByTime(0);
       await Promise.resolve();
       await Promise.resolve();
     });

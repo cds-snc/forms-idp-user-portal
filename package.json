@@ -1,5 +1,5 @@
 {
-  "name": "forms-login",
+  "name": "platform-unified-accounts-user-portal",
   "version": "0.2.0",
   "private": true,
   "prettier": {
@@ -50,7 +50,7 @@
     "react-dom": "19.2.5",
     "react-i18next": "^16.5.0",
     "react-toastify": "^11.0.5",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "valibot": "^1.2.0"
   },
   "devDependencies": {
