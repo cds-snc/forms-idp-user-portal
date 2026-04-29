@@ -96,13 +96,16 @@ export function useVersionUpdater(): VersionUpdateState {
       return;
     }
 
-    void checkVersion();
+    const checkVersionTimeout = setTimeout(() => {
+      void checkVersion();
+    }, 0);
 
     const intervalId = window.setInterval(() => {
       void checkVersion();
     }, POLL_INTERVAL_MS);
 
     return () => {
+      window.clearTimeout(checkVersionTimeout);
       window.clearInterval(intervalId);
     };
   }, [isLeaderTab]);
