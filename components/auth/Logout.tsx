@@ -1,7 +1,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 
 /*--------------------------------------------*
  * Internal Aliases
@@ -14,8 +13,7 @@ import { serverTranslation } from "@i18n/server";
 import { LogoutButton } from "@components/auth/LogoutButton";
 
 export const Logout = async ({ className }: { className?: string }) => {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("header");
   const allSessions = await loadSessionsFromCookies({ serviceUrl }).catch((_error) => {
     logMessage.warn("Failed to load sessions for logout state");

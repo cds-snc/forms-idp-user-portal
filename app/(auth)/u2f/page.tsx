@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -32,8 +31,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const safeRedirect = getSafeRedirectUrl(redirectParam);
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const authCheck = await checkAuthenticationLevel(
     serviceUrl,

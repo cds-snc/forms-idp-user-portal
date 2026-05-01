@@ -90,7 +90,7 @@ describe("password/change page", () => {
     vi.clearAllMocks();
 
     vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(getServiceUrlFromHeaders).mockReturnValue({ serviceUrl: "https://idp.example" });
+    vi.mocked(getServiceUrlFromHeaders).mockResolvedValue({ serviceUrl: "https://idp.example" });
     vi.mocked(getSessionCredentials).mockResolvedValue({
       sessionId: "session-123",
       loginName: "person@canada.ca",

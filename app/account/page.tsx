@@ -38,7 +38,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const loginRedirect = buildUrlWithRequestId("/", requestId);
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 

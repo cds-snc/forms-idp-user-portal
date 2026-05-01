@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -31,8 +30,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const searchParams = await props.searchParams;
   const requestId = searchParams.requestId;
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const organization = ZITADEL_ORGANIZATION;
 
   // Check if user is already authenticated

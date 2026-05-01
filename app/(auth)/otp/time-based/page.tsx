@@ -28,7 +28,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const [searchParams, _headers, { sessionId, loginName, organization, requestId }] =
     await Promise.all([props.searchParams, headers(), getSessionCredentials()]);
 
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 

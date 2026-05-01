@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -146,8 +146,7 @@ export async function continueWithSession({
   redirect,
   ...session
 }: ContinueWithSessionCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const { t } = await serverTranslation("error");
 
@@ -209,8 +208,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       };
     }
 
-    const _headers = await headers();
-    const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+    const { serviceUrl } = await getServiceUrlFromHeaders();
     const host = await getOriginalHost();
 
     if (!host) {
@@ -309,8 +307,7 @@ type ClearSessionOptions = {
 };
 
 async function clearSession(options: ClearSessionOptions) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const { sessionId } = options;
 

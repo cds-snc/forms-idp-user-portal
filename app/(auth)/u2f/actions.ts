@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { Duration } from "@zitadel/client";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
@@ -35,8 +35,7 @@ export async function verifyU2FLogin({
   requestId,
   redirect,
 }: VerifyU2FLoginCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   let sessionCookie;
   if (sessionId) {

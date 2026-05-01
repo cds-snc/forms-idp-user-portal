@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -48,8 +48,7 @@ export type SendLoginnameCommand = {
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const { t } = await serverTranslation("loginname");
 
@@ -120,8 +119,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       // If exactly one active IDP exists in the organization, redirect to it
       if (activeIdps.length === 1) {
-        const _headers = await headers();
-        const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+        const { serviceUrl } = await getServiceUrlFromHeaders();
         const host = await getOriginalHost();
 
         const identityProviderType = activeIdps[0].type;
@@ -165,8 +163,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     if (identityProviders.length === 1) {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       const host = await getOriginalHost();
 
       const identityProviderId = identityProviders[0].idpId;

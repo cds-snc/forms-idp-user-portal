@@ -1,7 +1,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 /*--------------------------------------------*
@@ -19,8 +18,7 @@ export const fetchCache = "default-no-store";
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const searchParams = request.nextUrl.searchParams;
 

@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -34,8 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   // Page-level authentication check - defense in depth
   const authCheck = await checkAuthenticationLevel(

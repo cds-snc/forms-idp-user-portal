@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import type { ConnectError } from "@connectrpc/connect";
 import { create, Duration } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
@@ -123,8 +123,7 @@ type UpdateSessionCommand = {
 export async function sendPassword(
   command: UpdateSessionCommand
 ): Promise<{ error: string } | { redirect: string }> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
 
   let sessionCookie = await getSessionCookieByLoginName({
@@ -421,8 +420,7 @@ export async function sendPassword(
 
 // this function lets users with code set a password or users with valid User Verification Check
 export async function changePassword(command: { code?: string; userId: string; password: string }) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
   const normalizedCode = command.code?.replace(/\s+/g, "").trim();
 
@@ -529,8 +527,7 @@ export async function checkSessionAndSetPassword({
   sessionId,
   password,
 }: CheckSessionAndSetPasswordCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
 
   let sessionCookie;

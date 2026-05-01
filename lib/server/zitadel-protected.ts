@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { create } from "@zitadel/client";
 import { UpdateHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -71,8 +71,7 @@ export const protectedRemoveU2F = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       return await z.removeU2F({ serviceUrl, userId, u2fId });
     } catch (error) {
       logMessage.error(`Failed to remove U2F for ${userId}`, error);
@@ -101,8 +100,7 @@ export const protectedRemoveTOTP = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       return await z.removeTOTP({ serviceUrl, userId });
     } catch (error) {
       logMessage.error(`Failed to remove TOTP for ${userId}`, error);
@@ -131,8 +129,7 @@ export const protectedGetTOTPStatus = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       return await z.getTOTPStatus({ serviceUrl, userId });
     } catch (error) {
       logMessage.error(`Failed to get TOTP status for ${userId}`, error);
@@ -161,8 +158,7 @@ export const protectedGetU2FList = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       return await z.getU2FList({ serviceUrl, userId });
     } catch (error) {
       logMessage.error(`Failed to get U2F list for ${userId}`, error);
@@ -195,8 +191,7 @@ export const protectedUpdatePersonalDetails = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl } = await getServiceUrlFromHeaders();
       const request = create(UpdateHumanUserRequestSchema, {
         userId,
         profile: {

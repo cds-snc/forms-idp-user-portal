@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -29,8 +28,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const { checkAfter } = searchParams;
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   let sessionId: string | undefined;
   let loginName: string | undefined;

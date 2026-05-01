@@ -35,7 +35,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { userId, loginName, code, organization, requestId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 

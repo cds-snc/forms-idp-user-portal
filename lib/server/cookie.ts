@@ -3,7 +3,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 import type { ConnectError } from "@connectrpc/connect";
 import { Duration, timestampMs } from "@zitadel/client";
 import { CredentialsCheckErrorSchema } from "@zitadel/proto/zitadel/message_pb";
@@ -52,8 +51,7 @@ export async function createSessionAndUpdateCookie(command: {
   requestId: string | undefined;
   lifetime?: Duration;
 }): Promise<Session> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   let sessionLifetime = command.lifetime;
 
@@ -125,8 +123,7 @@ export async function setSessionAndUpdateCookie(command: {
   requestId?: string;
   lifetime: Duration;
 }) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   return setSession({
     serviceUrl,

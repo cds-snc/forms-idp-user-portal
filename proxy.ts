@@ -91,7 +91,7 @@ export async function proxy(request: NextRequest) {
       return responseWithCSP(NextResponse.next({ request: { headers: requestHeaders } }), csp);
     }
 
-    const { serviceUrl } = getServiceUrlFromHeaders(request.headers);
+    const { serviceUrl } = await getServiceUrlFromHeaders();
 
     const instanceHost = `${serviceUrl}`.replace("https://", "").replace("http://", "");
 
@@ -134,7 +134,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Get service URL for auth checks
-  const { serviceUrl } = getServiceUrlFromHeaders(request.headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   // Determine required authentication level for this route
   const requiredLevel = getRequiredAuthLevel(pathname);

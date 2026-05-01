@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { GCNotifyConnector } from "@gcforms/connectors";
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -37,8 +37,7 @@ import { buildUrlWithRequestId } from "../utils";
 import { checkMFAFactors } from "../verify-helper";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   try {
     const session = await loadMostRecentSession({
@@ -75,8 +74,8 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const { t } = await serverTranslation("verify");
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const verifyResponse = await verifyEmail({
     serviceUrl,
@@ -240,8 +239,8 @@ type SendVerificationEmailCommand = {
 
 export async function sendVerificationEmail(command: SendVerificationEmailCommand) {
   const { t } = await serverTranslation("verify");
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   // Get verification code from Zitadel (returnCode mode - does not send email)
   const codeResponse = await sendEmailCodeWithReturn({
@@ -310,8 +309,8 @@ type SendPasswordChangedEmailCommand = {
 
 export async function sendPasswordChangedEmail(command: SendPasswordChangedEmailCommand) {
   const { t } = await serverTranslation("password");
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   // Get user's email address
   const userResponse = await getUserByID({

@@ -53,8 +53,7 @@ function isProtobufMessage(obj: unknown): obj is ProtobufMessage {
 }
 
 export async function addU2F(command: RegisterU2FCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   const host = await getOriginalHost();
 
   const sessionCookie = await getSessionCookieById({
@@ -106,8 +105,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
   let passkeyName = command.passkeyName;
 
   if (!passkeyName) {

@@ -1,7 +1,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -53,8 +53,7 @@ export default async function Page(props: {
   const { method } = params;
   const { t } = await serverTranslation("otp");
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const session = await loadMfaSetupSession({
     serviceUrl,

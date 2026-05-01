@@ -3,7 +3,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 
 import { logMessage } from "@lib/logger";
 /*--------------------------------------------*
@@ -33,8 +32,7 @@ export async function completeAuthFlow(
     `Completing ${requestId.startsWith("oidc_") ? "OIDC" : "unknown"} auth flow for requestId: ${requestId}`
   );
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = await getServiceUrlFromHeaders();
 
   const { sessions, sessionCookies } = await loadSessionsWithCookies({
     serviceUrl,

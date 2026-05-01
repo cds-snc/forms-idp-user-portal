@@ -8,7 +8,7 @@ const TEST_SERVICE_URL = "https://idp.example";
 
 export const setupServerActionContext = () => {
   vi.mocked(headers).mockResolvedValue(new Headers());
-  vi.mocked(getServiceUrlFromHeaders).mockReturnValue({
+  vi.mocked(getServiceUrlFromHeaders).mockResolvedValue({
     serviceUrl: TEST_SERVICE_URL,
   });
   vi.mocked(serverTranslation).mockResolvedValue({
