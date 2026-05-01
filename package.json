@@ -14,6 +14,15 @@
     "semi": true,
     "singleQuote": false
   },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint",
+      "prettier --check"
+    ],
+    "*.{json,md,yaml}": [
+      "prettier --check"
+    ]
+  },
   "scripts": {
     "dev": "next dev -p 3002",
     "build": "next build",
@@ -28,7 +37,8 @@
     "type-check": "tsc --noEmit",
     "upgrade": "next upgrade",
     "prepare": "husky",
-    "knip": "knip"
+    "knip": "knip",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@gcforms/connectors": "^2.2.16",
@@ -77,6 +87,7 @@
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
     "knip": "^6.4.1",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
