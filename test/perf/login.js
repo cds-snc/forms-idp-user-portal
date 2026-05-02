@@ -67,13 +67,10 @@ export const options = {
   scenarios: {
     login_flow: {
       executor: "ramping-vus",
-      startVUs: 1,
+      startVUs: 0,
       stages: [
-        { duration: "3m", target: 5 },
-        { duration: "3m", target: 10 },
-        { duration: "3m", target: 20 },
-        { duration: "3m", target: 10 },
-        { duration: "3m", target: 5 },
+        { duration: "1m", target: 5 },
+        { duration: "20m", target: 5 },
       ],
       gracefulRampDown: "30s",
       gracefulStop: "30s",
