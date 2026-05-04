@@ -77,7 +77,6 @@ describe("sendLoginname", () => {
     const { headers } = await import("next/headers");
     const { create } = await import("@zitadel/client");
     const { serverTranslation } = await import("@i18n/server");
-    const { getServiceUrlFromHeaders } = await import("@lib/service-url");
     const {
       getLoginSettings,
       searchUsers,
@@ -95,7 +94,6 @@ describe("sendLoginname", () => {
     mockHeaders = vi.mocked(headers);
     mockCreate = vi.mocked(create);
     mockServerTranslation = vi.mocked(serverTranslation);
-    mockGetServiceUrlFromHeaders = vi.mocked(getServiceUrlFromHeaders);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockSearchUsers = vi.mocked(searchUsers);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
