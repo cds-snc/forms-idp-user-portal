@@ -4,9 +4,7 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 
-import type { ConnectError } from "@connectrpc/connect";
 import { create, Duration } from "@zitadel/client";
-import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -31,7 +29,6 @@ import {
 import { serverTranslation } from "@i18n/server";
 
 import { logMessage } from "../../lib/logger";
-import { createServerTransport } from "../../lib/zitadel";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { loadMostRecentSession } from "../session";
@@ -558,83 +555,28 @@ export async function checkSessionAndSetPassword({
     return { error: t("errors.couldNotLoadAuthMethods") };
   }
 
-  let loginSettings;
-  try {
-    loginSettings = await getLoginSettings({
-      organization: session.factors.user.organizationId,
+  logMessage.info(
+    "Setting password via service account due to enforced MFA without existing MFA methods"
+  );
+  return setPassword({ payload })
+    .then(async (result) => {
+      // Send password changed email notification
+      if (didPasswordChangeSucceed(result)) {
+        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+          logMessage.debug({
+            error: error instanceof Error ? error.message : error,
+            message: "Failed to send password changed email",
+          });
+          // Don't fail the password change if email fails
+        });
+      }
+      return result;
+    })
+    .catch((error) => {
+      // throw error if failed precondition (ex. User is not yet initialized)
+      if (error.code === 9 && error.message) {
+        return { error: t("errors.failedPrecondition") };
+      }
+      return { error: "Could not set password" };
     });
-  } catch (error) {
-    logMessage.error("Could not load login settings", error);
-    return { error: "Could not load login settings" };
-  }
-
-  const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
-
-  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa) {
-    logMessage.info(
-      "Setting password via service account due to enforced MFA without existing MFA methods"
-    );
-    return setPassword({ payload })
-      .then(async (result) => {
-        // Send password changed email notification
-        if (didPasswordChangeSucceed(result)) {
-          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-            logMessage.debug({
-              error: error instanceof Error ? error.message : error,
-              message: "Failed to send password changed email",
-            });
-            // Don't fail the password change if email fails
-          });
-        }
-        return result;
-      })
-      .catch((error) => {
-        // throw error if failed precondition (ex. User is not yet initialized)
-        if (error.code === 9 && error.message) {
-          return { error: t("errors.failedPrecondition") };
-        }
-        return { error: "Could not set password" };
-      });
-  } else {
-    const transport = async (serviceUrl: string, token: string) => {
-      return createServerTransport(token, serviceUrl);
-    };
-
-    const myUserService = async (serviceUrl: string, sessionToken: string) => {
-      const transportPromise = await transport(serviceUrl, sessionToken);
-      return createUserServiceClient(transportPromise);
-    };
-
-    const selfService = await myUserService(serviceUrl, `${sessionCookie.token}`);
-
-    return selfService
-      .setPassword(
-        {
-          userId: session.factors.user.id,
-          newPassword: { password, changeRequired: false },
-        },
-        {}
-      )
-      .then(async (result) => {
-        // Send password changed email notification
-        if (didPasswordChangeSucceed(result)) {
-          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-            logMessage.debug({
-              error: error instanceof Error ? error.message : error,
-              message: "Failed to send password changed email",
-            });
-            // Don't fail the password change if email fails
-          });
-        }
-        return result;
-      })
-      .catch((error: ConnectError) => {
-        logMessage.error("Could not set password", error);
-        if (error.code === 7) {
-          return { error: t("errors.sessionNotValid") };
-        }
-        return { error: "Could not set the password" };
-      });
-  }
 }
