@@ -11,6 +11,7 @@ import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
@@ -26,7 +27,6 @@ import {
   getActiveIdentityProviders,
   getIDPByID,
   getLoginSettings,
-  getOrgsByDomain,
   listAuthenticationMethodTypes,
   listIDPLinks,
   searchUsers,
@@ -40,18 +40,14 @@ import { getOriginalHost } from "./host";
 export type SendLoginnameCommand = {
   loginName: string;
   requestId?: string;
-  organization?: string;
+
   suffix?: string;
 };
-
-const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const { t } = await serverTranslation("loginname");
 
-  const loginSettingsByContext = await getLoginSettings({
-    organization: command.organization,
-  });
+  const loginSettingsByContext = await getLoginSettings();
 
   if (!loginSettingsByContext) {
     return { error: t("errors.couldNotGetLoginSettings") };
@@ -59,7 +55,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const searchUsersRequest: SearchUsersCommand = {
     searchValue: command.loginName,
-    organizationId: command.organization,
+
     loginSettings: loginSettingsByContext,
     suffix: command.suffix,
   };
@@ -91,7 +87,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     logMessage.debug("No users found, will proceed with org discovery");
   }
 
-  const redirectUserToIDP = async (userId?: string, organization?: string) => {
+  const redirectUserToIDP = async (userId?: string) => {
     // If userId is provided, check for user-specific IDP links first
     let identityProviders: IDPLink[] = [];
     if (userId) {
@@ -104,9 +100,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
     if (identityProviders.length === 0) {
-      const activeIdps = await getActiveIdentityProviders({
-        orgId: organization,
-      }).then((resp) => {
+      const activeIdps = await getActiveIdentityProviders().then((resp) => {
         return resp.identityProviders;
       });
 
@@ -127,9 +121,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           params.set("requestId", command.requestId);
         }
 
-        if (organization) {
-          params.set("organization", organization);
-        }
+        params.set("organization", ZITADEL_ORGANIZATION);
 
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -181,9 +173,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("requestId", command.requestId);
       }
 
-      if (organization) {
-        params.set("organization", organization);
-      }
+      params.set("organization", ZITADEL_ORGANIZATION);
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -214,9 +204,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const user = users[0];
     const userId = users[0].userId;
 
-    const userLoginSettings = await getLoginSettings({
-      organization: user.details?.resourceOwner,
-    });
+    const userLoginSettings = await getLoginSettings();
 
     // compare with the concatenated suffix when set
     const concatLoginname = command.suffix
@@ -275,9 +263,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: t("errors.initialUserNotSupported") };
     }
 
-    // Resolve organization from command or session
-    const organization = command.organization ?? session.factors?.user?.organizationId;
-
     const methods = await listAuthenticationMethodTypes({
       userId: session.factors?.user?.id,
     });
@@ -303,7 +288,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
             // Check if user has IDPs available as alternative, that could eventually be used to register/link.
-            const idpResp = await redirectUserToIDP(userId, organization);
+            const idpResp = await redirectUserToIDP(userId);
             if (idpResp?.redirect) {
               return idpResp;
             }
@@ -319,9 +304,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
-          if (organization) {
-            paramsPassword.append("organization", organization);
-          }
+          paramsPassword.append("organization", ZITADEL_ORGANIZATION);
 
           if (command.requestId) {
             paramsPassword.append("requestId", command.requestId);
@@ -345,14 +328,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             paramsPasskey.append("requestId", command.requestId);
           }
 
-          if (organization) {
-            paramsPasskey.append("organization", organization);
-          }
+          paramsPasskey.append("organization", ZITADEL_ORGANIZATION);
 
           return { redirect: "/passkey?" + paramsPasskey };
 
         case AuthenticationMethodType.IDP:
-          const resp = await redirectUserToIDP(userId, organization);
+          const resp = await redirectUserToIDP(userId);
 
           if (resp?.error) {
             return { error: resp.error };
@@ -372,13 +353,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           passkeyParams.append("requestId", command.requestId);
         }
 
-        if (organization) {
-          passkeyParams.append("organization", organization);
-        }
+        passkeyParams.append("organization", ZITADEL_ORGANIZATION);
 
         return { redirect: "/passkey?" + passkeyParams };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-        return redirectUserToIDP(userId, organization);
+        return redirectUserToIDP(userId);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
         if (!userLoginSettings?.allowUsernamePassword) {
@@ -397,9 +376,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           paramsPasswordDefault.append("requestId", command.requestId);
         }
 
-        if (organization) {
-          paramsPasswordDefault.append("organization", organization);
-        }
+        paramsPasswordDefault.append("organization", ZITADEL_ORGANIZATION);
 
         return {
           redirect: "/password?" + paramsPasswordDefault,
@@ -411,43 +388,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   logMessage.debug("No users found (0 potential users), checking registration options");
 
   // user not found, perform organization discovery if no org context provided
-  let discoveredOrganization = command.organization;
-  let effectiveLoginSettings = loginSettingsByContext;
 
-  if (!discoveredOrganization && command.loginName && ORG_SUFFIX_REGEX.test(command.loginName)) {
-    const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
-    const suffix = matched?.[1] ?? "";
-
-    // this just returns orgs where the suffix is set as primary domain
-    const orgs = await getOrgsByDomain({
-      domain: suffix,
-    });
-
-    const orgToCheckForDiscovery =
-      orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
-
-    if (orgToCheckForDiscovery) {
-      const orgLoginSettings = await getLoginSettings({
-        organization: orgToCheckForDiscovery,
-      });
-
-      if (orgLoginSettings?.allowDomainDiscovery) {
-        logMessage.debug(`Org domain discovery successful, using org: ${orgToCheckForDiscovery}`);
-        discoveredOrganization = orgToCheckForDiscovery;
-        // Use the discovered organization's login settings for subsequent checks
-        effectiveLoginSettings = orgLoginSettings;
-      } else {
-        logMessage.debug("Org does not allow domain discovery");
-      }
-    } else {
-      logMessage.debug("No single org found for domain discovery");
-    }
-  }
+  const effectiveLoginSettings = loginSettingsByContext;
 
   // user not found, check if register is enabled on instance / organization context
   if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowUsernamePassword) {
     logMessage.debug("Redirecting to IDP (register allowed, password not allowed)");
-    const resp = await redirectUserToIDP(undefined, discoveredOrganization);
+    const resp = await redirectUserToIDP(undefined);
     if (resp) {
       return resp;
     }
@@ -459,9 +406,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   ) {
     logMessage.debug("Register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
-    if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
+    if (!effectiveLoginSettings?.ignoreUnknownUsernames) {
       logMessage.debug("Redirecting to registration page");
-      const params = new URLSearchParams({ organization: discoveredOrganization });
+      const params = new URLSearchParams({ organization: ZITADEL_ORGANIZATION });
 
       if (command.requestId) {
         params.set("requestId", command.requestId);
@@ -474,7 +421,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { redirect: "/register?" + params };
     } else {
       logMessage.debug(
-        `Not redirecting to register (hasDiscoveredOrg: ${!!discoveredOrganization}, ignoreUnknownUsernames: ${effectiveLoginSettings?.ignoreUnknownUsernames})`
+        `Not redirecting to register (ignoreUnknownUsernames: ${effectiveLoginSettings?.ignoreUnknownUsernames})`
       );
     }
   }
@@ -489,9 +436,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       paramsPasswordDefault.append("requestId", command.requestId);
     }
 
-    if (discoveredOrganization) {
-      paramsPasswordDefault.append("organization", discoveredOrganization);
-    }
+    paramsPasswordDefault.append("organization", ZITADEL_ORGANIZATION);
 
     return { redirect: "/password?" + paramsPasswordDefault };
   }

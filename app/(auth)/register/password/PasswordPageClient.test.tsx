@@ -21,19 +21,19 @@ vi.mock("./components/SetRegisterPasswordForm", () => ({
     email,
     firstname,
     lastname,
-    organization,
+
     requestId,
     onSubmitSuccess,
   }: {
     email: string;
     firstname: string;
     lastname: string;
-    organization: string;
+
     requestId?: string;
     onSubmitSuccess?: () => void;
   }) => (
     <div>
-      <span>{`set-register-password:${email}:${firstname}:${lastname}:${organization}:${requestId ?? ""}`}</span>
+      <span>{`set-register-password:${email}:${firstname}:${lastname}:${requestId ?? ""}`}</span>
       <button onClick={() => onSubmitSuccess?.()} type="button">
         complete-register-password
       </button>
@@ -48,7 +48,6 @@ describe("PasswordPageClient", () => {
     firstname: string;
     lastname: string;
     email: string;
-    organization?: string;
     requestId?: string;
   } | null;
   let isHydrated = true;
@@ -93,7 +92,6 @@ describe("PasswordPageClient", () => {
       email: "person@canada.ca",
       firstname: "Person",
       lastname: "Example",
-      organization: "org-1",
       requestId: "req-123",
     };
 
@@ -112,7 +110,6 @@ describe("PasswordPageClient", () => {
       email: "person@canada.ca",
       firstname: "Person",
       lastname: "Example",
-      organization: "org-1",
       requestId: "req-123",
     };
 

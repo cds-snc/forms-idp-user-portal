@@ -24,8 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
-  const [searchParams, _headers, { sessionId, loginName, organization, requestId }] =
-    await Promise.all([props.searchParams, headers(), getSessionCredentials()]);
+  const [searchParams, _headers, { sessionId, loginName, requestId }] = await Promise.all([
+    props.searchParams,
+    headers(),
+    getSessionCredentials(),
+  ]);
 
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
@@ -33,8 +36,8 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { redirect } = searchParams;
 
   const sessionData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData
@@ -43,9 +46,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const safeRedirect = getSafeRedirectUrl(redirect);
 
-  const loginSettings = await getLoginSettings({
-    organization: organization ?? sessionFactors?.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -58,7 +59,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         <LoginTOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
-          organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           requestId={requestId}
           loginSettings={loginSettings}
           redirect={safeRedirect}

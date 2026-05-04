@@ -144,8 +144,7 @@ export async function proxy(request: NextRequest) {
   // Check authentication level (loginName will be extracted from session cookie)
   const authCheck = await checkAuthenticationLevel(
     requiredLevel,
-    undefined, // loginName extracted from session cookie
-    ZITADEL_ORGANIZATION
+    undefined // loginName extracted from session cookie
   );
 
   // If satisfied, allow the request
@@ -167,7 +166,7 @@ export async function proxy(request: NextRequest) {
       if (hasPassword) {
         if (isMfaSetupRoute(pathname) && session?.id) {
           try {
-            const setupSession = await loadSessionById(session.id, ZITADEL_ORGANIZATION);
+            const setupSession = await loadSessionById(session.id);
 
             if (requiresStrongMfaSetupVerification(setupSession)) {
               const verifyUrl = request.nextUrl.clone();
@@ -193,7 +192,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Not satisfied and no special case applies - redirect
-  const redirectUrl = getSmartRedirect(pathname, authCheck.session || null, searchParams);
+  const redirectUrl = getSmartRedirect(authCheck.session || null, searchParams);
 
   const url = request.nextUrl.clone();
   url.pathname = redirectUrl.split("?")[0];

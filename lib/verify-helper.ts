@@ -4,12 +4,13 @@
 import { cookies } from "next/headers";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
 import moment from "moment";
+
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 
 /*--------------------------------------------*
  * Local Relative
@@ -21,7 +22,6 @@ export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
   session: Session,
   humanUser: HumanUser | undefined,
-  organization?: string,
   requestId?: string
 ) {
   let isOutdated = false;
@@ -37,9 +37,7 @@ export function checkPasswordChangeRequired(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (organization || session.factors?.user?.organizationId) {
-      params.append("organization", session.factors?.user?.organizationId as string);
-    }
+    params.append("organization", ZITADEL_ORGANIZATION);
 
     if (requestId) {
       params.append("requestId", requestId);
@@ -52,7 +50,6 @@ export function checkPasswordChangeRequired(
 export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,
-  organization?: string,
   requestId?: string
 ) {
   if (!humanUser?.email?.isVerified) {
@@ -61,9 +58,7 @@ export function checkEmailVerification(
       send: "true", // set this to true as we dont expect old email codes to be valid anymore
     });
 
-    if (organization || session.factors?.user?.organizationId) {
-      params.set("organization", organization ?? (session.factors?.user?.organizationId as string));
-    }
+    params.set("organization", ZITADEL_ORGANIZATION);
 
     const verifyUrl = buildUrlWithRequestId("/verify", requestId);
     const [basePath, existingQuery = ""] = verifyUrl.split("?");
@@ -75,8 +70,6 @@ export function checkEmailVerification(
 }
 
 export async function checkMFAFactors(
-  session: Session,
-  loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],
   requestId?: string
 ): Promise<{ error: string } | { redirect: string }> {
@@ -129,7 +122,7 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
     .update(`${userId}:${fingerPrintCookie.value}`)
     .digest("hex");
 
-  const cookieValue = await cookiesList.get("verificationCheck")?.value;
+  const cookieValue = cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
     return false;

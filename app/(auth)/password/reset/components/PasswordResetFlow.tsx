@@ -11,10 +11,10 @@ import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/p
 import { UserNameForm } from "./UserNameForm";
 type Props = {
   passwordComplexitySettings?: PasswordComplexitySettings;
-  organization?: string;
+
   requestId?: string;
 };
 
-export function PasswordResetFlow({ organization, requestId }: Props) {
-  return <UserNameForm organization={organization} requestId={requestId} />;
+export function PasswordResetFlow({ requestId }: Props) {
+  return <UserNameForm requestId={requestId} />;
 }

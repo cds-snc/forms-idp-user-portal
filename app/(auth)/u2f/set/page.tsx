@@ -29,11 +29,10 @@ export default async function Page(props: {
 
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
@@ -41,7 +40,7 @@ export default async function Page(props: {
   const sessionFactors = await loadMfaSetupSession({
     sessionId,
     loginName,
-    organization,
+
     pageName: "U2F setup page",
     missingSessionRedirect: "/mfa/set",
   });

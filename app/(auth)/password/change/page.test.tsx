@@ -56,22 +56,16 @@ vi.mock("@components/auth/AuthPanel", () => ({
 }));
 
 vi.mock("./components/ChangePasswordForm", () => ({
-  ChangePasswordForm: ({
-    sessionId,
-    loginName,
-    organization,
-  }: {
-    sessionId: string;
-    loginName: string;
-    organization?: string;
-  }) => <div>{`change-password-form:${sessionId}:${loginName}:${organization}`}</div>,
+  ChangePasswordForm: ({ sessionId, loginName }: { sessionId: string; loginName: string }) => (
+    <div>{`change-password-form:${sessionId}:${loginName}`}</div>
+  ),
 }));
 
 describe("password/change page", () => {
   const strongMfaSession = create(SessionSchema, {
     id: "session-123",
     factors: {
-      user: { id: "user-123", loginName: "person@canada.ca", organizationId: "org-1" },
+      user: { id: "user-123", loginName: "person@canada.ca" },
       password: { verifiedAt: { seconds: BigInt(1), nanos: 0 } },
       totp: { verifiedAt: { seconds: BigInt(1), nanos: 0 } },
     },
@@ -80,7 +74,7 @@ describe("password/change page", () => {
   const passwordOnlySession = create(SessionSchema, {
     id: "session-123",
     factors: {
-      user: { id: "user-123", loginName: "person@canada.ca", organizationId: "org-1" },
+      user: { id: "user-123", loginName: "person@canada.ca" },
       password: { verifiedAt: { seconds: BigInt(1), nanos: 0 } },
     },
   });
@@ -92,7 +86,6 @@ describe("password/change page", () => {
     vi.mocked(getSessionCredentials).mockResolvedValue({
       sessionId: "session-123",
       loginName: "person@canada.ca",
-      organization: "org-1",
     } as never);
 
     vi.mocked(checkAuthenticationLevel).mockResolvedValue({
@@ -118,8 +111,7 @@ describe("password/change page", () => {
 
     expect(checkAuthenticationLevel).toHaveBeenCalledWith(
       AuthLevel.PASSWORD_REQUIRED,
-      "person@canada.ca",
-      "org-1"
+      "person@canada.ca"
     );
     expect(redirect).toHaveBeenCalledWith("/mfa");
   });
@@ -128,7 +120,6 @@ describe("password/change page", () => {
     vi.mocked(getSessionCredentials).mockResolvedValue({
       sessionId: "",
       loginName: "person@canada.ca",
-      organization: "org-1",
     } as never);
 
     await expect(Page()).rejects.toThrow("NEXT_REDIRECT");
@@ -152,7 +143,7 @@ describe("password/change page", () => {
     render(view);
 
     expect(
-      screen.getByText("change-password-form:session-123:person@canada.ca:org-1")
+      screen.getByText("change-password-form:session-123:person@canada.ca")
     ).toBeInTheDocument();
     expect(redirect).not.toHaveBeenCalled();
   });

@@ -8,7 +8,6 @@ import { redirect } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
@@ -29,15 +28,13 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const searchParams = await props.searchParams;
   const requestId = searchParams.requestId;
 
-  const organization = ZITADEL_ORGANIZATION;
-
   // Check if user is already authenticated
   let isAuthenticated = false;
   try {
     const { loginName } = await getSessionCredentials();
 
     const session = await loadMostRecentSession({
-      sessionParams: { loginName, organization },
+      sessionParams: { loginName },
     });
 
     isAuthenticated = session ? await isSessionValid({ session }) : false;
@@ -54,7 +51,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
-      <LoginForm requestId={requestId} organization={organization} />
+      <LoginForm requestId={requestId} />
 
       <p className="mt-10">
         <I18n i18nKey="register" namespace="start" />

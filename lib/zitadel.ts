@@ -27,7 +27,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-// import { unstable_cacheLife as cacheLife } from "next/cache";
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { serverTranslation } from "@i18n/server";
 
 import { getUserAgent } from "./fingerprint";
@@ -44,24 +44,18 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
-export async function getLoginSettings({ organization }: { organization?: string }) {
+export async function getLoginSettings() {
   const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
+    .getLoginSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getSerializableLoginSettings({
-  organizationId,
-}: {
-  organizationId?: string;
-}) {
-  const loginSettings = await getLoginSettings({
-    organization: organizationId,
-  }).then((obj) => getSerializableObject(obj));
+export async function getSerializableLoginSettings() {
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   if (!loginSettings) {
     throw new Error("No login settings found");
@@ -80,11 +74,11 @@ export async function getSecuritySettings() {
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getLockoutSettings({ orgId }: { orgId?: string }) {
+export async function getLockoutSettings() {
   const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
-    .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
+    .getLockoutSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
@@ -93,11 +87,11 @@ export async function getLockoutSettings({ orgId }: { orgId?: string }) {
 /**
  * @security Requires authenticated session. Use protectedGetPasswordExpirySettings from lib/server/zitadel-protected.ts
  */
-export async function getPasswordExpirySettings({ orgId }: { orgId?: string }) {
+export async function getPasswordExpirySettings() {
   const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
-    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
+    .getPasswordExpirySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
@@ -121,11 +115,11 @@ export async function registerTOTP({ userId }: { userId: string }) {
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getPasswordComplexitySettings({ organization }: { organization?: string }) {
+export async function getPasswordComplexitySettings() {
   const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+    .getPasswordComplexitySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;
@@ -239,16 +233,9 @@ type AddHumanUserData = {
   lastName: string;
   email: string;
   password?: string;
-  organization: string;
 };
 
-export async function addHumanUser({
-  email,
-  firstName,
-  lastName,
-  password,
-  organization,
-}: AddHumanUserData) {
+export async function addHumanUser({ email, firstName, lastName, password }: AddHumanUserData) {
   const userService = await getServiceForHost("UserService");
 
   let addHumanUserRequest: AddHumanUserRequest = create(AddHumanUserRequestSchema, {
@@ -264,16 +251,14 @@ export async function addHumanUser({
     passwordType: password ? { case: "password", value: { password } } : undefined,
   });
 
-  if (organization) {
-    const organizationSchema = create(OrganizationSchema, {
-      org: { case: "orgId", value: organization },
-    });
+  const organizationSchema = create(OrganizationSchema, {
+    org: { case: "orgId", value: ZITADEL_ORGANIZATION },
+  });
 
-    addHumanUserRequest = {
-      ...addHumanUserRequest,
-      organization: organizationSchema,
-    };
-  }
+  addHumanUserRequest = {
+    ...addHumanUserRequest,
+    organization: organizationSchema,
+  };
 
   return userService.addHumanUser(addHumanUserRequest);
 }
@@ -328,16 +313,9 @@ type ListUsersCommand = {
   userName?: string;
   email?: string;
   phone?: string;
-  organizationId?: string;
 };
 
-export async function listUsers({
-  loginName,
-  userName,
-  phone,
-  email,
-  organizationId,
-}: ListUsersCommand) {
+export async function listUsers({ loginName, userName, phone, email }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
   // either use loginName or userName, email, phone
@@ -407,18 +385,16 @@ export async function listUsers({
     );
   }
 
-  if (organizationId) {
-    queries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "organizationIdQuery",
-          value: {
-            organizationId,
-          },
+  queries.push(
+    create(SearchQuerySchema, {
+      query: {
+        case: "organizationIdQuery",
+        value: {
+          organizationId: ZITADEL_ORGANIZATION,
         },
-      })
-    );
-  }
+      },
+    })
+  );
 
   const userService = await getServiceForHost("UserService");
 
@@ -428,7 +404,7 @@ export async function listUsers({
 export type SearchUsersCommand = {
   searchValue: string;
   loginSettings: LoginSettings;
-  organizationId?: string;
+
   suffix?: string;
 };
 
@@ -472,7 +448,7 @@ const EmailQuery = (searchValue: string) =>
 export async function searchUsers({
   searchValue,
   loginSettings,
-  organizationId,
+
   suffix,
 }: SearchUsersCommand) {
   const queries: SearchQuery[] = [];
@@ -489,18 +465,16 @@ export async function searchUsers({
     queries.push(loginNameQuery);
   }
 
-  if (organizationId) {
-    queries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "organizationIdQuery",
-          value: {
-            organizationId,
-          },
+  queries.push(
+    create(SearchQuerySchema, {
+      query: {
+        case: "organizationIdQuery",
+        value: {
+          organizationId: ZITADEL_ORGANIZATION,
         },
-      })
-    );
-  }
+      },
+    })
+  );
 
   const userService = await getServiceForHost("UserService");
 
@@ -552,18 +526,16 @@ export async function searchUsers({
     );
   }
 
-  if (organizationId) {
-    emailAndPhoneQueries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "organizationIdQuery",
-          value: {
-            organizationId,
-          },
+  emailAndPhoneQueries.push(
+    create(SearchQuerySchema, {
+      query: {
+        case: "organizationIdQuery",
+        value: {
+          organizationId: ZITADEL_ORGANIZATION,
         },
-      })
-    );
-  }
+      },
+    })
+  );
 
   const emailOrPhoneResult = await userService.listUsers({
     queries: emailAndPhoneQueries,
@@ -764,18 +736,17 @@ export async function verifyU2FRegistration({
 /**
  *
  * @param host
- * @param orgId the organization ID
  * @param linking_allowed whether linking is allowed
  * @returns the active identity providers
  */
 export async function getActiveIdentityProviders({
-  orgId,
   linking_allowed,
 }: {
-  orgId?: string;
   linking_allowed?: boolean;
-}) {
-  const props: { ctx: RequestContext; linkingAllowed?: boolean } = { ctx: makeReqCtx(orgId) };
+} = {}) {
+  const props: { ctx: RequestContext; linkingAllowed?: boolean } = {
+    ctx: makeReqCtx(ZITADEL_ORGANIZATION),
+  };
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }

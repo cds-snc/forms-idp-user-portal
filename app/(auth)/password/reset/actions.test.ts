@@ -107,7 +107,6 @@ describe("submitUserNameForm", () => {
 
     const response = await submitUserNameForm({
       loginName: "person@canada.ca",
-      organization: "org-1",
       requestId: "req-123",
     });
 
@@ -198,14 +197,12 @@ describe("submitUserNameForm", () => {
   it("creates a recovery session and redirects on successful reset code email", async () => {
     const response = await submitUserNameForm({
       loginName: "person@canada.ca",
-      organization: "org-1",
       requestId: "req-123",
     });
 
     expect(response).toEqual({ redirect: "/password/reset/verify?requestId=req-123" });
     expect(listUsers).toHaveBeenCalledWith({
       loginName: "person@canada.ca",
-      organizationId: "org-1",
     });
     expect(getPasswordResetTemplate).toHaveBeenCalledWith("reset-456");
     expect(sendEmail).toHaveBeenCalledWith("person@canada.ca", "template-123", {

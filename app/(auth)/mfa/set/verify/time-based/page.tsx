@@ -29,7 +29,7 @@ export default async function Page() {
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
+  const { sessionId, loginName, sessionData } = await loadMfaVerificationSession({
     pageName: "TOTP verify page",
     missingSessionRedirect: "/mfa/set/verify",
   });
@@ -38,9 +38,7 @@ export default async function Page() {
     redirect("/mfa/set/verify");
   }
 
-  const loginSettings = await getLoginSettings({
-    organization: organization ?? sessionData.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -52,7 +50,6 @@ export default async function Page() {
       <LoginTOTP
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
-        organization={organization ?? sessionData.factors?.user?.organizationId}
         loginSettings={loginSettings}
         redirect="/mfa/set"
         displayName={sessionData.factors?.user?.displayName}

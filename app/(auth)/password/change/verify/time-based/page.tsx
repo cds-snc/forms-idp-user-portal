@@ -28,10 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
@@ -40,27 +39,21 @@ export default async function Page() {
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
   }
 
   const sessionData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/password/change/verify");
   }
 
-  const loginSettings = await getLoginSettings({
-    organization: organization ?? sessionData.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -72,7 +65,6 @@ export default async function Page() {
       <LoginTOTP
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
-        organization={organization ?? sessionData.factors?.user?.organizationId}
         loginSettings={loginSettings}
         redirect="/password/change"
         displayName={sessionData.factors?.user?.displayName}

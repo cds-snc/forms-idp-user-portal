@@ -30,29 +30,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
+  const { loginName, sessionId, requestId } = await getSessionCredentials();
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionFactors) {
     logMessage.debug({
       message: "MFA page missing session factors",
       hasSessionId: !!sessionId,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect(authCheck.redirect || "/password");
   }
@@ -82,7 +77,6 @@ export default async function Page() {
           loginName={loginName}
           sessionId={sessionId}
           requestId={requestId}
-          organization={organization}
         />
       </AuthPanel>
     </>

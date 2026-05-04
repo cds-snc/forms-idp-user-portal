@@ -11,6 +11,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { Cookie } from "@lib/cookies";
 import { idpTypeToSlug } from "@lib/idp";
 import { toAuthRequestId, toOidcRequestId } from "@lib/oidc-request-id";
@@ -22,30 +23,21 @@ import {
   createCallback,
   getActiveIdentityProviders,
   getAuthRequest,
-  getOrgsByDomain,
   startIdentityProviderFlow,
 } from "@lib/zitadel";
 
 import { logMessage } from "../logger";
 
-const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
-const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 const gotoAccounts = ({
   request,
   requestId,
-  organization,
 }: {
   request: NextRequest;
   requestId: string;
-  organization?: string;
 }): NextResponse<unknown> => {
   const accountsUrl = constructUrl(request, buildUrlWithRequestId("/account", requestId));
-
-  if (organization) {
-    accountsUrl.searchParams.set("organization", organization);
-  }
 
   return NextResponse.redirect(accountsUrl);
 };
@@ -105,43 +97,17 @@ export async function handleOIDCFlowInitiation(
     ? toOidcRequestId(authRequest.id)
     : toOidcRequestId(requestId);
 
-  let organization = "";
+  const organization = ZITADEL_ORGANIZATION;
   let idpId = "";
 
   if (authRequest?.scope) {
-    const orgScope = authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s));
     const idpScope = authRequest.scope.find((s: string) => IDP_SCOPE_REGEX.test(s));
-
-    if (orgScope) {
-      const matched = ORG_SCOPE_REGEX.exec(orgScope);
-      organization = matched?.[1] ?? "";
-    } else {
-      const orgDomainScope = authRequest.scope.find((s: string) => ORG_DOMAIN_SCOPE_REGEX.test(s));
-
-      if (orgDomainScope) {
-        const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
-        const orgDomain = matched?.[1] ?? "";
-
-        if (orgDomain) {
-          logMessage.debug(`Extracted org domain for OIDC requestId: ${requestId}`);
-          const orgs = await getOrgsByDomain({
-            domain: orgDomain,
-          });
-
-          if (orgs.result && orgs.result.length === 1) {
-            organization = orgs.result[0].id ?? "";
-          }
-        }
-      }
-    }
 
     if (idpScope) {
       const matched = IDP_SCOPE_REGEX.exec(idpScope);
       idpId = matched?.[1] ?? "";
 
-      const identityProviders = await getActiveIdentityProviders({
-        orgId: organization ? organization : undefined,
-      }).then((resp) => {
+      const identityProviders = await getActiveIdentityProviders().then((resp) => {
         return resp.identityProviders;
       });
 
@@ -226,21 +192,16 @@ export async function handleOIDCFlowInitiation(
       return gotoAccounts({
         request,
         requestId: oidcRequestId,
-        organization,
       });
       // OIDC prompt=login requires active re-authentication.
       // Prefer known login hint flow when available, otherwise show login page.
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       if (authRequest.loginHint) {
         try {
-          let command: SendLoginnameCommand = {
+          const command: SendLoginnameCommand = {
             loginName: authRequest.loginHint,
             requestId: authRequest.id,
           };
-
-          if (organization) {
-            command = { ...command, organization };
-          }
 
           const res = await sendLoginname(command);
 

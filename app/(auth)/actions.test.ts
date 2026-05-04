@@ -117,7 +117,6 @@ describe("submitLoginForm", () => {
     const response = await submitLoginForm({
       username: "person@canada.ca",
       password: "P@ssw0rd",
-      organization: "org-1",
     });
 
     expect(response).toEqual({ error: "translated:validation.invalidCredentials" });

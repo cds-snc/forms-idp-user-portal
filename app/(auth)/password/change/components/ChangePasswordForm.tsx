@@ -21,7 +21,6 @@ type Props = {
   sessionId: string;
   loginName: string;
   requestId?: string;
-  organization?: string;
 };
 
 export function ChangePasswordForm({
@@ -29,7 +28,6 @@ export function ChangePasswordForm({
   sessionId,
   loginName,
   requestId,
-  organization,
 }: Props) {
   const { t } = useTranslation("password");
   const router = useRouter();
@@ -68,7 +66,6 @@ export function ChangePasswordForm({
 
     const passwordResponse = await sendPassword({
       loginName,
-      organization,
       checks: create(ChecksSchema, {
         password: { password },
       }),

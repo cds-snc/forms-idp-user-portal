@@ -25,7 +25,6 @@ export function SetRegisterPasswordForm({
   email,
   firstname,
   lastname,
-  organization,
   requestId,
   onSubmitSuccess,
 }: {
@@ -33,7 +32,6 @@ export function SetRegisterPasswordForm({
   email: string;
   firstname: string;
   lastname: string;
-  organization: string;
   requestId?: string;
   onSubmitSuccess?: () => void;
 }) {
@@ -56,7 +54,6 @@ export function SetRegisterPasswordForm({
       firstName: firstname,
       lastName: lastname,
       password,
-      organization: organization,
       requestId,
     }).catch(() => setError(t("errors.couldNotRegisterUser")));
 

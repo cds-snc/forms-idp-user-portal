@@ -19,7 +19,6 @@ import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 type SendResetCodeCommand = {
   loginName: string;
-  organization?: string;
   requestId?: string;
 };
 
@@ -34,7 +33,6 @@ export const submitUserNameForm = async (
 
   const users = await listUsers({
     loginName: command.loginName,
-    organizationId: command.organization,
   }).catch((_error) => {
     logMessage.warn("Failed to look up password reset user");
     return undefined;

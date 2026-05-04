@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { logMessage } from "@lib/logger";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
@@ -23,10 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const organization = ZITADEL_ORGANIZATION;
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    organization,
-  }).catch((_error) => {
+  const passwordComplexitySettings = await getPasswordComplexitySettings().catch((_error) => {
     logMessage.warn("Failed to load password complexity settings for registration");
     return undefined;
   });

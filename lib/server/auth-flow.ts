@@ -13,7 +13,6 @@ import { loadSessionsWithCookies } from "@lib/server/session";
 interface AuthFlowParams {
   sessionId: string;
   requestId: string;
-  organization?: string;
 }
 
 /**

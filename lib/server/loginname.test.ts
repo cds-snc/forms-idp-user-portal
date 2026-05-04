@@ -274,9 +274,6 @@ describe("sendLoginname", () => {
         const result = await sendLoginname({ loginName: "user@example.com" });
 
         expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
-        expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-          orgId: "org123",
-        });
       });
 
       test("should redirect to /passkey when user has only passkey and it is allowed", async () => {
@@ -408,13 +405,12 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        organization: "org123",
+
         requestId: "req123",
       });
 
       expect(result).toHaveProperty("redirect");
       expect((result as WithRedirect).redirect).toMatch(/^\/register\?/);
-      expect((result as WithRedirect).redirect).toContain("organization=org123");
       expect((result as WithRedirect).redirect).toContain("requestId=req123");
       expect((result as WithRedirect).redirect).toContain("email=user%40example.com");
     });
@@ -440,135 +436,12 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "user@example.com",
         requestId: "req123",
-        organization: "org123",
       });
 
       expect(result).toHaveProperty("redirect");
       expect((result as WithRedirect).redirect).toMatch(/^\/password\?/);
       expect((result as WithRedirect).redirect).toContain("loginName=user%40example.com");
       expect((result as WithRedirect).redirect).toContain("requestId=req123");
-      expect((result as WithRedirect).redirect).toContain("organization=org123");
-    });
-
-    test("should discover org from domain suffix when user not found and no org context provided", async () => {
-      mockGetLoginSettings
-        .mockResolvedValueOnce({
-          allowRegister: true,
-          allowUsernamePassword: true,
-          ignoreUnknownUsernames: false,
-        })
-        .mockResolvedValueOnce({
-          allowDomainDiscovery: true,
-          allowRegister: true,
-          allowUsernamePassword: true,
-          ignoreUnknownUsernames: false,
-        });
-
-      mockGetOrgsByDomain.mockResolvedValue({
-        result: [{ id: "discovered-org-123", name: "Example Org" }],
-      });
-
-      const result = await sendLoginname({
-        loginName: "user@example.com",
-        requestId: "req123",
-      });
-
-      expect(result).toHaveProperty("redirect");
-      expect((result as WithRedirect).redirect).toMatch(/^\/register\?/);
-      expect((result as WithRedirect).redirect).toContain("organization=discovered-org-123");
-      expect((result as WithRedirect).redirect).toContain("requestId=req123");
-      expect((result as WithRedirect).redirect).toContain("email=user%40example.com");
-
-      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        domain: "example.com",
-      });
-    });
-
-    test("should redirect to IDP with discovered org when password not allowed", async () => {
-      mockGetLoginSettings
-        .mockResolvedValueOnce({ allowRegister: true, allowUsernamePassword: false })
-        .mockResolvedValueOnce({
-          allowDomainDiscovery: true,
-          allowRegister: true,
-          allowUsernamePassword: false,
-        });
-
-      mockGetOrgsByDomain.mockResolvedValue({
-        result: [{ id: "discovered-org-456", name: "Example Org" }],
-      });
-      mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
-      });
-      mockStartIdentityProviderFlow.mockResolvedValue("https://idp.example.com/auth");
-
-      const result = await sendLoginname({
-        loginName: "user@company.com",
-        requestId: "req123",
-      });
-
-      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
-      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        domain: "company.com",
-      });
-      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-        orgId: "discovered-org-456",
-      });
-    });
-
-    test("should not use org discovery if domain discovery is disabled for the org", async () => {
-      mockGetLoginSettings
-        .mockResolvedValueOnce({
-          allowRegister: true,
-          allowUsernamePassword: true,
-          ignoreUnknownUsernames: false,
-        })
-        .mockResolvedValueOnce({ allowDomainDiscovery: false });
-
-      mockGetOrgsByDomain.mockResolvedValue({
-        result: [{ id: "10987654321", name: "Example Org" }],
-      });
-
-      const result = await sendLoginname({ loginName: "user@example.com" });
-
-      expect(result).toEqual({ error: "errors.userNotFound" });
-    });
-
-    test("should not use org discovery when multiple orgs match the domain", async () => {
-      mockGetLoginSettings.mockResolvedValue({
-        allowRegister: true,
-        allowUsernamePassword: true,
-        ignoreUnknownUsernames: false,
-      });
-
-      mockGetOrgsByDomain.mockResolvedValue({
-        result: [
-          { id: "12345678910", name: "Example Org 1" },
-          { id: "10987654321", name: "Example Org 2" },
-        ],
-      });
-
-      const result = await sendLoginname({ loginName: "user@example.com" });
-
-      expect(result).toEqual({ error: "errors.userNotFound" });
-    });
-
-    test("should use provided org context instead of discovering when org param is present", async () => {
-      mockGetLoginSettings.mockResolvedValue({
-        allowRegister: true,
-        allowUsernamePassword: true,
-        ignoreUnknownUsernames: false,
-      });
-
-      const result = await sendLoginname({
-        loginName: "user@example.com",
-        organization: "123456",
-        requestId: "req123",
-      });
-
-      expect(result).toHaveProperty("redirect");
-      expect((result as WithRedirect).redirect).toMatch(/^\/register\?/);
-      expect((result as WithRedirect).redirect).toContain("organization=123456");
-      expect(mockGetOrgsByDomain).not.toHaveBeenCalled();
     });
   });
 
@@ -623,12 +496,12 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        organization: "custom-org",
+
         requestId: "req123",
       });
 
       expect(result).toHaveProperty("redirect");
-      expect((result as WithRedirect).redirect).toContain("organization=custom-org");
+
       expect((result as WithRedirect).redirect).toContain("requestId=req123");
     });
 

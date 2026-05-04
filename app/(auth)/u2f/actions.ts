@@ -20,7 +20,6 @@ import { U2F_ERRORS } from "./u2f-errors";
 type VerifyU2FLoginCommand = {
   loginName?: string;
   sessionId?: string;
-  organization?: string;
   checks: Checks;
   requestId?: string;
   redirect?: string | null;
@@ -29,16 +28,15 @@ type VerifyU2FLoginCommand = {
 export async function verifyU2FLogin({
   loginName,
   sessionId,
-  organization,
   checks,
   requestId,
   redirect,
 }: VerifyU2FLoginCommand) {
   let sessionCookie;
   if (sessionId) {
-    sessionCookie = await getSessionCookieById({ sessionId, organization });
+    sessionCookie = await getSessionCookieById({ sessionId });
   } else if (loginName) {
-    sessionCookie = await getSessionCookieByLoginName({ loginName, organization });
+    sessionCookie = await getSessionCookieByLoginName({ loginName });
   }
 
   if (!sessionCookie) {
@@ -46,9 +44,7 @@ export async function verifyU2FLogin({
   }
 
   // Get login settings to determine lifetime
-  const loginSettings = await getLoginSettings({
-    organization,
-  });
+  const loginSettings = await getLoginSettings();
 
   const lifetime = loginSettings?.multiFactorCheckLifetime ?? {
     seconds: BigInt(60 * 60 * 24), // default to 24 hours

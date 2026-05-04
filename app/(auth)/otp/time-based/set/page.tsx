@@ -38,11 +38,11 @@ export default async function Page(props: {
 
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
+
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
@@ -55,7 +55,7 @@ export default async function Page(props: {
   const session = await loadMfaSetupSession({
     sessionId,
     loginName,
-    organization,
+
     pageName: "OTP setup page",
     missingSessionRedirect: "/mfa/set",
   });
@@ -89,7 +89,6 @@ export default async function Page(props: {
       message: "OTP setup page missing session",
       method,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect("/mfa/set");
   }
@@ -140,7 +139,6 @@ export default async function Page(props: {
               uri={totpResponse.uri as string}
               secret={totpResponse.secret as string}
               loginName={loginName}
-              organization={organization}
               requestId={requestId}
               checkAfter={checkAfter}
             ></TotpRegister>

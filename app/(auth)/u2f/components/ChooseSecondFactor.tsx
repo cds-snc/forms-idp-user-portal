@@ -20,7 +20,6 @@ type Props = {
   loginName?: string;
   sessionId?: string;
   requestId?: string;
-  organization?: string;
   userMethods: AuthenticationMethodType[];
 };
 

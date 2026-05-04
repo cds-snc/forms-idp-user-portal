@@ -16,7 +16,7 @@ type FinishFlowCommand =
  * - For other cases: returns default redirect or fallback URL
  */
 export async function completeFlowOrGetUrl(
-  command: FinishFlowCommand & { organization?: string },
+  command: FinishFlowCommand,
   defaultRedirectUri?: string
 ): Promise<{ redirect: string } | { error: string }> {
   // Complete OIDC flows directly with server action

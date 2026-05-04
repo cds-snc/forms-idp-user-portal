@@ -19,7 +19,6 @@ describe("checkEmailVerification", () => {
           isVerified: false,
         },
       } as never,
-      "org-1",
       "oidc_req-123"
     );
 

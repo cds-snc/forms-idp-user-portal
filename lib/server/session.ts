@@ -132,9 +132,7 @@ export async function continueWithSession({
 }: ContinueWithSessionCommand) {
   const { t } = await serverTranslation("error");
 
-  const loginSettings = await getLoginSettings({
-    organization: session.factors?.user?.organizationId,
-  });
+  const loginSettings = await getLoginSettings();
 
   // Use provided redirect if available, otherwise use defaultRedirectUri
   const targetRedirect = redirect || loginSettings?.defaultRedirectUri;
@@ -144,7 +142,6 @@ export async function continueWithSession({
       {
         sessionId: session.id,
         requestId: requestId,
-        organization: session.factors.user.organizationId,
       },
       targetRedirect
     );
@@ -154,7 +151,6 @@ export async function continueWithSession({
       {
         sessionId: session.id,
         loginName: session.factors.user.loginName,
-        organization: session.factors.user.organizationId,
       },
       targetRedirect
     );
@@ -167,7 +163,6 @@ export async function continueWithSession({
 type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
-  organization?: string;
   checks?: Checks;
   requestId?: string;
   challenges?: RequestChallenges;
@@ -175,12 +170,12 @@ type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  const { loginName, sessionId, organization, checks, requestId, challenges } = options;
+  const { loginName, sessionId, checks, requestId, challenges } = options;
   try {
     const recentSession = sessionId
       ? await getSessionCookieById({ sessionId })
       : loginName
-        ? await getSessionCookieByLoginName({ loginName, organization })
+        ? await getSessionCookieByLoginName({ loginName })
         : await getMostRecentSessionCookie();
 
     if (!recentSession) {
@@ -201,9 +196,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       challenges.webAuthN.domain = hostname;
     }
 
-    const loginSettings = await getLoginSettings({
-      organization,
-    });
+    const loginSettings = await getLoginSettings();
 
     let lifetime = checks?.webAuthN
       ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey

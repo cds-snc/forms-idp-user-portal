@@ -27,10 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
@@ -40,16 +39,14 @@ export default async function Page() {
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   const sessionData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/password/reset/verify");
   }
 
-  const loginSettings = await getLoginSettings({
-    organization: organization ?? sessionData.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -61,7 +58,6 @@ export default async function Page() {
       <LoginTOTP
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
-        organization={organization ?? sessionData.factors?.user?.organizationId}
         loginSettings={loginSettings}
         redirect="/password/reset/set"
         displayName={sessionData.factors?.user?.displayName}

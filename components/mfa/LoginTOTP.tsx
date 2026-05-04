@@ -26,7 +26,6 @@ export function LoginTOTP({
   loginName,
   sessionId,
   requestId,
-  organization,
   siteConfig,
   loginSettings,
   redirect,
@@ -35,7 +34,6 @@ export function LoginTOTP({
   loginName?: string;
   sessionId?: string;
   requestId?: string;
-  organization?: string;
   siteConfig: SiteConfig;
   loginSettings?: LoginSettings;
   redirect?: string | null;
@@ -58,7 +56,7 @@ export function LoginTOTP({
     const result = await handleOTPFormSubmit(enteredCode, {
       loginName,
       sessionId,
-      organization,
+
       requestId,
       loginSettings,
       redirect,

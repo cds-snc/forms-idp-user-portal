@@ -37,7 +37,6 @@ export function checkSessionFactorValidity(session: Partial<Session>): {
 type LoadMostRecentSessionParams = {
   sessionParams: {
     loginName?: string;
-    organization?: string;
   };
 };
 
@@ -46,7 +45,6 @@ export async function loadMostRecentSession({
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
     loginName: sessionParams.loginName,
-    organization: sessionParams.organization,
   });
 
   return getSession({
@@ -88,11 +86,8 @@ async function getAuthMethodsAndUser(session?: Session): Promise<SessionWithAuth
   };
 }
 
-export async function loadSessionById(
-  sessionId: string,
-  organization?: string
-): Promise<SessionWithAuthData> {
-  const recent = await getSessionCookieById({ sessionId, organization });
+export async function loadSessionById(sessionId: string): Promise<SessionWithAuthData> {
+  const recent = await getSessionCookieById({ sessionId });
   const sessionResponse = await getSession({
     sessionId: recent.id,
     sessionToken: recent.token,
@@ -100,14 +95,10 @@ export async function loadSessionById(
   return getAuthMethodsAndUser(sessionResponse.session);
 }
 
-export async function loadSessionByLoginname(
-  loginName?: string,
-  organization?: string
-): Promise<SessionWithAuthData> {
+export async function loadSessionByLoginname(loginName?: string): Promise<SessionWithAuthData> {
   const session = await loadMostRecentSession({
     sessionParams: {
       loginName,
-      organization,
     },
   });
   return getAuthMethodsAndUser(session);

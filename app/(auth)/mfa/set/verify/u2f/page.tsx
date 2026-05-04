@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
+  const { sessionId, loginName, sessionData } = await loadMfaVerificationSession({
     pageName: "U2F verify page",
     missingSessionRedirect: "/mfa/set/verify",
   });
@@ -42,13 +42,7 @@ export default async function Page() {
         showDropdown={false}
       />
       <div className="w-full">
-        <LoginU2F
-          loginName={loginName}
-          sessionId={sessionId}
-          organization={organization}
-          login={false}
-          redirect="/mfa/set"
-        />
+        <LoginU2F loginName={loginName} sessionId={sessionId} login={false} redirect="/mfa/set" />
       </div>
     </AuthPanel>
   );

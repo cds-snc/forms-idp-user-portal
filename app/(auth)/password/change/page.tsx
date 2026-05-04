@@ -24,14 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { sessionId, loginName, organization } = await getSessionCredentials();
+  const { sessionId, loginName } = await getSessionCredentials();
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
@@ -41,16 +37,14 @@ export default async function Page() {
     redirect("/password/change/verify");
   }
 
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    organization,
-  });
+  const passwordComplexitySettings = await getPasswordComplexitySettings();
 
-  if (!loginName || !sessionId || !organization || !passwordComplexitySettings) {
+  if (!loginName || !sessionId || !passwordComplexitySettings) {
     logMessage.debug({
       message: "Password change page missing required session context",
       hasLoginName: !!loginName,
       hasSessionId: !!sessionId,
-      hasOrganization: !!organization,
+
       hasPasswordComplexitySettings: !!passwordComplexitySettings,
     });
     redirect(authCheck.redirect || "/password");
@@ -65,7 +59,6 @@ export default async function Page() {
       <ChangePasswordForm
         sessionId={sessionId}
         loginName={loginName}
-        organization={organization}
         passwordComplexitySettings={passwordComplexitySettings}
       />
     </AuthPanel>

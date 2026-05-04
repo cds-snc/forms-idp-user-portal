@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId } = searchParams;
+  const { userId, loginName, code, requestId } = searchParams;
 
   const _headers = await headers();
 
@@ -58,14 +58,11 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     sessionFactors = await loadMostRecentSession({
       sessionParams: {
         loginName,
-        organization,
       },
     }).catch(() => undefined);
   }
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
-  const resolvedOrganization =
-    organization ?? sessionFactors?.factors?.user?.organizationId ?? user?.details?.resourceOwner;
 
   if (!id) {
     redirect("/");
@@ -75,7 +72,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="verify">
       <VerifyEmailForm
         loginName={loginName}
-        organization={resolvedOrganization}
         userId={id}
         code={code}
         requestId={requestId}

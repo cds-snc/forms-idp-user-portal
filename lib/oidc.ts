@@ -52,7 +52,6 @@ export async function loginWithOIDCAndSession({
       // TODO: handle IDP intent direcly if available
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
-        organization: selectedSession.factors?.user?.organizationId,
         requestId: oidcRequestId,
       };
 
@@ -106,9 +105,7 @@ export async function loginWithOIDCAndSession({
             // Fall through to login settings fallback when auth request lookup fails.
           }
 
-          const loginSettings = await getLoginSettings({
-            organization: selectedSession.factors?.user?.organizationId,
-          });
+          const loginSettings = await getLoginSettings();
 
           if (loginSettings?.defaultRedirectUri) {
             return { redirect: loginSettings.defaultRedirectUri };

@@ -35,12 +35,11 @@ import { loadMostRecentSession } from "../session";
 import { buildUrlWithRequestId } from "../utils";
 import { checkMFAFactors } from "../verify-helper";
 
-export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
+export async function verifyTOTP(code: string, loginName?: string) {
   try {
     const session = await loadMostRecentSession({
       sessionParams: {
         loginName,
-        organization,
       },
     });
 
@@ -62,7 +61,6 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
 type VerifyUserByEmailCommand = {
   userId: string;
   loginName?: string; // to determine already existing session
-  organization?: string;
   code: string;
   requestId?: string;
 };
@@ -99,7 +97,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName ?? user.preferredLoginName,
-    organization: command.organization,
   }).catch(() => {
     // Ignored error, checked later
   });
@@ -182,14 +179,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: t("errors.couldNotCreateSession") };
   }
 
-  const loginSettings = await getLoginSettings({
-    organization: user.details?.resourceOwner,
-  });
+  const loginSettings = await getLoginSettings();
 
   // redirect to mfa factor if user has one, or redirect to set one up
   const mfaFactorCheck = await checkMFAFactors(
-    session,
-    loginSettings,
     authMethodResponse.authMethodTypes,
     command.requestId
   );
@@ -204,7 +197,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       {
         sessionId: session.id,
         requestId: command.requestId,
-        organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri
     );
@@ -214,7 +206,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   return completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
-      organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri
   );

@@ -67,7 +67,6 @@ describe("RegisterForm", () => {
   it("renders registration fields and submit button", () => {
     render(
       <RegisterForm
-        organization="org-1"
         requestId="req-123"
         siteConfig={{
           id: "dev",
@@ -95,7 +94,6 @@ describe("RegisterForm", () => {
 
     render(
       <RegisterForm
-        organization="org-1"
         requestId="req-123"
         siteConfig={{
           id: "dev",
@@ -119,7 +117,6 @@ describe("RegisterForm", () => {
   it("stores registration data and redirects to password step on valid submit", async () => {
     render(
       <RegisterForm
-        organization="org-1"
         requestId="req-123"
         siteConfig={{
           id: "dev",
@@ -139,7 +136,6 @@ describe("RegisterForm", () => {
         firstname: "Person",
         lastname: "Example",
         email: "person@canada.ca",
-        organization: "org-1",
         requestId: "req-123",
       });
       expect(router.push).toHaveBeenCalledWith("/register/password?requestId=req-123");

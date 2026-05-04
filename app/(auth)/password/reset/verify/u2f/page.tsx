@@ -23,17 +23,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
 
   const sessionData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.U2F)) {
     redirect("/password/reset/verify");
@@ -55,7 +54,6 @@ export default async function Page() {
         <LoginU2F
           loginName={loginName}
           sessionId={sessionId}
-          organization={organization}
           login={false}
           redirect="/password/reset/set"
         />

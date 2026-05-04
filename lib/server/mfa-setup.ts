@@ -12,7 +12,6 @@ import {
 type LoadMfaSetupSessionParams = {
   sessionId?: string;
   loginName?: string;
-  organization?: string;
   pageName: string;
   missingSessionRedirect: string;
 };
@@ -20,15 +19,11 @@ type LoadMfaSetupSessionParams = {
 export async function loadMfaSetupSession({
   sessionId,
   loginName,
-  organization,
+
   pageName,
   missingSessionRedirect,
 }: LoadMfaSetupSessionParams): Promise<SessionWithAuthData> {
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     logMessage.debug({
@@ -43,14 +38,13 @@ export async function loadMfaSetupSession({
 
   try {
     sessionData = sessionId
-      ? await loadSessionById(sessionId, organization)
-      : await loadSessionByLoginname(loginName, organization);
+      ? await loadSessionById(sessionId)
+      : await loadSessionByLoginname(loginName);
   } catch {
     logMessage.debug({
       message: `${pageName} missing session factors`,
       hasSessionId: !!sessionId,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect(missingSessionRedirect);
   }

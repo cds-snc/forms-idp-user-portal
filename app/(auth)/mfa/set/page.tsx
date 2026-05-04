@@ -28,11 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
+
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
@@ -40,14 +40,12 @@ export default async function Page() {
   const sessionFactors = await loadMfaSetupSession({
     sessionId,
     loginName,
-    organization,
+
     pageName: "MFA set page",
     missingSessionRedirect: "/",
   });
 
-  const loginSettings = await getSerializableLoginSettings({
-    organizationId: sessionFactors.factors?.user?.organizationId,
-  });
+  const loginSettings = await getSerializableLoginSettings();
 
   const { valid } = checkSessionFactorValidity(sessionFactors);
 

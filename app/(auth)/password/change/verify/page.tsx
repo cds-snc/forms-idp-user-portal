@@ -24,27 +24,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
   }
 
   const sessionData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   const canUseTotp = sessionData.authMethods?.includes(AuthenticationMethodType.TOTP) ?? false;
   const canUseU2F = sessionData.authMethods?.includes(AuthenticationMethodType.U2F) ?? false;

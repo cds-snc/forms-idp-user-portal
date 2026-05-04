@@ -21,7 +21,6 @@ type RegisterUserCommand = {
   firstName: string;
   lastName: string;
   password: string;
-  organization: string;
   requestId?: string;
 };
 
@@ -47,7 +46,6 @@ export async function registerUser(command: RegisterUserCommand) {
     firstName: command.firstName,
     lastName: command.lastName,
     password: command.password,
-    organization: command.organization,
   });
 
   if (!addResponse) {
@@ -55,9 +53,7 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({
-    organization: command.organization,
-  });
+  const loginSettings = await getLoginSettings();
 
   const checks = create(ChecksSchema, {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -87,12 +83,7 @@ export async function registerUser(command: RegisterUserCommand) {
   const humanUser =
     userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    session.factors.user.organizationId,
-    command.requestId
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -104,11 +95,9 @@ export async function registerUser(command: RegisterUserCommand) {
       ? {
           sessionId: session.id,
           requestId: command.requestId,
-          organization: session.factors.user.organizationId,
         }
       : {
           loginName: session.factors.user.loginName,
-          organization: session.factors.user.organizationId,
         },
     loginSettings?.defaultRedirectUri
   );

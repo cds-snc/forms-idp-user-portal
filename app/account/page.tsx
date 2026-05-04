@@ -41,25 +41,21 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   // Attempt to get session credentials from cookies
-  let sessionId, organization, loginName;
+  let sessionId, loginName;
   try {
-    ({ sessionId, organization, loginName } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch (error) {
     redirect(loginRedirect);
   }
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(
-    AuthLevel.ANY_MFA_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(buildUrlWithRequestId(authCheck.redirect || "/", requestId));
   }
 
-  const session = await loadSessionById(sessionId, organization);
+  const session = await loadSessionById(sessionId);
   const userId = session.factors?.user?.id;
   const userResponse = await getUserByID({ userId: userId! });
   const user = userResponse.user?.type.case === "human" ? userResponse.user?.type.value : undefined;
@@ -75,7 +71,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   try {
     const authSession = await loadMostRecentSession({
-      sessionParams: { loginName, organization },
+      sessionParams: { loginName },
     });
 
     if (!authSession || !(await isSessionValid({ session: authSession }))) {

@@ -79,16 +79,13 @@ function didPasswordChangeSucceed(result: unknown): boolean {
  */
 async function handleAuthenticationFailure(
   error: unknown,
-  organization: string | undefined,
   t: (key: string, options?: Record<string, string>) => string
 ): Promise<{ error: string } | null> {
   if (!hasFailedAttempts(error)) {
     return null;
   }
 
-  const lockoutSettings = await getLockoutSettings({
-    orgId: organization,
-  });
+  const lockoutSettings = await getLockoutSettings();
 
   const hasLimit =
     lockoutSettings?.maxPasswordAttempts !== undefined &&
@@ -109,7 +106,6 @@ async function handleAuthenticationFailure(
 
 type UpdateSessionCommand = {
   loginName: string;
-  organization?: string;
   checks: Checks;
   requestId?: string;
 };
@@ -121,7 +117,6 @@ export async function sendPassword(
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
-    organization: command.organization,
   }).catch(() => {
     return undefined;
   });
@@ -129,14 +124,9 @@ export async function sendPassword(
   let session;
   let user: User;
   let loginSettings: LoginSettings | undefined;
-  // Capture organization from the cookie before it may be cleared, so the
-  // fallback new-session path retains the correct tenant context.
-  const cookieOrganization: string | undefined = sessionCookie?.organization;
 
   if (sessionCookie) {
-    loginSettings = await getLoginSettings({
-      organization: sessionCookie.organization,
-    });
+    loginSettings = await getLoginSettings();
 
     let lifetime = loginSettings?.passwordCheckLifetime;
 
@@ -159,12 +149,7 @@ export async function sendPassword(
       // A failed-attempts error means the password was wrong — return the
       // auth failure directly rather than retrying, which would count as a
       // second attempt and could lock the account sooner than intended.
-      const authFailure = await handleAuthenticationFailure(
-        error,
-
-        command.organization,
-        t
-      );
+      const authFailure = await handleAuthenticationFailure(error, t);
       if (authFailure) {
         return authFailure;
       }
@@ -178,15 +163,10 @@ export async function sendPassword(
   }
 
   if (!sessionCookie) {
-    const effectiveOrganization = cookieOrganization ?? command.organization;
-
-    loginSettings = await getLoginSettings({
-      organization: effectiveOrganization,
-    });
+    loginSettings = await getLoginSettings();
 
     const users = await listUsers({
       loginName: command.loginName,
-      organizationId: effectiveOrganization,
     });
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
@@ -204,12 +184,7 @@ export async function sendPassword(
           lifetime: loginSettings?.passwordCheckLifetime,
         });
       } catch (error: unknown) {
-        const authFailure = await handleAuthenticationFailure(
-          error,
-
-          effectiveOrganization,
-          t
-        );
+        const authFailure = await handleAuthenticationFailure(error, t);
         if (authFailure) {
           return authFailure;
         }
@@ -236,9 +211,7 @@ export async function sendPassword(
   user = userResponse.user;
 
   if (!loginSettings) {
-    loginSettings = await getLoginSettings({
-      organization: command.organization ?? session.factors?.user?.organizationId,
-    });
+    loginSettings = await getLoginSettings();
   }
 
   if (!session?.factors?.user?.id) {
@@ -247,16 +220,13 @@ export async function sendPassword(
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
-  const expirySettings = await getPasswordExpirySettings({
-    orgId: command.organization ?? session.factors?.user?.organizationId,
-  });
+  const expirySettings = await getPasswordExpirySettings();
 
   // check if the user has to change password first
   const passwordChangedCheck = checkPasswordChangeRequired(
     expirySettings,
     session,
     humanUser,
-    command.organization,
     command.requestId
   );
 
@@ -270,12 +240,7 @@ export async function sendPassword(
   }
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -304,7 +269,6 @@ export async function sendPassword(
         {
           sessionId: session.id,
           requestId: command.requestId,
-          organization: command.organization ?? session.factors?.user?.organizationId,
         },
         loginSettings?.defaultRedirectUri
       );
@@ -324,7 +288,6 @@ export async function sendPassword(
       {
         sessionId: session.id,
         loginName: session.factors.user.loginName,
-        organization: session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri
     );
@@ -340,12 +303,7 @@ export async function sendPassword(
     return result;
   }
 
-  const mfaFactorCheck = await checkMFAFactors(
-    session,
-    loginSettings,
-    authMethods,
-    command.requestId
-  );
+  const mfaFactorCheck = await checkMFAFactors(authMethods, command.requestId);
 
   if (mfaFactorCheck && "redirect" in mfaFactorCheck) {
     return mfaFactorCheck;
@@ -362,7 +320,6 @@ export async function sendPassword(
       {
         sessionId: session.id,
         requestId: command.requestId,
-        organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri
     );
@@ -389,7 +346,6 @@ export async function sendPassword(
   const result = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
-      organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri
   );
@@ -455,7 +411,6 @@ export async function changePassword(command: { code?: string; userId: string; p
     const session = await loadMostRecentSession({
       sessionParams: {
         loginName: user.preferredLoginName,
-        organization: user.details?.resourceOwner,
       },
     }).catch(() => undefined);
 
