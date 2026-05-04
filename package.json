@@ -19,7 +19,7 @@
       "eslint",
       "prettier --check"
     ],
-    "*.{json,md,yaml}": [
+    "*.{json,md}": [
       "prettier --check"
     ]
   },
