@@ -3,21 +3,14 @@
  *--------------------------------------------*/
 
 import { NextResponse } from "next/server";
-import { Client } from "@zitadel/client";
-import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { createServiceForHost } from "@lib/service";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-export async function GET() {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
+import { getServiceForHost } from "@lib/service";
 
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function GET() {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const settings = await settingsService
     .getSecuritySettings({})

@@ -1,21 +1,18 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { Client, create, Duration } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
-import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import {
   OrganizationSchema,
   RequestContext,
   TextQueryMethod,
 } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { CreateCallbackRequest, OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { Checks, SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { ReturnEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ReturnPasswordResetCodeSchema } from "@zitadel/proto/zitadel/user/v2/password_pb";
@@ -27,7 +24,6 @@ import {
   SetPasswordRequest,
   SetPasswordRequestSchema,
   UpdateHumanUserRequest,
-  UserService,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -36,7 +32,7 @@ import { serverTranslation } from "@i18n/server";
 
 import { getUserAgent } from "./fingerprint";
 import { logMessage } from "./logger";
-import { createServiceForHost } from "./service";
+import { getServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
 
 const useCache = process.env.DEBUG !== "true";
@@ -48,17 +44,8 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
-export async function getLoginSettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getLoginSettings({ organization }: { organization?: string }) {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
@@ -68,14 +55,11 @@ export async function getLoginSettings({
 }
 
 export async function getSerializableLoginSettings({
-  serviceUrl,
   organizationId,
 }: {
-  serviceUrl: string;
   organizationId?: string;
 }) {
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: organizationId,
   }).then((obj) => getSerializableObject(obj));
 
@@ -86,11 +70,8 @@ export async function getSerializableLoginSettings({
   return loginSettings;
 }
 
-export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getSecuritySettings() {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
     .getSecuritySettings({})
@@ -99,17 +80,8 @@ export async function getSecuritySettings({ serviceUrl }: { serviceUrl: string }
   return useCache ? cacheWrapper(callback) : callback;
 }
 
-export async function getLockoutSettings({
-  serviceUrl,
-  orgId,
-}: {
-  serviceUrl: string;
-  orgId?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getLockoutSettings({ orgId }: { orgId?: string }) {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
     .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
@@ -121,17 +93,8 @@ export async function getLockoutSettings({
 /**
  * @security Requires authenticated session. Use protectedGetPasswordExpirySettings from lib/server/zitadel-protected.ts
  */
-export async function getPasswordExpirySettings({
-  serviceUrl,
-  orgId,
-}: {
-  serviceUrl: string;
-  orgId?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getPasswordExpirySettings({ orgId }: { orgId?: string }) {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
@@ -143,11 +106,8 @@ export async function getPasswordExpirySettings({
 /**
  * @security Requires authenticated session. Use protectedListIDPLinks from lib/server/zitadel-protected.ts
  */
-export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function listIDPLinks({ userId }: { userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.listIDPLinks({ userId }, {});
 }
@@ -155,26 +115,14 @@ export async function listIDPLinks({ serviceUrl, userId }: { serviceUrl: string;
 /**
  * @security Requires authenticated session. Returns cryptographic secret material. Use protectedRegisterTOTP from lib/server/zitadel-protected.ts
  */
-export async function registerTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function registerTOTP({ userId }: { userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function getPasswordComplexitySettings({
-  serviceUrl,
-  organization,
-}: {
-  serviceUrl: string;
-  organization?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function getPasswordComplexitySettings({ organization }: { organization?: string }) {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
@@ -187,18 +135,13 @@ export async function getPasswordComplexitySettings({
  * @security Creates authenticated session after auth checks pass. Internal use in auth flow.
  */
 export async function createSessionFromChecks({
-  serviceUrl,
   checks,
   lifetime,
 }: {
-  serviceUrl: string;
   checks: Checks;
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+  const sessionService = await getServiceForHost("SessionService");
 
   const userAgent = await getUserAgent();
 
@@ -209,24 +152,19 @@ export async function createSessionFromChecks({
  * @security Updates session state during auth flow. Internal use only.
  */
 export async function setSession({
-  serviceUrl,
   sessionId,
   sessionToken,
   challenges,
   checks,
   lifetime,
 }: {
-  serviceUrl: string;
   sessionId: string;
   sessionToken: string;
   challenges: RequestChallenges | undefined;
   checks?: Checks;
   lifetime: Duration;
 }) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+  const sessionService = await getServiceForHost("SessionService");
 
   return sessionService.setSession(
     {
@@ -245,18 +183,13 @@ export async function setSession({
  * @security Requires authenticated session tokens. Internal use only.
  */
 export async function getSession({
-  serviceUrl,
   sessionId,
   sessionToken,
 }: {
-  serviceUrl: string;
   sessionId: string;
   sessionToken: string;
 }) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+  const sessionService = await getServiceForHost("SessionService");
 
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
@@ -265,35 +198,26 @@ export async function getSession({
  * @security Requires authenticated session tokens. Logout operation.
  */
 export async function deleteSession({
-  serviceUrl,
   sessionId,
   sessionToken,
 }: {
-  serviceUrl: string;
   sessionId: string;
   sessionToken: string;
 }) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+  const sessionService = await getServiceForHost("SessionService");
 
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
 type ListSessionsCommand = {
-  serviceUrl: string;
   ids: string[];
 };
 
 /**
  * @security Internal use only. Lists sessions by their IDs.
  */
-export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
-  const sessionService: Client<typeof SessionService> = await createServiceForHost(
-    SessionService,
-    serviceUrl
-  );
+export async function listSessions({ ids }: ListSessionsCommand) {
+  const sessionService = await getServiceForHost("SessionService");
 
   return sessionService.listSessions(
     {
@@ -311,7 +235,6 @@ export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
 }
 
 type AddHumanUserData = {
-  serviceUrl: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -320,17 +243,13 @@ type AddHumanUserData = {
 };
 
 export async function addHumanUser({
-  serviceUrl,
   email,
   firstName,
   lastName,
   password,
   organization,
 }: AddHumanUserData) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   let addHumanUserRequest: AddHumanUserRequest = create(AddHumanUserRequestSchema, {
     email: {
@@ -362,17 +281,8 @@ export async function addHumanUser({
 /**
  * @security Requires authenticated session. Use protected wrapper from lib/server/zitadel-protected.ts
  */
-export async function updateHuman({
-  serviceUrl,
-  request,
-}: {
-  serviceUrl: string;
-  request: UpdateHumanUserRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function updateHuman({ request }: { request: UpdateHumanUserRequest }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.updateHumanUser(request);
 }
@@ -380,19 +290,8 @@ export async function updateHuman({
 /**
  * @security Requires authenticated session. Use protectedVerifyTOTPRegistration from lib/server/zitadel-protected.ts
  */
-export async function verifyTOTPRegistration({
-  serviceUrl,
-  code,
-  userId,
-}: {
-  serviceUrl: string;
-  code: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function verifyTOTPRegistration({ code, userId }: { code: string; userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
@@ -400,17 +299,13 @@ export async function verifyTOTPRegistration({
 /**
  * @security Requires authenticated session. Use protectedGetUserByID from lib/server/zitadel-protected.ts
  */
-export async function getUserByID({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function getUserByID({ userId }: { serviceUrl: string; userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.getUserByID({ userId }, {});
 }
 
 export async function sendEmailCodeWithReturn({
-  serviceUrl,
   userId,
 }: {
   serviceUrl: string;
@@ -424,16 +319,12 @@ export async function sendEmailCodeWithReturn({
     },
   });
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.sendEmailCode(medium, {});
 }
 
 type ListUsersCommand = {
-  serviceUrl: string;
   loginName?: string;
   userName?: string;
   email?: string;
@@ -442,7 +333,6 @@ type ListUsersCommand = {
 };
 
 export async function listUsers({
-  serviceUrl,
   loginName,
   userName,
   phone,
@@ -531,10 +421,7 @@ export async function listUsers({
     );
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.listUsers({ queries });
 }
@@ -585,7 +472,6 @@ const EmailQuery = (searchValue: string) =>
  * it searches users based on the loginName or userName and org suffix combination, and falls back to email and phone if no users are found
  *  */
 export async function searchUsers({
-  serviceUrl,
   searchValue,
   loginSettings,
   organizationId,
@@ -618,10 +504,7 @@ export async function searchUsers({
     );
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   const loginNameResult = await userService.listUsers({ queries });
 
@@ -704,17 +587,8 @@ export async function searchUsers({
   return { result: [] };
 }
 
-export async function getOrgsByDomain({
-  serviceUrl,
-  domain,
-}: {
-  serviceUrl: string;
-  domain: string;
-}) {
-  const orgService: Client<typeof OrganizationService> = await createServiceForHost(
-    OrganizationService,
-    serviceUrl
-  );
+export async function getOrgsByDomain({ domain }: { domain: string }) {
+  const orgService = await getServiceForHost("OrganizationService");
 
   return orgService.listOrganizations(
     {
@@ -732,18 +606,13 @@ export async function getOrgsByDomain({
 }
 
 export async function startIdentityProviderFlow({
-  serviceUrl,
   idpId,
   urls,
 }: {
-  serviceUrl: string;
   idpId: string;
   urls: RedirectURLsJson;
 }): Promise<string | null> {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService
     .startIdentityProviderIntent({
@@ -762,34 +631,21 @@ export async function startIdentityProviderFlow({
     });
 }
 
-export async function getAuthRequest({
-  serviceUrl,
-  authRequestId,
-}: {
-  serviceUrl: string;
-  authRequestId: string;
-}) {
-  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+export async function getAuthRequest({ authRequestId }: { authRequestId: string }) {
+  const oidcService = await getServiceForHost("OIDCService");
 
   return oidcService.getAuthRequest({
     authRequestId,
   });
 }
 
-export async function createCallback({
-  serviceUrl,
-  req,
-}: {
-  serviceUrl: string;
-  req: CreateCallbackRequest;
-}) {
-  const oidcService = await createServiceForHost(OIDCService, serviceUrl);
+export async function createCallback({ req }: { req: CreateCallbackRequest }) {
+  const oidcService = await getServiceForHost("OIDCService");
 
   return oidcService.createCallback(req);
 }
 
 export async function verifyEmail({
-  serviceUrl,
   userId,
   verificationCode,
 }: {
@@ -797,10 +653,7 @@ export async function verifyEmail({
   userId: string;
   verificationCode: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.verifyEmail(
     {
@@ -811,11 +664,8 @@ export async function verifyEmail({
   );
 }
 
-export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: string }) {
-  const idpService: Client<typeof IdentityProviderService> = await createServiceForHost(
-    IdentityProviderService,
-    serviceUrl
-  );
+export async function getIDPByID({ id }: { id: string }) {
+  const idpService = await getServiceForHost("IdentityProviderService");
 
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
@@ -825,7 +675,6 @@ export async function getIDPByID({ serviceUrl, id }: { serviceUrl: string; id: s
  * This allows sending the code via GC Notify instead of Zitadel's built-in email.
  */
 export async function passwordResetWithReturn({
-  serviceUrl,
   userId,
 }: {
   serviceUrl: string;
@@ -833,10 +682,7 @@ export async function passwordResetWithReturn({
 }): Promise<{ verificationCode?: string }> {
   const medium = create(ReturnPasswordResetCodeSchema, {});
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.passwordReset(
     {
@@ -851,12 +697,10 @@ export async function passwordResetWithReturn({
 }
 
 export async function setUserPassword({
-  serviceUrl,
   userId,
   password,
   code,
 }: {
-  serviceUrl: string;
   userId: string;
   password: string;
   code?: string;
@@ -878,10 +722,7 @@ export async function setUserPassword({
     };
   }
 
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
@@ -893,17 +734,8 @@ export async function setUserPassword({
   });
 }
 
-export async function setPassword({
-  serviceUrl,
-  payload,
-}: {
-  serviceUrl: string;
-  payload: SetPasswordRequest;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function setPassword({ payload }: { payload: SetPasswordRequest }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.setPassword(payload, {});
 }
@@ -912,7 +744,6 @@ export async function setPassword({
  * @security Requires authenticated session. Returns cryptographic challenge data. Use protectedRegisterU2F from lib/server/zitadel-protected.ts
  */
 export async function registerU2F({
-  serviceUrl,
   userId,
   domain,
 }: {
@@ -920,10 +751,7 @@ export async function registerU2F({
   userId: string;
   domain: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.registerU2F({
     userId,
@@ -935,16 +763,12 @@ export async function registerU2F({
  * @security Requires authenticated session. Use protectedVerifyU2FRegistration from lib/server/zitadel-protected.ts
  */
 export async function verifyU2FRegistration({
-  serviceUrl,
   request,
 }: {
   serviceUrl: string;
   request: VerifyU2FRegistrationRequest;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.verifyU2FRegistration(request, {});
 }
@@ -957,7 +781,6 @@ export async function verifyU2FRegistration({
  * @returns the active identity providers
  */
 export async function getActiveIdentityProviders({
-  serviceUrl,
   orgId,
   linking_allowed,
 }: {
@@ -969,10 +792,7 @@ export async function getActiveIdentityProviders({
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+  const settingsService = await getServiceForHost("SettingsService");
 
   return settingsService.getActiveIdentityProviders(props, {});
 }
@@ -981,16 +801,12 @@ export async function getActiveIdentityProviders({
  * @security Requires authenticated session. Use protectedListAuthenticationMethodTypes from lib/server/zitadel-protected.ts
  */
 export async function listAuthenticationMethodTypes({
-  serviceUrl,
   userId,
 }: {
   serviceUrl: string;
   userId: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.listAuthenticationMethodTypes({
     userId,
@@ -1029,17 +845,8 @@ export function createServerTransport(token: string, baseUrl: string) {
  *
  * @security Requires authenticated session. Use protectedGetTOTPStatus from lib/server/zitadel-protected.ts
  */
-export async function getTOTPStatus({
-  serviceUrl,
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function getTOTPStatus({ userId }: { userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   const authMethodsResponse = await userService.listAuthenticationMethodTypes({ userId });
   const authMethodTypes = authMethodsResponse.authMethodTypes ?? [];
@@ -1050,11 +857,8 @@ export async function getTOTPStatus({
 /**
  * @security Requires authenticated session. Use protectedGetU2FList from lib/server/zitadel-protected.ts
  */
-export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function getU2FList({ userId }: { userId: string }) {
+  const userService = await getServiceForHost("UserService");
   const authFactorsResponse = await userService.listAuthenticationFactors({ userId });
 
   return authFactorsResponse.result
@@ -1072,7 +876,6 @@ export async function getU2FList({ serviceUrl, userId }: { serviceUrl: string; u
  * @security Requires authenticated session. Removing MFA devices is sensitive. Use protectedRemoveU2F from lib/server/zitadel-protected.ts
  */
 export async function removeU2F({
-  serviceUrl,
   userId,
   u2fId,
 }: {
@@ -1080,10 +883,7 @@ export async function removeU2F({
   userId: string;
   u2fId: string;
 }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+  const userService = await getServiceForHost("UserService");
 
   return userService.removeU2F({
     userId,
@@ -1094,11 +894,8 @@ export async function removeU2F({
 /**
  * @security Requires authenticated session. Removing MFA methods is sensitive. Use protectedRemoveTOTP from lib/server/zitadel-protected.ts
  */
-export async function removeTOTP({ serviceUrl, userId }: { serviceUrl: string; userId: string }) {
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl
-  );
+export async function removeTOTP({ userId }: { userId: string }) {
+  const userService = await getServiceForHost("UserService");
 
   return userService.removeTOTP({
     userId,
