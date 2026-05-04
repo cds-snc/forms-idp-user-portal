@@ -17,10 +17,10 @@
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
       "eslint",
-      "prettier --fix"
+      "prettier --write"
     ],
     "*.{json,md,yaml}": [
-      "prettier --fix"
+      "prettier --write"
     ]
   },
   "scripts": {

@@ -299,7 +299,7 @@ export async function verifyTOTPRegistration({ code, userId }: { code: string; u
 /**
  * @security Requires authenticated session. Use protectedGetUserByID from lib/server/zitadel-protected.ts
  */
-export async function getUserByID({ userId }: { serviceUrl: string; userId: string }) {
+export async function getUserByID({ userId }: { userId: string }) {
   const userService = await getServiceForHost("UserService");
 
   return userService.getUserByID({ userId }, {});
@@ -308,7 +308,6 @@ export async function getUserByID({ userId }: { serviceUrl: string; userId: stri
 export async function sendEmailCodeWithReturn({
   userId,
 }: {
-  serviceUrl: string;
   userId: string;
 }): Promise<{ verificationCode?: string }> {
   const medium = create(SendEmailCodeRequestSchema, {
@@ -427,7 +426,6 @@ export async function listUsers({
 }
 
 export type SearchUsersCommand = {
-  serviceUrl: string;
   searchValue: string;
   loginSettings: LoginSettings;
   organizationId?: string;
@@ -649,7 +647,6 @@ export async function verifyEmail({
   userId,
   verificationCode,
 }: {
-  serviceUrl: string;
   userId: string;
   verificationCode: string;
 }) {
@@ -677,7 +674,6 @@ export async function getIDPByID({ id }: { id: string }) {
 export async function passwordResetWithReturn({
   userId,
 }: {
-  serviceUrl: string;
   userId: string;
 }): Promise<{ verificationCode?: string }> {
   const medium = create(ReturnPasswordResetCodeSchema, {});
@@ -743,14 +739,7 @@ export async function setPassword({ payload }: { payload: SetPasswordRequest }) 
 /**
  * @security Requires authenticated session. Returns cryptographic challenge data. Use protectedRegisterU2F from lib/server/zitadel-protected.ts
  */
-export async function registerU2F({
-  userId,
-  domain,
-}: {
-  serviceUrl: string;
-  userId: string;
-  domain: string;
-}) {
+export async function registerU2F({ userId, domain }: { userId: string; domain: string }) {
   const userService = await getServiceForHost("UserService");
 
   return userService.registerU2F({
@@ -765,7 +754,6 @@ export async function registerU2F({
 export async function verifyU2FRegistration({
   request,
 }: {
-  serviceUrl: string;
   request: VerifyU2FRegistrationRequest;
 }) {
   const userService = await getServiceForHost("UserService");
@@ -784,7 +772,6 @@ export async function getActiveIdentityProviders({
   orgId,
   linking_allowed,
 }: {
-  serviceUrl: string;
   orgId?: string;
   linking_allowed?: boolean;
 }) {
@@ -800,12 +787,7 @@ export async function getActiveIdentityProviders({
 /**
  * @security Requires authenticated session. Use protectedListAuthenticationMethodTypes from lib/server/zitadel-protected.ts
  */
-export async function listAuthenticationMethodTypes({
-  userId,
-}: {
-  serviceUrl: string;
-  userId: string;
-}) {
+export async function listAuthenticationMethodTypes({ userId }: { userId: string }) {
   const userService = await getServiceForHost("UserService");
 
   return userService.listAuthenticationMethodTypes({
@@ -875,14 +857,7 @@ export async function getU2FList({ userId }: { userId: string }) {
 /**
  * @security Requires authenticated session. Removing MFA devices is sensitive. Use protectedRemoveU2F from lib/server/zitadel-protected.ts
  */
-export async function removeU2F({
-  userId,
-  u2fId,
-}: {
-  serviceUrl: string;
-  userId: string;
-  u2fId: string;
-}) {
+export async function removeU2F({ userId, u2fId }: { userId: string; u2fId: string }) {
   const userService = await getServiceForHost("UserService");
 
   return userService.removeU2F({
