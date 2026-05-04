@@ -28,7 +28,6 @@ import { serverTranslation } from "@i18n/server";
 
 import { logMessage } from "../../lib/logger";
 import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
@@ -37,11 +36,8 @@ import { buildUrlWithRequestId } from "../utils";
 import { checkMFAFactors } from "../verify-helper";
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   try {
     const session = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -53,7 +49,6 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
     }
 
     await verifyTOTPRegistration({
-      serviceUrl,
       code,
       userId: session.factors.user.id,
     });
@@ -75,10 +70,7 @@ type VerifyUserByEmailCommand = {
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const { t } = await serverTranslation("verify");
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const verifyResponse = await verifyEmail({
-    serviceUrl,
     userId: command.userId,
     verificationCode: command.code,
   }).catch((error) => {
@@ -96,7 +88,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   let session: Session | undefined;
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: command.userId,
   });
 
@@ -115,7 +106,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   if (sessionCookie) {
     session = await getSession({
-      serviceUrl,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -127,7 +117,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // load auth methods for user
   const authMethodResponse = await listAuthenticationMethodTypes({
-    serviceUrl,
     userId: user.userId,
   });
 
@@ -194,13 +183,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: user.details?.resourceOwner,
   });
 
   // redirect to mfa factor if user has one, or redirect to set one up
   const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
     session,
     loginSettings,
     authMethodResponse.authMethodTypes,
@@ -240,11 +227,8 @@ type SendVerificationEmailCommand = {
 export async function sendVerificationEmail(command: SendVerificationEmailCommand) {
   const { t } = await serverTranslation("verify");
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   // Get verification code from Zitadel (returnCode mode - does not send email)
   const codeResponse = await sendEmailCodeWithReturn({
-    serviceUrl,
     userId: command.userId,
   }).catch((error) => {
     logMessage.debug({ error, message: "Failed to get verification code" });
@@ -261,7 +245,6 @@ export async function sendVerificationEmail(command: SendVerificationEmailComman
 
   // Get user's email address
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: command.userId,
   });
 
@@ -310,11 +293,8 @@ type SendPasswordChangedEmailCommand = {
 export async function sendPasswordChangedEmail(command: SendPasswordChangedEmailCommand) {
   const { t } = await serverTranslation("password");
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   // Get user's email address
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: command.userId,
   });
 

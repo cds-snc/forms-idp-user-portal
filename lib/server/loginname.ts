@@ -21,7 +21,6 @@ import { serverTranslation } from "@i18n/server";
  *--------------------------------------------*/
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { logMessage } from "../logger";
-import { getServiceUrlFromHeaders } from "../service-url";
 import { buildUrlWithRequestId } from "../utils";
 import {
   getActiveIdentityProviders,
@@ -48,12 +47,9 @@ export type SendLoginnameCommand = {
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { t } = await serverTranslation("loginname");
 
   const loginSettingsByContext = await getLoginSettings({
-    serviceUrl,
     organization: command.organization,
   });
 
@@ -62,7 +58,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   const searchUsersRequest: SearchUsersCommand = {
-    serviceUrl,
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -101,7 +96,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     let identityProviders: IDPLink[] = [];
     if (userId) {
       identityProviders = await listIDPLinks({
-        serviceUrl,
         userId,
       }).then((resp) => {
         return resp.result;
@@ -111,7 +105,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
     if (identityProviders.length === 0) {
       const activeIdps = await getActiveIdentityProviders({
-        serviceUrl,
         orgId: organization,
       }).then((resp) => {
         return resp.identityProviders;
@@ -119,7 +112,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       // If exactly one active IDP exists in the organization, redirect to it
       if (activeIdps.length === 1) {
-        const { serviceUrl } = await getServiceUrlFromHeaders();
         const host = await getOriginalHost();
 
         const identityProviderType = activeIdps[0].type;
@@ -142,7 +134,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
         const url = await startIdentityProviderFlow({
-          serviceUrl,
           idpId: activeIdps[0].id,
           urls: {
             successUrl:
@@ -163,13 +154,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     if (identityProviders.length === 1) {
-      const { serviceUrl } = await getServiceUrlFromHeaders();
       const host = await getOriginalHost();
 
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID({
-        serviceUrl,
         id: identityProviderId,
       });
 
@@ -199,7 +188,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
       const url = await startIdentityProviderFlow({
-        serviceUrl,
         idpId: idp.id,
         urls: {
           successUrl:
@@ -227,7 +215,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const userId = users[0].userId;
 
     const userLoginSettings = await getLoginSettings({
-      serviceUrl,
       organization: user.details?.resourceOwner,
     });
 
@@ -292,7 +279,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const organization = command.organization ?? session.factors?.user?.organizationId;
 
     const methods = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId: session.factors?.user?.id,
     });
 
@@ -434,7 +420,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // this just returns orgs where the suffix is set as primary domain
     const orgs = await getOrgsByDomain({
-      serviceUrl,
       domain: suffix,
     });
 
@@ -443,7 +428,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (orgToCheckForDiscovery) {
       const orgLoginSettings = await getLoginSettings({
-        serviceUrl,
         organization: orgToCheckForDiscovery,
       });
 

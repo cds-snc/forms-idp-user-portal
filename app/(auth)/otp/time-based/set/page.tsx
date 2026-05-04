@@ -13,7 +13,6 @@ import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { registerTOTP } from "@lib/zitadel";
 import { getZitadelUiError } from "@lib/zitadel-errors";
@@ -53,10 +52,7 @@ export default async function Page(props: {
   const { method } = params;
   const { t } = await serverTranslation("otp");
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const session = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
     organization,
@@ -72,7 +68,6 @@ export default async function Page(props: {
 
     try {
       const resp = await registerTOTP({
-        serviceUrl,
         userId,
       });
 

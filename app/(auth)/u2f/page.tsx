@@ -11,7 +11,6 @@ import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
 import { SearchParams } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
@@ -31,10 +30,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
   const safeRedirect = getSafeRedirectUrl(redirectParam);
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
@@ -49,7 +45,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     redirect(authCheck.redirect || "/password");
   }
 
-  const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
+  const sessionFactors = await loadSessionById(sessionId, organization);
 
   if (!sessionFactors) {
     logMessage.debug({

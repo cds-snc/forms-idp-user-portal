@@ -9,7 +9,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  * Internal Aliases
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
@@ -32,11 +31,9 @@ export default async function Page() {
     redirect("/password/reset");
   }
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.U2F)) {
     redirect("/password/reset/verify");

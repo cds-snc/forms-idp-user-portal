@@ -10,7 +10,6 @@ import { redirect } from "next/navigation";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { checkSessionFactorValidity } from "@lib/session";
 import { getSerializableLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
@@ -27,7 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   let sessionId: string | undefined;
   let loginName: string | undefined;
   let organization: string | undefined;
@@ -40,7 +38,6 @@ export default async function Page() {
   }
 
   const sessionFactors = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
     organization,
@@ -49,7 +46,6 @@ export default async function Page() {
   });
 
   const loginSettings = await getSerializableLoginSettings({
-    serviceUrl,
     organizationId: sessionFactors.factors?.user?.organizationId,
   });
 

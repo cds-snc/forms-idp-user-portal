@@ -11,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -33,10 +32,7 @@ export default async function Page() {
     redirect("/password");
   }
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
@@ -47,8 +43,8 @@ export default async function Page() {
   }
 
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
   const canUseTotp = sessionData.authMethods?.includes(AuthenticationMethodType.TOTP) ?? false;
   const canUseU2F = sessionData.authMethods?.includes(AuthenticationMethodType.U2F) ?? false;

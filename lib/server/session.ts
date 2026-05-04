@@ -24,7 +24,6 @@ import {
 } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import {
   Cookie,
   getAllSessionCookieIds,
@@ -39,19 +38,11 @@ import { getOriginalHost } from "./host";
 
 /**
  * Load sessions by their IDs
- * @param serviceUrl - The Zitadel service URL
  * @param ids - Array of session IDs to load
  * @returns Array of Session objects
  */
-async function loadSessionsByIds({
-  serviceUrl,
-  ids,
-}: {
-  serviceUrl: string;
-  ids: string[];
-}): Promise<Session[]> {
+async function loadSessionsByIds({ ids }: { ids: string[] }): Promise<Session[]> {
   const response = await listSessions({
-    serviceUrl,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -60,22 +51,18 @@ async function loadSessionsByIds({
 
 /**
  * Load sessions for all cookie IDs
- * @param serviceUrl - The Zitadel service URL
  * @param cleanup - Whether to filter out expired sessions (default: true)
  * @returns Array of Session objects
  */
 export async function loadSessionsFromCookies({
-  serviceUrl,
   cleanup = true,
 }: {
-  serviceUrl: string;
   cleanup?: boolean;
-}): Promise<Session[]> {
+} = {}): Promise<Session[]> {
   const cookieIds = await getAllSessionCookieIds(cleanup);
 
   if (cookieIds && cookieIds.length) {
     return loadSessionsByIds({
-      serviceUrl,
       ids: cookieIds.filter((id) => !!id) as string[],
     });
   }
@@ -86,17 +73,14 @@ export async function loadSessionsFromCookies({
 /**
  * Load sessions with their corresponding cookies
  * Useful when you need both Session objects and cookie tokens (e.g., for OIDC callbacks)
- * @param serviceUrl - The Zitadel service URL
  * @param cleanup - Whether to filter out expired sessions (default: true)
  * @returns Object containing both sessions and sessionCookies arrays
  */
 export async function loadSessionsWithCookies({
-  serviceUrl,
   cleanup = true,
 }: {
-  serviceUrl: string;
   cleanup?: boolean;
-}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
+} = {}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
   const sessionCookies = await getAllSessions(cleanup);
 
   if (!sessionCookies.length) {
@@ -104,7 +88,7 @@ export async function loadSessionsWithCookies({
   }
 
   const ids = sessionCookies.map((s) => s.id).filter((id) => !!id);
-  const sessions = await loadSessionsByIds({ serviceUrl, ids });
+  const sessions = await loadSessionsByIds({ ids });
 
   return { sessions, sessionCookies };
 }
@@ -146,12 +130,9 @@ export async function continueWithSession({
   redirect,
   ...session
 }: ContinueWithSessionCommand) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { t } = await serverTranslation("error");
 
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: session.factors?.user?.organizationId,
   });
 
@@ -208,7 +189,6 @@ export async function updateSession(options: UpdateSessionCommand) {
       };
     }
 
-    const { serviceUrl } = await getServiceUrlFromHeaders();
     const host = await getOriginalHost();
 
     if (!host) {
@@ -222,7 +202,6 @@ export async function updateSession(options: UpdateSessionCommand) {
     }
 
     const loginSettings = await getLoginSettings({
-      serviceUrl,
       organization,
     });
 
@@ -272,7 +251,6 @@ export async function updateSession(options: UpdateSessionCommand) {
     let authMethods;
     if (checks && checks.password && session.factors?.user?.id) {
       const response = await listAuthenticationMethodTypes({
-        serviceUrl,
         userId: session.factors.user.id,
       });
       if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -307,19 +285,16 @@ type ClearSessionOptions = {
 };
 
 async function clearSession(options: ClearSessionOptions) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { sessionId } = options;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
-    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
 
-  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const securitySettings = await getSecuritySettings();
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {

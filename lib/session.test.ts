@@ -24,7 +24,6 @@ describe("isSessionValid", () => {
 
     await expect(
       isSessionValid({
-        serviceUrl: "https://example.com",
         session: validSession,
       })
     ).resolves.toBe(false);

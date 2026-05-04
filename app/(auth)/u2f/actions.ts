@@ -13,7 +13,6 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getSessionCookieById, getSessionCookieByLoginName } from "@lib/cookies";
 import { setSessionAndUpdateCookie } from "@lib/server/cookie";
 import { continueWithSession } from "@lib/server/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getLoginSettings } from "@lib/zitadel";
 
 import { U2F_ERRORS } from "./u2f-errors";
@@ -35,8 +34,6 @@ export async function verifyU2FLogin({
   requestId,
   redirect,
 }: VerifyU2FLoginCommand) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   let sessionCookie;
   if (sessionId) {
     sessionCookie = await getSessionCookieById({ sessionId, organization });
@@ -50,7 +47,6 @@ export async function verifyU2FLogin({
 
   // Get login settings to determine lifetime
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization,
   });
 

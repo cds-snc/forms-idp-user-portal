@@ -10,7 +10,6 @@ import { redirect } from "next/navigation";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel, hasStrongMFA } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -25,12 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { sessionId, loginName, organization } = await getSessionCredentials();
 
   // Page-level authentication check - defense in depth
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
@@ -45,7 +42,6 @@ export default async function Page() {
   }
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
     organization,
   });
 

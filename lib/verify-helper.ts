@@ -75,7 +75,6 @@ export function checkEmailVerification(
 }
 
 export async function checkMFAFactors(
-  serviceUrl: string,
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],

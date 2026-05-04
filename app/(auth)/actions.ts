@@ -13,7 +13,6 @@ import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
@@ -39,8 +38,6 @@ type SubmitLoginCommand = {
 export const submitLoginForm = async (
   command: SubmitLoginCommand
 ): Promise<{ error: string } | { redirect: string }> => {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { t } = await serverTranslation("start");
 
   const validationResult = await validateUsernameAndPassword(command);
@@ -54,7 +51,6 @@ export const submitLoginForm = async (
 
   // Get login settings for organization context
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: command.organization,
   });
 
@@ -85,7 +81,6 @@ export const submitLoginForm = async (
     // Log failed attempt count if available (for monitoring)
     if ("failedAttempts" in errorDetail && errorDetail.failedAttempts) {
       const lockoutSettings = await getLockoutSettings({
-        serviceUrl,
         orgId: command.organization,
       });
 
@@ -116,7 +111,6 @@ export const submitLoginForm = async (
 
   // Fetch user details
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: session.factors.user.id,
   });
 
@@ -148,7 +142,6 @@ export const submitLoginForm = async (
 
   // Get authentication methods for MFA check
   const response = await listAuthenticationMethodTypes({
-    serviceUrl,
     userId: session.factors.user.id,
   });
 
@@ -161,7 +154,6 @@ export const submitLoginForm = async (
 
   // Check MFA requirements and redirect appropriately
   const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
     session,
     loginSettings,
     authMethods,

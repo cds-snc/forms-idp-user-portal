@@ -11,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
@@ -33,11 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   // Page-level authentication check - defense in depth
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
@@ -48,8 +44,8 @@ export default async function Page() {
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
   if (!sessionFactors) {
     logMessage.debug({

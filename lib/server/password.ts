@@ -31,7 +31,6 @@ import {
 import { serverTranslation } from "@i18n/server";
 
 import { logMessage } from "../../lib/logger";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import { createServerTransport } from "../../lib/zitadel";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
@@ -83,7 +82,6 @@ function didPasswordChangeSucceed(result: unknown): boolean {
  */
 async function handleAuthenticationFailure(
   error: unknown,
-  serviceUrl: string,
   organization: string | undefined,
   t: (key: string, options?: Record<string, string>) => string
 ): Promise<{ error: string } | null> {
@@ -92,7 +90,6 @@ async function handleAuthenticationFailure(
   }
 
   const lockoutSettings = await getLockoutSettings({
-    serviceUrl,
     orgId: organization,
   });
 
@@ -123,7 +120,6 @@ type UpdateSessionCommand = {
 export async function sendPassword(
   command: UpdateSessionCommand
 ): Promise<{ error: string } | { redirect: string }> {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
 
   let sessionCookie = await getSessionCookieByLoginName({
@@ -142,7 +138,6 @@ export async function sendPassword(
 
   if (sessionCookie) {
     loginSettings = await getLoginSettings({
-      serviceUrl,
       organization: sessionCookie.organization,
     });
 
@@ -169,7 +164,7 @@ export async function sendPassword(
       // second attempt and could lock the account sooner than intended.
       const authFailure = await handleAuthenticationFailure(
         error,
-        serviceUrl,
+
         command.organization,
         t
       );
@@ -189,12 +184,10 @@ export async function sendPassword(
     const effectiveOrganization = cookieOrganization ?? command.organization;
 
     loginSettings = await getLoginSettings({
-      serviceUrl,
       organization: effectiveOrganization,
     });
 
     const users = await listUsers({
-      serviceUrl,
       loginName: command.loginName,
       organizationId: effectiveOrganization,
     });
@@ -216,7 +209,7 @@ export async function sendPassword(
       } catch (error: unknown) {
         const authFailure = await handleAuthenticationFailure(
           error,
-          serviceUrl,
+
           effectiveOrganization,
           t
         );
@@ -236,7 +229,6 @@ export async function sendPassword(
   }
 
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: session.factors.user.id,
   });
 
@@ -248,7 +240,6 @@ export async function sendPassword(
 
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
-      serviceUrl,
       organization: command.organization ?? session.factors?.user?.organizationId,
     });
   }
@@ -260,7 +251,6 @@ export async function sendPassword(
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
   const expirySettings = await getPasswordExpirySettings({
-    serviceUrl,
     orgId: command.organization ?? session.factors?.user?.organizationId,
   });
 
@@ -298,7 +288,6 @@ export async function sendPassword(
   let authMethods;
   if (command.checks && command.checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -355,7 +344,6 @@ export async function sendPassword(
   }
 
   const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
     session,
     loginSettings,
     authMethods,
@@ -420,7 +408,6 @@ export async function sendPassword(
 
 // this function lets users with code set a password or users with valid User Verification Check
 export async function changePassword(command: { code?: string; userId: string; password: string }) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
   const normalizedCode = command.code?.replace(/\s+/g, "").trim();
 
@@ -430,7 +417,6 @@ export async function changePassword(command: { code?: string; userId: string; p
 
   // check for init state
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: command.userId,
   }).catch(() => undefined);
 
@@ -448,7 +434,6 @@ export async function changePassword(command: { code?: string; userId: string; p
   // check if the user has no password set in order to set a password
   if (!normalizedCode) {
     const authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId,
     });
 
@@ -471,7 +456,6 @@ export async function changePassword(command: { code?: string; userId: string; p
   // that just completed a strong recovery factor for this user.
   if (normalizedCode) {
     const session = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: {
         loginName: user.preferredLoginName,
         organization: user.details?.resourceOwner,
@@ -489,7 +473,6 @@ export async function changePassword(command: { code?: string; userId: string; p
 
   try {
     const result = await setUserPassword({
-      serviceUrl,
       userId,
       password: command.password,
       code: normalizedCode,
@@ -527,7 +510,6 @@ export async function checkSessionAndSetPassword({
   sessionId,
   password,
 }: CheckSessionAndSetPasswordCommand) {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const { t } = await serverTranslation("password");
 
   let sessionCookie;
@@ -541,7 +523,6 @@ export async function checkSessionAndSetPassword({
   let session;
   try {
     const sessionResponse = await getSession({
-      serviceUrl,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     });
@@ -566,7 +547,6 @@ export async function checkSessionAndSetPassword({
   let authmethods;
   try {
     authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId: session.factors.user.id,
     });
   } catch (error) {
@@ -581,7 +561,6 @@ export async function checkSessionAndSetPassword({
   let loginSettings;
   try {
     loginSettings = await getLoginSettings({
-      serviceUrl,
       organization: session.factors.user.organizationId,
     });
   } catch (error) {
@@ -596,7 +575,7 @@ export async function checkSessionAndSetPassword({
     logMessage.info(
       "Setting password via service account due to enforced MFA without existing MFA methods"
     );
-    return setPassword({ serviceUrl, payload })
+    return setPassword({ payload })
       .then(async (result) => {
         // Send password changed email notification
         if (didPasswordChangeSucceed(result)) {

@@ -133,9 +133,6 @@ export async function proxy(request: NextRequest) {
     return responseWithCSP(NextResponse.next({ request: { headers: requestHeaders } }), csp);
   }
 
-  // Get service URL for auth checks
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   // Determine required authentication level for this route
   const requiredLevel = getRequiredAuthLevel(pathname);
 
@@ -146,7 +143,6 @@ export async function proxy(request: NextRequest) {
 
   // Check authentication level (loginName will be extracted from session cookie)
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     requiredLevel,
     undefined, // loginName extracted from session cookie
     ZITADEL_ORGANIZATION
@@ -171,11 +167,7 @@ export async function proxy(request: NextRequest) {
       if (hasPassword) {
         if (isMfaSetupRoute(pathname) && session?.id) {
           try {
-            const setupSession = await loadSessionById(
-              serviceUrl,
-              session.id,
-              ZITADEL_ORGANIZATION
-            );
+            const setupSession = await loadSessionById(session.id, ZITADEL_ORGANIZATION);
 
             if (requiresStrongMfaSetupVerification(setupSession)) {
               const verifyUrl = request.nextUrl.clone();

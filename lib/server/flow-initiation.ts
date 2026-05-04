@@ -63,7 +63,6 @@ const gotoLogin = ({
 };
 
 export interface FlowInitiationParams {
-  serviceUrl: string;
   requestId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
@@ -71,17 +70,14 @@ export interface FlowInitiationParams {
 }
 
 async function safeFindValidSession({
-  serviceUrl,
   sessions,
   authRequest,
 }: {
-  serviceUrl: string;
   sessions: Session[];
   authRequest?: Awaited<ReturnType<typeof getAuthRequest>>["authRequest"];
 }): Promise<Session | undefined> {
   try {
     return await findValidSession({
-      serviceUrl,
       sessions,
       authRequest,
     });
@@ -97,12 +93,11 @@ async function safeFindValidSession({
 export async function handleOIDCFlowInitiation(
   params: FlowInitiationParams
 ): Promise<NextResponse> {
-  const { serviceUrl, requestId, sessions, sessionCookies, request } = params;
+  const { requestId, sessions, sessionCookies, request } = params;
 
   const authRequestId = toAuthRequestId(requestId);
 
   const { authRequest } = await getAuthRequest({
-    serviceUrl,
     authRequestId,
   });
 
@@ -130,7 +125,6 @@ export async function handleOIDCFlowInitiation(
         if (orgDomain) {
           logMessage.debug(`Extracted org domain for OIDC requestId: ${requestId}`);
           const orgs = await getOrgsByDomain({
-            serviceUrl,
             domain: orgDomain,
           });
 
@@ -146,7 +140,6 @@ export async function handleOIDCFlowInitiation(
       idpId = matched?.[1] ?? "";
 
       const identityProviders = await getActiveIdentityProviders({
-        serviceUrl,
         orgId: organization ? organization : undefined,
       }).then((resp) => {
         return resp.identityProviders;
@@ -181,7 +174,6 @@ export async function handleOIDCFlowInitiation(
         }
 
         let url: string | null = await startIdentityProviderFlow({
-          serviceUrl,
           idpId,
           urls: {
             successUrl: `${origin}/idp/${provider}/process?` + new URLSearchParams(params),
@@ -220,7 +212,6 @@ export async function handleOIDCFlowInitiation(
     // Otherwise, send the user to login to establish a fresh session.
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
       const selectedSession = await safeFindValidSession({
-        serviceUrl,
         sessions,
         authRequest,
       });
@@ -270,7 +261,6 @@ export async function handleOIDCFlowInitiation(
       // If no valid reusable session is found, return an interaction-required style error response.
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       const selectedSession = await safeFindValidSession({
-        serviceUrl,
         sessions,
         authRequest,
       });
@@ -296,7 +286,6 @@ export async function handleOIDCFlowInitiation(
       };
 
       const { callbackUrl } = await createCallback({
-        serviceUrl,
         req: create(CreateCallbackRequestSchema, {
           authRequestId,
           callbackKind: {
@@ -314,7 +303,6 @@ export async function handleOIDCFlowInitiation(
       // fall back to interactive login with requestId context.
     } else {
       const selectedSession = await safeFindValidSession({
-        serviceUrl,
         sessions,
         authRequest,
       });
@@ -342,7 +330,6 @@ export async function handleOIDCFlowInitiation(
 
       try {
         const { callbackUrl } = await createCallback({
-          serviceUrl,
           req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {

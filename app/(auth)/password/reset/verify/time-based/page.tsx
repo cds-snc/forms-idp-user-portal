@@ -11,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject } from "@lib/utils";
@@ -37,20 +36,18 @@ export default async function Page() {
   }
 
   const _headers = await headers();
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/password/reset/verify");
   }
 
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: organization ?? sessionData.factors?.user?.organizationId,
   }).then((obj) => getSerializableObject(obj));
 

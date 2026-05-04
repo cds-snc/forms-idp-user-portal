@@ -35,13 +35,11 @@ type AuthCheckResult = {
  * Safe wrapper around loadMostRecentSession that returns null instead of throwing
  */
 async function getSessionFromCookies(
-  serviceUrl: string,
   loginName?: string,
   organization?: string
 ): Promise<Session | null> {
   try {
     const session = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: { loginName, organization },
     });
     return session || null;
@@ -149,7 +147,6 @@ export function requiresStrongMfaSetupVerification(
  * Check if authentication level is satisfied
  */
 export async function checkAuthenticationLevel(
-  serviceUrl: string,
   requiredLevel: AuthLevel,
   loginName?: string,
   organization?: string
@@ -160,7 +157,7 @@ export async function checkAuthenticationLevel(
   }
 
   // Get session from cookies (non-throwing)
-  const session = await getSessionFromCookies(serviceUrl, loginName, organization);
+  const session = await getSessionFromCookies(loginName, organization);
 
   // Basic session check - just verify cookie exists
   if (requiredLevel === AuthLevel.BASIC_SESSION) {

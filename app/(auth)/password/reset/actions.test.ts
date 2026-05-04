@@ -204,7 +204,6 @@ describe("submitUserNameForm", () => {
 
     expect(response).toEqual({ redirect: "/password/reset/verify?requestId=req-123" });
     expect(listUsers).toHaveBeenCalledWith({
-      serviceUrl: "https://idp.example",
       loginName: "person@canada.ca",
       organizationId: "org-1",
     });

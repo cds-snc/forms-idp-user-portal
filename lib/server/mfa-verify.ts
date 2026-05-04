@@ -7,7 +7,6 @@ import { loadSessionById, loadSessionByLoginname, type SessionWithAuthData } fro
 import { AuthLevel, checkAuthenticationLevel } from "./route-protection";
 
 type LoadMfaVerificationSessionParams = {
-  serviceUrl: string;
   pageName: string;
   missingSessionRedirect: string;
 };
@@ -20,7 +19,6 @@ type MfaVerificationSession = {
 };
 
 export async function loadMfaVerificationSession({
-  serviceUrl,
   pageName,
   missingSessionRedirect,
 }: LoadMfaVerificationSessionParams): Promise<MfaVerificationSession> {
@@ -35,7 +33,6 @@ export async function loadMfaVerificationSession({
   }
 
   const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
     AuthLevel.PASSWORD_REQUIRED,
     loginName,
     organization
@@ -54,8 +51,8 @@ export async function loadMfaVerificationSession({
 
   try {
     sessionData = sessionId
-      ? await loadSessionById(serviceUrl, sessionId, organization)
-      : await loadSessionByLoginname(serviceUrl, loginName, organization);
+      ? await loadSessionById(sessionId, organization)
+      : await loadSessionByLoginname(loginName, organization);
   } catch {
     logMessage.debug({
       message: `${pageName} missing session factors`,

@@ -12,7 +12,6 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { completeFlowOrGetUrl } from "@lib/client";
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { validateAccountWithPassword } from "@lib/validationSchemas";
 import { checkEmailVerification } from "@lib/verify-helper";
 import { addHumanUser, getLoginSettings, getUserByID } from "@lib/zitadel";
@@ -29,8 +28,6 @@ type RegisterUserCommand = {
 export async function registerUser(command: RegisterUserCommand) {
   const { t } = await serverTranslation("register");
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const validationResult = await validateAccountWithPassword({
     email: command.email,
     firstname: command.firstName,
@@ -46,7 +43,6 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const addResponse = await addHumanUser({
-    serviceUrl,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -60,7 +56,6 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const loginSettings = await getLoginSettings({
-    serviceUrl,
     organization: command.organization,
   });
 
@@ -81,7 +76,6 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: session?.factors?.user?.id,
   });
 

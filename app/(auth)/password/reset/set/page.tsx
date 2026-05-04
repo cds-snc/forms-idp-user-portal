@@ -9,7 +9,6 @@ import { redirect } from "next/navigation";
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { checkSessionFactors, hasStrongMFA } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
@@ -35,10 +34,7 @@ export default async function Page() {
     redirect("/password/reset");
   }
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const session = await loadMostRecentSession({
-    serviceUrl,
     sessionParams: { loginName, organization },
   }).catch(() => undefined);
 
@@ -51,7 +47,6 @@ export default async function Page() {
   }
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 

@@ -10,7 +10,6 @@ import { redirect } from "next/navigation";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -28,8 +27,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const { checkAfter } = searchParams;
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   let sessionId: string | undefined;
   let loginName: string | undefined;
   let organization: string | undefined;
@@ -42,7 +39,6 @@ export default async function Page(props: {
   }
 
   const sessionFactors = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
     organization,

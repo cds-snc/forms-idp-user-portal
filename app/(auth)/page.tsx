@@ -10,7 +10,6 @@ import { redirect } from "next/navigation";
  *--------------------------------------------*/
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
@@ -30,7 +29,6 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const searchParams = await props.searchParams;
   const requestId = searchParams.requestId;
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
   const organization = ZITADEL_ORGANIZATION;
 
   // Check if user is already authenticated
@@ -39,11 +37,10 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
     const { loginName } = await getSessionCredentials();
 
     const session = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: { loginName, organization },
     });
 
-    isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
+    isAuthenticated = session ? await isSessionValid({ session }) : false;
   } catch (error) {
     // No valid session, continue to login form
   }

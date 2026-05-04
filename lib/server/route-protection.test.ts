@@ -92,7 +92,7 @@ describe("route-protection", () => {
   });
 
   it("allows open routes without loading session", async () => {
-    const result = await checkAuthenticationLevel("https://idp.example", AuthLevel.OPEN);
+    const result = await checkAuthenticationLevel(AuthLevel.OPEN);
 
     expect(result).toEqual({ satisfied: true });
     expect(loadMostRecentSession).not.toHaveBeenCalled();
@@ -102,7 +102,6 @@ describe("route-protection", () => {
     vi.mocked(loadMostRecentSession).mockResolvedValue(undefined as never);
 
     const result = await checkAuthenticationLevel(
-      "https://idp.example",
       AuthLevel.BASIC_SESSION,
       "person@canada.ca",
       "org-1"
@@ -122,10 +121,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.PASSWORD_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
     expect(result).toMatchObject({
       satisfied: false,
@@ -143,10 +139,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.ANY_MFA_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED);
 
     expect(result.satisfied).toBe(true);
   });
@@ -160,10 +153,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.STRONG_MFA_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.STRONG_MFA_REQUIRED);
 
     expect(result).toMatchObject({
       satisfied: false,

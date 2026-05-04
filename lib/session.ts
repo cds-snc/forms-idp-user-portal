@@ -35,7 +35,6 @@ export function checkSessionFactorValidity(session: Partial<Session>): {
 }
 
 type LoadMostRecentSessionParams = {
-  serviceUrl: string;
   sessionParams: {
     loginName?: string;
     organization?: string;
@@ -43,7 +42,6 @@ type LoadMostRecentSessionParams = {
 };
 
 export async function loadMostRecentSession({
-  serviceUrl,
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
@@ -52,7 +50,6 @@ export async function loadMostRecentSession({
   });
 
   return getSession({
-    serviceUrl,
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((resp: GetSessionResponse) => resp.session);
@@ -67,10 +64,7 @@ export type SessionWithAuthData = {
   expirationDate?: Session["expirationDate"];
 };
 
-async function getAuthMethodsAndUser(
-  serviceUrl: string,
-  session?: Session
-): Promise<SessionWithAuthData> {
+async function getAuthMethodsAndUser(session?: Session): Promise<SessionWithAuthData> {
   const userId = session?.factors?.user?.id;
 
   if (!userId) {
@@ -78,11 +72,10 @@ async function getAuthMethodsAndUser(
   }
 
   const methods = await listAuthenticationMethodTypes({
-    serviceUrl,
     userId,
   });
 
-  const user = await getUserByID({ serviceUrl, userId });
+  const user = await getUserByID({ userId });
   const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
   return {
@@ -96,45 +89,35 @@ async function getAuthMethodsAndUser(
 }
 
 export async function loadSessionById(
-  serviceUrl: string,
   sessionId: string,
   organization?: string
 ): Promise<SessionWithAuthData> {
   const recent = await getSessionCookieById({ sessionId, organization });
   const sessionResponse = await getSession({
-    serviceUrl,
     sessionId: recent.id,
     sessionToken: recent.token,
   });
-  return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
+  return getAuthMethodsAndUser(sessionResponse.session);
 }
 
 export async function loadSessionByLoginname(
-  serviceUrl: string,
   loginName?: string,
   organization?: string
 ): Promise<SessionWithAuthData> {
   const session = await loadMostRecentSession({
-    serviceUrl,
     sessionParams: {
       loginName,
       organization,
     },
   });
-  return getAuthMethodsAndUser(serviceUrl, session);
+  return getAuthMethodsAndUser(session);
 }
 
 /**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-export async function isSessionValid({
-  serviceUrl,
-  session,
-}: {
-  serviceUrl: string;
-  session: Session;
-}): Promise<boolean> {
+export async function isSessionValid({ session }: { session: Session }): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
     logMessage.info("Session has no user");
@@ -175,7 +158,6 @@ export async function isSessionValid({
 
   try {
     const userResponse = await getUserByID({
-      serviceUrl,
       userId: session.factors.user.id,
     });
 
@@ -197,11 +179,9 @@ export async function isSessionValid({
 }
 
 export async function findValidSession({
-  serviceUrl,
   sessions,
   authRequest,
 }: {
-  serviceUrl: string;
   sessions: Session[];
   authRequest?: AuthRequest;
 }): Promise<Session | undefined> {
@@ -229,7 +209,7 @@ export async function findValidSession({
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
     // eslint-disable-next-line no-await-in-loop
-    if (await isSessionValid({ serviceUrl, session })) {
+    if (await isSessionValid({ session })) {
       return session;
     }
   }

@@ -9,7 +9,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  * Internal Aliases
  *--------------------------------------------*/
 import { loadMfaVerificationSession } from "@lib/server/mfa-verify";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -21,10 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
-    serviceUrl,
     pageName: "U2F verify page",
     missingSessionRedirect: "/mfa/set/verify",
   });

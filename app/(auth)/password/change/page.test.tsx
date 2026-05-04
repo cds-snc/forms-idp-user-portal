@@ -7,7 +7,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getSessionCredentials } from "@lib/cookies";
 import { AuthLevel, checkAuthenticationLevel, hasStrongMFA } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 
 import Page from "./page";
@@ -90,7 +89,6 @@ describe("password/change page", () => {
     vi.clearAllMocks();
 
     vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(getServiceUrlFromHeaders).mockResolvedValue({ serviceUrl: "https://idp.example" });
     vi.mocked(getSessionCredentials).mockResolvedValue({
       sessionId: "session-123",
       loginName: "person@canada.ca",
@@ -119,7 +117,6 @@ describe("password/change page", () => {
     await expect(Page()).rejects.toThrow("NEXT_REDIRECT");
 
     expect(checkAuthenticationLevel).toHaveBeenCalledWith(
-      "https://idp.example",
       AuthLevel.PASSWORD_REQUIRED,
       "person@canada.ca",
       "org-1"

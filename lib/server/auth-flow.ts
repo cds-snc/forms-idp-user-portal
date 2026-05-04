@@ -10,7 +10,6 @@ import { logMessage } from "@lib/logger";
  *--------------------------------------------*/
 import { loginWithOIDCAndSession } from "@lib/oidc";
 import { loadSessionsWithCookies } from "@lib/server/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 interface AuthFlowParams {
   sessionId: string;
   requestId: string;
@@ -32,17 +31,13 @@ export async function completeAuthFlow(
     `Completing ${requestId.startsWith("oidc_") ? "OIDC" : "unknown"} auth flow for requestId: ${requestId}`
   );
 
-  const { serviceUrl } = await getServiceUrlFromHeaders();
-
   const { sessions, sessionCookies } = await loadSessionsWithCookies({
-    serviceUrl,
     cleanup: true,
   });
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
     const result = await loginWithOIDCAndSession({
-      serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,

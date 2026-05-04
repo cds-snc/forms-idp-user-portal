@@ -55,12 +55,9 @@ vi.mock("./host", () => ({
  * Test setup
  *--------------------------------------------*/
 
-const TEST_SERVICE_URL = "https://api.example.com";
-
 describe("sendLoginname", () => {
   let mockHeaders: ReturnType<typeof vi.fn>;
   let mockCreate: ReturnType<typeof vi.fn>;
-  let mockGetServiceUrlFromHeaders: ReturnType<typeof vi.fn>;
   let mockServerTranslation: ReturnType<typeof vi.fn>;
   let mockGetLoginSettings: ReturnType<typeof vi.fn>;
   let mockSearchUsers: ReturnType<typeof vi.fn>;
@@ -113,7 +110,6 @@ describe("sendLoginname", () => {
 
     // Default implementations
     mockHeaders.mockResolvedValue(new Headers());
-    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceUrl: TEST_SERVICE_URL });
     // i18n: return the key itself so assertions can match on key strings
     mockServerTranslation.mockResolvedValue({ t: (key: string) => key });
     mockGetOriginalHost.mockResolvedValue("example.com");
@@ -248,7 +244,6 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
         expect(mockListIDPLinks).toHaveBeenCalledWith({
-          serviceUrl: TEST_SERVICE_URL,
           userId: "user123",
         });
       });
@@ -282,7 +277,6 @@ describe("sendLoginname", () => {
 
         expect(result).toEqual({ redirect: "https://org-idp.example.com/auth" });
         expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-          serviceUrl: TEST_SERVICE_URL,
           orgId: "org123",
         });
       });
@@ -488,7 +482,6 @@ describe("sendLoginname", () => {
       expect((result as WithRedirect).redirect).toContain("email=user%40example.com");
 
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        serviceUrl: TEST_SERVICE_URL,
         domain: "example.com",
       });
     });
@@ -517,11 +510,9 @@ describe("sendLoginname", () => {
 
       expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
-        serviceUrl: TEST_SERVICE_URL,
         domain: "company.com",
       });
       expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
-        serviceUrl: TEST_SERVICE_URL,
         orgId: "discovered-org-456",
       });
     });
