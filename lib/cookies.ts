@@ -334,7 +334,6 @@ export async function getMostRecentCookieWithLoginname<T>({
 
 /**
  * Get session credentials from the http-only session cookie
- * @param organizationOverride optional organization to override the cookie's organization
  * @returns sessionId, loginName, organization, and requestId (if linked to OIDC flow)
  */
 export async function getSessionCredentials() {
