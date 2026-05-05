@@ -72,7 +72,6 @@ describe("PasswordReset", () => {
       <PasswordReset
         userId="user-123"
         loginName="person@canada.ca"
-        organization="org-1"
         passwordComplexitySettings={{} as never}
       />
     );
@@ -87,7 +86,6 @@ describe("PasswordReset", () => {
       });
       expect(sendPassword).toHaveBeenCalledWith({
         loginName: "person@canada.ca",
-        organization: "org-1",
         checks: {
           password: {
             password: "P@ssw0rd",
@@ -126,7 +124,6 @@ describe("PasswordReset", () => {
       <PasswordReset
         userId="user-123"
         loginName="person@canada.ca"
-        organization="org-1"
         passwordComplexitySettings={{} as never}
       />
     );

@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -11,7 +10,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -25,20 +23,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   const canUseTotp = sessionData.authMethods?.includes(AuthenticationMethodType.TOTP) ?? false;
   const canUseU2F = sessionData.authMethods?.includes(AuthenticationMethodType.U2F) ?? false;

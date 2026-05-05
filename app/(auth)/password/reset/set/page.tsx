@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -10,7 +9,6 @@ import { redirect } from "next/navigation";
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { checkSessionFactors, hasStrongMFA } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
@@ -28,20 +26,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ loginName, organization } = await getSessionCredentials());
+    ({ loginName } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const session = await loadMostRecentSession({
-    serviceUrl,
-    sessionParams: { loginName, organization },
+    sessionParams: { loginName },
   }).catch(() => undefined);
 
   const factors = checkSessionFactors(session ?? null);
@@ -52,10 +45,7 @@ export default async function Page() {
     redirect("/password/reset/verify");
   }
 
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization: organization ?? session?.factors?.user?.organizationId,
-  });
+  const passwordComplexitySettings = await getPasswordComplexitySettings();
 
   if (!session?.factors?.user?.id || !passwordComplexitySettings) {
     redirect("/password/reset");
@@ -70,7 +60,6 @@ export default async function Page() {
       <PasswordReset
         userId={session.factors.user.id}
         loginName={session.factors.user.loginName}
-        organization={organization ?? session.factors.user.organizationId}
         passwordComplexitySettings={passwordComplexitySettings}
       />
     </AuthPanel>

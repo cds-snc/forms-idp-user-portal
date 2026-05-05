@@ -19,12 +19,10 @@ import { Alert, ErrorStatus } from "@components/ui/form";
 export function PasswordReset({
   userId,
   passwordComplexitySettings,
-  organization,
   loginName,
 }: {
   userId: string;
   passwordComplexitySettings?: PasswordComplexitySettings;
-  organization?: string;
   loginName?: string;
 }) {
   const { t } = useTranslation(["password"]);
@@ -60,7 +58,6 @@ export function PasswordReset({
 
     const passwordResponse = await sendPassword({
       loginName: loginName ?? "",
-      organization,
       checks: create(ChecksSchema, {
         password: { password },
       }),

@@ -13,7 +13,6 @@ import { generateCSP } from "@lib/cspScripts";
  * Local Relative
  *--------------------------------------------*/
 import { checkAuthenticationLevel, getSmartRedirect } from "./lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "./lib/service-url";
 import { proxy } from "./proxy";
 
 vi.mock("@lib/cspScripts", async (importOriginal) => {
@@ -49,8 +48,8 @@ vi.mock("./lib/server/route-protection", () => ({
   getSmartRedirect: vi.fn(),
 }));
 
-vi.mock("./lib/service-url", () => ({
-  getServiceUrlFromHeaders: vi.fn(() => ({ serviceUrl: "https://idp.example.com" })),
+vi.mock("./lib/service", () => ({
+  getServiceForHost: vi.fn(),
 }));
 
 vi.mock("./lib/middleware-config", () => ({
@@ -244,7 +243,6 @@ describe("proxy middleware", () => {
       const request = makeRequest("/password");
       const response = await proxy(request);
 
-      expect(getServiceUrlFromHeaders).toHaveBeenCalled();
       expect(response.headers.get("x-middleware-override-headers")).toContain(
         "x-zitadel-i18n-organization"
       );

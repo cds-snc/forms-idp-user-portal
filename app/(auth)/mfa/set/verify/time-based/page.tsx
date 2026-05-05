@@ -11,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { loadMfaVerificationSession } from "@lib/server/mfa-verify";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
@@ -26,12 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
-    serviceUrl,
+  const { sessionId, loginName, sessionData } = await loadMfaVerificationSession({
     pageName: "TOTP verify page",
     missingSessionRedirect: "/mfa/set/verify",
   });
@@ -40,10 +38,7 @@ export default async function Page() {
     redirect("/mfa/set/verify");
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization ?? sessionData.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -55,7 +50,6 @@ export default async function Page() {
       <LoginTOTP
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
-        organization={organization ?? sessionData.factors?.user?.organizationId}
         loginSettings={loginSettings}
         redirect="/mfa/set"
         displayName={sessionData.factors?.user?.displayName}

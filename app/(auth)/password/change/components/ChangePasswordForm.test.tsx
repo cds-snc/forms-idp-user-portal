@@ -67,7 +67,6 @@ describe("ChangePasswordForm", () => {
         sessionId="session-123"
         loginName="person@canada.ca"
         requestId="req-123"
-        organization="org-1"
         passwordComplexitySettings={{} as never}
       />
     );
@@ -83,7 +82,6 @@ describe("ChangePasswordForm", () => {
       () => {
         expect(sendPassword).toHaveBeenCalledWith({
           loginName: "person@canada.ca",
-          organization: "org-1",
           requestId: "req-123",
           checks: {
             password: {
@@ -107,7 +105,6 @@ describe("ChangePasswordForm", () => {
         sessionId="session-123"
         loginName="person@canada.ca"
         requestId="req-123"
-        organization="org-1"
         passwordComplexitySettings={{} as never}
       />
     );

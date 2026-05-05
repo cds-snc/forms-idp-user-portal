@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -11,7 +10,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
@@ -26,31 +24,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
   }
 
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.U2F)) {
     redirect("/password/change/verify");
@@ -72,7 +61,6 @@ export default async function Page() {
         <LoginU2F
           loginName={loginName}
           sessionId={sessionId}
-          organization={organization}
           login={false}
           redirect="/password/change"
         />

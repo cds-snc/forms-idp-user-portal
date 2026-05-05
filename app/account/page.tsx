@@ -12,7 +12,6 @@ import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
@@ -38,33 +37,27 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const loginRedirect = buildUrlWithRequestId("/", requestId);
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   // Attempt to get session credentials from cookies
-  let sessionId, organization, loginName;
+  let sessionId, loginName;
   try {
-    ({ sessionId, organization, loginName } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch (error) {
     redirect(loginRedirect);
   }
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
-    AuthLevel.ANY_MFA_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(buildUrlWithRequestId(authCheck.redirect || "/", requestId));
   }
 
-  const session = await loadSessionById(serviceUrl, sessionId, organization);
+  const session = await loadSessionById(sessionId);
   const userId = session.factors?.user?.id;
-  const userResponse = await getUserByID({ serviceUrl, userId: userId! });
+  const userResponse = await getUserByID({ userId: userId! });
   const user = userResponse.user?.type.case === "human" ? userResponse.user?.type.value : undefined;
   const firstName = user?.profile?.givenName;
   const lastName = user?.profile?.familyName;
@@ -78,11 +71,10 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   try {
     const authSession = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: { loginName, organization },
+      sessionParams: { loginName },
     });
 
-    if (!authSession || !(await isSessionValid({ serviceUrl, session: authSession }))) {
+    if (!authSession || !(await isSessionValid({ session: authSession }))) {
       redirect(loginRedirect);
     }
   } catch (error) {
@@ -92,11 +84,9 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const [u2fList, authenticatorStatus] = await Promise.all([
     getU2FList({
-      serviceUrl,
       userId: userId!,
     }),
     getTOTPStatus({
-      serviceUrl,
       userId: userId!,
     }),
   ]);

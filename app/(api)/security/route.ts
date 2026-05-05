@@ -1,24 +1,16 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { NextResponse } from "next/server";
-import { Client } from "@zitadel/client";
-import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { createServiceForHost } from "@lib/service";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
-export async function GET() {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+import { getServiceForHost } from "@lib/service";
 
-  const settingsService: Client<typeof SettingsService> = await createServiceForHost(
-    SettingsService,
-    serviceUrl
-  );
+export async function GET() {
+  const settingsService = await getServiceForHost("SettingsService");
 
   const settings = await settingsService
     .getSecuritySettings({})

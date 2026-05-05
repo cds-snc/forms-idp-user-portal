@@ -63,7 +63,6 @@ describe("registerUser", () => {
     firstName: "Person",
     lastName: "Example",
     password: "P@ssw0rd",
-    organization: "org-1",
     requestId: "req-123",
   };
 
@@ -85,7 +84,6 @@ describe("registerUser", () => {
         user: {
           id: "user-123",
           loginName: "person@canada.ca",
-          organizationId: "org-1",
         },
       },
     } as never);
@@ -157,7 +155,6 @@ describe("registerUser", () => {
       {
         sessionId: "session-123",
         requestId: "req-123",
-        organization: "org-1",
       },
       "https://forms.example"
     );
@@ -173,7 +170,6 @@ describe("registerUser", () => {
     expect(completeFlowOrGetUrl).toHaveBeenCalledWith(
       {
         loginName: "person@canada.ca",
-        organization: "org-1",
       },
       "https://forms.example"
     );

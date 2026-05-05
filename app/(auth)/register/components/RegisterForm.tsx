@@ -37,12 +37,11 @@ type FormState = {
 };
 
 type Props = {
-  organization: string;
   requestId?: string;
   siteConfig: SiteConfig;
 };
 
-export function RegisterForm({ organization, requestId, siteConfig }: Props) {
+export function RegisterForm({ requestId, siteConfig }: Props) {
   const { t, i18n } = useTranslation(["register", "validation", "errorSummary", "common"]);
   const termsOfUseLink = getSiteLink(siteConfig, "termsOfUse", i18n.language);
   const { setRegistrationData } = useRegistration();
@@ -71,7 +70,6 @@ export function RegisterForm({ organization, requestId, siteConfig }: Props) {
     // Store registration data in context (persisted to sessionStorage)
     setRegistrationData({
       ...validationResult.output,
-      ...(organization && { organization }),
       ...(requestId && { requestId }),
     });
     router.push(buildUrlWithRequestId("/register/password", requestId));

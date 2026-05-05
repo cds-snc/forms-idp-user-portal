@@ -92,7 +92,7 @@ describe("route-protection", () => {
   });
 
   it("allows open routes without loading session", async () => {
-    const result = await checkAuthenticationLevel("https://idp.example", AuthLevel.OPEN);
+    const result = await checkAuthenticationLevel(AuthLevel.OPEN);
 
     expect(result).toEqual({ satisfied: true });
     expect(loadMostRecentSession).not.toHaveBeenCalled();
@@ -101,12 +101,7 @@ describe("route-protection", () => {
   it("fails basic session level when no session exists", async () => {
     vi.mocked(loadMostRecentSession).mockResolvedValue(undefined as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.BASIC_SESSION,
-      "person@canada.ca",
-      "org-1"
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.BASIC_SESSION, "person@canada.ca");
 
     expect(result).toMatchObject({
       satisfied: false,
@@ -122,10 +117,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.PASSWORD_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
     expect(result).toMatchObject({
       satisfied: false,
@@ -143,10 +135,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.ANY_MFA_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED);
 
     expect(result.satisfied).toBe(true);
   });
@@ -160,10 +149,7 @@ describe("route-protection", () => {
       },
     } as never);
 
-    const result = await checkAuthenticationLevel(
-      "https://idp.example",
-      AuthLevel.STRONG_MFA_REQUIRED
-    );
+    const result = await checkAuthenticationLevel(AuthLevel.STRONG_MFA_REQUIRED);
 
     expect(result).toMatchObject({
       satisfied: false,
@@ -175,16 +161,14 @@ describe("route-protection", () => {
   it("builds smart redirect URLs based on factors and preserves requestId", () => {
     const params = new URLSearchParams("requestId=req-123");
 
-    expect(getSmartRedirect("/account", null, params)).toBe("/?requestId=req-123");
+    expect(getSmartRedirect(null, params)).toBe("/?requestId=req-123");
 
     const noPasswordSession = {
       factors: {
         user: { id: "user-123" },
       },
     } as never;
-    expect(getSmartRedirect("/account", noPasswordSession, params)).toBe(
-      "/password?requestId=req-123"
-    );
+    expect(getSmartRedirect(noPasswordSession, params)).toBe("/password?requestId=req-123");
 
     const noStrongMfaSession = {
       factors: {
@@ -193,7 +177,7 @@ describe("route-protection", () => {
         otpEmail: { verifiedAt: {} },
       },
     } as never;
-    expect(getSmartRedirect("/account", noStrongMfaSession, params)).toBe("/mfa?requestId=req-123");
+    expect(getSmartRedirect(noStrongMfaSession, params)).toBe("/mfa?requestId=req-123");
 
     const strongMfaSession = {
       factors: {
@@ -202,6 +186,6 @@ describe("route-protection", () => {
         totp: { verifiedAt: {} },
       },
     } as never;
-    expect(getSmartRedirect("/account", strongMfaSession, params)).toBe("/account");
+    expect(getSmartRedirect(strongMfaSession, params)).toBe("/account");
   });
 });

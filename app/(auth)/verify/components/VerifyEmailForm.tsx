@@ -33,7 +33,6 @@ type FormState = {
 export function VerifyEmailForm({
   userId,
   loginName,
-  organization,
   requestId,
   code,
   children,
@@ -41,7 +40,6 @@ export function VerifyEmailForm({
 }: {
   userId: string;
   loginName?: string;
-  organization?: string;
   code?: string;
   requestId?: string;
   children?: React.ReactNode;
@@ -103,7 +101,6 @@ export function VerifyEmailForm({
         code: code,
         userId,
         loginName: loginName,
-        organization: organization,
         requestId: requestId,
       }).then((response) => {
         if (response && "redirect" in response && response?.redirect) {
@@ -111,7 +108,7 @@ export function VerifyEmailForm({
         }
       });
     }
-  }, [code, userId, loginName, organization, requestId, router]);
+  }, [code, userId, loginName, requestId, router]);
 
   const localFormAction = async (previousState: FormState, formData: FormData) => {
     const code = (formData.get("code") as string) || "";
@@ -132,7 +129,6 @@ export function VerifyEmailForm({
       code: code,
       userId,
       loginName: loginName,
-      organization: organization,
       requestId: requestId,
     });
 

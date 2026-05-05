@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -24,7 +24,6 @@ import {
 } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
 import {
   Cookie,
   getAllSessionCookieIds,
@@ -39,19 +38,11 @@ import { getOriginalHost } from "./host";
 
 /**
  * Load sessions by their IDs
- * @param serviceUrl - The Zitadel service URL
  * @param ids - Array of session IDs to load
  * @returns Array of Session objects
  */
-async function loadSessionsByIds({
-  serviceUrl,
-  ids,
-}: {
-  serviceUrl: string;
-  ids: string[];
-}): Promise<Session[]> {
+async function loadSessionsByIds({ ids }: { ids: string[] }): Promise<Session[]> {
   const response = await listSessions({
-    serviceUrl,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -60,22 +51,18 @@ async function loadSessionsByIds({
 
 /**
  * Load sessions for all cookie IDs
- * @param serviceUrl - The Zitadel service URL
  * @param cleanup - Whether to filter out expired sessions (default: true)
  * @returns Array of Session objects
  */
 export async function loadSessionsFromCookies({
-  serviceUrl,
   cleanup = true,
 }: {
-  serviceUrl: string;
   cleanup?: boolean;
-}): Promise<Session[]> {
+} = {}): Promise<Session[]> {
   const cookieIds = await getAllSessionCookieIds(cleanup);
 
   if (cookieIds && cookieIds.length) {
     return loadSessionsByIds({
-      serviceUrl,
       ids: cookieIds.filter((id) => !!id) as string[],
     });
   }
@@ -86,17 +73,14 @@ export async function loadSessionsFromCookies({
 /**
  * Load sessions with their corresponding cookies
  * Useful when you need both Session objects and cookie tokens (e.g., for OIDC callbacks)
- * @param serviceUrl - The Zitadel service URL
  * @param cleanup - Whether to filter out expired sessions (default: true)
  * @returns Object containing both sessions and sessionCookies arrays
  */
 export async function loadSessionsWithCookies({
-  serviceUrl,
   cleanup = true,
 }: {
-  serviceUrl: string;
   cleanup?: boolean;
-}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
+} = {}): Promise<{ sessions: Session[]; sessionCookies: Cookie[] }> {
   const sessionCookies = await getAllSessions(cleanup);
 
   if (!sessionCookies.length) {
@@ -104,7 +88,7 @@ export async function loadSessionsWithCookies({
   }
 
   const ids = sessionCookies.map((s) => s.id).filter((id) => !!id);
-  const sessions = await loadSessionsByIds({ serviceUrl, ids });
+  const sessions = await loadSessionsByIds({ ids });
 
   return { sessions, sessionCookies };
 }
@@ -146,15 +130,9 @@ export async function continueWithSession({
   redirect,
   ...session
 }: ContinueWithSessionCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const { t } = await serverTranslation("error");
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: session.factors?.user?.organizationId,
-  });
+  const loginSettings = await getLoginSettings();
 
   // Use provided redirect if available, otherwise use defaultRedirectUri
   const targetRedirect = redirect || loginSettings?.defaultRedirectUri;
@@ -164,7 +142,6 @@ export async function continueWithSession({
       {
         sessionId: session.id,
         requestId: requestId,
-        organization: session.factors.user.organizationId,
       },
       targetRedirect
     );
@@ -174,7 +151,6 @@ export async function continueWithSession({
       {
         sessionId: session.id,
         loginName: session.factors.user.loginName,
-        organization: session.factors.user.organizationId,
       },
       targetRedirect
     );
@@ -187,7 +163,6 @@ export async function continueWithSession({
 type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
-  organization?: string;
   checks?: Checks;
   requestId?: string;
   challenges?: RequestChallenges;
@@ -195,12 +170,12 @@ type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  const { loginName, sessionId, organization, checks, requestId, challenges } = options;
+  const { loginName, sessionId, checks, requestId, challenges } = options;
   try {
     const recentSession = sessionId
       ? await getSessionCookieById({ sessionId })
       : loginName
-        ? await getSessionCookieByLoginName({ loginName, organization })
+        ? await getSessionCookieByLoginName({ loginName })
         : await getMostRecentSessionCookie();
 
     if (!recentSession) {
@@ -209,8 +184,6 @@ export async function updateSession(options: UpdateSessionCommand) {
       };
     }
 
-    const _headers = await headers();
-    const { serviceUrl } = getServiceUrlFromHeaders(_headers);
     const host = await getOriginalHost();
 
     if (!host) {
@@ -223,10 +196,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       challenges.webAuthN.domain = hostname;
     }
 
-    const loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization,
-    });
+    const loginSettings = await getLoginSettings();
 
     let lifetime = checks?.webAuthN
       ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -274,7 +244,6 @@ export async function updateSession(options: UpdateSessionCommand) {
     let authMethods;
     if (checks && checks.password && session.factors?.user?.id) {
       const response = await listAuthenticationMethodTypes({
-        serviceUrl,
         userId: session.factors.user.id,
       });
       if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -309,20 +278,16 @@ type ClearSessionOptions = {
 };
 
 async function clearSession(options: ClearSessionOptions) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const { sessionId } = options;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
-    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
 
-  const securitySettings = await getSecuritySettings({ serviceUrl });
+  const securitySettings = await getSecuritySettings();
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {

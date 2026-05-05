@@ -2,15 +2,12 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { logMessage } from "@lib/logger";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -25,14 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const organization = ZITADEL_ORGANIZATION;
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
-    serviceUrl,
-    organization,
-  }).catch((_error) => {
+  const passwordComplexitySettings = await getPasswordComplexitySettings().catch((_error) => {
     logMessage.warn("Failed to load password complexity settings for registration");
     return undefined;
   });

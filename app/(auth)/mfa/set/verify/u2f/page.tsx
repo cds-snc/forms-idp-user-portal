@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -10,7 +9,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  * Internal Aliases
  *--------------------------------------------*/
 import { loadMfaVerificationSession } from "@lib/server/mfa-verify";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -22,11 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const { sessionId, loginName, organization, sessionData } = await loadMfaVerificationSession({
-    serviceUrl,
+  const { sessionId, loginName, sessionData } = await loadMfaVerificationSession({
     pageName: "U2F verify page",
     missingSessionRedirect: "/mfa/set/verify",
   });
@@ -48,13 +42,7 @@ export default async function Page() {
         showDropdown={false}
       />
       <div className="w-full">
-        <LoginU2F
-          loginName={loginName}
-          sessionId={sessionId}
-          organization={organization}
-          login={false}
-          redirect="/mfa/set"
-        />
+        <LoginU2F loginName={loginName} sessionId={sessionId} login={false} redirect="/mfa/set" />
       </div>
     </AuthPanel>
   );

@@ -53,7 +53,6 @@ export function PasswordPageClient({ passwordComplexitySettings }: Props) {
       email={registrationData?.email ?? ""}
       firstname={registrationData?.firstname ?? ""}
       lastname={registrationData?.lastname ?? ""}
-      organization={registrationData?.organization || ""}
       requestId={registrationData?.requestId}
       onSubmitSuccess={onSubmitSuccess}
     />

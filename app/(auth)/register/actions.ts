@@ -3,7 +3,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
@@ -13,7 +12,6 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { completeFlowOrGetUrl } from "@lib/client";
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { validateAccountWithPassword } from "@lib/validationSchemas";
 import { checkEmailVerification } from "@lib/verify-helper";
 import { addHumanUser, getLoginSettings, getUserByID } from "@lib/zitadel";
@@ -23,14 +21,11 @@ type RegisterUserCommand = {
   firstName: string;
   lastName: string;
   password: string;
-  organization: string;
   requestId?: string;
 };
 
 export async function registerUser(command: RegisterUserCommand) {
   const { t } = await serverTranslation("register");
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const validationResult = await validateAccountWithPassword({
     email: command.email,
@@ -47,12 +42,10 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const addResponse = await addHumanUser({
-    serviceUrl,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     password: command.password,
-    organization: command.organization,
   });
 
   if (!addResponse) {
@@ -60,10 +53,7 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: command.organization,
-  });
+  const loginSettings = await getLoginSettings();
 
   const checks = create(ChecksSchema, {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -82,7 +72,6 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: session?.factors?.user?.id,
   });
 
@@ -94,12 +83,7 @@ export async function registerUser(command: RegisterUserCommand) {
   const humanUser =
     userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    session.factors.user.organizationId,
-    command.requestId
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -111,11 +95,9 @@ export async function registerUser(command: RegisterUserCommand) {
       ? {
           sessionId: session.id,
           requestId: command.requestId,
-          organization: session.factors.user.organizationId,
         }
       : {
           loginName: session.factors.user.loginName,
-          organization: session.factors.user.organizationId,
         },
     loginSettings?.defaultRedirectUri
   );

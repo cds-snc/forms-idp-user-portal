@@ -6,6 +6,8 @@
 import { cookies } from "next/headers";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 
+import { ZITADEL_ORGANIZATION } from "@root/constants/config";
+
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
@@ -187,10 +189,8 @@ export async function getMostRecentSessionCookie<T>(): Promise<SessionCookie<T>>
 
 export async function getSessionCookieById<T>({
   sessionId,
-  organization,
 }: {
   sessionId: string;
-  organization?: string;
 }): Promise<SessionCookie<T>> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -198,8 +198,8 @@ export async function getSessionCookieById<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
-    const found = sessions.find((s) =>
-      organization ? s.organization === organization && s.id === sessionId : s.id === sessionId
+    const found = sessions.find(
+      (s) => s.organization === ZITADEL_ORGANIZATION && s.id === sessionId
     );
     if (found) {
       return found;
@@ -213,20 +213,16 @@ export async function getSessionCookieById<T>({
 
 export async function getSessionCookieByLoginName<T>({
   loginName,
-  organization,
 }: {
   loginName?: string;
-  organization?: string;
 }): Promise<SessionCookie<T>> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-    const found = sessions.find((s) =>
-      organization
-        ? s.organization === organization && s.loginName === loginName
-        : s.loginName === loginName
+    const found = sessions.find(
+      (s) => s.organization === ZITADEL_ORGANIZATION && s.loginName === loginName
     );
     if (found) {
       return found;
@@ -303,10 +299,8 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
  */
 export async function getMostRecentCookieWithLoginname<T>({
   loginName,
-  organization,
 }: {
   loginName?: string;
-  organization?: string;
 }): Promise<SessionCookie<T>> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -317,11 +311,9 @@ export async function getMostRecentCookieWithLoginname<T>({
       return loginName ? cookie.loginName === loginName : true;
     });
 
-    if (organization) {
-      filtered = filtered.filter((cookie) => {
-        return cookie.organization === organization;
-      });
-    }
+    filtered = filtered.filter((cookie) => {
+      return cookie.organization === ZITADEL_ORGANIZATION;
+    });
 
     const latest =
       filtered && filtered.length
@@ -345,14 +337,14 @@ export async function getMostRecentCookieWithLoginname<T>({
  * @param organizationOverride optional organization to override the cookie's organization
  * @returns sessionId, loginName, organization, and requestId (if linked to OIDC flow)
  */
-export async function getSessionCredentials(organizationOverride?: string) {
+export async function getSessionCredentials() {
   try {
     const sessionCookie = await getMostRecentSessionCookie();
     return {
       sessionId: sessionCookie.id,
       loginName: sessionCookie.loginName,
       userId: sessionCookie.userId,
-      organization: organizationOverride || sessionCookie.organization,
+      organization: sessionCookie.organization,
       requestId: sessionCookie.requestId, // Include requestId for OIDC flows
     };
   } catch (error) {

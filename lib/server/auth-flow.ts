@@ -3,7 +3,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 
 import { logMessage } from "@lib/logger";
 /*--------------------------------------------*
@@ -11,11 +10,9 @@ import { logMessage } from "@lib/logger";
  *--------------------------------------------*/
 import { loginWithOIDCAndSession } from "@lib/oidc";
 import { loadSessionsWithCookies } from "@lib/server/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 interface AuthFlowParams {
   sessionId: string;
   requestId: string;
-  organization?: string;
 }
 
 /**
@@ -33,18 +30,13 @@ export async function completeAuthFlow(
     `Completing ${requestId.startsWith("oidc_") ? "OIDC" : "unknown"} auth flow for requestId: ${requestId}`
   );
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const { sessions, sessionCookies } = await loadSessionsWithCookies({
-    serviceUrl,
     cleanup: true,
   });
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
     const result = await loginWithOIDCAndSession({
-      serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,

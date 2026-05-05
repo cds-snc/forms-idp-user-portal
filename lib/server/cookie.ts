@@ -3,7 +3,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 import type { ConnectError } from "@connectrpc/connect";
 import { Duration, timestampMs } from "@zitadel/client";
 import { CredentialsCheckErrorSchema } from "@zitadel/proto/zitadel/message_pb";
@@ -14,8 +13,6 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { createSessionFromChecks, getSecuritySettings, getSession, setSession } from "@lib/zitadel";
-
-import { getServiceUrlFromHeaders } from "../service-url";
 
 type CustomCookieData = {
   id: string;
@@ -52,9 +49,6 @@ export async function createSessionAndUpdateCookie(command: {
   requestId: string | undefined;
   lifetime?: Duration;
 }): Promise<Session> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   let sessionLifetime = command.lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
@@ -67,14 +61,12 @@ export async function createSessionAndUpdateCookie(command: {
   }
 
   const createdSession = await createSessionFromChecks({
-    serviceUrl,
     checks: command.checks,
     lifetime: sessionLifetime,
   });
 
   if (createdSession) {
     return getSession({
-      serviceUrl,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then(async (response) => {
@@ -103,7 +95,7 @@ export async function createSessionAndUpdateCookie(command: {
           sessionCookie.organization = response.session.factors.user.organizationId;
         }
 
-        const securitySettings = await getSecuritySettings({ serviceUrl });
+        const securitySettings = await getSecuritySettings();
         const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
         await addSessionToCookie({ session: sessionCookie, iFrameEnabled });
@@ -125,11 +117,7 @@ export async function setSessionAndUpdateCookie(command: {
   requestId?: string;
   lifetime: Duration;
 }) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   return setSession({
-    serviceUrl,
     sessionId: command.recentCookie.id,
     sessionToken: command.recentCookie.token,
     challenges: command.challenges,
@@ -157,7 +145,6 @@ export async function setSessionAndUpdateCookie(command: {
         }
 
         return getSession({
-          serviceUrl,
           sessionId: sessionCookie.id,
           sessionToken: sessionCookie.token,
         }).then(async (response) => {
@@ -184,7 +171,7 @@ export async function setSessionAndUpdateCookie(command: {
             newCookie.requestId = sessionCookie.requestId;
           }
 
-          const securitySettings = await getSecuritySettings({ serviceUrl });
+          const securitySettings = await getSecuritySettings();
           const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
           return updateSessionCookie({

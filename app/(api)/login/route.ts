@@ -1,7 +1,6 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 /*--------------------------------------------*
@@ -10,7 +9,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { isRSCRequest, validateAuthRequest } from "@lib/auth-utils";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "@lib/server/flow-initiation";
 import { loadSessionsWithCookies } from "@lib/server/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -19,9 +17,6 @@ export const fetchCache = "default-no-store";
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const searchParams = request.nextUrl.searchParams;
 
   // Defensive check: block RSC requests early
@@ -35,13 +30,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "No valid authentication request found" }, { status: 400 });
   }
 
-  const { sessions, sessionCookies } = await loadSessionsWithCookies({
-    serviceUrl,
-  });
+  const { sessions, sessionCookies } = await loadSessionsWithCookies({});
 
   // Flow initiation - delegate to appropriate handler
   const flowParams: FlowInitiationParams = {
-    serviceUrl,
     requestId,
     sessions,
     sessionCookies,

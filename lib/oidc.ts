@@ -17,14 +17,12 @@ import { logMessage } from "./logger";
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCAndSession = {
-  serviceUrl: string;
   authRequest: string;
   sessionId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
 };
 export async function loginWithOIDCAndSession({
-  serviceUrl,
   authRequest,
   sessionId,
   sessions,
@@ -41,7 +39,6 @@ export async function loginWithOIDCAndSession({
     logMessage.debug(`Found session ${selectedSession.id} for OIDC requestId: ${oidcRequestId}`);
 
     const isValid = await isSessionValid({
-      serviceUrl,
       session: selectedSession,
     });
 
@@ -55,7 +52,6 @@ export async function loginWithOIDCAndSession({
       // TODO: handle IDP intent direcly if available
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
-        organization: selectedSession.factors?.user?.organizationId,
         requestId: oidcRequestId,
       };
 
@@ -77,7 +73,6 @@ export async function loginWithOIDCAndSession({
 
       try {
         const { callbackUrl } = await createCallback({
-          serviceUrl,
           req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {
@@ -100,7 +95,6 @@ export async function loginWithOIDCAndSession({
           // In that case, recover with a deterministic redirect to the relying party when possible.
           try {
             const { authRequest: authRequestData } = await getAuthRequest({
-              serviceUrl,
               authRequestId,
             });
 
@@ -111,10 +105,7 @@ export async function loginWithOIDCAndSession({
             // Fall through to login settings fallback when auth request lookup fails.
           }
 
-          const loginSettings = await getLoginSettings({
-            serviceUrl,
-            organization: selectedSession.factors?.user?.organizationId,
-          });
+          const loginSettings = await getLoginSettings();
 
           if (loginSettings?.defaultRedirectUri) {
             return { redirect: loginSettings.defaultRedirectUri };

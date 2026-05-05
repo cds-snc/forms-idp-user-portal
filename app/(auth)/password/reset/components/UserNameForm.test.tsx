@@ -54,9 +54,7 @@ describe("UserNameForm", () => {
   });
 
   it("renders username field and continue button", () => {
-    const { getByLabelText, getByText, getByRole } = render(
-      <UserNameForm organization="org-1" requestId="req-123" />
-    );
+    const { getByLabelText, getByText, getByRole } = render(<UserNameForm requestId="req-123" />);
 
     expect(getByLabelText(/form\.label/i)).toBeInTheDocument();
     expect(getByText("form.description")).toBeInTheDocument();
@@ -69,9 +67,7 @@ describe("UserNameForm", () => {
       issues: [{ path: [{ key: "username" }], message: "requiredUsername" }],
     } as never);
 
-    const { getByRole, getByText } = render(
-      <UserNameForm organization="org-1" requestId="req-123" />
-    );
+    const { getByRole, getByText } = render(<UserNameForm requestId="req-123" />);
 
     await userEvent.click(getByRole("button", { name: "button.continue" }));
 
@@ -84,9 +80,7 @@ describe("UserNameForm", () => {
   });
 
   it("submits username and redirects when action succeeds", async () => {
-    const { getByLabelText, getByRole } = render(
-      <UserNameForm organization="org-1" requestId="req-123" />
-    );
+    const { getByLabelText, getByRole } = render(<UserNameForm requestId="req-123" />);
 
     await userEvent.type(getByLabelText(/form\.label/i), "person@canada.ca");
     await userEvent.click(getByRole("button", { name: "button.continue" }));
@@ -94,7 +88,7 @@ describe("UserNameForm", () => {
     await vi.waitFor(() => {
       expect(submitUserNameForm).toHaveBeenCalledWith({
         loginName: "person@canada.ca",
-        organization: "org-1",
+
         requestId: "req-123",
       });
       expect(router.push).toHaveBeenCalledWith("/password/reset/verify");
@@ -105,7 +99,7 @@ describe("UserNameForm", () => {
     vi.mocked(submitUserNameForm).mockResolvedValue({ error: "raw backend message" } as never);
 
     const { getByLabelText, getByRole, getAllByText, queryByText } = render(
-      <UserNameForm organization="org-1" requestId="req-123" />
+      <UserNameForm requestId="req-123" />
     );
 
     await userEvent.type(getByLabelText(/form\.label/i), "person@canada.ca");

@@ -3,10 +3,8 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
-import type { ConnectError } from "@connectrpc/connect";
+
 import { create, Duration } from "@zitadel/client";
-import { createUserServiceClient } from "@zitadel/client/v2";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -31,8 +29,6 @@ import {
 import { serverTranslation } from "@i18n/server";
 
 import { logMessage } from "../../lib/logger";
-import { getServiceUrlFromHeaders } from "../../lib/service-url";
-import { createServerTransport } from "../../lib/zitadel";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { loadMostRecentSession } from "../session";
@@ -83,18 +79,13 @@ function didPasswordChangeSucceed(result: unknown): boolean {
  */
 async function handleAuthenticationFailure(
   error: unknown,
-  serviceUrl: string,
-  organization: string | undefined,
   t: (key: string, options?: Record<string, string>) => string
 ): Promise<{ error: string } | null> {
   if (!hasFailedAttempts(error)) {
     return null;
   }
 
-  const lockoutSettings = await getLockoutSettings({
-    serviceUrl,
-    orgId: organization,
-  });
+  const lockoutSettings = await getLockoutSettings();
 
   const hasLimit =
     lockoutSettings?.maxPasswordAttempts !== undefined &&
@@ -115,7 +106,6 @@ async function handleAuthenticationFailure(
 
 type UpdateSessionCommand = {
   loginName: string;
-  organization?: string;
   checks: Checks;
   requestId?: string;
 };
@@ -123,13 +113,10 @@ type UpdateSessionCommand = {
 export async function sendPassword(
   command: UpdateSessionCommand
 ): Promise<{ error: string } | { redirect: string }> {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
-    organization: command.organization,
   }).catch(() => {
     return undefined;
   });
@@ -137,15 +124,9 @@ export async function sendPassword(
   let session;
   let user: User;
   let loginSettings: LoginSettings | undefined;
-  // Capture organization from the cookie before it may be cleared, so the
-  // fallback new-session path retains the correct tenant context.
-  const cookieOrganization: string | undefined = sessionCookie?.organization;
 
   if (sessionCookie) {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: sessionCookie.organization,
-    });
+    loginSettings = await getLoginSettings();
 
     let lifetime = loginSettings?.passwordCheckLifetime;
 
@@ -168,12 +149,7 @@ export async function sendPassword(
       // A failed-attempts error means the password was wrong — return the
       // auth failure directly rather than retrying, which would count as a
       // second attempt and could lock the account sooner than intended.
-      const authFailure = await handleAuthenticationFailure(
-        error,
-        serviceUrl,
-        command.organization,
-        t
-      );
+      const authFailure = await handleAuthenticationFailure(error, t);
       if (authFailure) {
         return authFailure;
       }
@@ -187,17 +163,10 @@ export async function sendPassword(
   }
 
   if (!sessionCookie) {
-    const effectiveOrganization = cookieOrganization ?? command.organization;
-
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: effectiveOrganization,
-    });
+    loginSettings = await getLoginSettings();
 
     const users = await listUsers({
-      serviceUrl,
       loginName: command.loginName,
-      organizationId: effectiveOrganization,
     });
 
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
@@ -215,12 +184,7 @@ export async function sendPassword(
           lifetime: loginSettings?.passwordCheckLifetime,
         });
       } catch (error: unknown) {
-        const authFailure = await handleAuthenticationFailure(
-          error,
-          serviceUrl,
-          effectiveOrganization,
-          t
-        );
+        const authFailure = await handleAuthenticationFailure(error, t);
         if (authFailure) {
           return authFailure;
         }
@@ -237,7 +201,6 @@ export async function sendPassword(
   }
 
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: session.factors.user.id,
   });
 
@@ -248,10 +211,7 @@ export async function sendPassword(
   user = userResponse.user;
 
   if (!loginSettings) {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: command.organization ?? session.factors?.user?.organizationId,
-    });
+    loginSettings = await getLoginSettings();
   }
 
   if (!session?.factors?.user?.id) {
@@ -260,17 +220,13 @@ export async function sendPassword(
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
-  const expirySettings = await getPasswordExpirySettings({
-    serviceUrl,
-    orgId: command.organization ?? session.factors?.user?.organizationId,
-  });
+  const expirySettings = await getPasswordExpirySettings();
 
   // check if the user has to change password first
   const passwordChangedCheck = checkPasswordChangeRequired(
     expirySettings,
     session,
     humanUser,
-    command.organization,
     command.requestId
   );
 
@@ -284,12 +240,7 @@ export async function sendPassword(
   }
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -299,7 +250,6 @@ export async function sendPassword(
   let authMethods;
   if (command.checks && command.checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -319,7 +269,6 @@ export async function sendPassword(
         {
           sessionId: session.id,
           requestId: command.requestId,
-          organization: command.organization ?? session.factors?.user?.organizationId,
         },
         loginSettings?.defaultRedirectUri
       );
@@ -339,7 +288,6 @@ export async function sendPassword(
       {
         sessionId: session.id,
         loginName: session.factors.user.loginName,
-        organization: session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri
     );
@@ -355,13 +303,7 @@ export async function sendPassword(
     return result;
   }
 
-  const mfaFactorCheck = await checkMFAFactors(
-    serviceUrl,
-    session,
-    loginSettings,
-    authMethods,
-    command.requestId
-  );
+  const mfaFactorCheck = await checkMFAFactors(authMethods, command.requestId);
 
   if (mfaFactorCheck && "redirect" in mfaFactorCheck) {
     return mfaFactorCheck;
@@ -378,7 +320,6 @@ export async function sendPassword(
       {
         sessionId: session.id,
         requestId: command.requestId,
-        organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri
     );
@@ -405,7 +346,6 @@ export async function sendPassword(
   const result = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
-      organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri
   );
@@ -421,8 +361,6 @@ export async function sendPassword(
 
 // this function lets users with code set a password or users with valid User Verification Check
 export async function changePassword(command: { code?: string; userId: string; password: string }) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
   const normalizedCode = command.code?.replace(/\s+/g, "").trim();
 
@@ -432,7 +370,6 @@ export async function changePassword(command: { code?: string; userId: string; p
 
   // check for init state
   const userResponse = await getUserByID({
-    serviceUrl,
     userId: command.userId,
   }).catch(() => undefined);
 
@@ -450,7 +387,6 @@ export async function changePassword(command: { code?: string; userId: string; p
   // check if the user has no password set in order to set a password
   if (!normalizedCode) {
     const authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId,
     });
 
@@ -473,10 +409,8 @@ export async function changePassword(command: { code?: string; userId: string; p
   // that just completed a strong recovery factor for this user.
   if (normalizedCode) {
     const session = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: {
         loginName: user.preferredLoginName,
-        organization: user.details?.resourceOwner,
       },
     }).catch(() => undefined);
 
@@ -491,7 +425,6 @@ export async function changePassword(command: { code?: string; userId: string; p
 
   try {
     const result = await setUserPassword({
-      serviceUrl,
       userId,
       password: command.password,
       code: normalizedCode,
@@ -529,8 +462,6 @@ export async function checkSessionAndSetPassword({
   sessionId,
   password,
 }: CheckSessionAndSetPasswordCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
 
   let sessionCookie;
@@ -544,7 +475,6 @@ export async function checkSessionAndSetPassword({
   let session;
   try {
     const sessionResponse = await getSession({
-      serviceUrl,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     });
@@ -569,7 +499,6 @@ export async function checkSessionAndSetPassword({
   let authmethods;
   try {
     authmethods = await listAuthenticationMethodTypes({
-      serviceUrl,
       userId: session.factors.user.id,
     });
   } catch (error) {
@@ -581,84 +510,28 @@ export async function checkSessionAndSetPassword({
     return { error: t("errors.couldNotLoadAuthMethods") };
   }
 
-  let loginSettings;
-  try {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: session.factors.user.organizationId,
+  logMessage.info(
+    "Setting password via service account due to enforced MFA without existing MFA methods"
+  );
+  return setPassword({ payload })
+    .then(async (result) => {
+      // Send password changed email notification
+      if (didPasswordChangeSucceed(result)) {
+        await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
+          logMessage.debug({
+            error: error instanceof Error ? error.message : error,
+            message: "Failed to send password changed email",
+          });
+          // Don't fail the password change if email fails
+        });
+      }
+      return result;
+    })
+    .catch((error) => {
+      // throw error if failed precondition (ex. User is not yet initialized)
+      if (error.code === 9 && error.message) {
+        return { error: t("errors.failedPrecondition") };
+      }
+      return { error: "Could not set password" };
     });
-  } catch (error) {
-    logMessage.error("Could not load login settings", error);
-    return { error: "Could not load login settings" };
-  }
-
-  const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
-
-  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa) {
-    logMessage.info(
-      "Setting password via service account due to enforced MFA without existing MFA methods"
-    );
-    return setPassword({ serviceUrl, payload })
-      .then(async (result) => {
-        // Send password changed email notification
-        if (didPasswordChangeSucceed(result)) {
-          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-            logMessage.debug({
-              error: error instanceof Error ? error.message : error,
-              message: "Failed to send password changed email",
-            });
-            // Don't fail the password change if email fails
-          });
-        }
-        return result;
-      })
-      .catch((error) => {
-        // throw error if failed precondition (ex. User is not yet initialized)
-        if (error.code === 9 && error.message) {
-          return { error: t("errors.failedPrecondition") };
-        }
-        return { error: "Could not set password" };
-      });
-  } else {
-    const transport = async (serviceUrl: string, token: string) => {
-      return createServerTransport(token, serviceUrl);
-    };
-
-    const myUserService = async (serviceUrl: string, sessionToken: string) => {
-      const transportPromise = await transport(serviceUrl, sessionToken);
-      return createUserServiceClient(transportPromise);
-    };
-
-    const selfService = await myUserService(serviceUrl, `${sessionCookie.token}`);
-
-    return selfService
-      .setPassword(
-        {
-          userId: session.factors.user.id,
-          newPassword: { password, changeRequired: false },
-        },
-        {}
-      )
-      .then(async (result) => {
-        // Send password changed email notification
-        if (didPasswordChangeSucceed(result)) {
-          await sendPasswordChangedEmail({ userId: session.factors!.user!.id }).catch((error) => {
-            logMessage.debug({
-              error: error instanceof Error ? error.message : error,
-              message: "Failed to send password changed email",
-            });
-            // Don't fail the password change if email fails
-          });
-        }
-        return result;
-      })
-      .catch((error: ConnectError) => {
-        logMessage.error("Could not set password", error);
-        if (error.code === 7) {
-          return { error: t("errors.sessionNotValid") };
-        }
-        return { error: "Could not set the password" };
-      });
-  }
 }

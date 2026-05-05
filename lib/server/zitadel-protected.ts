@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { create } from "@zitadel/client";
 import { UpdateHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -12,7 +12,6 @@ import { UpdateHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/use
  *--------------------------------------------*/
 import { AuthenticatedAction, type SessionCredentials } from "@lib/actions/authenticated";
 import { logMessage } from "@lib/logger";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import * as z from "@lib/zitadel";
 
 /*--------------------------------------------*
@@ -71,9 +70,7 @@ export const protectedRemoveU2F = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      return await z.removeU2F({ serviceUrl, userId, u2fId });
+      return await z.removeU2F({ userId, u2fId });
     } catch (error) {
       logMessage.error(`Failed to remove U2F for ${userId}`, error);
       return { error: "Failed to remove U2F" };
@@ -101,9 +98,7 @@ export const protectedRemoveTOTP = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      return await z.removeTOTP({ serviceUrl, userId });
+      return await z.removeTOTP({ userId });
     } catch (error) {
       logMessage.error(`Failed to remove TOTP for ${userId}`, error);
       return { error: "Failed to remove TOTP" };
@@ -131,9 +126,7 @@ export const protectedGetTOTPStatus = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      return await z.getTOTPStatus({ serviceUrl, userId });
+      return await z.getTOTPStatus({ userId });
     } catch (error) {
       logMessage.error(`Failed to get TOTP status for ${userId}`, error);
       return { error: "Failed to get TOTP status" };
@@ -161,9 +154,7 @@ export const protectedGetU2FList = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-      return await z.getU2FList({ serviceUrl, userId });
+      return await z.getU2FList({ userId });
     } catch (error) {
       logMessage.error(`Failed to get U2F list for ${userId}`, error);
       return { error: "Failed to get U2F list" };
@@ -195,8 +186,6 @@ export const protectedUpdatePersonalDetails = AuthenticatedAction(
     }
 
     try {
-      const _headers = await headers();
-      const { serviceUrl } = getServiceUrlFromHeaders(_headers);
       const request = create(UpdateHumanUserRequestSchema, {
         userId,
         profile: {
@@ -210,7 +199,7 @@ export const protectedUpdatePersonalDetails = AuthenticatedAction(
         // },
         // username: account.email,
       });
-      return await z.updateHuman({ serviceUrl, request });
+      return await z.updateHuman({ request });
     } catch (error) {
       logMessage.error(`Failed to update user ${userId}`, error);
       return { error: "Failed to update user" };

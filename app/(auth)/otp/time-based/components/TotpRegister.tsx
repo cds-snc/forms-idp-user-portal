@@ -35,10 +35,9 @@ type Props = {
   secret: string;
   loginName?: string;
   requestId?: string;
-  organization?: string;
   checkAfter?: boolean;
 };
-export function TotpRegister({ uri, loginName, requestId, organization, checkAfter }: Props) {
+export function TotpRegister({ uri, loginName, requestId, checkAfter }: Props) {
   const router = useRouter();
 
   const { t } = useTranslation(["otp", "error"]);
@@ -64,7 +63,7 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
       };
     }
 
-    return verifyTOTP(normalizedCode, loginName, organization)
+    return verifyTOTP(normalizedCode, loginName)
       .then(async (verifyResponse) => {
         if (verifyResponse && "error" in verifyResponse && verifyResponse.error) {
           throw verifyResponse.error;
@@ -79,7 +78,6 @@ export function TotpRegister({ uri, loginName, requestId, organization, checkAft
           // Mark second-factor checks complete for this session during setup.
           const sessionResponse = await updateSession({
             loginName,
-            organization,
             checks,
             requestId,
           });

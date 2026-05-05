@@ -7,7 +7,6 @@ import { headers } from "next/headers";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { SearchParams } from "@lib/utils";
@@ -31,11 +30,9 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const resolvedHost = getOriginalHostFromHeaders(await headers());
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
-  const organization = ZITADEL_ORGANIZATION;
-
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="register">
-      <RegisterForm organization={organization} requestId={requestId} siteConfig={siteConfig} />
+      <RegisterForm requestId={requestId} siteConfig={siteConfig} />
     </AuthPanel>
   );
 }

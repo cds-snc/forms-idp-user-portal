@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -11,7 +10,6 @@ import { redirect } from "next/navigation";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -29,25 +27,20 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const { checkAfter } = searchParams;
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
   const sessionFactors = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
-    organization,
+
     pageName: "U2F setup page",
     missingSessionRedirect: "/mfa/set",
   });

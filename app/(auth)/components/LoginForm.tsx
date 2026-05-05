@@ -26,7 +26,6 @@ import { ErrorSummary } from "@components/ui/form/ErrorSummary";
 import { submitLoginForm } from "../actions";
 type Props = {
   requestId?: string;
-  organization?: string;
 };
 
 type FormState = {

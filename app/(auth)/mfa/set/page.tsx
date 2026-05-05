@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -11,7 +10,6 @@ import { redirect } from "next/navigation";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { checkSessionFactorValidity } from "@lib/session";
 import { getSerializableLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
@@ -28,32 +26,26 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
+
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
   const sessionFactors = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
-    organization,
+
     pageName: "MFA set page",
     missingSessionRedirect: "/",
   });
 
-  const loginSettings = await getSerializableLoginSettings({
-    serviceUrl,
-    organizationId: sessionFactors.factors?.user?.organizationId,
-  });
+  const loginSettings = await getSerializableLoginSettings();
 
   const { valid } = checkSessionFactorValidity(sessionFactors);
 

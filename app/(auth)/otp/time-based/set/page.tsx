@@ -1,7 +1,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { type RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -13,7 +13,6 @@ import { LOGGED_IN_HOME_PAGE } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { registerTOTP } from "@lib/zitadel";
 import { getZitadelUiError } from "@lib/zitadel-errors";
@@ -39,11 +38,11 @@ export default async function Page(props: {
 
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
+
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
@@ -53,14 +52,10 @@ export default async function Page(props: {
   const { method } = params;
   const { t } = await serverTranslation("otp");
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   const session = await loadMfaSetupSession({
-    serviceUrl,
     sessionId,
     loginName,
-    organization,
+
     pageName: "OTP setup page",
     missingSessionRedirect: "/mfa/set",
   });
@@ -73,7 +68,6 @@ export default async function Page(props: {
 
     try {
       const resp = await registerTOTP({
-        serviceUrl,
         userId,
       });
 
@@ -95,7 +89,6 @@ export default async function Page(props: {
       message: "OTP setup page missing session",
       method,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect("/mfa/set");
   }
@@ -146,7 +139,6 @@ export default async function Page(props: {
               uri={totpResponse.uri as string}
               secret={totpResponse.secret as string}
               loginName={loginName}
-              organization={organization}
               requestId={requestId}
               checkAfter={checkAfter}
             ></TotpRegister>

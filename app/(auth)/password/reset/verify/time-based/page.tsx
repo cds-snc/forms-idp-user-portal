@@ -11,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject } from "@lib/utils";
@@ -28,31 +27,26 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/password/reset/verify");
   }
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization ?? sessionData.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -64,7 +58,6 @@ export default async function Page() {
       <LoginTOTP
         loginName={loginName ?? sessionData.factors?.user?.loginName}
         sessionId={sessionId}
-        organization={organization ?? sessionData.factors?.user?.organizationId}
         loginSettings={loginSettings}
         redirect="/password/reset/set"
         displayName={sessionData.factors?.user?.displayName}

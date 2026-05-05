@@ -10,7 +10,6 @@ type RegistrationData = {
   firstname: string;
   lastname: string;
   email: string;
-  organization?: string;
   requestId?: string;
 };
 

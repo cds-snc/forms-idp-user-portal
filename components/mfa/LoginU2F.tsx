@@ -35,7 +35,6 @@ type Props = {
   sessionId?: string;
   requestId?: string;
   login?: boolean;
-  organization?: string;
   redirect?: string | null;
 };
 
@@ -87,7 +86,7 @@ export function LoginU2F({
   loginName,
   sessionId,
   requestId,
-  organization,
+
   login = true,
   redirect,
 }: Props) {
@@ -108,7 +107,6 @@ export function LoginU2F({
       session = await updateSession({
         loginName,
         sessionId,
-        organization,
         challenges: create(RequestChallengesSchema, {
           webAuthN: {
             domain: "",
@@ -145,7 +143,7 @@ export function LoginU2F({
       response = await verifyU2FLogin({
         loginName,
         sessionId,
-        organization,
+
         checks: { webAuthN: { credentialAssertionData: data } } as Checks,
         requestId,
         redirect,

@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { GCNotifyConnector } from "@gcforms/connectors";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -14,21 +14,17 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { getPasswordResetTemplate } from "@lib/emailTemplates";
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 type SendResetCodeCommand = {
   loginName: string;
-  organization?: string;
   requestId?: string;
 };
 
 export const submitUserNameForm = async (
   command: SendResetCodeCommand
 ): Promise<{ error: string } | { redirect: string }> => {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const { t } = await serverTranslation("password");
 
   const genericErrorResponse = {
@@ -36,9 +32,7 @@ export const submitUserNameForm = async (
   };
 
   const users = await listUsers({
-    serviceUrl,
     loginName: command.loginName,
-    organizationId: command.organization,
   }).catch((_error) => {
     logMessage.warn("Failed to look up password reset user");
     return undefined;
@@ -74,7 +68,6 @@ export const submitUserNameForm = async (
   }
 
   const codeResponse = await passwordResetWithReturn({
-    serviceUrl,
     userId,
   }).catch((_error) => {
     logMessage.error("Failed to get password reset code");

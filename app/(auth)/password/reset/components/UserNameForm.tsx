@@ -23,7 +23,6 @@ import { ErrorSummary } from "@components/ui/form/ErrorSummary";
  *--------------------------------------------*/
 import { submitUserNameForm } from "../actions";
 type Props = {
-  organization?: string;
   requestId?: string;
 };
 
@@ -35,7 +34,7 @@ type FormState = {
   validationErrors?: { fieldKey: string; fieldValue: string }[];
 };
 
-export const UserNameForm = ({ organization, requestId }: Props) => {
+export const UserNameForm = ({ requestId }: Props) => {
   const { t } = useTranslation(["start", "common", "error"]);
   const genericErrorMessage = t("title", { ns: "error" });
   const router = useRouter();
@@ -61,7 +60,6 @@ export const UserNameForm = ({ organization, requestId }: Props) => {
 
     const result = await submitUserNameForm({
       loginName: username,
-      organization,
       requestId,
     }).catch(() => {
       return {

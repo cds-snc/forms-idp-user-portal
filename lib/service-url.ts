@@ -1,7 +1,8 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+
+import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 import { getOriginalHostFromHeaders } from "./server/host";
@@ -12,14 +13,15 @@ import { getOriginalHostFromHeaders } from "./server/host";
  * @throws if the service url could not be determined
  *
  */
-export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
+export async function getServiceUrlFromHeaders(): Promise<{
   serviceUrl: string;
-} {
+}> {
   if (process.env.ZITADEL_API_URL) {
     return { serviceUrl: process.env.ZITADEL_API_URL };
   }
+  const _headers = await headers();
 
-  const host = getOriginalHostFromHeaders(headers);
+  const host = getOriginalHostFromHeaders(_headers);
 
   return { serviceUrl: host.includes("localhost") ? `http://${host}` : `https://${host}` };
 }

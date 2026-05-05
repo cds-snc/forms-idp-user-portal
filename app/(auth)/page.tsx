@@ -2,16 +2,13 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { getSessionCredentials } from "@lib/cookies";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { isSessionValid, loadMostRecentSession } from "@lib/session";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
@@ -31,21 +28,16 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
   const searchParams = await props.searchParams;
   const requestId = searchParams.requestId;
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const organization = ZITADEL_ORGANIZATION;
-
   // Check if user is already authenticated
   let isAuthenticated = false;
   try {
     const { loginName } = await getSessionCredentials();
 
     const session = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: { loginName, organization },
+      sessionParams: { loginName },
     });
 
-    isAuthenticated = session ? await isSessionValid({ serviceUrl, session }) : false;
+    isAuthenticated = session ? await isSessionValid({ session }) : false;
   } catch (error) {
     // No valid session, continue to login form
   }
@@ -59,7 +51,7 @@ export default async function LoginPage(props: { searchParams: Promise<SearchPar
 
   return (
     <AuthPanel titleI18nKey="title" descriptionI18nKey="none" namespace="start">
-      <LoginForm requestId={requestId} organization={organization} />
+      <LoginForm requestId={requestId} />
 
       <p className="mt-10">
         <I18n i18nKey="register" namespace="start" />

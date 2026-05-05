@@ -31,7 +31,6 @@ type Inputs = {
 type SubmitCodeParams = {
   loginName?: string;
   sessionId?: string;
-  organization?: string;
   requestId?: string;
   redirect?: string | null;
 };
@@ -110,12 +109,10 @@ export async function handleOTPFormSubmit(
           ? {
               sessionId: response.sessionId,
               requestId: submitParams.requestId,
-              organization: response.factors.user.organizationId,
             }
           : {
               sessionId: response.sessionId,
               loginName: response.factors.user.loginName,
-              organization: response.factors.user.organizationId,
             },
         redirectUrl
       );
@@ -169,7 +166,7 @@ async function _submitOTPCode(
   values: Inputs,
   params: SubmitCodeParams
 ): Promise<SessionResponse | undefined> {
-  const { loginName, sessionId, organization, requestId } = params;
+  const { loginName, sessionId, requestId } = params;
 
   const checks = create(ChecksSchema, {
     totp: { code: values.code },
@@ -179,7 +176,6 @@ async function _submitOTPCode(
     const response = await updateSession({
       loginName,
       sessionId,
-      organization,
       checks,
       requestId,
     });

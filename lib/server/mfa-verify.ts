@@ -7,7 +7,6 @@ import { loadSessionById, loadSessionByLoginname, type SessionWithAuthData } fro
 import { AuthLevel, checkAuthenticationLevel } from "./route-protection";
 
 type LoadMfaVerificationSessionParams = {
-  serviceUrl: string;
   pageName: string;
   missingSessionRedirect: string;
 };
@@ -15,31 +14,23 @@ type LoadMfaVerificationSessionParams = {
 type MfaVerificationSession = {
   sessionId?: string;
   loginName?: string;
-  organization?: string;
   sessionData: SessionWithAuthData;
 };
 
 export async function loadMfaVerificationSession({
-  serviceUrl,
   pageName,
   missingSessionRedirect,
 }: LoadMfaVerificationSessionParams): Promise<MfaVerificationSession> {
   let sessionId: string | undefined;
   let loginName: string | undefined;
-  let organization: string | undefined;
 
   try {
-    ({ sessionId, loginName, organization } = await getSessionCredentials());
+    ({ sessionId, loginName } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
-  const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     logMessage.debug({
@@ -54,14 +45,13 @@ export async function loadMfaVerificationSession({
 
   try {
     sessionData = sessionId
-      ? await loadSessionById(serviceUrl, sessionId, organization)
-      : await loadSessionByLoginname(serviceUrl, loginName, organization);
+      ? await loadSessionById(sessionId)
+      : await loadSessionByLoginname(loginName);
   } catch {
     logMessage.debug({
       message: `${pageName} missing session factors`,
       hasSessionId: !!sessionId,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect(missingSessionRedirect);
   }
@@ -69,7 +59,7 @@ export async function loadMfaVerificationSession({
   return {
     sessionId,
     loginName,
-    organization,
+
     sessionData,
   };
 }

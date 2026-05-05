@@ -34,15 +34,10 @@ type AuthCheckResult = {
 /**
  * Safe wrapper around loadMostRecentSession that returns null instead of throwing
  */
-async function getSessionFromCookies(
-  serviceUrl: string,
-  loginName?: string,
-  organization?: string
-): Promise<Session | null> {
+async function getSessionFromCookies(loginName?: string): Promise<Session | null> {
   try {
     const session = await loadMostRecentSession({
-      serviceUrl,
-      sessionParams: { loginName, organization },
+      sessionParams: { loginName },
     });
     return session || null;
   } catch (error) {
@@ -50,7 +45,6 @@ async function getSessionFromCookies(
       error,
       message: "Failed to get session from cookies",
       loginName,
-      organization,
     });
     return null;
   }
@@ -149,10 +143,8 @@ export function requiresStrongMfaSetupVerification(
  * Check if authentication level is satisfied
  */
 export async function checkAuthenticationLevel(
-  serviceUrl: string,
   requiredLevel: AuthLevel,
-  loginName?: string,
-  organization?: string
+  loginName?: string
 ): Promise<AuthCheckResult> {
   // Open routes always pass
   if (requiredLevel === AuthLevel.OPEN) {
@@ -160,7 +152,7 @@ export async function checkAuthenticationLevel(
   }
 
   // Get session from cookies (non-throwing)
-  const session = await getSessionFromCookies(serviceUrl, loginName, organization);
+  const session = await getSessionFromCookies(loginName);
 
   // Basic session check - just verify cookie exists
   if (requiredLevel === AuthLevel.BASIC_SESSION) {
@@ -248,11 +240,7 @@ export async function checkAuthenticationLevel(
  * Get smart redirect URL based on current auth state and destination
  * Preserves requestId and organization params
  */
-export function getSmartRedirect(
-  destinationPath: string,
-  session: Session | null,
-  searchParams?: URLSearchParams
-): string {
+export function getSmartRedirect(session: Session | null, searchParams?: URLSearchParams): string {
   const factors = checkSessionFactors(session);
   const params = new URLSearchParams();
 

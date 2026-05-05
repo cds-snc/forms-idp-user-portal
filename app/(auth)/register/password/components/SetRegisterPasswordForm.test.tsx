@@ -61,7 +61,6 @@ describe("SetRegisterPasswordForm", () => {
     email: "person@canada.ca",
     firstname: "Person",
     lastname: "Example",
-    organization: "org-1",
     requestId: "req-123",
     onSubmitSuccess,
   };
@@ -100,7 +99,6 @@ describe("SetRegisterPasswordForm", () => {
         firstName: "Person",
         lastName: "Example",
         password: "P@ssw0rd",
-        organization: "org-1",
         requestId: "req-123",
       });
       expect(onSubmitSuccess).toHaveBeenCalledTimes(1);

@@ -13,7 +13,6 @@ import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/
  *--------------------------------------------*/
 import { getSessionCookieById } from "@lib/cookies";
 import { getOriginalHost } from "@lib/server/host";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getSession, registerU2F, verifyU2FRegistration } from "@lib/zitadel";
 
 import { U2F_ERRORS } from "../u2f-errors";
@@ -53,8 +52,6 @@ function isProtobufMessage(obj: unknown): obj is ProtobufMessage {
 }
 
 export async function addU2F(command: RegisterU2FCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = await getOriginalHost();
 
   const sessionCookie = await getSessionCookieById({
@@ -66,7 +63,6 @@ export async function addU2F(command: RegisterU2FCommand) {
   }
 
   const session = await getSession({
-    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -83,7 +79,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: U2F_ERRORS.SESSION_NOT_FOUND };
   }
 
-  const result = await registerU2F({ serviceUrl, userId, domain: hostname });
+  const result = await registerU2F({ userId, domain: hostname });
 
   // The publicKeyCredentialCreationOptions is a structpb.Struct
   // We need to use toJson() to get a plain object
@@ -106,8 +102,6 @@ export async function addU2F(command: RegisterU2FCommand) {
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   let passkeyName = command.passkeyName;
 
   if (!passkeyName) {
@@ -129,7 +123,6 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   }
 
   const session = await getSession({
-    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -147,7 +140,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  const result = await verifyU2FRegistration({ serviceUrl, request });
+  const result = await verifyU2FRegistration({ request });
 
   // Check if the error is due to credential already being registered
   if (result && "error" in result && result.error) {

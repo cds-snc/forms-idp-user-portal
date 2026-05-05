@@ -10,7 +10,6 @@ import { headers } from "next/headers";
 import { getSessionCredentials } from "@lib/cookies";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject, SearchParams } from "@lib/utils";
@@ -25,18 +24,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
-  const [searchParams, _headers, { sessionId, loginName, organization, requestId }] =
-    await Promise.all([props.searchParams, headers(), getSessionCredentials()]);
+  const [searchParams, _headers, { sessionId, loginName, requestId }] = await Promise.all([
+    props.searchParams,
+    headers(),
+    getSessionCredentials(),
+  ]);
 
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   const { redirect } = searchParams;
 
   const sessionData = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData
@@ -45,10 +46,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const safeRedirect = getSafeRedirectUrl(redirect);
 
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization: organization ?? sessionFactors?.factors?.user?.organizationId,
-  }).then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
 
   return (
     <AuthPanel
@@ -61,7 +59,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
         <LoginTOTP
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           sessionId={sessionId}
-          organization={organization ?? sessionFactors?.factors?.user?.organizationId}
           requestId={requestId}
           loginSettings={loginSettings}
           redirect={safeRedirect}

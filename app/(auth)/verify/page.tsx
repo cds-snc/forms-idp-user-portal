@@ -10,7 +10,6 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
  * Internal Aliases
  *--------------------------------------------*/
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadMostRecentSession } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { SearchParams } from "@lib/utils";
@@ -32,10 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId } = searchParams;
+  const { userId, loginName, code, requestId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
   const resolvedHost = getOriginalHostFromHeaders(_headers);
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
@@ -45,7 +44,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   if ("userId" in searchParams && userId) {
     const userResponse = await getUserByID({
-      serviceUrl,
       userId,
     });
     if (userResponse) {
@@ -58,17 +56,13 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   if (!sessionFactors) {
     sessionFactors = await loadMostRecentSession({
-      serviceUrl,
       sessionParams: {
         loginName,
-        organization,
       },
     }).catch(() => undefined);
   }
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
-  const resolvedOrganization =
-    organization ?? sessionFactors?.factors?.user?.organizationId ?? user?.details?.resourceOwner;
 
   if (!id) {
     redirect("/");
@@ -78,7 +72,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     <AuthPanel titleI18nKey="title" descriptionI18nKey="description" namespace="verify">
       <VerifyEmailForm
         loginName={loginName}
-        organization={resolvedOrganization}
         userId={id}
         code={code}
         requestId={requestId}

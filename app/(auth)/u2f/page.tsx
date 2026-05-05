@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /*--------------------------------------------*
@@ -12,7 +11,6 @@ import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById } from "@lib/session";
 import { SearchParams } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
@@ -29,18 +27,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { redirect: redirectParam } = searchParams;
-  const { sessionId, loginName, organization, requestId } = await getSessionCredentials();
+  const { sessionId, loginName, requestId } = await getSessionCredentials();
   const safeRedirect = getSafeRedirectUrl(redirectParam);
 
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     logMessage.debug({
@@ -51,13 +41,12 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
     redirect(authCheck.redirect || "/password");
   }
 
-  const sessionFactors = await loadSessionById(serviceUrl, sessionId, organization);
+  const sessionFactors = await loadSessionById(sessionId);
 
   if (!sessionFactors) {
     logMessage.debug({
       message: "U2F verify page missing session factors",
       hasSessionId: !!sessionId,
-      hasOrganization: !!organization,
     });
     redirect("/mfa");
   }
@@ -90,7 +79,6 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           <LoginU2F
             loginName={loginName}
             sessionId={sessionId}
-            organization={organization}
             requestId={requestId}
             login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
             redirect={safeRedirect}

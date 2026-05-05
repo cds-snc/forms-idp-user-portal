@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -12,7 +11,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
@@ -32,33 +30,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, organization, sessionId, requestId } = await getSessionCredentials();
-
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const { loginName, sessionId, requestId } = await getSessionCredentials();
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(
-    serviceUrl,
-    AuthLevel.PASSWORD_REQUIRED,
-    loginName,
-    organization
-  );
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
-    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+    ? await loadSessionById(sessionId)
+    : await loadSessionByLoginname(loginName);
 
   if (!sessionFactors) {
     logMessage.debug({
       message: "MFA page missing session factors",
       hasSessionId: !!sessionId,
       hasLoginName: !!loginName,
-      hasOrganization: !!organization,
     });
     redirect(authCheck.redirect || "/password");
   }
@@ -88,7 +77,6 @@ export default async function Page() {
           loginName={loginName}
           sessionId={sessionId}
           requestId={requestId}
-          organization={organization}
         />
       </AuthPanel>
     </>

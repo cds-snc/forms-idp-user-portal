@@ -3,7 +3,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
-import { headers } from "next/headers";
+
 import { Duration } from "@zitadel/client";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
@@ -13,7 +13,6 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getSessionCookieById, getSessionCookieByLoginName } from "@lib/cookies";
 import { setSessionAndUpdateCookie } from "@lib/server/cookie";
 import { continueWithSession } from "@lib/server/session";
-import { getServiceUrlFromHeaders } from "@lib/service-url";
 import { getLoginSettings } from "@lib/zitadel";
 
 import { U2F_ERRORS } from "./u2f-errors";
@@ -21,7 +20,6 @@ import { U2F_ERRORS } from "./u2f-errors";
 type VerifyU2FLoginCommand = {
   loginName?: string;
   sessionId?: string;
-  organization?: string;
   checks: Checks;
   requestId?: string;
   redirect?: string | null;
@@ -30,19 +28,15 @@ type VerifyU2FLoginCommand = {
 export async function verifyU2FLogin({
   loginName,
   sessionId,
-  organization,
   checks,
   requestId,
   redirect,
 }: VerifyU2FLoginCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
   let sessionCookie;
   if (sessionId) {
-    sessionCookie = await getSessionCookieById({ sessionId, organization });
+    sessionCookie = await getSessionCookieById({ sessionId });
   } else if (loginName) {
-    sessionCookie = await getSessionCookieByLoginName({ loginName, organization });
+    sessionCookie = await getSessionCookieByLoginName({ loginName });
   }
 
   if (!sessionCookie) {
@@ -50,10 +44,7 @@ export async function verifyU2FLogin({
   }
 
   // Get login settings to determine lifetime
-  const loginSettings = await getLoginSettings({
-    serviceUrl,
-    organization,
-  });
+  const loginSettings = await getLoginSettings();
 
   const lifetime = loginSettings?.multiFactorCheckLifetime ?? {
     seconds: BigInt(60 * 60 * 24), // default to 24 hours
