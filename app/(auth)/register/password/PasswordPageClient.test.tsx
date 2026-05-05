@@ -98,7 +98,7 @@ describe("PasswordPageClient", () => {
     render(<PasswordPageClient passwordComplexitySettings={{} as never} />);
 
     expect(
-      screen.getByText("set-register-password:person@canada.ca:Person:Example:org-1:req-123")
+      screen.getByText("set-register-password:person@canada.ca:Person:Example:req-123")
     ).toBeInTheDocument();
     expect(router.replace).not.toHaveBeenCalled();
   });

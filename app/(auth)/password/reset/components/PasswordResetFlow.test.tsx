@@ -15,6 +15,6 @@ describe("PasswordResetFlow", () => {
       <PasswordResetFlow passwordComplexitySettings={{} as never} requestId="req-123" />
     );
 
-    expect(getByText("username-form:org-1:req-123")).toBeInTheDocument();
+    expect(getByText("username-form:req-123")).toBeInTheDocument();
   });
 });

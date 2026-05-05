@@ -10,8 +10,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import crypto from "crypto";
 import moment from "moment";
 
-import { ZITADEL_ORGANIZATION } from "@root/constants/config";
-
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
@@ -37,8 +35,6 @@ export function checkPasswordChangeRequired(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    params.append("organization", ZITADEL_ORGANIZATION);
-
     if (requestId) {
       params.append("requestId", requestId);
     }
@@ -57,9 +53,6 @@ export function checkEmailVerification(
       userId: session.factors?.user?.id as string,
       send: "true", // set this to true as we dont expect old email codes to be valid anymore
     });
-
-    params.set("organization", ZITADEL_ORGANIZATION);
-
     const verifyUrl = buildUrlWithRequestId("/verify", requestId);
     const [basePath, existingQuery = ""] = verifyUrl.split("?");
     const mergedParams = new URLSearchParams(existingQuery);

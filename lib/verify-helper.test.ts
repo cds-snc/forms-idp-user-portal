@@ -23,7 +23,7 @@ describe("checkEmailVerification", () => {
     );
 
     expect(redirect).toEqual({
-      redirect: "/verify?requestId=oidc_req-123&userId=user-123&send=true&organization=org-1",
+      redirect: "/verify?requestId=oidc_req-123&userId=user-123&send=true",
     });
   });
 });
