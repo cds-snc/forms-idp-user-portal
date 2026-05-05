@@ -14,6 +14,7 @@ import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
  *--------------------------------------------*/
 import { createServerTransport } from "../lib/zitadel";
 
+import { logMessage } from "./logger";
 import { getServiceUrlFromHeaders } from "./service-url";
 
 const ServiceClass = {
@@ -28,11 +29,11 @@ const ServiceClass = {
 type Services = (typeof ServiceClass)[keyof typeof ServiceClass];
 
 if (!process.env.ZITADEL_SERVICE_USER_TOKEN) {
-  throw new Error("No Zitadel Service Token found");
+  logMessage.error("No Zitadel Service Token found");
 }
 
 const services: Record<string, Client<Services>> = {};
-const token: string = process.env.ZITADEL_SERVICE_USER_TOKEN;
+const token: string = process.env.ZITADEL_SERVICE_USER_TOKEN ?? "dummy_token_for_building";
 
 export const getServiceForHost = async <S extends keyof typeof ServiceClass>(service: S) => {
   if (!services[service]) {
