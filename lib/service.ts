@@ -9,8 +9,6 @@ import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_servic
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { logMessage } from "@lib/logger";
-
 /*--------------------------------------------*
  * Parent Relative
  *--------------------------------------------*/
@@ -28,25 +26,19 @@ const ServiceClass = {
 } as const;
 
 type Services = (typeof ServiceClass)[keyof typeof ServiceClass];
-class ServiceForHost {
-  private services: Record<string, Client<Services>> = {};
-  private token: string;
-  constructor() {
-    if (!process.env.ZITADEL_SERVICE_USER_TOKEN) {
-      throw new Error("No token found");
-    }
-    this.token = process.env.ZITADEL_SERVICE_USER_TOKEN;
-  }
 
-  public async getServiceForHost<S extends keyof typeof ServiceClass>(service: S) {
-    if (!this.services[service]) {
-      logMessage.debug(`[ZITADEL SERVICE]: Creating service for ${service}`);
-      const { serviceUrl } = await getServiceUrlFromHeaders();
-      const transport = createServerTransport(this.token, serviceUrl);
-      this.services[service] = createClientFor(ServiceClass[service])(transport);
-    }
-    logMessage.debug(`[ZITADEL SERVICE]: Getting service for ${service}`);
-    return this.services[service] as Client<(typeof ServiceClass)[S]>;
-  }
+if (!process.env.ZITADEL_SERVICE_USER_TOKEN) {
+  throw new Error("No Zitadel Service Token found");
 }
-export const { getServiceForHost } = new ServiceForHost();
+
+const services: Record<string, Client<Services>> = {};
+const token: string = process.env.ZITADEL_SERVICE_USER_TOKEN;
+
+export const getServiceForHost = async <S extends keyof typeof ServiceClass>(service: S) => {
+  if (!services[service]) {
+    const { serviceUrl } = await getServiceUrlFromHeaders();
+    const transport = createServerTransport(token, serviceUrl);
+    services[service] = createClientFor(ServiceClass[service])(transport);
+  }
+  return services[service] as Client<(typeof ServiceClass)[S]>;
+};
