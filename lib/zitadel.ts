@@ -120,9 +120,6 @@ export async function registerTOTP({ userId }: { userId: string }) {
 }
 
 export async function getPasswordComplexitySettings() {
-  "use cache";
-  cacheLife("minutes");
-
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) })
