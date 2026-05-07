@@ -10,12 +10,6 @@ import { isRSCRequest, validateAuthRequest } from "@lib/auth-utils";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "@lib/server/flow-initiation";
 import { loadSessionsWithCookies } from "@lib/server/session";
 
-export const dynamic = "force-dynamic";
-export const revalidate = false;
-export const fetchCache = "default-no-store";
-// Add this to prevent RSC requests
-export const runtime = "nodejs";
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 

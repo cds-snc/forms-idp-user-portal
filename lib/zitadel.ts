@@ -757,13 +757,13 @@ export async function getActiveIdentityProviders({
 /**
  * @security Requires authenticated session. Use protectedListAuthenticationMethodTypes from lib/server/zitadel-protected.ts
  */
-export async function listAuthenticationMethodTypes({ userId }: { userId: string }) {
+export const listAuthenticationMethodTypes = cache(async ({ userId }: { userId: string }) => {
   const userService = await getServiceForHost("UserService");
 
   return userService.listAuthenticationMethodTypes({
     userId,
   });
-}
+});
 
 type AnyFn = (req: UnaryRequest | StreamRequest) => Promise<UnaryResponse | StreamResponse>;
 const loggingInterceptor = (next: AnyFn) => async (req: UnaryRequest | StreamRequest) => {

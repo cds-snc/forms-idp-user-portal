@@ -8,11 +8,9 @@
 import { logMessage } from "@lib/logger";
 import { loadSessionsFromCookies } from "@lib/server/session";
 import { isSessionValid } from "@lib/session";
-import { serverTranslation } from "@i18n/server";
 import { LogoutButton } from "@components/auth/LogoutButton";
 
 export const Logout = async ({ className }: { className?: string }) => {
-  const { t } = await serverTranslation("header");
   const allSessions = await loadSessionsFromCookies().catch((_error) => {
     logMessage.warn("Failed to load sessions for logout state");
     return [];
@@ -31,5 +29,5 @@ export const Logout = async ({ className }: { className?: string }) => {
     return null;
   }
 
-  return <LogoutButton className={className} label={t("logout")} />;
+  return <LogoutButton className={className} />;
 };
