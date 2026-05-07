@@ -45,6 +45,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   cacheComponents: true,
+  cacheHandler: "./nextCacheHandler.ts",
+  cacheMaxMemorySize: 0, // disable default in-memory caching
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
   async headers() {
     return [
