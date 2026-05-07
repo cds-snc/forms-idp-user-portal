@@ -76,7 +76,7 @@ const InnerRootLayout = async ({ children }: { children: React.ReactNode }) => {
           </style>
         )}
       </head>
-      <body>{children} </body>
+      <body>{children}</body>
     </html>
   );
 };
