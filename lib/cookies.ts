@@ -307,10 +307,12 @@ export async function getMostRecentCookieWithLoginname<T>({
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-    let filtered = sessions.filter((cookie) => {
-      return loginName ? cookie.loginName === loginName : true;
-    });
-
+    let filtered = sessions;
+    if (loginName) {
+      filtered = sessions.filter((cookie) => {
+        return loginName ? cookie.loginName === loginName : true;
+      });
+    }
     filtered = filtered.filter((cookie) => {
       return cookie.organization === ZITADEL_ORGANIZATION;
     });

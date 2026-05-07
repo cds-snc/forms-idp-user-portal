@@ -1,6 +1,15 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
+
+import { cache } from "react";
+import { cacheLife } from "next/cache";
+import type {
+  StreamRequest,
+  StreamResponse,
+  UnaryRequest,
+  UnaryResponse,
+} from "@connectrpc/connect";
 import { create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -35,23 +44,14 @@ import { logMessage } from "./logger";
 import { getServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
 
-const useCache = process.env.DEBUG !== "true";
-
-async function cacheWrapper<T>(callback: Promise<T>) {
-  // "use cache";
-  // cacheLife("hours");
-
-  return callback;
-}
-
 export async function getLoginSettings() {
-  const settingsService = await getServiceForHost("SettingsService");
+  "use cache";
+  cacheLife("minutes");
 
-  const callback = settingsService
+  const settingsService = await getServiceForHost("SettingsService");
+  return settingsService
     .getLoginSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getSerializableLoginSettings() {
@@ -65,42 +65,46 @@ export async function getSerializableLoginSettings() {
 }
 
 export async function getSecuritySettings() {
+  "use cache";
+  cacheLife("minutes");
+
   const settingsService = await getServiceForHost("SettingsService");
 
-  const callback = settingsService
+  return settingsService
     .getSecuritySettings({})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLockoutSettings() {
-  const settingsService = await getServiceForHost("SettingsService");
+  "use cache";
+  cacheLife("minutes");
 
-  const callback = settingsService
+  const settingsService = await getServiceForHost("SettingsService");
+  return settingsService
     .getLockoutSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 /**
  * @security Requires authenticated session. Use protectedGetPasswordExpirySettings from lib/server/zitadel-protected.ts
  */
 export async function getPasswordExpirySettings() {
-  const settingsService = await getServiceForHost("SettingsService");
+  "use cache";
+  cacheLife("minutes");
 
-  const callback = settingsService
+  const settingsService = await getServiceForHost("SettingsService");
+  return settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 /**
  * @security Requires authenticated session. Use protectedListIDPLinks from lib/server/zitadel-protected.ts
  */
 export async function listIDPLinks({ userId }: { userId: string }) {
+  "use cache";
+  cacheLife("minutes");
+
   const userService = await getServiceForHost("UserService");
 
   return userService.listIDPLinks({ userId }, {});
@@ -116,13 +120,13 @@ export async function registerTOTP({ userId }: { userId: string }) {
 }
 
 export async function getPasswordComplexitySettings() {
-  const settingsService = await getServiceForHost("SettingsService");
+  "use cache";
+  cacheLife("minutes");
 
-  const callback = settingsService
+  const settingsService = await getServiceForHost("SettingsService");
+  return settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 /**
@@ -176,17 +180,12 @@ export async function setSession({
 /**
  * @security Requires authenticated session tokens. Internal use only.
  */
-export async function getSession({
-  sessionId,
-  sessionToken,
-}: {
-  sessionId: string;
-  sessionToken: string;
-}) {
-  const sessionService = await getServiceForHost("SessionService");
-
-  return sessionService.getSession({ sessionId, sessionToken }, {});
-}
+export const getSession = cache(
+  async ({ sessionId, sessionToken }: { sessionId: string; sessionToken: string }) => {
+    const sessionService = await getServiceForHost("SessionService");
+    return sessionService.getSession({ sessionId, sessionToken }, {});
+  }
+);
 
 /**
  * @security Requires authenticated session tokens. Logout operation.
@@ -766,28 +765,18 @@ export async function listAuthenticationMethodTypes({ userId }: { userId: string
   });
 }
 
+type AnyFn = (req: UnaryRequest | StreamRequest) => Promise<UnaryResponse | StreamResponse>;
+const loggingInterceptor = (next: AnyFn) => async (req: UnaryRequest | StreamRequest) => {
+  logMessage.debug(
+    `[ZITADEL CONNECTION]${req.stream ? "[STREAM]" : ""} Sending request to: ${req.method.name}`
+  );
+  return next(req);
+};
+
 export function createServerTransport(token: string, baseUrl: string) {
   return libCreateServerTransport(token, {
     baseUrl,
-    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
-      ? undefined
-      : [
-          (next) => {
-            return (req) => {
-              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
-                const kv = header.indexOf(":");
-                if (kv > 0) {
-                  req.header.set(header.slice(0, kv).trim(), header.slice(kv + 1).trim());
-                } else {
-                  logMessage.warn(
-                    `Skipping malformed CUSTOM_REQUEST_HEADERS entry (expected key:value format)`
-                  );
-                }
-              });
-              return next(req);
-            };
-          },
-        ],
+    interceptors: process.env.NODE_ENV === "development" ? [loggingInterceptor] : undefined,
   });
 }
 

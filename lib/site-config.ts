@@ -10,12 +10,11 @@ export type SiteConfig = {
   zitadelOrganizationId: string;
 };
 
-type SiteLinkKey = "home" | "about" | "termsOfUse" | "sla" | "support" | "gcForms";
-type ConfigurableSiteLinkKey = Exclude<SiteLinkKey, "home">;
+type SiteLinkKey = "about" | "termsOfUse" | "sla" | "support" | "gcForms";
 
 // Use URL templates with {baseUrl} and optional {locale}; set false to hide a link.
 type SiteLinkValue = string | false;
-type SiteLinksConfig = Record<ConfigurableSiteLinkKey, SiteLinkValue>;
+type SiteLinksConfig = Record<SiteLinkKey, SiteLinkValue>;
 
 type TrustedDomainConfig = Pick<SiteConfig, "baseUrl"> & {
   links: SiteLinksConfig;
@@ -125,10 +124,6 @@ const resolveSiteLinkTemplate = (
   site: Pick<SiteConfig, "id" | "baseUrl">,
   linkKey: SiteLinkKey
 ) => {
-  if (linkKey === "home") {
-    return "{baseUrl}";
-  }
-
   const links = TRUSTED_DOMAINS[site.id].links;
   return links[linkKey];
 };
@@ -136,16 +131,13 @@ const resolveSiteLinkTemplate = (
 export function getSiteLink<K extends SiteLinkKey>(
   site: Pick<SiteConfig, "id" | "baseUrl">,
   linkKey: K,
-  locale: string
-): K extends "home" ? string : string | false {
+  locale?: string
+): string | false {
   const linkTemplate = resolveSiteLinkTemplate(site, linkKey);
-  const resolvedLocale = locale || "en";
 
   if (linkTemplate === false) {
-    return false as K extends "home" ? string : string | false;
+    return false;
   }
 
-  return linkTemplate
-    .replaceAll("{baseUrl}", site.baseUrl)
-    .replaceAll("{locale}", resolvedLocale) as K extends "home" ? string : string | false;
+  return linkTemplate.replaceAll("{baseUrl}", site.baseUrl).replaceAll("{locale}", locale ?? "en");
 }
