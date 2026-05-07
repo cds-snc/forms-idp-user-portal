@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 
 import { ZITADEL_ORGANIZATION } from "@root/constants/config";
 import { generateCSP, responseWithCSP } from "@lib/cspScripts";
-import { logMessage } from "@lib/logger";
 
 import {
   API_ROUTES,
@@ -17,7 +15,6 @@ import {
   getSmartRedirect,
   requiresStrongMfaSetupVerification,
 } from "./lib/server/route-protection";
-import { getServiceUrlFromHeaders } from "./lib/service-url";
 import { loadSessionById } from "./lib/session";
 
 export const config = {
@@ -37,24 +34,6 @@ export const config = {
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
-
-async function loadSecuritySettings(request: NextRequest): Promise<SecuritySettings | null> {
-  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
-
-  if (!securityResponse.ok) {
-    logMessage.error(`Failed to fetch security settings: ${securityResponse.statusText}`);
-    return null;
-  }
-
-  const response = await securityResponse.json();
-
-  if (!response || !response.settings) {
-    logMessage.error("No security settings found in the response.");
-    return null;
-  }
-
-  return response.settings;
-}
 
 function isMfaSetupRoute(pathname: string): boolean {
   return (
@@ -79,54 +58,6 @@ export async function proxy(request: NextRequest) {
   // Generate CSP once for this request; propagate nonce to layouts via request header
   const { csp, nonce } = generateCSP();
   requestHeaders.set("x-nonce", nonce);
-
-  // Only run the proxy logic for OIDC paths
-  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/"];
-  const isProxyPath = proxyPaths.some((prefix) => pathname.startsWith(prefix));
-
-  // Handle OIDC proxy paths
-  if (isProxyPath) {
-    // escape proxy if the environment is not setup for multitenancy
-    if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
-      return responseWithCSP(NextResponse.next({ request: { headers: requestHeaders } }), csp);
-    }
-
-    const { serviceUrl } = await getServiceUrlFromHeaders();
-
-    const instanceHost = `${serviceUrl}`.replace("https://", "").replace("http://", "");
-
-    // Add additional headers for proxy
-    requestHeaders.set("x-zitadel-public-host", `https://${request.headers.get("host")}`);
-    requestHeaders.set("x-zitadel-instance-host", instanceHost);
-
-    const responseHeaders = new Headers();
-    responseHeaders.set("Access-Control-Allow-Origin", "*");
-    responseHeaders.set("Access-Control-Allow-Headers", "*");
-
-    const securitySettings = await loadSecuritySettings(request);
-
-    const contentSecurityPolicy = securitySettings?.embeddedIframe?.enabled
-      ? csp.replace(
-          /frame-ancestors\s+[^;]+;/,
-          `frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`
-        )
-      : csp;
-
-    responseHeaders.set("Content-Security-Policy", contentSecurityPolicy);
-
-    if (securitySettings?.embeddedIframe?.enabled) {
-      responseHeaders.delete("X-Frame-Options");
-    }
-
-    request.nextUrl.href = `${serviceUrl}${pathname}${request.nextUrl.search}`;
-
-    return NextResponse.rewrite(request.nextUrl, {
-      request: {
-        headers: requestHeaders,
-      },
-      headers: responseHeaders,
-    });
-  }
 
   // Skip auth checks for API routes
   if (matchesPattern(pathname, API_ROUTES)) {
