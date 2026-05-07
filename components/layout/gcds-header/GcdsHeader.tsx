@@ -10,11 +10,9 @@ import { BrandContainer } from "./BrandContainer";
 import { Fip } from "./Fip";
 
 export const GcdsHeader = ({
-  language,
   skipLink = true,
   children,
 }: {
-  language: string;
   skipLink?: boolean;
   children?: React.ReactNode;
 }) => {
@@ -23,10 +21,16 @@ export const GcdsHeader = ({
       <header className="gcds-header">
         {skipLink && <SkipLink />}
         <BrandContainer>
-          <Fip language={language} />
+          <Fip />
           <div className="brand__toggle">{children}</div>
         </BrandContainer>
       </header>
     </div>
   );
 };
+
+export const GcdsHeaderSkeleton = () => (
+  <div className="gcds-header__container">
+    <header className="gcds-header"></header>
+  </div>
+);

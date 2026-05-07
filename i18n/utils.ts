@@ -1,6 +1,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
+import { cache } from "react";
 import { cookies } from "next/headers";
 
 /*--------------------------------------------*
@@ -23,11 +24,11 @@ const normalizeLocaleToSupportedLanguage = (locale: string) => {
   return languages[0];
 };
 
-export async function getCurrentLanguage() {
+export const getCurrentLanguage = cache(async () => {
   const cookieLang = (await cookies()).get(LANGUAGE_COOKIE_NAME)?.value;
   if (!cookieLang) {
     return languages[0];
   }
 
   return normalizeLocaleToSupportedLanguage(cookieLang);
-}
+});

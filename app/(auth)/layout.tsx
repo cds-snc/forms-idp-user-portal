@@ -1,40 +1,35 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
+import { Suspense } from "react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSiteConfigFromHeaders } from "@lib/server/site-config";
-import { getSiteLink } from "@lib/site-config";
-import { serverTranslation } from "@i18n/server";
 import { Logout } from "@components/auth/Logout";
 import { VersionUpdater } from "@components/auth/VersionUpdater";
-import { Footer } from "@components/layout/footer/Footer";
+import { Footer, FooterSkeleton } from "@components/layout/footer/Footer";
 import { FooterLinks } from "@components/layout/footer/FooterLinks";
-import { GcdsHeader } from "@components/layout/gcds-header/GcdsHeader";
+import { GcdsHeader, GcdsHeaderSkeleton } from "@components/layout/gcds-header/GcdsHeader";
 import { SiteLink } from "@components/layout/site-header/SiteLink";
 import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
 import { NavMenu } from "@components/ui/nav-menu/NavMenu";
 import { ToastContainer } from "@components/ui/toast/Toast";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  const siteConfig = await getSiteConfigFromHeaders();
-  const {
-    i18n: { language },
-  } = await serverTranslation(["fip"]);
-
   const isDev = process.env.NODE_ENV === "development";
 
   return (
     <div className="flex min-h-full flex-col bg-gray-soft">
-      <GcdsHeader language={language}>
-        <NavMenu>
-          {await Logout({}) /* allow to resolve to null or element */}
-          <LanguageToggle />
-        </NavMenu>
-      </GcdsHeader>
+      <Suspense fallback={<GcdsHeaderSkeleton />}>
+        <GcdsHeader>
+          <NavMenu>
+            <Logout />
+            <LanguageToggle />
+          </NavMenu>
+        </GcdsHeader>
+      </Suspense>
 
       <div id="page-container" className="gc-authpages">
         <div className="account-wrapper mt-10 flex items-center justify-center">
@@ -43,7 +38,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           >
             <main id="content" tabIndex={-1}>
               <div className="mr-10 mb-6 inline-flex">
-                <SiteLink href={getSiteLink(siteConfig, "home", language)} />
+                <SiteLink href="/" />
               </div>
               <Tooltip.Provider>{children}</Tooltip.Provider>
               <ToastContainer autoClose={false} containerId="default" />
@@ -52,9 +47,11 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         </div>
       </div>
       {!isDev && <VersionUpdater />}
-      <Footer>
-        <FooterLinks siteConfig={siteConfig} />
-      </Footer>
+      <Suspense fallback={<FooterSkeleton />}>
+        <Footer>
+          <FooterLinks />
+        </Footer>
+      </Suspense>
     </div>
   );
 }

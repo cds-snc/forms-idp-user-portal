@@ -1,6 +1,7 @@
 /*--------------------------------------------*
  * Framework and Third-Party
  *--------------------------------------------*/
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 
@@ -12,9 +13,9 @@ import { resolveSiteConfigByHost } from "@lib/site-config";
 import { serverTranslation } from "@i18n/server";
 import { Logout } from "@components/auth/Logout";
 import { VersionUpdater } from "@components/auth/VersionUpdater";
-import { Footer } from "@components/layout/footer/Footer";
+import { Footer, FooterSkeleton } from "@components/layout/footer/Footer";
 import { FooterLinks } from "@components/layout/footer/FooterLinks";
-import { SiteHeader } from "@components/layout/site-header/SiteHeader";
+import { SiteHeader, SiteHeaderSkeleton } from "@components/layout/site-header/SiteHeader";
 import LanguageToggle from "@components/ui/language-toggle/LanguageToggle";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,12 +47,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen bg-gray-soft">
-      <SiteHeader>
-        <NavMenu>
-          <Logout />
-          <LanguageToggle />
-        </NavMenu>
-      </SiteHeader>
+      <Suspense fallback={<SiteHeaderSkeleton />}>
+        <SiteHeader>
+          <NavMenu>
+            <Logout />
+            <LanguageToggle />
+          </NavMenu>
+        </SiteHeader>
+      </Suspense>
       <main id="content" className="mx-auto max-w-285 px-6 py-2 laptop:px-0" tabIndex={-1}>
         <div className="mb-20 grid items-start gap-6 py-4 tablet:grid-cols-[22rem_1fr] tablet:gap-8">
           <aside className="w-full">
@@ -61,9 +64,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
         </div>
       </main>
       {!isDev && <VersionUpdater />}
-      <Footer>
-        <FooterLinks siteConfig={siteConfig} />
-      </Footer>
+      <Suspense fallback={<FooterSkeleton />}>
+        <Footer>
+          <FooterLinks />
+        </Footer>
+      </Suspense>
     </div>
   );
 }

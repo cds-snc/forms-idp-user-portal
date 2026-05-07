@@ -10,16 +10,18 @@ import { useRouter } from "next/navigation";
  * Internal Aliases
  *--------------------------------------------*/
 import { logoutCurrentSession } from "@lib/server/session";
+import { useTranslation } from "@i18n";
+
 type LogoutButtonProps = {
   className?: string;
-  label: string;
+
   postLogoutRedirectUri?: string;
 };
 
-export function LogoutButton({ className, label, postLogoutRedirectUri }: LogoutButtonProps) {
+export function LogoutButton({ className, postLogoutRedirectUri }: LogoutButtonProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
+  const { t } = useTranslation("header");
   async function handleLogout() {
     if (isLoggingOut) return;
 
@@ -46,11 +48,11 @@ export function LogoutButton({ className, label, postLogoutRedirectUri }: Logout
   return (
     <button
       onClick={handleLogout}
-      className={`cursor-pointer border-none bg-transparent p-0 !text-lg text-inherit underline hover:no-underline ${className ?? ""}`}
-      aria-label={label}
+      className={`cursor-pointer border-none bg-transparent p-0 text-lg! text-inherit underline hover:no-underline ${className ?? ""}`}
+      aria-label={t("logout")}
       disabled={isLoggingOut}
     >
-      {label}
+      {t("logout")}
     </button>
   );
 }

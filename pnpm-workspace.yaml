@@ -1,10 +1,5 @@
 packages: []
 
-ignoredBuiltDependencies:
-  - "@parcel/watcher"
-  - sharp
-  - unrs-resolver
-
 blockExoticSubdeps: true
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
@@ -12,3 +7,7 @@ minimumReleaseAgeExclude:
   - uuid@14.0.0
   # Renovate security update: postcss@8.5.10
   - postcss@8.5.10
+allowBuilds:
+  '@parcel/watcher': false
+  sharp: false
+  unrs-resolver: false

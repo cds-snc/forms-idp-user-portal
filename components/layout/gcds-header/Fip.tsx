@@ -18,13 +18,13 @@ const normalizeLanguage = (language: string): "en" | "fr" => {
   return "en";
 };
 
-export const Fip = ({ language }: { language: string }) => {
+export const Fip = () => {
   const {
     t,
     i18n: { language: currentLanguage },
   } = useTranslation("fip");
 
-  const normalizedLanguage = normalizeLanguage(currentLanguage || language);
+  const normalizedLanguage = normalizeLanguage(currentLanguage);
 
   const link = t("link", { lng: normalizedLanguage });
 

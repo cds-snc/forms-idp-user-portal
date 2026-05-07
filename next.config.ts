@@ -44,6 +44,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  cacheComponents: true,
   serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
   async headers() {
     return [

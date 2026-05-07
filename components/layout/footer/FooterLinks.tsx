@@ -1,22 +1,19 @@
-"use client";
-
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSiteLink, SiteConfig } from "@lib/site-config";
+import { getSiteConfigFromHeaders } from "@lib/server/site-config";
+import { getSiteLink } from "@lib/site-config";
 import { I18n } from "@i18n";
-import { useTranslation } from "@i18n/client";
 
 const BulletPoint = () => {
   return <span className="px-3">&#x2022;</span>;
 };
 
-export const FooterLinks = ({ siteConfig }: { siteConfig: SiteConfig }) => {
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
-  const aboutLink = getSiteLink(siteConfig, "about", locale);
-  const termsOfUseLink = getSiteLink(siteConfig, "termsOfUse", locale);
-  const slaLink = getSiteLink(siteConfig, "sla", locale);
+export const FooterLinks = async () => {
+  const siteConfig = await getSiteConfigFromHeaders();
+  const aboutLink = getSiteLink(siteConfig, "about");
+  const termsOfUseLink = getSiteLink(siteConfig, "termsOfUse");
+  const slaLink = getSiteLink(siteConfig, "sla");
 
   if (!aboutLink && !termsOfUseLink && !slaLink) {
     return null; // Don't render the component if all links are missing

@@ -307,10 +307,12 @@ export async function getMostRecentCookieWithLoginname<T>({
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
-    let filtered = sessions.filter((cookie) => {
-      return loginName ? cookie.loginName === loginName : true;
-    });
-
+    let filtered = sessions;
+    if (loginName) {
+      filtered = sessions.filter((cookie) => {
+        return loginName ? cookie.loginName === loginName : true;
+      });
+    }
     filtered = filtered.filter((cookie) => {
       return cookie.organization === ZITADEL_ORGANIZATION;
     });
@@ -334,7 +336,6 @@ export async function getMostRecentCookieWithLoginname<T>({
 
 /**
  * Get session credentials from the http-only session cookie
- * @param organizationOverride optional organization to override the cookie's organization
  * @returns sessionId, loginName, organization, and requestId (if linked to OIDC flow)
  */
 export async function getSessionCredentials() {
