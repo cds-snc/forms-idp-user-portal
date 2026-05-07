@@ -14,7 +14,6 @@ import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
-import { getSerializableObject } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -53,7 +52,7 @@ export default async function Page() {
     redirect("/password/change/verify");
   }
 
-  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings();
 
   return (
     <AuthPanel

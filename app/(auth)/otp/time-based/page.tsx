@@ -12,7 +12,7 @@ import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { loadSessionById, loadSessionByLoginname } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
-import { getSerializableObject, SearchParams } from "@lib/utils";
+import { SearchParams } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -46,7 +46,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const safeRedirect = getSafeRedirectUrl(redirect);
 
-  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings();
 
   return (
     <AuthPanel

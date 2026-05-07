@@ -12,7 +12,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { loadMfaVerificationSession } from "@lib/server/mfa-verify";
 import { resolveSiteConfigByHost } from "@lib/site-config";
-import { getSerializableObject } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -38,7 +37,7 @@ export default async function Page() {
     redirect("/mfa/set/verify");
   }
 
-  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
+  const loginSettings = await getLoginSettings();
 
   return (
     <AuthPanel
