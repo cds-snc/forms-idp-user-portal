@@ -1,9 +1,10 @@
 import { GCNotifyConnector } from "@gcforms/connectors";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getPasswordResetTemplate } from "@lib/emailTemplates";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
-import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
+import { listAuthenticationMethodTypes, listUsers, passwordResetWithReturn } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 
 import { setupServerActionContext } from "../../../../test/helpers/serverAction";
@@ -33,6 +34,7 @@ vi.mock("@lib/server/cookie", () => ({
 }));
 
 vi.mock("@lib/zitadel", () => ({
+  listAuthenticationMethodTypes: vi.fn(),
   listUsers: vi.fn(),
   passwordResetWithReturn: vi.fn(),
 }));
@@ -74,6 +76,10 @@ describe("submitUserNameForm", () => {
           },
         },
       ],
+    } as never);
+
+    vi.mocked(listAuthenticationMethodTypes).mockResolvedValue({
+      authMethodTypes: [AuthenticationMethodType.TOTP],
     } as never);
 
     vi.mocked(passwordResetWithReturn).mockResolvedValue({

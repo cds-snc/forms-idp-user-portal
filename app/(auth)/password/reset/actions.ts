@@ -7,6 +7,7 @@
 import { GCNotifyConnector } from "@gcforms/connectors";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 /*--------------------------------------------*
  * Internal Aliases
@@ -15,7 +16,7 @@ import { getPasswordResetTemplate } from "@lib/emailTemplates";
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie } from "@lib/server/cookie";
 import { buildUrlWithRequestId } from "@lib/utils";
-import { listUsers, passwordResetWithReturn } from "@lib/zitadel";
+import { listAuthenticationMethodTypes, listUsers, passwordResetWithReturn } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 type SendResetCodeCommand = {
   loginName: string;
@@ -64,6 +65,19 @@ export const submitUserNameForm = async (
 
   if (!emailVerified) {
     logMessage.info("Password reset requested for user with unverified email address");
+    return genericErrorResponse;
+  }
+
+  const response = await listAuthenticationMethodTypes({
+    userId: userId,
+  });
+
+  const authMethods = response.authMethodTypes ?? [];
+  const canUseTotp = authMethods.includes(AuthenticationMethodType.TOTP);
+  const canUseU2F = authMethods.includes(AuthenticationMethodType.U2F);
+
+  if (!canUseTotp && !canUseU2F) {
+    logMessage.info("Password reset recovery requires at least one strong MFA method");
     return genericErrorResponse;
   }
 
