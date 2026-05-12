@@ -31,7 +31,7 @@ export default async function Page() {
     redirect("/password");
   }
 
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");

@@ -41,15 +41,15 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const siteConfig = resolveSiteConfigByHost(resolvedHost);
 
   // Attempt to get session credentials from cookies
-  let sessionId, loginName;
+  let sessionId;
   try {
-    ({ sessionId, loginName } = await getSessionCredentials());
+    ({ sessionId } = await getSessionCredentials());
   } catch (error) {
     redirect(loginRedirect);
   }
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.ANY_MFA_REQUIRED);
 
   if (!authCheck.satisfied) {
     redirect(buildUrlWithRequestId(authCheck.redirect || "/", requestId));

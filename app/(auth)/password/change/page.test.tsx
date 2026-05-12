@@ -109,10 +109,7 @@ describe("password/change page", () => {
 
     await expect(Page()).rejects.toThrow("NEXT_REDIRECT");
 
-    expect(checkAuthenticationLevel).toHaveBeenCalledWith(
-      AuthLevel.PASSWORD_REQUIRED,
-      "person@canada.ca"
-    );
+    expect(checkAuthenticationLevel).toHaveBeenCalledWith(AuthLevel.PASSWORD_REQUIRED);
     expect(redirect).toHaveBeenCalledWith("/mfa");
   });
 

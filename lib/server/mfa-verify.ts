@@ -30,7 +30,7 @@ export async function loadMfaVerificationSession({
     redirect("/password");
   }
 
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     logMessage.debug({

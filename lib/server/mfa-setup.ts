@@ -23,7 +23,7 @@ export async function loadMfaSetupSession({
   pageName,
   missingSessionRedirect,
 }: LoadMfaSetupSessionParams): Promise<SessionWithAuthData> {
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     logMessage.debug({

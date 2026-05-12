@@ -34,7 +34,7 @@ type AuthCheckResult = {
 /**
  * Safe wrapper around loadMostRecentSession that returns null instead of throwing
  */
-async function getSessionFromCookies(loginName?: string): Promise<Session | null> {
+async function getActiveSessionFromCookies(): Promise<Session | null> {
   try {
     const session = await loadActiveSession();
     return session || null;
@@ -42,7 +42,6 @@ async function getSessionFromCookies(loginName?: string): Promise<Session | null
     logMessage.debug({
       error,
       message: "Failed to get session from cookies",
-      loginName,
     });
     return null;
   }
@@ -140,17 +139,14 @@ export function requiresStrongMfaSetupVerification(
 /**
  * Check if authentication level is satisfied
  */
-export async function checkAuthenticationLevel(
-  requiredLevel: AuthLevel,
-  loginName?: string
-): Promise<AuthCheckResult> {
+export async function checkAuthenticationLevel(requiredLevel: AuthLevel): Promise<AuthCheckResult> {
   // Open routes always pass
   if (requiredLevel === AuthLevel.OPEN) {
     return { satisfied: true };
   }
 
   // Get session from cookies (non-throwing)
-  const session = await getSessionFromCookies(loginName);
+  const session = await getActiveSessionFromCookies();
 
   // Basic session check - just verify cookie exists
   if (requiredLevel === AuthLevel.BASIC_SESSION) {

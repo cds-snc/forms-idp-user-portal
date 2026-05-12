@@ -23,15 +23,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   let sessionId: string | undefined;
-  let loginName: string | undefined;
 
   try {
-    ({ sessionId, loginName } = await getSessionCredentials());
+    ({ sessionId } = await getSessionCredentials());
   } catch {
     redirect("/password");
   }
 
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");

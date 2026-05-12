@@ -30,7 +30,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const { sessionId, loginName, requestId } = await getSessionCredentials();
   const safeRedirect = getSafeRedirectUrl(redirectParam);
 
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     logMessage.debug({

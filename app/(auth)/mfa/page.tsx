@@ -33,7 +33,7 @@ export default async function Page() {
   const { loginName, sessionId, requestId } = await getSessionCredentials();
 
   // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, loginName);
+  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
 
   if (!authCheck.satisfied) {
     redirect(authCheck.redirect || "/password");

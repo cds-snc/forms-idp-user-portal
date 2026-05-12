@@ -73,10 +73,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Check authentication level (loginName will be extracted from session cookie)
-  const authCheck = await checkAuthenticationLevel(
-    requiredLevel,
-    undefined // loginName extracted from session cookie
-  );
+  const authCheck = await checkAuthenticationLevel(requiredLevel);
 
   // If satisfied, allow the request
   if (authCheck.satisfied) {
