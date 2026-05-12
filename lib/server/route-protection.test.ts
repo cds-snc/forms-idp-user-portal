@@ -20,6 +20,7 @@ vi.mock("@zitadel/client", () => ({
 
 vi.mock("@lib/session", () => ({
   loadMostRecentSession: vi.fn(),
+  loadActiveSession: vi.fn(),
 }));
 
 vi.mock("@lib/logger", () => ({
@@ -101,7 +102,7 @@ describe("route-protection", () => {
   it("fails basic session level when no session exists", async () => {
     vi.mocked(loadActiveSession).mockResolvedValue(undefined as never);
 
-    const result = await checkAuthenticationLevel(AuthLevel.BASIC_SESSION, "person@canada.ca");
+    const result = await checkAuthenticationLevel(AuthLevel.BASIC_SESSION);
 
     expect(result).toMatchObject({
       satisfied: false,
