@@ -136,6 +136,10 @@
       "validGovEmail": "Enter a valid individual Government of Canada email address.",
       "requiredPassword": "Password is required.",
       "invalidCredentials": "Invalid email address or password. Please try again."
+    },
+    "session": {
+      "otherAccount": "Different Account",
+      "continueWithOther": "Continue with different account"
     }
   },
   "password": {

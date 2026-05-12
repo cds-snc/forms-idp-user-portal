@@ -1,13 +1,24 @@
+/*--------------------------------------------*
+ * Framework and Third-Party
+ *--------------------------------------------*/
 import type { Cookie } from "@lib/cookies";
 import { cn } from "@lib/utils";
+/*--------------------------------------------*
+ * Internal Aliases
+ *--------------------------------------------*/
+import { useTranslation } from "@i18n";
 import { ArrowRightNav } from "@components/icons/ArrowRightNav";
 import { Button } from "@components/ui/button/Button";
+/*--------------------------------------------*
+ * Local Relative
+ *--------------------------------------------*/
 type SessionSelectProps = {
   sessions: Map<string, Cookie>;
   selectSession: (sessionId: string) => void;
 };
 
 export const SessionSelect = ({ sessions, selectSession }: SessionSelectProps) => {
+  const { t } = useTranslation("start");
   return (
     <div className="flex flex-col">
       {Array.from(sessions.entries()).map(([id, session], index) => (
@@ -20,11 +31,11 @@ export const SessionSelect = ({ sessions, selectSession }: SessionSelectProps) =
         />
       ))}
       <div className="flex flex-row items-center rounded-b-2xl border-x-2.5 border-b-2.5 border-gcds-grayscale-400 p-4">
-        <div className="grow">Other Account</div>
+        <div className="grow">{t("session.otherAccount")}</div>
         <div className="float-right">
           <Button
             type="button"
-            aria-label={`Continue with Other Account`}
+            aria-label={t("session.continueWithOther")}
             onClick={() => selectSession("other")}
           >
             <ArrowRightNav />

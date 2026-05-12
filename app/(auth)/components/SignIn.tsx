@@ -48,7 +48,7 @@ export const SignIn = ({ requestId, registerLink, allSessions }: SignInProps) =>
 
   return (
     <>
-      {selectedSession ? (
+      {selectedSession || allSessions.size === 0 ? (
         <LoginForm
           // Ensure Login Form is reset on navigation
           key={pathname}
