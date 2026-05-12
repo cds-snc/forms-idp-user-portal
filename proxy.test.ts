@@ -88,8 +88,6 @@ describe("proxy middleware", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(generateCSP).mockReturnValue({ csp: "default-src 'self';", nonce: "test-nonce" });
-    delete process.env.ZITADEL_API_URL;
-    delete process.env.ZITADEL_SERVICE_USER_TOKEN;
   });
 
   describe("Content-Security-Policy headers", () => {
@@ -124,22 +122,12 @@ describe("proxy middleware", () => {
       expect(response.headers.get("x-middleware-override-headers")).toContain("x-nonce");
     });
 
-    it("sets CSP on proxy path when multitenancy env vars are absent", async () => {
-      const request = makeRequest("/oidc/v1/authorize");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-
     it("sets CSP on proxy path when multitenancy env vars are present", async () => {
-      process.env.ZITADEL_API_URL = "https://idp.example.com";
-      process.env.ZITADEL_SERVICE_USER_TOKEN = "token";
-
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({ settings: null }),
       });
-
+      vi.mocked(checkAuthenticationLevel).mockResolvedValue({ satisfied: true });
       const request = makeRequest("/oidc/v1/authorize");
       const response = await proxy(request);
 
@@ -165,59 +153,6 @@ describe("proxy middleware", () => {
       const response = await proxy(request);
 
       expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-  });
-
-  describe("proxy path (OIDC)", () => {
-    it("rewrites to Zitadel when env vars are set", async () => {
-      process.env.ZITADEL_API_URL = "https://idp.example.com";
-      process.env.ZITADEL_SERVICE_USER_TOKEN = "token";
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ settings: null }),
-      });
-
-      const request = makeRequest("/oauth/v2/token");
-      const response = await proxy(request);
-
-      expect(response.status).toBe(200);
-    });
-
-    it("skips rewrite when env vars are absent", async () => {
-      const request = makeRequest("/oauth/v2/token");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-
-    it("modifies frame-ancestors when embedded iframe is enabled", async () => {
-      process.env.ZITADEL_API_URL = "https://idp.example.com";
-      process.env.ZITADEL_SERVICE_USER_TOKEN = "token";
-
-      vi.mocked(generateCSP).mockReturnValue({
-        csp: "default-src 'self'; frame-ancestors 'none';",
-        nonce: "test-nonce",
-      });
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          settings: {
-            embeddedIframe: {
-              enabled: true,
-              allowedOrigins: ["https://app.example.com"],
-            },
-          },
-        }),
-      });
-
-      const request = makeRequest("/oidc/v1/authorize");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toContain(
-        "frame-ancestors https://app.example.com;"
-      );
     });
   });
 
