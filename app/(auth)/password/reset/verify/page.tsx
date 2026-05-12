@@ -10,7 +10,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { loadActiveSession, loadSessionById } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
 import { StrongFactorSelection } from "@components/mfa/StrongFactorSelection";
@@ -22,17 +22,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   let sessionId: string | undefined;
-  let loginName: string | undefined;
 
   try {
-    ({ sessionId, loginName } = await getSessionCredentials());
+    ({ sessionId } = await getSessionCredentials());
   } catch {
     redirect("/password/reset");
   }
 
-  const sessionData = sessionId
-    ? await loadSessionById(sessionId)
-    : await loadSessionByLoginname(loginName);
+  const sessionData = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
 
   const canUseTotp = sessionData.authMethods?.includes(AuthenticationMethodType.TOTP) ?? false;
   const canUseU2F = sessionData.authMethods?.includes(AuthenticationMethodType.U2F) ?? false;

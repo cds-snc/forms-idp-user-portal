@@ -2,7 +2,7 @@ import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { loadMostRecentSession } from "@lib/session";
+import { loadActiveSession } from "@lib/session";
 
 import {
   AuthLevel,
@@ -95,11 +95,11 @@ describe("route-protection", () => {
     const result = await checkAuthenticationLevel(AuthLevel.OPEN);
 
     expect(result).toEqual({ satisfied: true });
-    expect(loadMostRecentSession).not.toHaveBeenCalled();
+    expect(loadActiveSession).not.toHaveBeenCalled();
   });
 
   it("fails basic session level when no session exists", async () => {
-    vi.mocked(loadMostRecentSession).mockResolvedValue(undefined as never);
+    vi.mocked(loadActiveSession).mockResolvedValue(undefined as never);
 
     const result = await checkAuthenticationLevel(AuthLevel.BASIC_SESSION, "person@canada.ca");
 
@@ -111,7 +111,7 @@ describe("route-protection", () => {
   });
 
   it("fails password-required level when password is not verified", async () => {
-    vi.mocked(loadMostRecentSession).mockResolvedValue({
+    vi.mocked(loadActiveSession).mockResolvedValue({
       factors: {
         user: { id: "user-123" },
       },
@@ -127,7 +127,7 @@ describe("route-protection", () => {
   });
 
   it("satisfies any-mfa level after password verification", async () => {
-    vi.mocked(loadMostRecentSession).mockResolvedValue({
+    vi.mocked(loadActiveSession).mockResolvedValue({
       factors: {
         user: { id: "user-123" },
         password: { verifiedAt: {} },
@@ -141,7 +141,7 @@ describe("route-protection", () => {
   });
 
   it("fails strong-mfa level", async () => {
-    vi.mocked(loadMostRecentSession).mockResolvedValue({
+    vi.mocked(loadActiveSession).mockResolvedValue({
       factors: {
         user: { id: "user-123" },
         password: { verifiedAt: {} },

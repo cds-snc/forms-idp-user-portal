@@ -10,21 +10,10 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
+import { Cookie } from "@lib/cookies";
 import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { createSessionFromChecks, getSecuritySettings, getSession, setSession } from "@lib/zitadel";
-
-type CustomCookieData = {
-  id: string;
-  token: string;
-  loginName: string;
-  userId: string;
-  organization?: string;
-  creationTs: string;
-  expirationTs: string;
-  changeTs: string;
-  requestId?: string; // if its linked to an OIDC flow
-};
 
 export type CreateSessionFailedError = {
   error: string;
@@ -71,7 +60,7 @@ export async function createSessionAndUpdateCookie(command: {
       sessionToken: createdSession.sessionToken,
     }).then(async (response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: CustomCookieData = {
+        const sessionCookie: Cookie = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationTs: response.session.creationDate
@@ -95,10 +84,7 @@ export async function createSessionAndUpdateCookie(command: {
           sessionCookie.organization = response.session.factors.user.organizationId;
         }
 
-        const securitySettings = await getSecuritySettings();
-        const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
-
-        await addSessionToCookie({ session: sessionCookie, iFrameEnabled });
+        await addSessionToCookie({ session: sessionCookie });
 
         return response.session as Session;
       } else {
@@ -111,7 +97,7 @@ export async function createSessionAndUpdateCookie(command: {
 }
 
 export async function setSessionAndUpdateCookie(command: {
-  recentCookie: CustomCookieData;
+  recentCookie: Cookie;
   checks?: Checks;
   challenges?: RequestChallenges;
   requestId?: string;
@@ -126,7 +112,7 @@ export async function setSessionAndUpdateCookie(command: {
   })
     .then((updatedSession) => {
       if (updatedSession) {
-        const sessionCookie: CustomCookieData = {
+        const sessionCookie: Cookie = {
           id: command.recentCookie.id,
           token: updatedSession.sessionToken,
           creationTs: command.recentCookie.creationTs,
@@ -153,7 +139,7 @@ export async function setSessionAndUpdateCookie(command: {
           }
 
           const { session } = response;
-          const newCookie: CustomCookieData = {
+          const newCookie: Cookie = {
             id: sessionCookie.id,
             token: updatedSession.sessionToken,
             creationTs: sessionCookie.creationTs,

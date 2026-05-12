@@ -19,7 +19,8 @@
   },
   "header": {
     "lang-toggle": "Sélection de la langue",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "switchAccount": "Changer de compte"
   },
   "fip": {
     "link": "http://canada.ca/fr.html",

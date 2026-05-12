@@ -12,7 +12,7 @@ import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { isSessionValid, loadMostRecentSession, loadSessionById } from "@lib/session";
+import { isSessionValid, loadActiveSession, loadSessionById } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { getTOTPStatus, getU2FList, getUserByID } from "@lib/zitadel";
@@ -70,9 +70,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   }
 
   try {
-    const authSession = await loadMostRecentSession({
-      sessionParams: { loginName },
-    });
+    const authSession = await loadActiveSession();
 
     if (!authSession || !(await isSessionValid({ session: authSession }))) {
       redirect(loginRedirect);

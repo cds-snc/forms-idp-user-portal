@@ -7,9 +7,8 @@ import { redirect } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCredentials } from "@lib/cookies";
 import { checkSessionFactors, hasStrongMFA } from "@lib/server/route-protection";
-import { loadMostRecentSession } from "@lib/session";
+import { loadActiveSession } from "@lib/session";
 import { getPasswordComplexitySettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -25,17 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  let loginName: string | undefined;
-
-  try {
-    ({ loginName } = await getSessionCredentials());
-  } catch {
-    redirect("/password/reset");
-  }
-
-  const session = await loadMostRecentSession({
-    sessionParams: { loginName },
-  }).catch(() => undefined);
+  const session = await loadActiveSession().catch(() => undefined);
 
   const factors = checkSessionFactors(session ?? null);
 

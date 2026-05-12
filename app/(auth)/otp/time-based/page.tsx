@@ -10,7 +10,7 @@ import { headers } from "next/headers";
 import { getSessionCredentials } from "@lib/cookies";
 import { getSafeRedirectUrl } from "@lib/redirect-validator";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { loadActiveSession, loadSessionById } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject, SearchParams } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
@@ -35,9 +35,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
 
   const { redirect } = searchParams;
 
-  const sessionData = sessionId
-    ? await loadSessionById(sessionId)
-    : await loadSessionByLoginname(loginName);
+  const sessionData = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
 
   // Extract just the session factors from the session data
   const sessionFactors = sessionData

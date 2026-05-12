@@ -9,7 +9,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  * Internal Aliases
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
-import { loadMostRecentSession } from "@lib/session";
+import { loadActiveSession } from "@lib/session";
 /**
  * Authentication levels for route protection
  */
@@ -36,9 +36,7 @@ type AuthCheckResult = {
  */
 async function getSessionFromCookies(loginName?: string): Promise<Session | null> {
   try {
-    const session = await loadMostRecentSession({
-      sessionParams: { loginName },
-    });
+    const session = await loadActiveSession();
     return session || null;
   } catch (error) {
     logMessage.debug({

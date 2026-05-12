@@ -12,7 +12,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { getSessionCredentials } from "@lib/cookies";
 import { getOriginalHostFromHeaders } from "@lib/server/host";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { loadActiveSession, loadSessionById } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { getSerializableObject } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
@@ -45,9 +45,7 @@ export default async function Page() {
     redirect(authCheck.redirect || "/password");
   }
 
-  const sessionData = sessionId
-    ? await loadSessionById(sessionId)
-    : await loadSessionByLoginname(loginName);
+  const sessionData = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.TOTP)) {
     redirect("/password/change/verify");

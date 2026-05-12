@@ -10,7 +10,7 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
  * Internal Aliases
  *--------------------------------------------*/
 import { getOriginalHostFromHeaders } from "@lib/server/host";
-import { loadMostRecentSession } from "@lib/session";
+import { loadActiveSession } from "@lib/session";
 import { resolveSiteConfigByHost } from "@lib/site-config";
 import { SearchParams } from "@lib/utils";
 import { getUserByID } from "@lib/zitadel";
@@ -55,11 +55,7 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   }
 
   if (!sessionFactors) {
-    sessionFactors = await loadMostRecentSession({
-      sessionParams: {
-        loginName,
-      },
-    }).catch(() => undefined);
+    sessionFactors = await loadActiveSession().catch(() => undefined);
   }
 
   const id = userId ?? sessionFactors?.factors?.user?.id;

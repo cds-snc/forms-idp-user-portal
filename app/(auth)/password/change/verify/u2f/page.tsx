@@ -10,7 +10,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { getSessionCredentials } from "@lib/cookies";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { loadSessionById, loadSessionByLoginname } from "@lib/session";
+import { loadActiveSession, loadSessionById } from "@lib/session";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -37,9 +37,7 @@ export default async function Page() {
     redirect(authCheck.redirect || "/password");
   }
 
-  const sessionData = sessionId
-    ? await loadSessionById(sessionId)
-    : await loadSessionByLoginname(loginName);
+  const sessionData = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
 
   if (!sessionData.authMethods?.includes(AuthenticationMethodType.U2F)) {
     redirect("/password/change/verify");

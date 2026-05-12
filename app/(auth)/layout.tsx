@@ -4,11 +4,11 @@
 import { Suspense } from "react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 
+import { VersionUpdater } from "@components/auth/VersionUpdater";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { Logout } from "@components/auth/Logout";
-import { VersionUpdater } from "@components/auth/VersionUpdater";
+import { YourAccount } from "@components/auth/YourAccount";
 import { Footer, FooterSkeleton } from "@components/layout/footer/Footer";
 import { FooterLinks } from "@components/layout/footer/FooterLinks";
 import { GcdsHeader, GcdsHeaderSkeleton } from "@components/layout/gcds-header/GcdsHeader";
@@ -25,7 +25,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       <Suspense fallback={<GcdsHeaderSkeleton />}>
         <GcdsHeader>
           <NavMenu>
-            <Logout />
+            <YourAccount />
             <LanguageToggle />
           </NavMenu>
         </GcdsHeader>

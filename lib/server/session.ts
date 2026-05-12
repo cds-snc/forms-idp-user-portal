@@ -26,9 +26,9 @@ import { serverTranslation } from "@i18n/server";
 
 import {
   Cookie,
+  getActiveSessionCookie,
   getAllSessionCookieIds,
   getAllSessions,
-  getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
@@ -176,7 +176,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       ? await getSessionCookieById({ sessionId })
       : loginName
         ? await getSessionCookieByLoginName({ loginName })
-        : await getMostRecentSessionCookie();
+        : await getActiveSessionCookie();
 
     if (!recentSession) {
       return {
@@ -307,13 +307,13 @@ export async function logoutCurrentSession(
   const { postLogoutRedirectUri } = options;
 
   try {
-    const mostRecentSession = await getMostRecentSessionCookie();
+    const activeSession = await getActiveSessionCookie();
 
-    if (!mostRecentSession?.id) {
+    if (!activeSession?.id) {
       return { error: "No active session found" };
     }
 
-    await clearSession({ sessionId: mostRecentSession.id });
+    await clearSession({ sessionId: activeSession.id });
 
     // Determine redirect URL
     if (postLogoutRedirectUri) {
