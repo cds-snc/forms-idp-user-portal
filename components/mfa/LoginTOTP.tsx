@@ -96,7 +96,7 @@ export function LoginTOTP({
       <UserAvatar loginName={loginName} displayName={displayName} showDropdown={false} />
 
       <div className="w-full">
-        <form action={formAction} noValidate>
+        <form id="totp" action={formAction} noValidate>
           <CodeEntry state={state} code={""} className="mt-8" />
           <div className="mt-6 flex items-center gap-4">
             <BackButton />

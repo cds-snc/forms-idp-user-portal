@@ -67,10 +67,10 @@ export const options = {
   scenarios: {
     login_flow: {
       executor: "ramping-vus",
-      startVUs: 0,
+      startVUs: 1,
       stages: [
-        { duration: "5m", target: 5 },
-        { duration: "15m", target: 5 },
+        { duration: "3m", target: 5 },
+        { duration: "17m", target: 5 },
       ],
       gracefulRampDown: "30s",
       gracefulStop: "30s",
@@ -291,10 +291,8 @@ export default async function loginFlow() {
     // ─── Login page submit ──────────────────────────────
     await page.locator("#username").fill(USERNAME);
     await page.locator("#password").fill(PASSWORD);
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "load" }),
-      page.locator("form#login button[type=submit]").click(),
-    ]);
+    await page.locator("form#login button[type=submit]").click();
+    await page.waitForNavigation({ waitUntil: "load" });
 
     // ─── TOTP page ──────────────────────────────────────
     const totpPageOk = check(page, {
@@ -308,10 +306,8 @@ export default async function loginFlow() {
     // ─── TOTP page submit ───────────────────────────────
     const totpCode = generateTOTP(TOTP_SECRET);
     await page.locator("#code").fill(totpCode);
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "load", timeout: 30000 }),
-      page.locator("form button[type=submit]").click(),
-    ]);
+    await page.locator("form#totp button[type=submit]").click();
+    await page.waitForNavigation({ waitUntil: "load" });
 
     // In non-OIDC mode, successful login ends on the /account page
     if (!useOidc) {

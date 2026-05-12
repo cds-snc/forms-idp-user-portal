@@ -130,7 +130,7 @@
     "registerLinkText": "en créer un maintenant",
     "form": {
       "label": "Adresse courriel",
-      "description": "Entrez votre propre adresse courriel individuelledu gouvernement.",
+      "description": "Entrez votre propre adresse courriel individuelle du gouvernement.",
       "passwordLabel": "Mot de passe",
       "forgotPasswordLink": "Vous avez oublié votre mot de passe?",
       "signingIn": "Connexion en cours...",
