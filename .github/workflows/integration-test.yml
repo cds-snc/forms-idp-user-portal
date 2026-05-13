@@ -1,9 +1,6 @@
 name: Integration test Staging
 
 on:
-  pull_request:
-    branches:
-      - main
   workflow_run:
     workflows: ["Docker deploy Staging"]
     types:
@@ -16,7 +13,7 @@ permissions:
 
 jobs:
   integration-test:
-    if: ${{ github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     container:
       # Playwright Docker image tag must match the pnpm-lock.yaml pinned version
