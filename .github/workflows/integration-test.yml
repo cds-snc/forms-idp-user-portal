@@ -12,7 +12,7 @@ jobs:
   integration-test:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.60.0-noble@sha256:9bd26ad900bb5e0f4dee75839e957a89ae89c2b7ab1e76050e559790e946b948
+      image: mcr.microsoft.com/playwright:v1.59.1-noble@sha256:b0ab6f3cb99aa7803adbc14d9027ec1785fc6e433b97e134e0f8fe61683b6b53
       options: --user 1001
     steps:
       - name: Audit DNS requests
@@ -41,7 +41,6 @@ jobs:
       - name: Debug
         run: |
           ls -la /ms-playwright
-          ls -la /ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell
 
       - name: Playwright tests
         env:
@@ -49,4 +48,10 @@ jobs:
           USERNAME: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
           PASSWORD: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
           TOTP_SECRET: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
-        run: playwright test
+        run: 
+          pnpm test:playwright
+
+      - name: Debug
+        if: failure()
+        run: |
+          ls -la /ms-playwright
