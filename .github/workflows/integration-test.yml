@@ -49,5 +49,6 @@ jobs:
           USERNAME: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
           PASSWORD: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
           TOTP_SECRET: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
+          WAF_GEO_RESTRICTION_BYPASS: ${{ secrets.STAGING_WAF_GEO_RESTRICTION_BYPASS }}
         run: 
           pnpm test:playwright
