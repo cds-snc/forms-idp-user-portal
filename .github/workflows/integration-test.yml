@@ -38,10 +38,15 @@ jobs:
           node-version: 24
           cache: pnpm
 
+      - name: Debug
+        run: |
+          ls -la /ms-playwright
+          ls -la /ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-linux64/chrome-headless-shell
+
       - name: Playwright tests
         env:
           IDP_URL: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
           USERNAME: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
           PASSWORD: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
           TOTP_SECRET: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
-        run: pnpm test:playwright
+        run: playwright test
