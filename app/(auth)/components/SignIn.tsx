@@ -4,7 +4,7 @@
  *--------------------------------------------*/
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 /*--------------------------------------------*
  * Internal Aliases
@@ -33,8 +33,6 @@ export const SignIn = ({ requestId, registerLink, allSessions }: SignInProps) =>
   const searchParams = useSearchParams();
   const selectedSession = searchParams.get("session");
 
-  const pathname = usePathname();
-
   const selectSession = async (sessionId: string) => {
     if (sessionId !== "other") {
       await setSession(sessionId);
@@ -50,8 +48,6 @@ export const SignIn = ({ requestId, registerLink, allSessions }: SignInProps) =>
     <>
       {selectedSession || allSessions.size === 0 ? (
         <LoginForm
-          // Ensure Login Form is reset on navigation
-          key={pathname}
           requestId={requestId}
           session={
             selectedSession && selectedSession !== "other"

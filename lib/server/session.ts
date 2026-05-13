@@ -30,7 +30,6 @@ import {
   getAllSessionCookieIds,
   getAllSessions,
   getSessionCookieById,
-  getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
 
@@ -170,15 +169,13 @@ type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  const { loginName, sessionId, checks, requestId, challenges } = options;
+  const { sessionId, checks, requestId, challenges } = options;
   try {
-    const recentSession = sessionId
+    const activeSession = sessionId
       ? await getSessionCookieById({ sessionId })
-      : loginName
-        ? await getSessionCookieByLoginName({ loginName })
-        : await getActiveSessionCookie();
+      : await getActiveSessionCookie();
 
-    if (!recentSession) {
+    if (!activeSession) {
       return {
         error: "Could not find session",
       };
@@ -215,7 +212,7 @@ export async function updateSession(options: UpdateSessionCommand) {
 
     try {
       session = await setSessionAndUpdateCookie({
-        recentCookie: recentSession,
+        activeCookie: activeSession,
         checks,
         challenges,
         requestId,

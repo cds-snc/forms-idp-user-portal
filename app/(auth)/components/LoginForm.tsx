@@ -100,7 +100,7 @@ export function LoginForm({ requestId, session }: Props) {
 
   const [state, formAction] = useActionState(localFormAction, {
     formData: {
-      username: "",
+      username: session?.loginName ?? "",
       password: "",
     },
   });
@@ -141,7 +141,7 @@ export function LoginForm({ requestId, session }: Props) {
               id={"username"}
               required
               autoComplete={"email"}
-              defaultValue={state.formData?.username || session?.loginName}
+              defaultValue={state.formData?.username}
               ariaDescribedbyIds={
                 hasError("username", state.validationErrors)
                   ? ["login-description", "errorMessageUsername"]

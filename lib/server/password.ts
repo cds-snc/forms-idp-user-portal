@@ -140,7 +140,7 @@ export async function sendPassword(
 
     try {
       session = await setSessionAndUpdateCookie({
-        recentCookie: sessionCookie,
+        activeCookie: sessionCookie,
         checks: command.checks,
         requestId: command.requestId,
         lifetime,

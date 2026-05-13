@@ -3,7 +3,6 @@
  *--------------------------------------------*/
 
 import { cache } from "react";
-import { cacheLife } from "next/cache";
 import type {
   StreamRequest,
   StreamResponse,
@@ -45,8 +44,7 @@ import { getServiceForHost } from "./service";
 import { getSerializableObject } from "./utils";
 
 export async function getLoginSettings() {
-  "use cache";
-  cacheLife("minutes");
+  // TODO - cache in mem or Redis
 
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
@@ -55,8 +53,7 @@ export async function getLoginSettings() {
 }
 
 export async function getSecuritySettings() {
-  "use cache";
-  cacheLife("minutes");
+  // TODO - cache in mem or Redis
 
   const settingsService = await getServiceForHost("SettingsService");
 
@@ -66,8 +63,7 @@ export async function getSecuritySettings() {
 }
 
 export async function getLockoutSettings() {
-  "use cache";
-  cacheLife("minutes");
+  // TODO - cache in mem or Redis
 
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
@@ -79,8 +75,7 @@ export async function getLockoutSettings() {
  * @security Requires authenticated session. Use protectedGetPasswordExpirySettings from lib/server/zitadel-protected.ts
  */
 export async function getPasswordExpirySettings() {
-  "use cache";
-  cacheLife("minutes");
+  // TODO - cache in mem or Redis
 
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
@@ -92,8 +87,7 @@ export async function getPasswordExpirySettings() {
  * @security Requires authenticated session. Use protectedListIDPLinks from lib/server/zitadel-protected.ts
  */
 export async function listIDPLinks({ userId }: { userId: string }) {
-  "use cache";
-  cacheLife("minutes");
+  // TODO - cache in mem or Redis
 
   const userService = await getServiceForHost("UserService");
 
@@ -167,14 +161,27 @@ export async function setSession({
 /**
  * @security Requires authenticated session tokens. Internal use only.
  */
-export const getSession = cache(
-  async ({ sessionId, sessionToken }: { sessionId: string; sessionToken: string }) => {
-    const sessionService = await getServiceForHost("SessionService");
-    return sessionService
-      .getSession({ sessionId, sessionToken }, {})
-      .then((obj) => getSerializableObject(obj));
-  }
-);
+// export const getSession = cache(
+//   async ({ sessionId, sessionToken }: { sessionId: string; sessionToken: string }) => {
+//     const sessionService = await getServiceForHost("SessionService");
+//     return sessionService
+//       .getSession({ sessionId, sessionToken }, {})
+//       .then((obj) => getSerializableObject(obj));
+//   }
+// );
+
+export const getSession = async ({
+  sessionId,
+  sessionToken,
+}: {
+  sessionId: string;
+  sessionToken: string;
+}) => {
+  const sessionService = await getServiceForHost("SessionService");
+  return sessionService
+    .getSession({ sessionId, sessionToken }, {})
+    .then((obj) => getSerializableObject(obj));
+};
 
 /**
  * @security Requires authenticated session tokens. Logout operation.

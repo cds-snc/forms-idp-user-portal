@@ -19,7 +19,6 @@ type LoadMfaSetupSessionParams = {
 export async function loadMfaSetupSession({
   sessionId,
   loginName,
-
   pageName,
   missingSessionRedirect,
 }: LoadMfaSetupSessionParams): Promise<SessionWithAuthData> {

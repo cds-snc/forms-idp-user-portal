@@ -97,15 +97,15 @@ export async function createSessionAndUpdateCookie(command: {
 }
 
 export async function setSessionAndUpdateCookie(command: {
-  recentCookie: Cookie;
+  activeCookie: Cookie;
   checks?: Checks;
   challenges?: RequestChallenges;
   requestId?: string;
   lifetime: Duration;
 }) {
   return setSession({
-    sessionId: command.recentCookie.id,
-    sessionToken: command.recentCookie.token,
+    sessionId: command.activeCookie.id,
+    sessionToken: command.activeCookie.token,
     challenges: command.challenges,
     checks: command.checks,
     lifetime: command.lifetime,
@@ -113,17 +113,17 @@ export async function setSessionAndUpdateCookie(command: {
     .then((updatedSession) => {
       if (updatedSession) {
         const sessionCookie: Cookie = {
-          id: command.recentCookie.id,
+          id: command.activeCookie.id,
           token: updatedSession.sessionToken,
-          creationTs: command.recentCookie.creationTs,
-          expirationTs: command.recentCookie.expirationTs,
+          creationTs: command.activeCookie.creationTs,
+          expirationTs: command.activeCookie.expirationTs,
           // just overwrite the changeDate with the new one
           changeTs: updatedSession.details?.changeDate
             ? `${timestampMs(updatedSession.details.changeDate)}`
             : "",
-          loginName: command.recentCookie.loginName,
-          userId: command.recentCookie.userId,
-          organization: command.recentCookie.organization,
+          loginName: command.activeCookie.loginName,
+          userId: command.activeCookie.userId,
+          organization: command.activeCookie.organization,
         };
 
         if (command.requestId) {

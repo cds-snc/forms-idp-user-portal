@@ -30,7 +30,6 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           </NavMenu>
         </GcdsHeader>
       </Suspense>
-
       <div id="page-container" className="gc-authpages">
         <div className="account-wrapper mt-10 flex items-center justify-center">
           <div

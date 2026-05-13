@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import { loadActiveSession, loadSessionById, type SessionWithAuthData } from "@lib/session";
+import { loadSessionById, type SessionWithAuthData } from "@lib/session";
 
 import { AuthLevel, checkAuthenticationLevel } from "./route-protection";
 
@@ -44,7 +44,7 @@ export async function loadMfaVerificationSession({
   let sessionData: SessionWithAuthData;
 
   try {
-    sessionData = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
+    sessionData = await loadSessionById(sessionId);
   } catch {
     logMessage.debug({
       message: `${pageName} missing session factors`,
@@ -57,7 +57,6 @@ export async function loadMfaVerificationSession({
   return {
     sessionId,
     loginName,
-
     sessionData,
   };
 }

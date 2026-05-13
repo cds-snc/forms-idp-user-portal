@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 
-import { Suspense } from "react";
 import { Viewport } from "next";
 import { Lato, Noto_Sans } from "next/font/google";
 import { cookies, headers } from "next/headers";
@@ -36,14 +35,6 @@ export const viewport: Viewport = {
 };
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <Suspense fallback={null}>
-      <InnerRootLayout>{children}</InnerRootLayout>
-    </Suspense>
-  );
-}
-
-const InnerRootLayout = async ({ children }: { children: React.ReactNode }) => {
   const [requestCookies, requestHeaders] = await Promise.all([cookies(), headers()]);
   const locale = requestCookies.get("i18next")?.value ?? languages[0];
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
@@ -79,4 +70,4 @@ const InnerRootLayout = async ({ children }: { children: React.ReactNode }) => {
       <body>{children}</body>
     </html>
   );
-};
+}
