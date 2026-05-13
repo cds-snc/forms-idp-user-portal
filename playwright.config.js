@@ -6,12 +6,12 @@ module.exports = defineConfig({
   expect: {
     timeout: 20000,
   },
-  extraHTTPHeaders: {
-    "waf-geo-restriction-bypass": `${process.env.WAF_GEO_RESTRICTION_BYPASS ?? ""}`,
-  },
   workers: 1,
   use: {
     headless: true,
     trace: "on-first-retry",
+    extraHTTPHeaders: {
+      "waf-geo-restriction-bypass": `${process.env.WAF_GEO_RESTRICTION_BYPASS ?? ""}`,
+    },
   },
 });

@@ -1,6 +1,9 @@
 name: Integration test Staging
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_run:
     workflows: ["Docker deploy Staging"]
     types:
