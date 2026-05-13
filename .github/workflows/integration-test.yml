@@ -38,10 +38,6 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Debug
-        run: |
-          ls -la /ms-playwright
-
       - name: Playwright tests
         env:
           IDP_URL: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
@@ -50,8 +46,3 @@ jobs:
           TOTP_SECRET: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
         run: 
           pnpm test:playwright
-
-      - name: Debug
-        if: failure()
-        run: |
-          ls -la /ms-playwright
