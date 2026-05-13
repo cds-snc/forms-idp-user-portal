@@ -6,6 +6,7 @@ on:
       - "Docker build and push Staging"
       - "Docker deploy Staging"
       - "Docker SBOM Staging"
+      - "Integration test Staging"
     types:
       - completed
 
