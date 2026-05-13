@@ -38,9 +38,6 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Playwright tests
         env:
           IDP_URL: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
