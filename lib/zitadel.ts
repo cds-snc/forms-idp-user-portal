@@ -51,17 +51,7 @@ export async function getLoginSettings() {
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
     .getLoginSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
-}
-
-export async function getSerializableLoginSettings() {
-  const loginSettings = await getLoginSettings().then((obj) => getSerializableObject(obj));
-
-  if (!loginSettings) {
-    throw new Error("No login settings found");
-  }
-
-  return loginSettings;
+    .then((resp) => (resp.settings ? getSerializableObject(resp.settings) : undefined));
 }
 
 export async function getSecuritySettings() {
@@ -72,7 +62,7 @@ export async function getSecuritySettings() {
 
   return settingsService
     .getSecuritySettings({})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    .then((resp) => (resp.settings ? getSerializableObject(resp.settings) : undefined));
 }
 
 export async function getLockoutSettings() {
@@ -82,7 +72,7 @@ export async function getLockoutSettings() {
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
     .getLockoutSettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    .then((resp) => (resp.settings ? getSerializableObject(resp.settings) : undefined));
 }
 
 /**
@@ -95,7 +85,7 @@ export async function getPasswordExpirySettings() {
   const settingsService = await getServiceForHost("SettingsService");
   return settingsService
     .getPasswordExpirySettings({ ctx: makeReqCtx(ZITADEL_ORGANIZATION) }, {})
-    .then((resp) => (resp.settings ? resp.settings : undefined));
+    .then((resp) => (resp.settings ? getSerializableObject(resp.settings) : undefined));
 }
 
 /**
@@ -107,7 +97,7 @@ export async function listIDPLinks({ userId }: { userId: string }) {
 
   const userService = await getServiceForHost("UserService");
 
-  return userService.listIDPLinks({ userId }, {});
+  return userService.listIDPLinks({ userId }, {}).then((obj) => getSerializableObject(obj));
 }
 
 /**
@@ -180,7 +170,9 @@ export async function setSession({
 export const getSession = cache(
   async ({ sessionId, sessionToken }: { sessionId: string; sessionToken: string }) => {
     const sessionService = await getServiceForHost("SessionService");
-    return sessionService.getSession({ sessionId, sessionToken }, {});
+    return sessionService
+      .getSession({ sessionId, sessionToken }, {})
+      .then((obj) => getSerializableObject(obj));
   }
 );
 

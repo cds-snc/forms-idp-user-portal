@@ -11,7 +11,7 @@ import { getSessionCredentials } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
 import { checkSessionFactorValidity } from "@lib/session";
-import { getSerializableLoginSettings } from "@lib/zitadel";
+import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
 
@@ -45,7 +45,7 @@ export default async function Page() {
     missingSessionRedirect: "/",
   });
 
-  const loginSettings = await getSerializableLoginSettings();
+  const loginSettings = await getLoginSettings();
 
   const { valid } = checkSessionFactorValidity(sessionFactors);
 
