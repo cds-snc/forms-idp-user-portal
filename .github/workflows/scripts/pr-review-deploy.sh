@@ -42,10 +42,6 @@ else
 
   aws lambda create-function-url-config --function-name "$FUNCTION_NAME" --auth-type NONE > /dev/null 2>&1
 
-  aws lambda update-function-configuration \
-    --function-name "$FUNCTION_NAME" \
-    --environment "Variables={NEXTAUTH_URL=$URL}" > /dev/null 2>&1
-
   aws logs create-log-group --log-group-name "/aws/lambda/$FUNCTION_NAME" > /dev/null 2>&1
   aws logs put-retention-policy \
     --log-group-name "/aws/lambda/$FUNCTION_NAME" \
