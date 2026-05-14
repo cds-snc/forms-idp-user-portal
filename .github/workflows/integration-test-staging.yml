@@ -1,0 +1,25 @@
+name: Integration test Staging
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Docker deploy Staging"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  integration-test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      idp_url: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
+    secrets:
+      username: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
+      password: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
+      totp_secret: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
+      waf_geo_restriction_bypass: ${{ secrets.STAGING_WAF_GEO_RESTRICTION_BYPASS }}

@@ -1,19 +1,26 @@
-name: Integration test Staging
+name: Integration test
 
 on:
-  workflow_run:
-    workflows: ["Docker deploy Staging"]
-    types:
-      - completed
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      idp_url:
+        required: true
+        type: string
+    secrets:
+      username:
+        required: true
+      password:
+        required: true
+      totp_secret:
+        required: true
+      waf_geo_restriction_bypass:
+        required: true
 
 permissions:
   contents: read
 
 jobs:
   integration-test:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     container:
       # Playwright Docker image tag must match the pnpm-lock.yaml pinned version
@@ -45,10 +52,10 @@ jobs:
 
       - name: Run integration tests
         env:
-          IDP_URL: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
-          USERNAME: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
-          PASSWORD: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
-          TOTP_SECRET: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
-          WAF_GEO_RESTRICTION_BYPASS: ${{ secrets.STAGING_WAF_GEO_RESTRICTION_BYPASS }}
+          IDP_URL: ${{ inputs.idp_url }}
+          USERNAME: ${{ secrets.username }}
+          PASSWORD: ${{ secrets.password }}
+          TOTP_SECRET: ${{ secrets.totp_secret }}
+          WAF_GEO_RESTRICTION_BYPASS: ${{ secrets.waf_geo_restriction_bypass }}
         run: 
           pnpm test:playwright
