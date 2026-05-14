@@ -2,7 +2,6 @@
  * Framework and Third-Party
  *--------------------------------------------*/
 
-import { cache } from "react";
 import type {
   StreamRequest,
   StreamResponse,
@@ -177,6 +176,7 @@ export const getSession = async ({
   sessionId: string;
   sessionToken: string;
 }) => {
+  logMessage.debug(`Getting session ${sessionId} with token ${sessionToken}`);
   const sessionService = await getServiceForHost("SessionService");
   return sessionService
     .getSession({ sessionId, sessionToken }, {})
@@ -753,13 +753,13 @@ export async function getActiveIdentityProviders({
 /**
  * @security Requires authenticated session. Use protectedListAuthenticationMethodTypes from lib/server/zitadel-protected.ts
  */
-export const listAuthenticationMethodTypes = cache(async ({ userId }: { userId: string }) => {
+export const listAuthenticationMethodTypes = async ({ userId }: { userId: string }) => {
   const userService = await getServiceForHost("UserService");
 
   return userService.listAuthenticationMethodTypes({
     userId,
   });
-});
+};
 
 type AnyFn = (req: UnaryRequest | StreamRequest) => Promise<UnaryResponse | StreamResponse>;
 const loggingInterceptor = (next: AnyFn) => async (req: UnaryRequest | StreamRequest) => {

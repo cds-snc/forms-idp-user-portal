@@ -13,7 +13,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { Cookie } from "@lib/cookies";
 import { addSessionToCookie, updateSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import { createSessionFromChecks, getSecuritySettings, getSession, setSession } from "@lib/zitadel";
+import { createSessionFromChecks, getSession, setSession } from "@lib/zitadel";
 
 export type CreateSessionFailedError = {
   error: string;
@@ -157,13 +157,9 @@ export async function setSessionAndUpdateCookie(command: {
             newCookie.requestId = sessionCookie.requestId;
           }
 
-          const securitySettings = await getSecuritySettings();
-          const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
-
           return updateSessionCookie({
             id: sessionCookie.id,
             session: newCookie,
-            iFrameEnabled,
           }).then(() => {
             return { challenges: updatedSession.challenges, ...session };
           });
