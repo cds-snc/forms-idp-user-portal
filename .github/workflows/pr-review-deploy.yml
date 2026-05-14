@@ -133,7 +133,7 @@ jobs:
             if (!isComment) {
               github.rest.issues.createComment({
                 ...pr,
-                body: `${commentId}## :test_tube: Review environment\n${{ steps.deploy.outputs.url }}ui/v2`
+                body: `${commentId}\n## :test_tube: Review environment\n${{ steps.deploy.outputs.url }}ui/v2`
               });
             }
 
