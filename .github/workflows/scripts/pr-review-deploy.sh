@@ -19,7 +19,7 @@ else
     --function-name "$FUNCTION_NAME" \
     --package-type Image \
     --role "$ROLE_ARN" \
-    --timeout 15 \
+    --timeout 30 \
     --memory-size 2048 \
     --architectures "arm64" \
     --code "ImageUri=$IMAGE_URI" \

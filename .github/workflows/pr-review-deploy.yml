@@ -117,14 +117,6 @@ jobs:
             "${{ secrets.PR_REVIEW_ENV_SECURITY_GROUP_IDS }}")
           echo "URL=$URL" >> $GITHUB_OUTPUT
 
-      - name: Wait for environment to be ready
-        timeout-minutes: 1
-        run: |
-          until [ "$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.url }}ui/v2/healthy)" == "200" ]; do
-            echo "⌛ Waiting for environment to be ready..."
-            sleep 10
-          done
-
       - name: PR comment
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
