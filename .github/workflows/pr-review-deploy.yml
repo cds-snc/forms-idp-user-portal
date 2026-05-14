@@ -128,7 +128,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             };
-            const { data: comments } = await github.paginate(github.rest.issues.listComments(pr));
+            const comments = await github.paginate(github.rest.issues.listComments, pr);
             const isComment = comments.some(comment => comment.body.includes(commentId));
             if (!isComment) {
               github.rest.issues.createComment({
