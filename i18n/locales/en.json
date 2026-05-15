@@ -138,7 +138,7 @@
       "invalidCredentials": "Invalid email address or password. Please try again."
     },
     "session": {
-      "otherAccount": "Different Account",
+      "otherAccount": "Different account",
       "continueWithOther": "Continue with different account"
     }
   },
