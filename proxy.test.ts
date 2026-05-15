@@ -12,7 +12,6 @@ import { generateCSP } from "@lib/cspScripts";
 /*--------------------------------------------*
  * Local Relative
  *--------------------------------------------*/
-import { checkAuthenticationLevel, getSmartRedirect } from "./lib/server/route-protection";
 import { proxy } from "./proxy";
 
 vi.mock("@lib/cspScripts", async (importOriginal) => {
@@ -45,7 +44,6 @@ vi.mock("./lib/server/route-protection", () => ({
     STRONG_MFA_REQUIRED: "strong_mfa_required",
   },
   checkAuthenticationLevel: vi.fn(),
-  getSmartRedirect: vi.fn(),
 }));
 
 vi.mock("./lib/service", () => ({
@@ -91,7 +89,7 @@ describe("proxy middleware", () => {
   });
 
   describe("Content-Security-Policy headers", () => {
-    it("sets CSP header on open route responses", async () => {
+    it("sets CSP header on route responses", async () => {
       const request = makeRequest("/");
       const response = await proxy(request);
 
@@ -120,82 +118,6 @@ describe("proxy middleware", () => {
       expect(generateCSP).toHaveBeenCalledOnce();
       expect(response.headers.get("x-middleware-request-x-nonce")).toBe("test-nonce");
       expect(response.headers.get("x-middleware-override-headers")).toContain("x-nonce");
-    });
-
-    it("sets CSP on proxy path when multitenancy env vars are present", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ settings: null }),
-      });
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({ satisfied: true });
-      const request = makeRequest("/oidc/v1/authorize");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-
-    it("sets CSP on satisfied auth route responses", async () => {
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({ satisfied: true });
-
-      const request = makeRequest("/password");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-
-    it("sets CSP on auth flow route when password is verified", async () => {
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({
-        satisfied: false,
-        session: { factors: { password: { verifiedAt: {} } } } as never,
-      });
-
-      const request = makeRequest("/mfa");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
-    });
-  });
-
-  describe("auth checks", () => {
-    it("redirects to login when auth check fails on protected route", async () => {
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({
-        satisfied: false,
-        session: null,
-        redirect: "/",
-        reason: "No session found",
-      });
-      vi.mocked(getSmartRedirect).mockReturnValue("/");
-
-      const request = makeRequest("/account");
-      const response = await proxy(request);
-
-      expect(response.status).toBe(307);
-    });
-
-    it("forwards x-zitadel-i18n-organization header on all requests", async () => {
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({ satisfied: true });
-
-      const request = makeRequest("/password");
-      const response = await proxy(request);
-
-      expect(response.headers.get("x-middleware-override-headers")).toContain(
-        "x-zitadel-i18n-organization"
-      );
-      expect(response.headers.get("x-middleware-request-x-zitadel-i18n-organization")).toBe(
-        "test-org"
-      );
-    });
-
-    it("allows password route when session has user factor", async () => {
-      vi.mocked(checkAuthenticationLevel).mockResolvedValue({
-        satisfied: false,
-        session: { factors: { user: { id: "u1" } } } as never,
-      });
-
-      const request = makeRequest("/password");
-      const response = await proxy(request);
-
-      expect(response.headers.get("Content-Security-Policy")).toBe("default-src 'self';");
     });
   });
 });

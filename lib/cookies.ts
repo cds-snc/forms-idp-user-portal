@@ -166,21 +166,27 @@ export async function removeSessionFromCookie<T>({
   }
 }
 
-export async function getActiveSessionCookie<T>(): Promise<SessionCookie<T> | undefined> {
+export async function getActiveSessionCookie() {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
+    const sessions: Cookie[] = JSON.parse(stringifiedCookie?.value);
 
     const activeSession = sessions.filter((session) => session.selectedSession);
     if (activeSession.length) {
-      return activeSession[0];
+      const sessionCookie = activeSession[0];
+      return {
+        sessionId: sessionCookie.id,
+        loginName: sessionCookie.loginName,
+        userId: sessionCookie.userId,
+        organization: sessionCookie.organization,
+        requestId: sessionCookie.requestId, // Include requestId for OIDC flows
+      };
     }
-    return undefined;
-  } else {
-    return Promise.reject("no session cookie found");
   }
+
+  throw new Error("No active Session cookie found");
 }
 
 export async function getSessionCookieById<T>({
@@ -329,16 +335,15 @@ export async function getMostRecentCookie<T>(): Promise<SessionCookie<T>> {
 // TODO - Refactor to see if we still need this transformative function
 export async function getSessionCredentials() {
   try {
-    const sessionCookie = await getActiveSessionCookie();
-    if (!sessionCookie) {
-      throw new Error("No active session found");
-    }
+    const { sessionId, loginName, userId, organization, requestId } =
+      await getActiveSessionCookie();
+
     return {
-      sessionId: sessionCookie.id,
-      loginName: sessionCookie.loginName,
-      userId: sessionCookie.userId,
-      organization: sessionCookie.organization,
-      requestId: sessionCookie.requestId, // Include requestId for OIDC flows
+      sessionId,
+      loginName,
+      userId,
+      organization,
+      requestId, // Include requestId for OIDC flows
     };
   } catch (error) {
     throw new Error("No session found in cookies");

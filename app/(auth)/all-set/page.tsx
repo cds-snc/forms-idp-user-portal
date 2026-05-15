@@ -6,8 +6,8 @@ import { Metadata } from "next";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCredentials } from "@lib/cookies";
 import { getImageUrl } from "@lib/imageUrl";
+import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { I18n } from "@i18n";
 import { serverTranslation } from "@i18n/server";
@@ -25,7 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { requestId, checkAfter, method } = searchParams;
-  const { loginName } = await getSessionCredentials();
+  const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
+
+  const loginName = session?.factors?.user?.loginName;
 
   let continueUrl = buildUrlWithRequestId("/account", requestId);
 

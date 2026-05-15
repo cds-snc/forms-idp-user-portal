@@ -8,10 +8,8 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCredentials } from "@lib/cookies";
-import { logMessage } from "@lib/logger";
+import { getActiveSessionCookie } from "@lib/cookies";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
-import { loadActiveSession, loadSessionById } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
@@ -30,30 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { loginName, sessionId, requestId } = await getSessionCredentials();
+  const { requestId } = await getActiveSessionCookie();
 
-  // Page-level authentication check - defense in depth
-  const authCheck = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED);
+  const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
 
-  if (!authCheck.satisfied) {
-    redirect(authCheck.redirect || "/password");
-  }
-
-  const sessionFactors = sessionId ? await loadSessionById(sessionId) : await loadActiveSession();
-
-  if (!sessionFactors) {
-    logMessage.debug({
-      message: "MFA page missing session factors",
-      hasSessionId: !!sessionId,
-      hasLoginName: !!loginName,
-    });
-    redirect(authCheck.redirect || "/password");
-  }
+  const sessionFactors = session?.factors;
 
   // Check if user has at least one strong MFA method (TOTP or U2F)
-  const hasStrongMFA = STRONG_MFA_METHODS.some((method) =>
-    sessionFactors.authMethods?.includes(method)
-  );
+  const hasStrongMFA = STRONG_MFA_METHODS.some((method) => session?.authMethods?.includes(method));
 
   // Redirect to MFA setup if no strong MFA method is configured
   if (!hasStrongMFA) {
@@ -65,15 +47,15 @@ export default async function Page() {
       <AuthPanel titleI18nKey="title" descriptionI18nKey="verify.description" namespace="mfa">
         <div className="flex flex-col space-y-4">
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={sessionFactors?.user?.loginName}
+            displayName={sessionFactors?.user?.displayName}
             showDropdown={false}
           ></UserAvatar>
         </div>
         <ChooseSecondFactor
-          userMethods={sessionFactors.authMethods ?? []}
-          loginName={loginName}
-          sessionId={sessionId}
+          userMethods={session?.authMethods ?? []}
+          loginName={sessionFactors?.user?.loginName}
+          sessionId={session?.id}
           requestId={requestId}
         />
       </AuthPanel>

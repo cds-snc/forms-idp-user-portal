@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getSessionCredentials } from "@lib/cookies";
+import { getActiveSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
 import { loadMfaSetupSession } from "@lib/server/mfa-setup";
 import { checkSessionFactorValidity } from "@lib/session";
@@ -32,7 +32,7 @@ export default async function Page() {
   let requestId: string | undefined;
 
   try {
-    ({ sessionId, loginName, requestId } = await getSessionCredentials());
+    ({ sessionId, loginName, requestId } = await getActiveSessionCookie());
   } catch {
     redirect("/password");
   }
