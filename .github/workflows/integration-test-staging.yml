@@ -15,7 +15,7 @@ permissions:
 jobs:
   integration-test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    uses: ./.github/workflows/integration-test.yml
+    uses: cds-snc/platform-unified-accounts-user-portal/.github/workflows/integration-test.yml@278da63df4d9e5a2cae7495dfef753d3851ca0df
     with:
       idp_url: ${{ vars.STAGING_INTEGRATION_TEST_URL }}
     secrets:

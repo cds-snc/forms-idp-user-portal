@@ -139,7 +139,7 @@ jobs:
 
   pr-integration-test:
     needs: pr-review-deploy
-    uses: ./.github/workflows/integration-test.yml
+    uses: cds-snc/platform-unified-accounts-user-portal/.github/workflows/integration-test.yml@278da63df4d9e5a2cae7495dfef753d3851ca0df
     with:
       idp_url: ${{ needs.pr-review-deploy.outputs.url }}ui/v2
     secrets:
