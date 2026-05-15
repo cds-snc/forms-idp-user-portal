@@ -20,7 +20,7 @@
   "header": {
     "lang-toggle": "Language selection",
     "logout": "Sign out",
-    "switchAccount": "Switch Accounts"
+    "switchAccount": "Switch accounts"
   },
   "fip": {
     "link": "http://canada.ca/en.html",
@@ -138,7 +138,7 @@
       "invalidCredentials": "Invalid email address or password. Please try again."
     },
     "session": {
-      "otherAccount": "Different Account",
+      "otherAccount": "Different account",
       "continueWithOther": "Continue with different account"
     }
   },
