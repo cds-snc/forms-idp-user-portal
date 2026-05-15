@@ -160,15 +160,6 @@ export async function setSession({
 /**
  * @security Requires authenticated session tokens. Internal use only.
  */
-// export const getSession = cache(
-//   async ({ sessionId, sessionToken }: { sessionId: string; sessionToken: string }) => {
-//     const sessionService = await getServiceForHost("SessionService");
-//     return sessionService
-//       .getSession({ sessionId, sessionToken }, {})
-//       .then((obj) => getSerializableObject(obj));
-//   }
-// );
-
 export const getSession = async ({
   sessionId,
   sessionToken,
