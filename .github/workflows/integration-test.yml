@@ -15,6 +15,8 @@ on:
         required: true
       waf_geo_restriction_bypass:
         required: true
+      zitadel_bearer_token:
+        required: true
 
 permissions:
   contents: read
@@ -57,5 +59,6 @@ jobs:
           PASSWORD: ${{ secrets.password }}
           TOTP_SECRET: ${{ secrets.totp_secret }}
           WAF_GEO_RESTRICTION_BYPASS: ${{ secrets.waf_geo_restriction_bypass }}
+          ZITADEL_BEARER_TOKEN: ${{ secrets.zitadel_bearer_token }}
         run: 
           pnpm test:playwright
