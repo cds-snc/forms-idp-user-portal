@@ -12,7 +12,7 @@ test.describe("register user flow", () => {
 
   test.beforeAll(() => {
     idpUrl = getRequiredEnv("IDP_URL");
-    email = getRandomEmail(getRequiredEnv("EMAIL"));
+    email = getRandomEmail(getRequiredEnv("USERNAME"));
     password = getRandomPassword();
     zitadelBearerToken = getRequiredEnv("ZITADEL_BEARER_TOKEN");
   });

@@ -1,3 +1,9 @@
+import type {
+  StreamRequest,
+  StreamResponse,
+  UnaryRequest,
+  UnaryResponse,
+} from "@connectrpc/connect";
 import { type Client, create, createClientFor } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb.js";
@@ -11,13 +17,25 @@ import {
 
 let userService: Client<typeof UserService>;
 
+type AnyFn = (req: UnaryRequest | StreamRequest) => Promise<UnaryResponse | StreamResponse>;
+
+const addRequestHeaders = () => (next: AnyFn) => async (req: UnaryRequest | StreamRequest) => {
+  req.header.set("waf-geo-restriction-bypass", process.env.WAF_GEO_RESTRICTION_BYPASS ?? "");
+  return next(req);
+};
+
 function getUserService(bearerToken: string, apiBaseUrl: string): Client<typeof UserService> {
-  if (!userService) {
-    const transport = createServerTransport(bearerToken, {
-      baseUrl: apiBaseUrl,
-    });
-    userService = createClientFor(UserService)(transport);
+  if (userService) {
+    return userService;
   }
+
+  const transport = createServerTransport(bearerToken, {
+    baseUrl: apiBaseUrl,
+    interceptors: [addRequestHeaders()],
+  });
+
+  userService = createClientFor(UserService)(transport);
+
   return userService;
 }
 
