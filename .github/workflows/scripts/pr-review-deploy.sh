@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Usage: pr-review-deploy.sh <function-name> <image-uri> <role-arn> <subnet-ids> <security-group-ids> 
-# Outputs the function URL to stdout when a new function is created.
+# Outputs the function URL to stdout
 
 FUNCTION_NAME="$1"
 IMAGE_URI="$2"
@@ -19,7 +19,7 @@ else
     --function-name "$FUNCTION_NAME" \
     --package-type Image \
     --role "$ROLE_ARN" \
-    --timeout 15 \
+    --timeout 30 \
     --memory-size 2048 \
     --architectures "arm64" \
     --code "ImageUri=$IMAGE_URI" \
@@ -40,20 +40,18 @@ else
     --action lambda:InvokeFunction \
     --principal "*" > /dev/null 2>&1
 
-  URL="$(aws lambda create-function-url-config --function-name "$FUNCTION_NAME" --auth-type NONE | jq -r .FunctionUrl)"
-  echo "$URL"
-
-  aws lambda update-function-configuration \
-    --function-name "$FUNCTION_NAME" \
-    --environment "Variables={NEXTAUTH_URL=$URL}" > /dev/null 2>&1
+  aws lambda create-function-url-config --function-name "$FUNCTION_NAME" --auth-type NONE > /dev/null 2>&1
 
   aws logs create-log-group --log-group-name "/aws/lambda/$FUNCTION_NAME" > /dev/null 2>&1
   aws logs put-retention-policy \
     --log-group-name "/aws/lambda/$FUNCTION_NAME" \
     --retention-in-days 14 > /dev/null 2>&1
+
+  aws lambda put-function-concurrency \
+  --function-name "$FUNCTION_NAME" \
+  --reserved-concurrent-executions 10 > /dev/null 2>&1
 fi
 
 aws lambda wait function-updated --function-name "$FUNCTION_NAME" > /dev/null 2>&1
-aws lambda put-function-concurrency \
-  --function-name "$FUNCTION_NAME" \
-  --reserved-concurrent-executions 10 > /dev/null 2>&1
+URL="$(aws lambda get-function-url-config --function-name "$FUNCTION_NAME" | jq -r .FunctionUrl)"
+echo "$URL"
