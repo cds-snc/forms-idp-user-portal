@@ -62,6 +62,15 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  ...(process.env.DEBUG && {
+    logging: {
+      fetches: {
+        fullUrl: true,
+      },
+      serverFunctions: true,
+      browserToTerminal: true,
+    },
+  }),
 };
 
 export default nextConfig;

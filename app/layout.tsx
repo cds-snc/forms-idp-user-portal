@@ -11,6 +11,7 @@ import { dir } from "i18next";
  * Internal Aliases
  *--------------------------------------------*/
 import { languages } from "@i18n/settings";
+import RouterDebugger from "@components/debugging/RouterDebugger";
 
 /*--------------------------------------------*
  * Styles
@@ -67,7 +68,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </style>
         )}
       </head>
-      <body>{children}</body>
+      <body>
+        {process.env.DEBUG && <RouterDebugger />}
+        {children}
+      </body>
     </html>
   );
 }
