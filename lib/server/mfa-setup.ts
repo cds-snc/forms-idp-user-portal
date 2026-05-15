@@ -50,7 +50,7 @@ export async function loadMfaSetupSession({
     logMessage.debug({
       message: `${pageName} requires strong MFA re-verification`,
     });
-    redirect("/mfa/set/verify");
+    redirect("/mfa");
   }
 
   return sessionData;

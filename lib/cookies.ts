@@ -102,7 +102,6 @@ export async function updateSessionCookie<T>({
   id: string;
   session: SessionCookie<T>;
   cleanup?: boolean;
-  iFrameEnabled?: boolean;
 }): Promise<void> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
