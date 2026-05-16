@@ -6,6 +6,7 @@ module.exports = defineConfig({
   expect: {
     timeout: 20000,
   },
+  reporter: "list",
   workers: 1,
   use: {
     headless: true,
