@@ -6,6 +6,9 @@ on:
       idp_url:
         required: true
         type: string
+      portal_url:
+        required: true
+        type: string
     secrets:
       username:
         required: true
@@ -55,6 +58,7 @@ jobs:
       - name: Run integration tests
         env:
           IDP_URL: ${{ inputs.idp_url }}
+          PORTAL_URL: ${{ inputs.portal_url }}
           USERNAME: ${{ secrets.username }}
           PASSWORD: ${{ secrets.password }}
           TOTP_SECRET: ${{ secrets.totp_secret }}

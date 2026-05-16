@@ -7,6 +7,7 @@ test.describe("register user flow", () => {
   let idpUrl = "";
   let email = "";
   let password = "";
+  let portalUrl = "";
   let userId = "";
   let zitadelBearerToken = "";
 
@@ -14,6 +15,7 @@ test.describe("register user flow", () => {
     idpUrl = getRequiredEnv("IDP_URL");
     email = getRandomEmail(getRequiredEnv("USERNAME"));
     password = getRandomPassword();
+    portalUrl = getRequiredEnv("PORTAL_URL");
     zitadelBearerToken = getRequiredEnv("ZITADEL_BEARER_TOKEN");
   });
 
@@ -24,7 +26,7 @@ test.describe("register user flow", () => {
   });
 
   test("creates a new users with TOTP MFA", async ({ page }) => {
-    await page.goto(idpUrl);
+    await page.goto(portalUrl);
 
     // Login
     await expect(page.locator("a[href$='/register']")).toBeVisible();

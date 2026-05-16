@@ -141,7 +141,8 @@ jobs:
     needs: pr-review-deploy
     uses: ./.github/workflows/integration-test.yml
     with:
-      idp_url: ${{ needs.pr-review-deploy.outputs.url }}ui/v2
+      idp_url: ${{ vars.STAGING_INTEGRATION_TEST_IDP_URL }}
+      portal_url: ${{ needs.pr-review-deploy.outputs.url }}ui/v2
     secrets:
       username: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
       password: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}

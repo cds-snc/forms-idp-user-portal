@@ -3,20 +3,20 @@ import { expect, test } from "@playwright/test";
 import { generateTOTP, getRequiredEnv } from "./utils/utils";
 
 test.describe("login user flow", () => {
-  let idpUrl = "";
+  let portalUrl = "";
   let username = "";
   let password = "";
   let totpSecret = "";
 
   test.beforeAll(() => {
-    idpUrl = getRequiredEnv("IDP_URL");
+    portalUrl = getRequiredEnv("PORTAL_URL");
     username = getRequiredEnv("USERNAME");
     password = getRequiredEnv("PASSWORD");
     totpSecret = getRequiredEnv("TOTP_SECRET");
   });
 
   test("logs in with TOTP and lands on the account page", async ({ page }) => {
-    await page.goto(idpUrl);
+    await page.goto(portalUrl);
 
     // Login
     await expect(page.locator("#login #username")).toBeVisible();
