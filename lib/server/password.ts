@@ -31,7 +31,7 @@ import { serverTranslation } from "@i18n/server";
 import { logMessage } from "../../lib/logger";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { loadMostRecentSession } from "../session";
+import { loadActiveSession } from "../session";
 import {
   checkEmailVerification,
   checkMFAFactors,
@@ -140,7 +140,7 @@ export async function sendPassword(
 
     try {
       session = await setSessionAndUpdateCookie({
-        recentCookie: sessionCookie,
+        activeCookie: sessionCookie,
         checks: command.checks,
         requestId: command.requestId,
         lifetime,
@@ -408,11 +408,7 @@ export async function changePassword(command: { code?: string; userId: string; p
   // A reset code is only accepted when it is paired with the same browser session
   // that just completed a strong recovery factor for this user.
   if (normalizedCode) {
-    const session = await loadMostRecentSession({
-      sessionParams: {
-        loginName: user.preferredLoginName,
-      },
-    }).catch(() => undefined);
+    const session = await loadActiveSession().catch(() => undefined);
 
     if (
       !session?.factors?.user?.id ||

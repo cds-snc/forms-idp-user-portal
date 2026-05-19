@@ -8,11 +8,13 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 
+import { setSelectedSession } from "@lib/cookies";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
 import { createSessionAndUpdateCookie, CreateSessionFailedError } from "@lib/server/cookie";
+import { isSessionValid, loadActiveSession } from "@lib/session";
 import { buildUrlWithRequestId } from "@lib/utils";
 import { validateUsernameAndPassword } from "@lib/validationSchemas";
 import { checkEmailVerification, checkMFAFactors } from "@lib/verify-helper";
@@ -157,4 +159,13 @@ export const submitLoginForm = async (
   // If no MFA redirect, authentication is complete
   logMessage.info("Login successful, redirecting to account page");
   return { redirect: buildUrlWithRequestId("/account", command.requestId) };
+};
+
+export const setSession = async (sessionId: string) => {
+  return setSelectedSession(sessionId);
+};
+
+export const checkActiveSession = async () => {
+  const session = await loadActiveSession();
+  return isSessionValid({ session });
 };

@@ -31,17 +31,13 @@ import { createSessionAndUpdateCookie } from "../../lib/server/cookie";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
-import { loadMostRecentSession } from "../session";
+import { loadActiveSession } from "../session";
 import { buildUrlWithRequestId } from "../utils";
 import { checkMFAFactors } from "../verify-helper";
 
-export async function verifyTOTP(code: string, loginName?: string) {
+export async function verifyTOTP(code: string) {
   try {
-    const session = await loadMostRecentSession({
-      sessionParams: {
-        loginName,
-      },
-    });
+    const session = await loadActiveSession();
 
     if (!session?.factors?.user?.id) {
       return { error: new Error("No user id found in session.") };
