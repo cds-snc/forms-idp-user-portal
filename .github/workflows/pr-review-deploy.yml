@@ -139,11 +139,13 @@ jobs:
 
   pr-integration-test:
     needs: pr-review-deploy
-    uses: cds-snc/platform-unified-accounts-user-portal/.github/workflows/integration-test.yml@278da63df4d9e5a2cae7495dfef753d3851ca0df
+    uses: ./.github/workflows/integration-test.yml
     with:
-      idp_url: ${{ needs.pr-review-deploy.outputs.url }}ui/v2
+      idp_url: ${{ vars.STAGING_INTEGRATION_TEST_IDP_URL }}
+      portal_url: ${{ needs.pr-review-deploy.outputs.url }}ui/v2
     secrets:
       username: ${{ secrets.STAGING_INTEGRATION_TEST_USERNAME }}
       password: ${{ secrets.STAGING_INTEGRATION_TEST_PASSWORD }}
       totp_secret: ${{ secrets.STAGING_INTEGRATION_TEST_TOTP_SECRET }}
       waf_geo_restriction_bypass: ${{ secrets.STAGING_WAF_GEO_RESTRICTION_BYPASS }}
+      zitadel_bearer_token: ${{ secrets.STAGING_INTEGRATION_TEST_ZITADEL_BEARER_TOKEN }}
