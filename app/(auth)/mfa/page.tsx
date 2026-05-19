@@ -30,16 +30,23 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { requestId } = searchParams;
-  const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
+  const session = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId).then(
+    (result) => {
+      if (result.session === null) {
+        throw new Error("This should never throw but used as a type check");
+      }
+      return result.session;
+    }
+  );
 
-  const sessionFactors = session?.factors;
+  const sessionFactors = session.factors;
 
   // Check if user has at least one strong MFA method (TOTP or U2F)
-  const hasStrongMFA = STRONG_MFA_METHODS.some((method) => session?.authMethods?.includes(method));
+  const hasStrongMFA = STRONG_MFA_METHODS.some((method) => session.authMethods?.includes(method));
 
   // Redirect to MFA setup if no strong MFA method is configured
   if (!hasStrongMFA) {
-    redirect(buildUrlWithRequestId("/mfa/set", session?.requestId));
+    redirect(buildUrlWithRequestId("/mfa/set", session.requestId));
   }
 
   return (
@@ -53,10 +60,10 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
           ></UserAvatar>
         </div>
         <ChooseSecondFactor
-          userMethods={session?.authMethods ?? []}
+          userMethods={session.authMethods ?? []}
           loginName={sessionFactors?.user?.loginName}
-          sessionId={session?.id}
-          requestId={session?.requestId}
+          sessionId={session.id}
+          requestId={session.requestId}
         />
       </AuthPanel>
     </>

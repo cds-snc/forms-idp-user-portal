@@ -14,7 +14,7 @@ import {
   requiresStrongMfaSetupVerification,
 } from "@lib/server/route-protection";
 import { checkSessionFactorValidity } from "@lib/session";
-import { SearchParams } from "@lib/utils";
+import { buildUrlWithRequestId, SearchParams } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -32,26 +32,33 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<SearchParams> }) {
   const searchParams = await props.searchParams;
   const { requestId } = searchParams;
-  const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
+  const session = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId).then(
+    (result) => {
+      if (result.session === null) {
+        throw new Error("This should never throw but used as a type check");
+      }
+      return result.session;
+    }
+  );
 
   if (requiresStrongMfaSetupVerification(session)) {
     logMessage.debug({
       message: "MFA setup page requires strong MFA re-verification",
     });
-    redirect("/mfa");
+    redirect(buildUrlWithRequestId("/mfa", requestId));
   }
 
   const loginSettings = await getLoginSettings();
 
-  const { valid } = session ? checkSessionFactorValidity(session) : { valid: false };
+  const { valid } = checkSessionFactorValidity(session);
 
-  if (!valid || !session?.factors?.user?.id) {
+  if (!valid || !session.factors?.user?.id) {
     logMessage.debug({
       message: "MFA set page invalid session factors",
       valid,
-      hasUserId: !!session?.factors?.user?.id,
+      hasUserId: !!session.factors?.user?.id,
     });
-    redirect("/mfa");
+    redirect(buildUrlWithRequestId("/mfa", requestId));
   }
 
   return (
