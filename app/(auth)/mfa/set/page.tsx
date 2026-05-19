@@ -7,10 +7,14 @@ import { redirect } from "next/navigation";
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getActiveSessionCookie } from "@lib/cookies";
 import { logMessage } from "@lib/logger";
-import { loadMfaSetupSession } from "@lib/server/mfa-setup";
+import {
+  AuthLevel,
+  checkAuthenticationLevel,
+  requiresStrongMfaSetupVerification,
+} from "@lib/server/route-protection";
 import { checkSessionFactorValidity } from "@lib/session";
+import { SearchParams } from "@lib/utils";
 import { getLoginSettings } from "@lib/zitadel";
 import { serverTranslation } from "@i18n/server";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -25,35 +29,27 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("set.title") };
 }
 
-export default async function Page() {
-  let sessionId: string | undefined;
-  let loginName: string | undefined;
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const { requestId } = searchParams;
+  const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
 
-  let requestId: string | undefined;
-
-  try {
-    ({ sessionId, loginName, requestId } = await getActiveSessionCookie());
-  } catch {
-    redirect("/password");
+  if (requiresStrongMfaSetupVerification(session)) {
+    logMessage.debug({
+      message: "MFA setup page requires strong MFA re-verification",
+    });
+    redirect("/mfa");
   }
-
-  const sessionFactors = await loadMfaSetupSession({
-    sessionId,
-    loginName,
-
-    pageName: "MFA set page",
-    missingSessionRedirect: "/",
-  });
 
   const loginSettings = await getLoginSettings();
 
-  const { valid } = checkSessionFactorValidity(sessionFactors);
+  const { valid } = session ? checkSessionFactorValidity(session) : { valid: false };
 
-  if (!valid || !sessionFactors.factors?.user?.id) {
+  if (!valid || !session?.factors?.user?.id) {
     logMessage.debug({
       message: "MFA set page invalid session factors",
       valid,
-      hasUserId: !!sessionFactors.factors?.user?.id,
+      hasUserId: !!session?.factors?.user?.id,
     });
     redirect("/mfa");
   }
@@ -63,7 +59,7 @@ export default async function Page() {
       <AuthPanel titleI18nKey="set.title" descriptionI18nKey="set.description" namespace="mfa">
         <div className="w-full">
           <div className="flex flex-col space-y-4">
-            {valid && loginSettings && sessionFactors && sessionFactors.factors?.user?.id && (
+            {valid && loginSettings && session.factors?.user?.id && (
               <ChooseSecondFactorToSetup checkAfter={true} requestId={requestId} />
             )}
           </div>

@@ -32,7 +32,7 @@ type AuthCheckResult = {
 /**
  * Safe wrapper around loadMostRecentSession that returns null instead of throwing
  */
-async function getActiveSessionFromCookies(): Promise<SessionWithAuthData | null> {
+async function getActiveSessionFromCookies() {
   try {
     const session = await loadActiveSession();
     return session || null;
@@ -148,6 +148,7 @@ export async function checkAuthenticationLevel(
 
   // Get session from cookies (non-throwing)
   const session = await getActiveSessionFromCookies();
+  const requestIdRef = requestId || session?.requestId;
 
   // Basic session check - just verify cookie exists
   if (requiredLevel === AuthLevel.BASIC_SESSION) {
@@ -155,7 +156,7 @@ export async function checkAuthenticationLevel(
       logMessage.debug(
         `[Authentication Level] Required: ${requiredLevel}, Reason: No session found, Redirecting: "/"`
       );
-      return redirect(`/${requestId ? `?requestId:${requestId}` : ""}`);
+      return redirect(`/${requestIdRef ? `?requestId:${requestIdRef}` : ""}`);
     }
     return { session };
   }

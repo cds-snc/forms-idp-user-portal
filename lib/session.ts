@@ -43,7 +43,7 @@ export async function loadActiveSession(): Promise<SessionWithAuthData> {
   }
 
   const session = await getSession({
-    sessionId: active.id,
+    sessionId: active.sessionId,
     sessionToken: active.token,
   }).then((resp: GetSessionResponse) => resp.session);
 
@@ -52,13 +52,17 @@ export async function loadActiveSession(): Promise<SessionWithAuthData> {
     redirect("/", RedirectType.push);
   }
 
-  return getAuthMethodsAndUser(session);
+  const requestId = active.requestId;
+
+  const enhancedSession = await getAuthMethodsAndUser(session);
+  return { ...enhancedSession, requestId };
 }
 
 export type SessionWithAuthData = Session & {
   authMethods: AuthenticationMethodType[];
   phoneVerified: boolean;
   emailVerified: boolean;
+  requestId?: string;
 };
 
 async function getAuthMethodsAndUser(session?: Session): Promise<SessionWithAuthData> {

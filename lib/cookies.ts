@@ -178,6 +178,7 @@ export async function getActiveSessionCookie() {
       const sessionCookie = activeSession[0];
       return {
         sessionId: sessionCookie.id,
+        token: sessionCookie.token,
         loginName: sessionCookie.loginName,
         userId: sessionCookie.userId,
         organization: sessionCookie.organization,

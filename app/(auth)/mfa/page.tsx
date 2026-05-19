@@ -8,9 +8,9 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 /*--------------------------------------------*
  * Internal Aliases
  *--------------------------------------------*/
-import { getActiveSessionCookie } from "@lib/cookies";
 import { AuthLevel, checkAuthenticationLevel } from "@lib/server/route-protection";
 import { buildUrlWithRequestId } from "@lib/utils";
+import { SearchParams } from "@lib/utils";
 import { serverTranslation } from "@i18n/server";
 import { UserAvatar } from "@components/account/user-avatar/UserAvatar";
 import { AuthPanel } from "@components/auth/AuthPanel";
@@ -27,9 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("verify.title") };
 }
 
-export default async function Page() {
-  const { requestId } = await getActiveSessionCookie();
-
+export default async function Page(props: { searchParams: Promise<SearchParams> }) {
+  const searchParams = await props.searchParams;
+  const { requestId } = searchParams;
   const { session } = await checkAuthenticationLevel(AuthLevel.PASSWORD_REQUIRED, requestId);
 
   const sessionFactors = session?.factors;
@@ -39,7 +39,7 @@ export default async function Page() {
 
   // Redirect to MFA setup if no strong MFA method is configured
   if (!hasStrongMFA) {
-    redirect(buildUrlWithRequestId("/mfa/set", requestId));
+    redirect(buildUrlWithRequestId("/mfa/set", session?.requestId));
   }
 
   return (
@@ -56,7 +56,7 @@ export default async function Page() {
           userMethods={session?.authMethods ?? []}
           loginName={sessionFactors?.user?.loginName}
           sessionId={session?.id}
-          requestId={requestId}
+          requestId={session?.requestId}
         />
       </AuthPanel>
     </>
