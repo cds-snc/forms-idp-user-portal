@@ -43,7 +43,7 @@ export async function loadActiveSession(): Promise<SessionWithAuthData> {
   }
 
   const session = await getSession({
-    sessionId: active.sessionId,
+    sessionId: active.id,
     sessionToken: active.token,
   }).then((resp: GetSessionResponse) => resp.session);
 

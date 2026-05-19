@@ -176,14 +176,7 @@ export async function getActiveSessionCookie() {
     const activeSession = sessions.filter((session) => session.selectedSession);
     if (activeSession.length) {
       const sessionCookie = activeSession[0];
-      return {
-        sessionId: sessionCookie.id,
-        token: sessionCookie.token,
-        loginName: sessionCookie.loginName,
-        userId: sessionCookie.userId,
-        organization: sessionCookie.organization,
-        requestId: sessionCookie.requestId, // Include requestId for OIDC flows
-      };
+      return sessionCookie;
     }
   }
 
@@ -336,11 +329,10 @@ export async function getMostRecentCookie<T>(): Promise<SessionCookie<T>> {
 // TODO - Refactor to see if we still need this transformative function
 export async function getSessionCredentials() {
   try {
-    const { sessionId, loginName, userId, organization, requestId } =
-      await getActiveSessionCookie();
+    const { id, loginName, userId, organization, requestId } = await getActiveSessionCookie();
 
     return {
-      sessionId,
+      sessionId: id,
       loginName,
       userId,
       organization,

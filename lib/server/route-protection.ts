@@ -11,6 +11,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
  *--------------------------------------------*/
 import { logMessage } from "@lib/logger";
 import { loadActiveSession, SessionWithAuthData } from "@lib/session";
+import { buildUrlWithRequestId } from "@lib/utils";
 /**
  * Authentication levels for route protection
  */
@@ -148,6 +149,7 @@ export async function checkAuthenticationLevel(
 
   // Get session from cookies (non-throwing)
   const session = await getActiveSessionFromCookies();
+  // Get requestId from session cookie as backup in case it was not passed in
   const requestIdRef = requestId || session?.requestId;
 
   // Basic session check - just verify cookie exists
@@ -156,7 +158,7 @@ export async function checkAuthenticationLevel(
       logMessage.debug(
         `[Authentication Level] Required: ${requiredLevel}, Reason: No session found, Redirecting: "/"`
       );
-      return redirect(`/${requestIdRef ? `?requestId:${requestIdRef}` : ""}`);
+      return redirect(buildUrlWithRequestId("/", requestIdRef));
     }
     return { session };
   }
