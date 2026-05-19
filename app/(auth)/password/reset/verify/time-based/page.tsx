@@ -29,7 +29,9 @@ export default async function Page(props: { searchParams: Promise<SearchParams> 
   const session = await checkAuthenticationLevel(AuthLevel.BASIC_SESSION, requestId).then(
     (result) => {
       if (result.session === null) {
-        throw new Error("This should never throw but used as a type check");
+        throw new Error(
+          "This should never throw but used as a type check in checkAuthenticationLevel"
+        );
       }
       return result.session;
     }
